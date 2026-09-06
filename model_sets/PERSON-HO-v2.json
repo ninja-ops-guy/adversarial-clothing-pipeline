@@ -1,0 +1,10 @@
+{
+  "model_set_id": "PERSON-HO-v2",
+  "role": "heldout",
+  "models": [
+    "retinanet_resnet50_fpn_v2",
+    "fcos_resnet50_fpn"
+  ],
+  "status": "LOCK_PENDING",
+  "source_manifest": "benchmarks/model_manifest.json"
+}
