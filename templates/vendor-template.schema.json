@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/vendor-template.schema.json",
+  "title": "RAC Vendor Print Template",
+  "type": "object",
+  "required": ["schema_version", "provider", "product_id", "template_version", "units", "dpi", "canvas", "panels"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "provider": { "type": "string", "minLength": 1 },
+    "product_id": { "type": "string", "minLength": 1 },
+    "product_name": { "type": "string" },
+    "template_version": { "type": "string", "minLength": 1 },
+    "source": { "type": "string" },
+    "vendor_ready": { "type": "boolean" },
+    "units": { "enum": ["px"] },
+    "dpi": { "type": "number", "exclusiveMinimum": 0 },
+    "canvas": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "panels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "x", "y", "width", "height"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+          "label": { "type": "string", "minLength": 1 },
+          "x": { "type": "integer", "minimum": 0 },
+          "y": { "type": "integer", "minimum": 0 },
+          "width": { "type": "integer", "minimum": 1 },
+          "height": { "type": "integer", "minimum": 1 },
+          "bleed": { "type": "integer", "minimum": 0 },
+          "safe_margin": { "type": "integer", "minimum": 0 },
+          "rotation": { "type": "number" },
+          "continuity_group": { "type": "string" },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "seams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["a", "edge_a", "b", "edge_b"],
+        "properties": {
+          "a": { "type": "string" },
+          "edge_a": { "enum": ["top", "right", "bottom", "left"] },
+          "b": { "type": "string" },
+          "edge_b": { "enum": ["top", "right", "bottom", "left"] },
+          "reverse": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
