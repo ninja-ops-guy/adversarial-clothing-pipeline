@@ -14,6 +14,11 @@ on:
       - 'product-studio.css'
       - 'product-studio.js'
       - 'studio-patterns.js'
+      - 'studio-bridge.js'
+      - 'production-studio.html'
+      - 'production-studio.css'
+      - 'production-studio.js'
+      - 'templates/**'
       - 'benchmark-results.json'
       - 'package.json'
       - 'playwright.config.js'
@@ -63,6 +68,10 @@ jobs:
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
         run: npx playwright test tests/e2e/product-studio.spec.js --project=chromium-desktop --grep "design families|garment mockups"
+      - name: Verify deployed Production Mapper
+        env:
+          BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
+        run: npx playwright test tests/e2e/production-studio.spec.js --project=chromium-desktop --grep "generic template|imports exact vendor template"
       - name: Verify deployed measured benchmark JSON when published
         if: ${{ hashFiles('benchmark-results.json') != '' }}
         run: |
