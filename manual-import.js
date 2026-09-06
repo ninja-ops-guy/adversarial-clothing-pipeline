@@ -20,6 +20,27 @@ async function importMeasuredResults(file) {
     }
 }
 
+// Keep the browser's automatic benchmark loader on the same locked schema
+// enforced by the measured-benchmark workflow and manual import path.
+async function loadMeasuredBenchmark() {
+    try {
+        const response = await fetch(`benchmark-results.json?cache=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const result = await response.json();
+        const measuredStatuses = new Set(['measured_locked', 'measured_unlocked']);
+        if (!measuredStatuses.has(result.status) || !result.models) {
+            throw new Error('benchmark payload is not a locked/unlocked measured result');
+        }
+        renderMeasuredBenchmark(result);
+        log('Loaded measured detector benchmark', 'success');
+        return result;
+    } catch (error) {
+        resetMeasuredDisplay('Measured detector benchmark is not available yet. The CI benchmark workflow must complete successfully.');
+        log(`Measured benchmark unavailable: ${error.message}`, 'warning');
+        return null;
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     const actions = document.querySelector('.header-actions');
     if (!actions || document.getElementById('productStudioLink')) return;
