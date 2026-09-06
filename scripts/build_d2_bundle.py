@@ -86,6 +86,15 @@ def main() -> int:
                 f"frozen model framework version mismatch: {model_id}: "
                 f"{model_manifest.get('framework_version')} != {measured_model.get('framework_version')}"
             )
+        frozen_ref = str(model_manifest.get("weights_id", ""))
+        measured_ref = str(measured_model.get("model_ref", ""))
+        if frozen_ref and frozen_ref not in measured_ref and measured_ref not in frozen_ref:
+            raise SystemExit(
+                f"frozen model reference mismatch: {model_id}: {frozen_ref} != {measured_ref}"
+            )
+        preprocessing = model_manifest.get("preprocessing")
+        if not isinstance(preprocessing, dict) or not preprocessing:
+            raise SystemExit(f"missing frozen preprocessing contract: {model_id}")
         bundle.write_json(f"manifests/models/{model_id}.json", model_manifest)
     expected_sets = {
         protocol.surrogate_model_set: list(result["benchmark"]["surrogate_models"]),
