@@ -10,7 +10,7 @@
     <div class="header">
         <div>
             <h1>🔬 Adversarial Pattern Lab</h1>
-            <div class="subtitle">Simulation & Generation Testbed v2.0.0 | Black-Box Pipeline</div>
+            <div class="subtitle">Simulation & Generation Testbed v2.1.0 | Heuristics are explicitly non-measured</div>
         </div>
         <div class="header-actions">
             <button class="btn btn-secondary" onclick="resetAll()"><span>↺</span> Reset</button>
@@ -107,10 +107,10 @@
                 </div>
                 <div class="section-divider"></div>
                 <div class="metrics-grid">
-                    <div class="metric-card"><div class="metric-label">Transfer Rate (Est.)</div><div class="metric-value" id="transferRate" style="color: var(--accent-green);">--%</div></div>
-                    <div class="metric-card"><div class="metric-label">Stealth Score</div><div class="metric-value" id="stealthScore" style="color: var(--accent-blue);">--/10</div></div>
-                    <div class="metric-card"><div class="metric-label">Printability</div><div class="metric-value" id="printabilityScore" style="color: var(--accent-orange);">--/10</div></div>
-                    <div class="metric-card"><div class="metric-label">Complexity</div><div class="metric-value" id="complexityScore" style="color: var(--accent-purple);">--</div></div>
+                    <div class="metric-card"><div class="metric-label">Heuristic Texture Energy</div><div class="metric-value" id="transferRate" style="color: var(--accent-green);">--</div></div>
+                    <div class="metric-card"><div class="metric-label">Heuristic Color Diversity</div><div class="metric-value" id="stealthScore" style="color: var(--accent-blue);">--</div></div>
+                    <div class="metric-card"><div class="metric-label">Heuristic Print Complexity</div><div class="metric-value" id="printabilityScore" style="color: var(--accent-orange);">--</div></div>
+                    <div class="metric-card"><div class="metric-label">Heuristic Edge Density</div><div class="metric-value" id="complexityScore" style="color: var(--accent-purple);">--</div></div>
                 </div>
             </div>
             <div class="tab-content" id="simulation">
@@ -126,10 +126,12 @@
             </div>
             <div class="tab-content" id="analysis">
                 <div class="panel-body">
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">YOLOv8 Attack Success</span><span class="progress-value" id="yoloRate">--%</span></div><div class="progress-bar"><div class="progress-fill blue" id="yoloBar" style="width: 0%"></div></div></div>
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">DETR Attack Success</span><span class="progress-value" id="detrRate">--%</span></div><div class="progress-bar"><div class="progress-fill green" id="detrBar" style="width: 0%"></div></div></div>
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Faster R-CNN Attack Success</span><span class="progress-value" id="rcnnRate">--%</span></div><div class="progress-bar"><div class="progress-fill orange" id="rcnnBar" style="width: 0%"></div></div></div>
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">SSD MobileNet Attack Success</span><span class="progress-value" id="ssdRate">--%</span></div><div class="progress-bar"><div class="progress-fill red" id="ssdBar" style="width: 0%"></div></div></div>
+                    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">DEMO / HEURISTIC ONLY — these values are image statistics, not detector inference. Import a Python benchmark JSON to display measured evidence.</div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Brightness Energy (heuristic)</span><span class="progress-value" id="yoloRate">--</span></div><div class="progress-bar"><div class="progress-fill blue" id="yoloBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Color Variance (heuristic)</span><span class="progress-value" id="detrRate">--</span></div><div class="progress-bar"><div class="progress-fill green" id="detrBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Edge Density (heuristic)</span><span class="progress-value" id="rcnnRate">--</span></div><div class="progress-bar"><div class="progress-fill orange" id="rcnnBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Composite Diversity (heuristic)</span><span class="progress-value" id="ssdRate">--</span></div><div class="progress-bar"><div class="progress-fill red" id="ssdBar" style="width: 0%"></div></div></div>
+                    <div class="control-group"><div class="control-label"><label>Measured benchmark result</label></div><input id="measuredResultsFile" type="file" accept=".json,application/json" onchange="importMeasuredResults(this.files[0])"><div id="measuredEvidence" style="font-size:11px;color:var(--text-secondary);margin-top:8px;">No measured result loaded.</div></div>
                     <div class="section-divider"></div>
                     <div class="control-group"><div class="control-label"><label>Frequency Spectrum</label></div><div class="canvas-container" style="min-height: 150px;"><canvas id="frequencyCanvas" width="512" height="150"></canvas></div></div>
                     <div class="section-divider"></div>
@@ -148,7 +150,7 @@
                 <div class="section-divider"></div>
                 <div class="control-group"><div class="control-label"><label>Pattern History</label><span class="control-value" id="historyCount">0</span></div><div style="max-height: 150px; overflow-y: auto;"><div id="patternHistory"></div></div></div>
                 <div class="section-divider"></div>
-                <div class="control-group"><div class="control-label"><label>Quick Actions</label></div><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Quick Optimize</button><button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button></div>
+                <div class="control-group"><div class="control-label"><label>Quick Actions</label></div><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Heuristic Seed Search</button><button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button></div>
             </div>
         </div>
     </div>
