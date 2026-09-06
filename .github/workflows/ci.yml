@@ -31,6 +31,8 @@ jobs:
         run: pytest
       - name: Smoke test
         run: python -m examples.smoke_test
+      - name: Certification contract tests
+        run: pytest tests/test_certification.py
 
   package:
     runs-on: ubuntu-latest
