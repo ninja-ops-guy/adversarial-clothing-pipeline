@@ -200,12 +200,12 @@ test('4096 tile export button produces a non-empty download', async ({ page }) =
   expect(fs.statSync(path).size).toBeGreaterThan(1000);
 });
 
-
-test('showcase source is never rejected for low resolution', async ({ page }) => {
-  const toggle = page.locator('#useShowcaseSource');
-  await expect(toggle).toBeEnabled();
-  await toggle.check();
-  await expect(toggle).toBeChecked();
-  await expect(page.locator('.showcase-source-section')).not.toContainText('LOW-RES SOURCE REJECTED');
-  await expect(page.locator('.showcase-source-section')).not.toContainText('blocked from pattern sampling');
+test('obsolete low-resolution showcase source is absent', async ({ page }) => {
+  await expect(page.locator('.showcase-source-section')).toHaveCount(0);
+  await expect(page.locator('#showcaseReference')).toHaveCount(0);
+  await expect(page.locator('#useShowcaseSource')).toHaveCount(0);
+  await expect(page.locator('#showcaseRegion')).toHaveCount(0);
+  await expect(page.locator('#showcaseStrength')).toHaveCount(0);
+  const scripts = await page.locator('script[src]').evaluateAll(nodes => nodes.map(n => n.getAttribute('src')));
+  expect(scripts).not.toContain('showcase-asset.js');
 });
