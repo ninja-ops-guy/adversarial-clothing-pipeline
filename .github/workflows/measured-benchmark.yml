@@ -43,6 +43,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Require preregistered detector lock
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('benchmarks/model_manifest.json').read_text())
+          hashes=[str(x.get('state_dict_sha256','')) for x in m['models']]
+          if m.get('lock_status') != 'PREREGISTERED' or not all(len(x)==64 for x in hashes):
+              raise SystemExit('Measured candidate inference blocked until all detector states are preregistered.')
+          PY
+
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
@@ -85,13 +96,13 @@ jobs:
           node scripts/export_candidate_pool.js benchmarks/runtime/pool
 
       - name: Select candidate on surrogate models only
-        run: python scripts/select_surrogate_candidate.py --final-id RAC-PER-D2-0001
+        run: python scripts/select_surrogate_candidate.py --final-id RAC-PER-D2-0002
 
       - name: Run held-out measured detector inference on frozen winner
         run: python scripts/run_measured_benchmark.py
 
       - name: Build D2 evidence bundle
-        run: python scripts/build_d2_bundle.py
+        run: python scripts/build_d2_bundle.py --protocol protocols/RAC-PERSON-DETECT-1.1.json
 
       - name: Validate measured result schema
         run: |
