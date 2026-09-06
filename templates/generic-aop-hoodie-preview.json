@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "provider": "GENERIC_PREVIEW",
+  "product_id": "aop_hoodie_normalized",
+  "product_name": "Generic AOP Hoodie Preview",
+  "template_version": "preview-1",
+  "source": "RAC normalized preview geometry; not a vendor production specification",
+  "vendor_ready": false,
+  "units": "px",
+  "dpi": 150,
+  "canvas": { "width": 1800, "height": 1400 },
+  "panels": [
+    { "id": "front", "label": "Front", "x": 40, "y": 40, "width": 650, "height": 760, "bleed": 24, "safe_margin": 40, "continuity_group": "torso", "required": true },
+    { "id": "back", "label": "Back", "x": 720, "y": 40, "width": 650, "height": 760, "bleed": 24, "safe_margin": 40, "continuity_group": "torso", "required": true },
+    { "id": "left_sleeve", "label": "Left Sleeve", "x": 40, "y": 840, "width": 390, "height": 500, "bleed": 20, "safe_margin": 32, "continuity_group": "sleeves", "required": true },
+    { "id": "right_sleeve", "label": "Right Sleeve", "x": 460, "y": 840, "width": 390, "height": 500, "bleed": 20, "safe_margin": 32, "continuity_group": "sleeves", "required": true },
+    { "id": "hood_left", "label": "Hood Left", "x": 880, "y": 840, "width": 410, "height": 500, "bleed": 20, "safe_margin": 28, "continuity_group": "hood", "required": true },
+    { "id": "hood_right", "label": "Hood Right", "x": 1320, "y": 840, "width": 410, "height": 500, "bleed": 20, "safe_margin": 28, "continuity_group": "hood", "required": true }
+  ],
+  "seams": [
+    { "a": "front", "edge_a": "left", "b": "back", "edge_b": "right", "reverse": false },
+    { "a": "front", "edge_a": "right", "b": "back", "edge_b": "left", "reverse": false },
+    { "a": "left_sleeve", "edge_a": "right", "b": "front", "edge_b": "left", "reverse": false },
+    { "a": "right_sleeve", "edge_a": "left", "b": "front", "edge_b": "right", "reverse": false },
+    { "a": "hood_left", "edge_a": "right", "b": "hood_right", "edge_b": "left", "reverse": false }
+  ]
+}
