@@ -1,0 +1,45 @@
+# RAC Evidence Certification System
+
+The certification layer converts a pattern experiment into a reproducible evidence object. It is an internal verification framework, not an independent accredited certification and not a guarantee against arbitrary surveillance systems.
+
+## Evidence states
+
+- RAC-D0: design candidate
+- RAC-D1: surrogate-model evidence
+- RAC-D2: frozen held-out digital evidence
+- RAC-P1: controlled physical evidence
+- RAC-P2: durability/retest evidence
+- RAC-M1: verified production golden sample
+- RAC-M2: verified production lot conformity
+
+Digital evidence may never satisfy a physical or manufacturing state.
+
+## Fail-closed issuance
+
+A certificate requires a preregistered protocol, distinct surrogate/held-out model sets, a pattern/master hash, source commit, baseline-qualified held-out results, acceptable invalid-condition fraction, and a sealed evidence bundle. Physical/manufacturing states additionally require their corresponding evidence.
+
+## Required evidence bundle
+
+A production bundle should retain:
+- pattern manifest and immutable master art hash;
+- frozen model manifests and model-set IDs;
+- benchmark raw rows and summary;
+- protocol version;
+- calibration/textile/print records where applicable;
+- physical trials where applicable;
+- manufacturing conformity results where applicable;
+- hashes.sha256 and certificate.json.
+
+## Physical rig contract
+
+Physical trials must compare a control garment and candidate under matched conditions. Conditions where the control is not detectable are invalid and cannot count as adversarial success. Record camera identity, distance, angles, pose, lighting, wash state, and any calibration IDs.
+
+## Manufacturing conformity
+
+A golden sample certificate does not automatically transfer to a production lot. Sample units must remain within frozen color, scale, placement, and registration tolerances.
+
+## Operational command
+
+`python tools/certify_bundle.py issue ...` issues a certificate from completed evidence. `verify` checks bundle hashes.
+
+Real detector weights, physical measurements, ICC profiles, and production-lot observations are external evidence inputs and must never be fabricated by the software.
