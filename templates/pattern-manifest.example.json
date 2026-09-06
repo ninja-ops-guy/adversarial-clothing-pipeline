@@ -1,0 +1,21 @@
+{
+  "pattern_id": "RAC-PER-0001",
+  "version": "1.0.0",
+  "task": "person_detection",
+  "source_commit": "REPLACE_WITH_40_CHAR_COMMIT_SHA",
+  "optimizer": "EnhancedBlackBoxNAP",
+  "optimizer_version": "3.1.0",
+  "seed": 1337,
+  "master": {
+    "path": "pattern/master.png",
+    "sha256": "REPLACE_WITH_SHA256",
+    "media_type": "image/png"
+  },
+  "protocol_id": "RAC-PERSON-DETECT",
+  "surrogate_model_set": "PERSON-SUR-v1",
+  "heldout_model_set": "PERSON-HO-v1",
+  "textile_profile": "TX-001",
+  "print_profile": "SP-001",
+  "evidence_state": "RAC-D0",
+  "metadata": {}
+}
