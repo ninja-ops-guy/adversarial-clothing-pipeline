@@ -169,7 +169,19 @@ function runAnalysis() {
                 link.download = `adversarial_config_${Date.now()}.json`;
                 link.href = URL.createObjectURL(blob);
                 link.click();
+                URL.revokeObjectURL(link.href);
                 log('Configuration exported as JSON', 'success');
+            } else if (format === 'svg') {
+                const canvas = document.getElementById('previewCanvas');
+                const pngData = canvas.toDataURL('image/png');
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}" viewBox="0 0 ${canvas.width} ${canvas.height}"><image width="100%" height="100%" href="${pngData}"/></svg>`;
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const link = document.createElement('a');
+                link.download = `adversarial_pattern_${Date.now()}.svg`;
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                URL.revokeObjectURL(link.href);
+                log('Pattern exported as SVG', 'success');
             }
         }
 
@@ -198,6 +210,7 @@ function runAnalysis() {
             link.download = `lab_config_${Date.now()}.json`;
             link.href = URL.createObjectURL(blob);
             link.click();
+            URL.revokeObjectURL(link.href);
             log('Lab configuration exported', 'success');
         }
 
