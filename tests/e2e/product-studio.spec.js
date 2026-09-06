@@ -149,3 +149,38 @@ test('manifest records selected stylized motif features', async ({ page }) => {
   const manifest = JSON.parse(fs.readFileSync(path, 'utf8'));
   expect(manifest.design.feature_motifs).toEqual(expect.arrayContaining(['canine_eye', 'slash']));
 });
+
+
+test('existing RAC showcase asset is visible and can be blended into generated textiles', async ({ page }) => {
+  const img = page.locator('#showcaseReference');
+  await expect(img).toBeVisible();
+  await expect(img).toHaveAttribute('src', /^data:image\/webp;base64,/);
+
+  const before = await page.locator('#studioPatternCanvas').evaluate(c => c.toDataURL().slice(-1600));
+  await page.locator('#useShowcaseSource').check();
+  await page.selectOption('#showcaseRegion', 'families');
+  await page.locator('#showcaseStrength').fill('45');
+  await expect(page.locator('#showcaseStrengthValue')).toHaveText('45');
+  await page.getByRole('button', { name: 'Generate Pattern' }).click();
+  const after = await page.locator('#studioPatternCanvas').evaluate(c => c.toDataURL().slice(-1600));
+  expect(after).not.toBe(before);
+});
+
+test('showcase source provenance is recorded in exported manifest', async ({ page }) => {
+  await page.locator('#useShowcaseSource').check();
+  await page.selectOption('#showcaseRegion', 'tiles');
+  await page.locator('#showcaseStrength').fill('33');
+  await page.getByRole('button', { name: 'Generate Pattern' }).click();
+
+  const wait = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export Production Manifest' }).click();
+  const download = await wait;
+  const path = await download.path();
+  const manifest = JSON.parse(fs.readFileSync(path, 'utf8'));
+  expect(manifest.design.showcase_source).toEqual({
+    enabled: true,
+    region: 'tiles',
+    strength: 33,
+    asset: 'RAC Textile Generator Showcase'
+  });
+});
