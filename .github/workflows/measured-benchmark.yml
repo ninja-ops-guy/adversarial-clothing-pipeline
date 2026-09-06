@@ -114,9 +114,11 @@ jobs:
           assert isinstance(result['certification_eligible'], bool)
           assert set(result['models']) == {
               'yolov8n',
-              'detr_resnet50',
               'fasterrcnn_mobilenet_v3_320',
+              'detr_resnet50',
               'ssdlite320_mobilenet_v3',
+              'retinanet_resnet50_fpn_v2',
+              'fcos_resnet50_fpn',
           }
           assert result['benchmark']['raw_row_count'] > 0
           assert result['benchmark']['surrogate_models']
