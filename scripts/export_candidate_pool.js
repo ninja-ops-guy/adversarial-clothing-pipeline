@@ -6,7 +6,7 @@ const FAMILIES = [
   'noise', 'geometric', 'organic', 'checkered',
   'machine_static', 'ghost_hound', 'broken_human', 'error_garden'
 ];
-const SEEDS = [113, 271];
+const SEEDS = [113, 271, 433, 619];
 
 async function main() {
   const outputDir = path.resolve(process.argv[2] || 'benchmarks/runtime/pool');
@@ -63,7 +63,7 @@ async function main() {
     }
     fs.writeFileSync(path.join(outputDir, 'pool.json'), JSON.stringify({
       schema_version: '2.0',
-      generation_policy: '16 fixed core/reference-inspired candidates; two-stage surrogate-only selection; no held-out feedback',
+      generation_policy: '32 fixed core/reference-inspired candidates; two-stage surrogate-only selection; no held-out feedback',
       candidates: records
     }, null, 2));
     console.log(`Exported ${records.length} v2 candidates to ${outputDir}`);
