@@ -28,7 +28,7 @@ def main() -> int:
     if not surrogate_ids:
         raise SystemExit("no surrogate models configured")
 
-    sweep = manifest["transform_sweep"]
+    sweep = manifest.get("selection_sweep", manifest["transform_sweep"])
     config = BenchmarkConfig(
         threshold=float(manifest.get("threshold", 0.5)),
         thresholds={
