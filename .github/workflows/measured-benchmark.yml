@@ -1,0 +1,132 @@
+name: Measured Detector Benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 5 * * 1'
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'core.js'
+      - 'ui.js'
+      - 'analysis.js'
+      - 'manual-import.js'
+      - 'scripts/export_benchmark_pattern.js'
+      - 'scripts/run_measured_benchmark.py'
+      - 'benchmarks/model_manifest.json'
+      - 'benchmarks/requirements.txt'
+      - '.github/workflows/measured-benchmark.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: measured-detector-benchmark
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HF_HOME: ${{ github.workspace }}/.model-cache/huggingface
+      TORCH_HOME: ${{ github.workspace }}/.model-cache/torch
+      ULTRALYTICS_SETTINGS_DIR: ${{ github.workspace }}/.model-cache/ultralytics
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Cache detector weights
+        uses: actions/cache@v4
+        with:
+          path: |
+            .model-cache
+            yolov8n.pt
+          key: measured-detectors-v1-${{ runner.os }}
+
+      - name: Install CPU PyTorch
+        run: python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+
+      - name: Install pipeline and detector adapters
+        run: |
+          python -m pip install -e . --no-deps
+          python -m pip install -r benchmarks/requirements.txt
+
+      - name: Install browser runtime
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Export canonical Pattern Lab canvas
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/pattern-lab-http.log 2>&1 &
+          echo $! >/tmp/pattern-lab-http.pid
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && break
+            sleep 1
+          done
+          node scripts/export_benchmark_pattern.js benchmarks/runtime
+
+      - name: Run real detector inference
+        run: python scripts/run_measured_benchmark.py
+
+      - name: Validate measured result schema
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('benchmark-results.json').read_text())
+          assert result['status'] == 'measured'
+          assert set(result['models']) == {
+              'yolov8n',
+              'detr_resnet50',
+              'fasterrcnn_mobilenet_v3_320',
+              'ssdlite320_mobilenet_v3',
+          }
+          assert result['benchmark']['raw_row_count'] > 0
+          for name, model in result['models'].items():
+              assert model['n'] > 0, name
+              assert 0 <= model['baseline_detection_rate'] <= 1, name
+              assert 0 <= model['candidate_detection_rate'] <= 1, name
+          print(json.dumps({
+              'status': result['status'],
+              'candidate': result['candidate']['sha256'],
+              'aggregate': result['aggregate'],
+          }, indent=2))
+          PY
+
+      - name: Upload benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: measured-detector-benchmark-${{ github.run_id }}
+          path: |
+            benchmark-results.json
+            benchmarks/runtime/candidate.png
+            benchmarks/runtime/candidate-config.json
+            benchmarks/runtime/benchmark-rows.csv
+            benchmarks/runtime/fixture/*.png
+          retention-days: 30
+
+      - name: Publish latest measured JSON to main
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmark-results.json
+          if git diff --cached --quiet; then
+            echo 'Measured result unchanged.'
+            exit 0
+          fi
+          git commit -m 'benchmark: publish latest measured detector results [skip benchmark]'
+          git push
