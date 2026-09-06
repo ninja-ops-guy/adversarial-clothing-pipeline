@@ -83,11 +83,10 @@ function runAnalysis() {
                 return a + Math.abs(c[0] - avgColor[0]) + Math.abs(c[1] - avgColor[1]) + Math.abs(c[2] - avgColor[2]);
             }, 0) / colors.length / 255;
             edgeDensity = edgeDensity / (colors.length / 2);
-            const baseRate = 0.5;
-            const yoloRate = Math.min(0.95, baseRate + highFreqEnergy * 0.3 + edgeDensity * 0.2);
-            const detrRate = Math.min(0.90, baseRate + highFreqEnergy * 0.25 + colorVariance * 0.15);
-            const rcnnRate = Math.min(0.92, baseRate + edgeDensity * 0.3 + highFreqEnergy * 0.2);
-            const ssdRate = Math.min(0.88, baseRate + colorVariance * 0.25 + edgeDensity * 0.15);
+            const yoloRate = Math.max(0, Math.min(1, highFreqEnergy));
+            const detrRate = Math.max(0, Math.min(1, colorVariance));
+            const rcnnRate = Math.max(0, Math.min(1, edgeDensity));
+            const ssdRate = Math.max(0, Math.min(1, (highFreqEnergy + colorVariance + edgeDensity) / 3));
             document.getElementById('yoloRate').textContent = (yoloRate * 100).toFixed(0) + '%';
             document.getElementById('yoloBar').style.width = (yoloRate * 100) + '%';
             document.getElementById('detrRate').textContent = (detrRate * 100).toFixed(0) + '%';
@@ -143,14 +142,23 @@ function runAnalysis() {
         }
 
         function updateMetrics() {
-            const transferRate = 65 + Math.random() * 20;
-            const stealthScore = 6 + Math.random() * 3;
-            const printability = 6 + Math.random() * 3;
-            const complexity = (Math.random() * 10).toFixed(1);
-            document.getElementById('transferRate').textContent = transferRate.toFixed(0) + '%';
-            document.getElementById('stealthScore').textContent = stealthScore.toFixed(1) + '/10';
-            document.getElementById('printabilityScore').textContent = printability.toFixed(1) + '/10';
-            document.getElementById('complexityScore').textContent = complexity;
+            const canvas = document.getElementById('previewCanvas');
+            const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
+            let energy = 0, diversity = 0, edges = 0, samples = 0;
+            let prev = null;
+            for (let i = 0; i < data.length; i += 64) {
+                const v = (data[i] + data[i + 1] + data[i + 2]) / (3 * 255);
+                energy += v; diversity += Math.abs(data[i] - data[i + 1]) / 255;
+                if (prev !== null && Math.abs(v - prev) > 0.2) edges++;
+                prev = v; samples++;
+            }
+            energy /= Math.max(1, samples); diversity /= Math.max(1, samples);
+            const edgeDensity = edges / Math.max(1, samples - 1);
+            const printComplexity = Math.min(1, diversity * 0.6 + edgeDensity * 0.4);
+            document.getElementById('transferRate').textContent = energy.toFixed(3);
+            document.getElementById('stealthScore').textContent = diversity.toFixed(3);
+            document.getElementById('printabilityScore').textContent = printComplexity.toFixed(3);
+            document.getElementById('complexityScore').textContent = edgeDensity.toFixed(3);
         }
 
         function exportPattern(format) {
@@ -246,14 +254,14 @@ function runAnalysis() {
         }
 
         function optimizePattern() {
-            log('Quick optimize: Running 10 iterations...', 'info');
+            log('Heuristic seed search: Running 10 deterministic image-statistic comparisons...', 'info');
             let bestSeed = parseInt(document.getElementById('seed').value);
             let bestScore = 0;
             for (let i = 0; i < 10; i++) {
                 document.getElementById('seed').value = Math.floor(Math.random() * 1000);
                 updateSlider('seed');
                 generatePattern();
-                const score = parseFloat(document.getElementById('transferRate').textContent);
+                const score = parseFloat(document.getElementById('complexityScore').textContent);
                 if (score > bestScore) {
                     bestScore = score;
                     bestSeed = parseInt(document.getElementById('seed').value);
@@ -262,7 +270,7 @@ function runAnalysis() {
             document.getElementById('seed').value = bestSeed;
             updateSlider('seed');
             generatePattern();
-            log(`Optimization complete. Best transfer rate: ${bestScore}%`, 'success');
+            log(`Heuristic seed search complete. Best edge-density score: ${bestScore.toFixed(3)}`, 'success');
         }
 
         function comparePatterns() {
@@ -310,3 +318,27 @@ function runAnalysis() {
         window.onload = function() {
             generatePattern();
         };
+
+
+        async function importMeasuredResults(file) {
+            if (!file) return;
+            try {
+                const payload = JSON.parse(await file.text());
+                if (!payload.summary || !payload.config) throw new Error('Expected Python benchmark JSON with config and summary');
+                const h = payload.summary.heldout || {};
+                const evidence = {
+                    experimentId: payload.experiment_id || 'unassigned',
+                    heldoutModels: payload.config.heldout_models || [],
+                    baselineDetectionRate: h.baseline_detection_rate,
+                    candidateDetectionRate: h.candidate_detection_rate,
+                    invalidConditionFraction: payload.summary.invalid_condition_fraction,
+                    evidenceLabel: 'INTERNALLY MEASURED — IMPORTED'
+                };
+                document.getElementById('measuredEvidence').textContent =
+                    `${evidence.evidenceLabel} | Experiment: ${evidence.experimentId} | Held-out models: ${evidence.heldoutModels.join(', ') || 'none'} | Baseline: ${Number(evidence.baselineDetectionRate ?? 0).toFixed(3)} | Candidate: ${Number(evidence.candidateDetectionRate ?? 0).toFixed(3)} | Invalid: ${Number(evidence.invalidConditionFraction ?? 0).toFixed(3)}`;
+                log('Measured benchmark JSON imported with provenance boundary preserved', 'success');
+            } catch (error) {
+                document.getElementById('measuredEvidence').textContent = 'Invalid measured result: ' + error.message;
+                log('Measured benchmark import rejected: ' + error.message, 'warning');
+            }
+        }
