@@ -120,6 +120,7 @@
     c.save();c.globalAlpha=.28;c.fillStyle='#d8ccb6';
     for(let i=0;i<7;i++)c.fillRect(r()*s,r()*s,s*(.006+r()*.012),s*(.12+r()*.28));
     c.restore();
+    applyFeatureMotifs(c,s,p,r);
   };
 
   patternGenerators.signal_shadow=function(c,s,p,pal,r){
@@ -129,6 +130,7 @@
     for(let i=0;i<eyes;i++)eye(c,r()*s,r()*s,s*(.07+r()*.08),r,'#d8ccb6',.72+r()*.18);
     for(let i=0;i<4;i++)signalWedge(c,s,r,i%2?'#155bd8':'#e7df16');
     for(let i=0;i<3;i++)portraitFragment(c,s,r);
+    applyFeatureMotifs(c,s,p,r);
   };
 
   patternGenerators.ghost_hound=function(c,s,p,pal,r){
@@ -139,6 +141,7 @@
     c.save();c.globalAlpha=.55;c.fillStyle='#d8ccb6';
     for(let i=0;i<3;i++){const x=r()*s,y=r()*s,rad=s*(.04+r()*.05);c.beginPath();c.moveTo(x,y);c.lineTo(x+rad,y-rad*1.25);c.lineTo(x+rad*1.55,y+rad*.15);c.closePath();c.fill();}
     c.restore();
+    applyFeatureMotifs(c,s,p,r);
   };
 
   patternGenerators.broken_human=function(c,s,p,pal,r){
@@ -148,7 +151,24 @@
     ribs(c,s*(.46+r()*.22),s*(.42+r()*.26),s*(.16+r()*.05));
     for(let i=0;i<4;i++)signalWedge(c,s,r,i%2?'#155bd8':'#e7df16');
     portraitFragment(c,s,r);
+    applyFeatureMotifs(c,s,p,r);
   };
+
+  function applyFeatureMotifs(c,s,p,r){
+    const motifs=Array.isArray(p.featureMotifs)?p.featureMotifs:[];
+    for(const motif of motifs){
+      if(motif==='canine_eye')eye(c,r()*s,r()*s,s*(.08+r()*.08),r,'#d8ccb6',.92);
+      else if(motif==='human_eye')eye(c,r()*s,r()*s,s*(.06+r()*.065),r,'#d8ccb6',.78);
+      else if(motif==='rib')ribs(c,r()*s,r()*s,s*(.12+r()*.07),'#d8ccb6');
+      else if(motif==='floral')for(let i=0;i<3;i++)flower(c,r()*s,r()*s,s*(.035+r()*.06),6+Math.floor(r()*5),r()>.5?'#d98ca4':'#d9cdb9',r);
+      else if(motif==='glitch'){c.save();for(let i=0;i<12;i++){c.globalAlpha=.45+r()*.45;c.fillStyle=r()>.5?'#155bd8':'#d98ca4';wrapRect(c,s,r()*s,r()*s,s*(.012+r()*.04),s*(.008+r()*.025));}c.restore();}
+      else if(motif==='slash')for(let i=0;i<3;i++)signalWedge(c,s,r,i%2?'#155bd8':'#e7df16');
+      else if(motif==='static')grainChannels(c,s,r,p,22);
+      else if(motif==='leaf')for(let i=0;i<5;i++)leaf(c,r()*s,r()*s,s*(.04+r()*.09),'#7b8756',r);
+      else if(motif==='data'){c.save();c.strokeStyle='#d8ccb6';c.globalAlpha=.55;for(let i=0;i<12;i++){const x=r()*s,y=r()*s;c.beginPath();c.moveTo(x,y);c.lineTo(x,y+s*(.03+r()*.15));c.stroke();}c.restore();}
+      else if(motif==='mask')for(let i=0;i<2;i++)portraitFragment(c,s,r);
+    }
+  }
 
   patternGenerators.error_garden=function(c,s,p,pal,r){
     patchField(c,s,colorPalettes.error_garden,r,p,{dark:'#080808'});
@@ -158,5 +178,6 @@
     eye(c,s*(.26+r()*.5),s*(.28+r()*.45),s*(.08+r()*.05),r,'#d8ccb6',.72);
     if(r()>.45)eye(c,r()*s,r()*s,s*(.055+r()*.04),r,'#d8ccb6',.55);
     for(let i=0;i<4;i++)signalWedge(c,s,r,i%2?'#2b62d8':'#eadf1a');
+    applyFeatureMotifs(c,s,p,r);
   };
 })();
