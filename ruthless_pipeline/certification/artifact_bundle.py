@@ -32,8 +32,8 @@ class ArtifactBundle:
             hashes[rel] = hash_file(path)
         return hashes
 
-    def seal(self) -> tuple[Path, str]:
-        hashes = self.hash_manifest()
+    def seal(self, exclude: tuple[str, ...] = ("hashes.sha256", "certificate.json")) -> tuple[Path, str]:
+        hashes = self.hash_manifest(exclude=exclude)
         body = "".join(f"{digest}  {path}\n" for path, digest in sorted(hashes.items()))
         hashes_path = self.root / "hashes.sha256"
         hashes_path.write_text(body)
