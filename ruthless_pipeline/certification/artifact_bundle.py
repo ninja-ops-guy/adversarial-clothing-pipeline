@@ -17,8 +17,18 @@ class ArtifactBundle:
         path.mkdir(parents=True, exist_ok=True)
         return cls(path)
 
+    def resolve_path(self, relative_path: str | Path) -> Path:
+        relative = Path(relative_path)
+        if not str(relative) or relative.is_absolute() or ".." in relative.parts:
+            raise ValueError("artifact path must be a safe relative path")
+        root = self.root.resolve()
+        path = (root / relative).resolve()
+        if path != root and root not in path.parents:
+            raise ValueError("artifact path escapes bundle root")
+        return path
+
     def write_json(self, relative_path: str, payload: dict) -> Path:
-        path = self.root / relative_path
+        path = self.resolve_path(relative_path)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
         return path
