@@ -107,22 +107,10 @@
                 </div>
                 <div class="section-divider"></div>
                 <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-label">Transfer Rate (Est.)</div>
-                        <div class="metric-value" id="transferRate" style="color: var(--accent-green);">--%</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Stealth Score</div>
-                        <div class="metric-value" id="stealthScore" style="color: var(--accent-blue);">--/10</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Printability</div>
-                        <div class="metric-value" id="printabilityScore" style="color: var(--accent-orange);">--/10</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Complexity</div>
-                        <div class="metric-value" id="complexityScore" style="color: var(--accent-purple);">--</div>
-                    </div>
+                    <div class="metric-card"><div class="metric-label">Transfer Rate (Est.)</div><div class="metric-value" id="transferRate" style="color: var(--accent-green);">--%</div></div>
+                    <div class="metric-card"><div class="metric-label">Stealth Score</div><div class="metric-value" id="stealthScore" style="color: var(--accent-blue);">--/10</div></div>
+                    <div class="metric-card"><div class="metric-label">Printability</div><div class="metric-value" id="printabilityScore" style="color: var(--accent-orange);">--/10</div></div>
+                    <div class="metric-card"><div class="metric-label">Complexity</div><div class="metric-value" id="complexityScore" style="color: var(--accent-purple);">--</div></div>
                 </div>
             </div>
             <div class="tab-content" id="simulation">
@@ -131,129 +119,42 @@
                     <div class="canvas-label">FABRIC SIMULATION</div>
                 </div>
                 <div class="section-divider"></div>
-                <div class="control-group">
-                    <div class="control-label"><label>Pose</label></div>
-                    <select id="poseSelect" onchange="runSimulation()">
-                        <option value="standing">Standing</option>
-                        <option value="walking">Walking</option>
-                        <option value="sitting">Sitting</option>
-                        <option value="arms_raised">Arms Raised</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><label>Fabric Type</label></div>
-                    <select id="fabricType" onchange="runSimulation()">
-                        <option value="cotton">Cotton</option>
-                        <option value="polyester">Polyester</option>
-                        <option value="silk">Silk</option>
-                        <option value="denim">Denim</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><label>Warp Intensity</label><span class="control-value" id="warpIntensityValue">30</span></div>
-                    <input type="range" id="warpIntensity" min="0" max="100" value="30" oninput="updateSlider('warpIntensity')">
-                </div>
-                <div class="control-group">
-                    <div class="control-label"><label>Lighting</label></div>
-                    <select id="lightingSelect" onchange="runSimulation()">
-                        <option value="indoor">Indoor</option>
-                        <option value="outdoor">Outdoor</option>
-                        <option value="low_light">Low Light</option>
-                        <option value="direct_sun">Direct Sun</option>
-                    </select>
-                </div>
+                <div class="control-group"><div class="control-label"><label>Pose</label></div><select id="poseSelect" onchange="runSimulation()"><option value="standing">Standing</option><option value="walking">Walking</option><option value="sitting">Sitting</option><option value="arms_raised">Arms Raised</option></select></div>
+                <div class="control-group"><div class="control-label"><label>Fabric Type</label></div><select id="fabricType" onchange="runSimulation()"><option value="cotton">Cotton</option><option value="polyester">Polyester</option><option value="silk">Silk</option><option value="denim">Denim</option></select></div>
+                <div class="control-group"><div class="control-label"><label>Warp Intensity</label><span class="control-value" id="warpIntensityValue">30</span></div><input type="range" id="warpIntensity" min="0" max="100" value="30" oninput="updateSlider('warpIntensity')"></div>
+                <div class="control-group"><div class="control-label"><label>Lighting</label></div><select id="lightingSelect" onchange="runSimulation()"><option value="indoor">Indoor</option><option value="outdoor">Outdoor</option><option value="low_light">Low Light</option><option value="direct_sun">Direct Sun</option></select></div>
             </div>
             <div class="tab-content" id="analysis">
                 <div class="panel-body">
-                    <div class="progress-container">
-                        <div class="progress-header"><span class="progress-label">YOLOv8 Attack Success</span><span class="progress-value" id="yoloRate">--%</span></div>
-                        <div class="progress-bar"><div class="progress-fill blue" id="yoloBar" style="width: 0%"></div></div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-header"><span class="progress-label">DETR Attack Success</span><span class="progress-value" id="detrRate">--%</span></div>
-                        <div class="progress-bar"><div class="progress-fill green" id="detrBar" style="width: 0%"></div></div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-header"><span class="progress-label">Faster R-CNN Attack Success</span><span class="progress-value" id="rcnnRate">--%</span></div>
-                        <div class="progress-bar"><div class="progress-fill orange" id="rcnnBar" style="width: 0%"></div></div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-header"><span class="progress-label">SSD MobileNet Attack Success</span><span class="progress-value" id="ssdRate">--%</span></div>
-                        <div class="progress-bar"><div class="progress-fill red" id="ssdBar" style="width: 0%"></div></div>
-                    </div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">YOLOv8 Attack Success</span><span class="progress-value" id="yoloRate">--%</span></div><div class="progress-bar"><div class="progress-fill blue" id="yoloBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">DETR Attack Success</span><span class="progress-value" id="detrRate">--%</span></div><div class="progress-bar"><div class="progress-fill green" id="detrBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Faster R-CNN Attack Success</span><span class="progress-value" id="rcnnRate">--%</span></div><div class="progress-bar"><div class="progress-fill orange" id="rcnnBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">SSD MobileNet Attack Success</span><span class="progress-value" id="ssdRate">--%</span></div><div class="progress-bar"><div class="progress-fill red" id="ssdBar" style="width: 0%"></div></div></div>
                     <div class="section-divider"></div>
-                    <div class="control-group">
-                        <div class="control-label"><label>Frequency Spectrum</label></div>
-                        <div class="canvas-container" style="min-height: 150px;">
-                            <canvas id="frequencyCanvas" width="512" height="150"></canvas>
-                        </div>
-                    </div>
+                    <div class="control-group"><div class="control-label"><label>Frequency Spectrum</label></div><div class="canvas-container" style="min-height: 150px;"><canvas id="frequencyCanvas" width="512" height="150"></canvas></div></div>
                     <div class="section-divider"></div>
-                    <div class="control-group">
-                        <div class="control-label"><label>Color Distribution</label></div>
-                        <div class="canvas-container" style="min-height: 100px;">
-                            <canvas id="colorCanvas" width="512" height="100"></canvas>
-                        </div>
-                    </div>
+                    <div class="control-group"><div class="control-label"><label>Color Distribution</label></div><div class="canvas-container" style="min-height: 100px;"><canvas id="colorCanvas" width="512" height="100"></canvas></div></div>
                 </div>
             </div>
-            <div class="tab-content" id="gallery">
-                <div class="panel-body">
-                    <div class="pattern-gallery" id="patternGallery"></div>
-                    <div class="empty-state" id="galleryEmpty">
-                        <div class="icon">🎨</div>
-                        <p>Generate patterns to build your gallery</p>
-                    </div>
-                </div>
-            </div>
+            <div class="tab-content" id="gallery"><div class="panel-body"><div class="pattern-gallery" id="patternGallery"></div><div class="empty-state" id="galleryEmpty"><div class="icon">🎨</div><p>Generate patterns to build your gallery</p></div></div></div>
         </div>
 
         <div class="panel">
-            <div class="panel-header">
-                <h3><span class="icon">📊</span> Output & Logs</h3>
-            </div>
+            <div class="panel-header"><h3><span class="icon">📊</span> Output & Logs</h3></div>
             <div class="panel-body">
-                <div class="control-group">
-                    <div class="control-label"><label>Generation Log</label></div>
-                    <div class="log-console" id="logConsole">
-                        <div class="log-entry">
-                            <span class="log-time">[14:52:00]</span>
-                            <span class="log-level info">INFO</span>
-                            <span class="log-message">Adversarial Pattern Lab initialized</span>
-                        </div>
-                        <div class="log-entry">
-                            <span class="log-time">[14:52:01]</span>
-                            <span class="log-level success">READY</span>
-                            <span class="log-message">Black-box pipeline loaded</span>
-                        </div>
-                    </div>
-                </div>
+                <div class="control-group"><div class="control-label"><label>Generation Log</label></div><div class="log-console" id="logConsole"><div class="log-entry"><span class="log-time">[14:52:00]</span><span class="log-level info">INFO</span><span class="log-message">Adversarial Pattern Lab initialized</span></div><div class="log-entry"><span class="log-time">[14:52:01]</span><span class="log-level success">READY</span><span class="log-message">Black-box pipeline loaded</span></div></div></div>
                 <div class="section-divider"></div>
-                <div class="control-group">
-                    <div class="control-label"><label>Export Pattern</label></div>
-                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportPattern('png')"><span>📷</span> Export as PNG</button>
-                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="exportPattern('json')"><span>📋</span> Export Config (JSON)</button>
-                    <button class="btn btn-secondary" style="width: 100%;" onclick="exportPattern('svg')"><span>🎨</span> Export as SVG</button>
-                </div>
+                <div class="control-group"><div class="control-label"><label>Export Pattern</label></div><button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportPattern('png')"><span>📷</span> Export as PNG</button><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="exportPattern('json')"><span>📋</span> Export Config (JSON)</button><button class="btn btn-secondary" style="width: 100%;" onclick="exportPattern('svg')"><span>🎨</span> Export as SVG</button></div>
                 <div class="section-divider"></div>
-                <div class="control-group">
-                    <div class="control-label"><label>Pattern History</label><span class="control-value" id="historyCount">0</span></div>
-                    <div style="max-height: 150px; overflow-y: auto;">
-                        <div id="patternHistory"></div>
-                    </div>
-                </div>
+                <div class="control-group"><div class="control-label"><label>Pattern History</label><span class="control-value" id="historyCount">0</span></div><div style="max-height: 150px; overflow-y: auto;"><div id="patternHistory"></div></div></div>
                 <div class="section-divider"></div>
-                <div class="control-group">
-                    <div class="control-label"><label>Quick Actions</label></div>
-                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button>
-                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Quick Optimize</button>
-                    <button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button>
-                </div>
+                <div class="control-group"><div class="control-label"><label>Quick Actions</label></div><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Quick Optimize</button><button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button></div>
             </div>
         </div>
     </div>
 
     <script src="core.js"></script>
     <script src="ui.js"></script>
+    <script src="analysis.js"></script>
 </body>
 </html>
