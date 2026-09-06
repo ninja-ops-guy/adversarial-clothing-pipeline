@@ -9,12 +9,17 @@
 - GitHub Pages deployment workflow.
 - Repository/research documentation that separates UI heuristics, software validation, external published results, internal measurements, targets, and physical product claims.
 
+### Changed
+- Replaced model-named/randomized Pattern Lab efficacy displays with deterministic visual heuristics: luminance, color spread, edge density, texture energy, and heuristic complexity.
+- Renamed Quick Optimize behavior to seed exploration driven by heuristic complexity only.
+- Hardened CI so undefined-name correctness lint is blocking while the existing full Ruff style debt remains visible as a non-blocking report.
+- Switched CI test/audit setup to CPU-only PyTorch installation to avoid unnecessary CUDA downloads.
+
 ### Clarified
-- Pattern Lab model-named percentages are **heuristic/demo outputs**, not inference from YOLO, DETR, Faster R-CNN, SSD, or another detector.
-- Several Pattern Lab summary metrics are currently randomized by the front-end implementation and must not be used as evidence.
+- Pattern Lab heuristics are not inference from YOLO, DETR, Faster R-CNN, SSD, or another detector.
 - The browser Pattern Lab is not yet wired to the Python evaluator/benchmark stack.
 - The Python package remains version `3.0.0`; the Pattern Lab export schema currently uses `2.0.0` and is a separate version identifier.
-- Current GitHub CI is not yet a green release gate because the v3 production-import workflow stopped at Ruff lint findings before pytest.
+- The hardened CI workflow still requires a successful GitHub run before it can be promoted to a required release gate.
 
 ## 3.0.0 - 2026-09-06
 
