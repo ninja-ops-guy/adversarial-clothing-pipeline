@@ -11,7 +11,7 @@
       "person_class": 0,
       "role": "surrogate",
       "decision_threshold": 0.5,
-      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
+      "state_dict_sha256": "fc3866bddeb949fed0de53bfb9498ccb51645936920c89888dc730df082a1776"
     },
     {
       "id": "fasterrcnn_mobilenet_v3_320",
@@ -21,7 +21,7 @@
       "person_class": 1,
       "role": "surrogate",
       "decision_threshold": 0.5,
-      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
+      "state_dict_sha256": "e89b81090180d2b5894750544fb6401b1a546b328f31ee6da7348f4968b12e61"
     },
     {
       "id": "detr_resnet50",
@@ -31,7 +31,7 @@
       "person_class": "person",
       "role": "heldout",
       "decision_threshold": 0.5,
-      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
+      "state_dict_sha256": "ba2a4b1a72e362a84b8a31511e7a1dfa9a28226898d1738a5db4cb3673ce9ec7"
     },
     {
       "id": "ssdlite320_mobilenet_v3",
@@ -41,7 +41,7 @@
       "person_class": 1,
       "role": "heldout",
       "decision_threshold": 0.5,
-      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
+      "state_dict_sha256": "711cd0e2d35ce1921972aad81b9924a1fedeff902e4bb61f64c05b6cac35a7e1"
     }
   ],
   "fixture": {
@@ -70,5 +70,8 @@
       20
     ]
   },
-  "min_baseline_score": 0.5
+  "min_baseline_score": 0.5,
+  "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32",
+  "lock_status": "PREREGISTERED",
+  "lock_note": "Hashes measured in a bootstrap run and committed before subsequent D2 candidate evaluation. The bootstrap candidate/result is not certification evidence."
 }
