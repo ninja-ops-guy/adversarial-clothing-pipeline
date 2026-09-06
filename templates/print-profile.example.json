@@ -1,0 +1,10 @@
+{
+  "profile_id": "SP-001",
+  "printer": "REPLACE",
+  "ink_set": "REPLACE",
+  "textile_profile": "TX-001",
+  "icc_profile_sha256": "REPLACE_WITH_SHA256",
+  "measured_patch_set_sha256": "REPLACE_WITH_SHA256",
+  "max_delta_e": 3.0,
+  "measured_delta_e": 0.0
+}
