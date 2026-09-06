@@ -65,8 +65,11 @@ test('simulation works across every pose, fabric and lighting option', async ({ 
 
 test('analysis produces visible numeric metrics and charts', async ({ page }) => {
   await page.getByText('Analysis', { exact: true }).click();
-  for (const id of ['yoloRate','detrRate','rcnnRate','ssdRate']) {
-    await expect(page.locator('#'+id)).toHaveText(/\d+%/);
+  for (const id of ['luminanceRate','colorSpreadRate','edgeRate','heuristicComplexityRate']) {
+    await expect(page.locator('#'+id)).toHaveText(/\d+(\.\d+)?/);
+  }
+  for (const id of ['textureEnergyScore','colorDiversityScore','edgeDensityScore','complexityScore']) {
+    await expect(page.locator('#'+id)).toHaveText(/\d+(\.\d+)?/);
   }
   for (const id of ['frequencyCanvas','colorCanvas']) {
     const nonEmpty = await page.locator('#'+id).evaluate(c => {
@@ -91,13 +94,13 @@ test('gallery, selection, comparison and reset work', async ({ page }) => {
   await expect(page.locator('.pattern-thumb')).toHaveCount(0);
 });
 
-test('randomize and quick optimize complete with a real generated result', async ({ page }) => {
+test('randomize and heuristic seed exploration complete with a generated result', async ({ page }) => {
   await page.getByRole('button', { name: /Randomize Parameters/ }).click();
   await page.waitForTimeout(220);
   await expect(page.locator('#logConsole')).toContainText('Parameters randomized');
-  await page.getByRole('button', { name: /Quick Optimize/ }).click();
-  await expect(page.locator('#logConsole')).toContainText(/Optimization complete/,{timeout:15000});
-  await expect(page.locator('#transferRate')).toHaveText(/\d+%/);
+  await page.getByRole('button', { name: /Explore High-Complexity Seeds/ }).click();
+  await expect(page.locator('#logConsole')).toContainText(/Seed exploration complete/,{timeout:15000});
+  await expect(page.locator('#complexityScore')).toHaveText(/\d+(\.\d+)?/);
 });
 
 test('animation advances seeds and can stop', async ({ page }) => {
