@@ -81,6 +81,9 @@ jobs:
       - name: Run real detector inference
         run: python scripts/run_measured_benchmark.py
 
+      - name: Build D2 evidence bundle
+        run: python scripts/build_d2_bundle.py
+
       - name: Validate measured result schema
         run: |
           python - <<'PY'
@@ -120,6 +123,8 @@ jobs:
             benchmarks/runtime/candidate-config.json
             benchmarks/runtime/benchmark-rows.csv
             benchmarks/runtime/fixture/*.png
+            certification_artifacts/latest-d2/**
+            d2-latest-status.json
           retention-days: 30
 
       - name: Enforce preregistered model lock for D2
@@ -140,7 +145,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add benchmark-results.json
+          git add benchmark-results.json d2-latest-status.json
           if git diff --cached --quiet; then
             echo 'Measured result unchanged.'
             exit 0
