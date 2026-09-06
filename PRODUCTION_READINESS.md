@@ -1,7 +1,7 @@
 # Production Readiness Gates
 
 **State review:** 2026-09-06  
-**Repository baseline:** `main` at `a9e827e` when this document was revised
+**Repository baseline:** post-`df43b4b` CI/Pattern-Lab hardening branch
 
 Status language is intentionally strict: **PASS** means the repository contains working evidence for that software gate; it does not imply physical-world adversarial efficacy.
 
@@ -19,10 +19,10 @@ Status language is intentionally strict: **PASS** means the repository contains 
 | Pattern Lab static UI | PRESENT | `index.html`, `styles.css`, `core.js`, `analysis.js` |
 | Pattern Lab candidate generators | PRESENT | Eight procedural browser generators plus palettes/controls |
 | Pattern Lab history/export | PRESENT | Gallery/history and PNG/JSON exports are implemented |
-| Pattern Lab model-backed efficacy scoring | **NOT IMPLEMENTED** | Current model-named percentages are heuristics; several dashboard metrics are randomized |
+| Pattern Lab model-backed efficacy scoring | **NOT IMPLEMENTED** | Browser metrics are now deterministic visual heuristics and are no longer labeled as detector attack-success results |
 | Pattern Lab ↔ Python pipeline integration | **NOT IMPLEMENTED** | No job/API/result bridge exists yet |
 | GitHub Pages workflow | PRESENT | Static-site deployment workflow exists; deployment availability is operational evidence only |
-| GitHub CI release gate | **BLOCKED** | First v3 import run reported 58 Ruff findings; fix lint and require a green workflow before treating CI as a release gate |
+| GitHub CI release gate | HARDENED / VALIDATION PENDING | Blocking gate now targets correctness errors; full Ruff debt is surfaced non-blocking; CPU-only Torch install avoids CUDA runner bloat |
 | Real Stable Diffusion prior | READY TO INTEGRATE | Optional adapter present; dependency/model was not exercised during v3 hardening |
 | Real CLIP aesthetic guidance | READY TO INTEGRATE | Optional adapter present; runtime was not exercised during v3 hardening |
 | Real detector ensemble | BLOCKED ON MANIFEST/WEIGHTS | Freeze open-model adapters, weights, preprocessing, thresholds, and versions |
@@ -35,9 +35,9 @@ Status language is intentionally strict: **PASS** means the repository contains 
 
 ## Immediate production-readiness order
 
-1. **Make CI green.** Resolve Ruff findings and keep pytest/smoke/package jobs behind the same required gate.
+1. **Validate CI green.** Confirm correctness lint, pytest, smoke, package, and dependency-audit behavior across Python 3.10–3.12; then require the blocking jobs on `main`.
 2. **Freeze benchmark provenance.** Model IDs, exact weights, preprocessing, thresholds, seed policy, transform grid, surrogate/held-out split, and artifact hashes.
-3. **Remove ambiguity from Pattern Lab.** Keep heuristic fields clearly labeled `DEMO/HEURISTIC` until model-backed results are imported from the Python benchmark.
+3. **Keep Pattern Lab evidence-safe.** Browser fields are deterministic visual heuristics only; model-backed results must arrive from the Python benchmark with provenance.
 4. **Connect real open-model evaluators.** Do not use browser-estimated model percentages as substitutes.
 5. **Collect calibrated deformation and print data.** Synthetic fixtures remain useful for CI but are not physical evidence.
 6. **Run physical degradation studies.** Resolution/distance, pose/angle, stretch, laundering, lighting, weather where appropriate.
