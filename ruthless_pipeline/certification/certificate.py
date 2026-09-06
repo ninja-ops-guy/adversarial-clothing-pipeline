@@ -46,7 +46,7 @@ def issue_certificate(
     if manifest.heldout_model_set != protocol.heldout_model_set:
         raise ValueError("held-out model set mismatch")
 
-    master_path = bundle.root / manifest.master.path
+    master_path = bundle.resolve_path(manifest.master.path)
     if not master_path.exists() or not master_path.is_file():
         raise ValueError(f"missing master artifact: {manifest.master.path}")
     if hash_file(master_path) != manifest.master.sha256:
