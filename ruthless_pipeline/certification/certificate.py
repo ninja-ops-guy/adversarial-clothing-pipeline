@@ -85,4 +85,8 @@ def issue_certificate(
         "evidence_state": cert.evidence_state.value,
         "decision": cert.decision.value,
     })
+    # Final integrity manifest covers certificate.json as well as the evidence artifacts.
+    # certificate.bundle_sha256 remains the evidence-root hash computed before the
+    # certificate was created, avoiding a recursive self-hash.
+    bundle.seal(exclude=("hashes.sha256",))
     return cert
