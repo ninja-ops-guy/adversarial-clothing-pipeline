@@ -31,7 +31,7 @@ Status language is intentionally strict: **PASS** means the repository contains 
 | ICC/fabric print calibration | NOT YET | Replace approximate NPS palette with measured printer/ink/fabric profile data |
 | Standards-aligned wash durability | NOT YET | Define laundering/colorimetry protocol and re-run the same frozen CV benchmark after each condition |
 | Pre-registered physical validation | NOT YET | Owned/authorized cameras; fixed pose/distance/angle/lighting/compression/garment-size protocol |
-| Product efficacy claim | **NOT SUPPORTED** | Requires held-out physical evidence, uncertainty reporting, and claim review |
+| Internal RAC certification framework | **IMPLEMENTED AS SOFTWARE** | Fail-closed manifests, protocol, baseline qualification, evidence states, bundle hashing, physical/manufacturing contracts |\n| Real frozen model manifests | **BLOCKED ON REAL WEIGHTS** | Empty model-set files intentionally prevent pretending placeholder models are certified evidence |\n| Physical evidence ingestion contract | **IMPLEMENTED AS SOFTWARE** | Real calibrated trials still must be collected in an owned/authorized lab |\n| Production lot conformity contract | **IMPLEMENTED AS SOFTWARE** | Real factory measurements still required |\n| Product efficacy claim | **NOT SUPPORTED** | Requires real held-out detector manifests, print calibration, physical evidence, durability and claim review |
 
 ## Immediate production-readiness order
 
