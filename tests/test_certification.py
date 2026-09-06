@@ -291,3 +291,35 @@ def test_manufacturing_rejects_nonfinite_measurements_duplicate_ids_and_bad_limi
         assert "finite and nonnegative" in str(exc)
     else:
         raise AssertionError("negative manufacturing limits must fail")
+
+
+def test_certificate_rejects_out_of_range_or_nonfinite_rates(tmp_path: Path):
+    protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
+    for bad_summary in (
+        {
+            "heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": -0.1},
+            "invalid_condition_fraction": 0.0,
+        },
+        {
+            "heldout": {"baseline_detection_rate": 1.1, "candidate_detection_rate": 0.3},
+            "invalid_condition_fraction": 0.0,
+        },
+        {
+            "heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3},
+            "invalid_condition_fraction": float("nan"),
+        },
+    ):
+        bundle = ArtifactBundle.create(tmp_path / f"bad-rate-{len(list(tmp_path.iterdir()))}")
+        (bundle.root / "master.png").write_bytes(b"pattern")
+        try:
+            issue_certificate(
+                bundle=bundle,
+                manifest=manifest(tmp_path),
+                protocol=protocol,
+                digital_summary=bad_summary,
+                requested_state=EvidenceState.DIGITAL_HELDOUT,
+            )
+        except ValueError as exc:
+            assert "finite value within [0,1]" in str(exc)
+        else:
+            raise AssertionError("invalid certification rates must fail closed")
