@@ -113,3 +113,30 @@ test('production mapper remains usable on mobile', async ({ page }) => {
   await expect(page.locator('#panelScaleValue')).toHaveText('130');
   await expect(page.locator('#panelMap')).toBeVisible();
 });
+
+
+test('rejects malformed or unsafe vendor templates', async ({ page }) => {
+  const bad = JSON.parse(JSON.stringify(vendorTemplate));
+  bad.canvas.width = 100;
+  bad.panels[0].width = 999999;
+  await page.locator('#templateFile').setInputFiles({
+    name: 'bad-template.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(bad))
+  });
+  await expect(page.locator('#productionStatus')).toContainText('TEMPLATE ERROR');
+  await expect(page.locator('#productionStatus')).toContainText(/safety limit|canvas bounds/);
+});
+
+test('rejects duplicate panel ids and broken seam references', async ({ page }) => {
+  const bad = JSON.parse(JSON.stringify(vendorTemplate));
+  bad.panels[1].id = 'front';
+  bad.seams[0].b = 'missing';
+  await page.locator('#templateFile').setInputFiles({
+    name: 'bad-seams.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(bad))
+  });
+  await expect(page.locator('#productionStatus')).toContainText('TEMPLATE ERROR');
+  await expect(page.locator('#productionStatus')).toContainText(/duplicate panel id|missing panel/);
+});
