@@ -49,7 +49,8 @@ const RACStudio=(()=>{
     signal_shadow:'SIGNAL SHADOW',machine_static:'MACHINE STATIC',ghost_hound:'GHOST HOUND',broken_human:'BROKEN HUMAN',error_garden:'ERROR GARDEN'
   };
 
-  let tile=null,manifest=null;
+  let tile=null,manifest=null,mode='generate';
+  const selectedMotifs=new Set();
   const $=id=>document.getElementById(id);
   function state(){
     const product=$('productType').value;
@@ -60,7 +61,8 @@ const RACStudio=(()=>{
       brand:($('brandName').value||'RUTHLESS').trim().toUpperCase(),
       productName:($('productName').value||N[product]).trim().toUpperCase(),
       collection:($('collectionName').value||'URBAN WILDERNESS').trim().toUpperCase(),
-      seed:+$('studioSeed').value,scale:+$('studioScale').value,density:+$('studioDensity').value,distress:+$('studioDistress').value
+      seed:+$('studioSeed').value,scale:+$('studioScale').value,density:+$('studioDensity').value,distress:+$('studioDistress').value,
+      featureMotifs:[...selectedMotifs]
     };
   }
   function defaults(force=false){
@@ -73,7 +75,7 @@ const RACStudio=(()=>{
   function makeTile(size,s=state()){
     const c=document.createElement('canvas');c.width=c.height=size;
     const x=c.getContext('2d');
-    const p={patternType:s.family,patternScale:s.scale,colorVariance:s.density,edgeIntensity:s.distress,symmetry:0,seed:s.seed};
+    const p={patternType:s.family,patternScale:s.scale,colorVariance:s.density,edgeIntensity:s.distress,symmetry:0,seed:s.seed,featureMotifs:s.featureMotifs};
     const pal=colorPalettes[s.family==='error_garden'?'error_garden':'rac_reference'];
     const r=seededRandom(s.seed),g=patternGenerators[s.family];
     if(!g)throw new Error('Missing pattern family: '+s.family);
@@ -202,7 +204,7 @@ const RACStudio=(()=>{
     return {
       schema_version:'1.1',generated_at:new Date().toISOString(),brand:s.brand,collection:s.collection,product:s.product,product_name:s.productName,
       art_direction_profile:'canonical_launch_capsule_v1',reference_target:FAMILY_TITLE[s.family]||s.family,
-      design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,repeat:'tile',master_export_px:4096},
+      design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,feature_motifs:s.featureMotifs,repeat:'tile',master_export_px:4096},
       outputs:{reference_board_px:[W,H],production_tile_px:[4096,4096]},production_status:'digital_design_ready',pod_status:'requires provider-specific print-template mapping'
     };
   }
@@ -214,10 +216,31 @@ const RACStudio=(()=>{
   function exportTile(){const s=state();$('studioStatus').textContent='BUILDING 4096 PX PRODUCTION TILE…';requestAnimationFrame(()=>{const t=makeTile(4096,s);dl(t.toDataURL('image/png'),`rac_${s.family}_seed-${s.seed}_4096.png`);$('studioStatus').textContent='READY · 4096 PX TILE EXPORTED';});}
   function exportManifest(){if(!manifest)render();const b=new Blob([JSON.stringify(manifest,null,2)],{type:'application/json'}),a=document.createElement('a');a.download=`rac_${state().product}_${Date.now()}_manifest.json`;a.href=URL.createObjectURL(b);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
   function next(){$('studioSeed').value=(+$('studioSeed').value+37)%1000;sync('studioSeed');render();}
+  function updateMotifUI(){
+    document.querySelectorAll('.motif-card[data-motif]').forEach(card=>card.classList.toggle('selected',selectedMotifs.has(card.dataset.motif)));
+    const names=[...selectedMotifs].map(v=>v.replaceAll('_',' ').toUpperCase());
+    $('motifCount').textContent=names.length?String(names.length):'AUTO';
+    $('motifSelection').textContent=names.length?names.join(' + '):'Click motifs above to add/remove stylized features from generated patterns.';
+  }
+  function toggleMotif(name){
+    if(selectedMotifs.has(name))selectedMotifs.delete(name);else selectedMotifs.add(name);
+    updateMotifUI();render();
+  }
+  function setMode(nextMode){
+    mode=nextMode;
+    document.querySelectorAll('.mode-tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.mode===mode));
+    if(mode==='generate'){$('studioStatus').textContent='GENERATE MODE · ADJUST CONDITIONS AND BUILD A PATTERN';return;}
+    if(mode==='refine'){$('studioStatus').textContent='REFINE MODE · SELECT MOTIFS, SCALE, DENSITY AND DISTRESS';document.querySelector('.motif-section').scrollIntoView({behavior:'smooth',block:'start'});return;}
+    if(mode==='batch'){next();$('studioStatus').textContent='BATCH MODE · ADVANCED TO NEXT DETERMINISTIC VARIATION';return;}
+    if(mode==='export'){$('studioStatus').textContent='EXPORT MODE · CHOOSE A VERIFIED OUTPUT';document.querySelector('.export-panel').scrollIntoView({behavior:'smooth',block:'center'});}
+  }
   function init(){
     ['studioSeed','studioScale','studioDensity','studioDistress'].forEach(id=>{sync(id);$(id).addEventListener('input',()=>sync(id));});
-    $('productType').addEventListener('change',()=>{defaults();render();});$('designFamily').addEventListener('change',()=>{defaults();render();});$('productName').addEventListener('input',()=>{$('productName').dataset.edited='true';});defaults(true);render();
+    $('productType').addEventListener('change',()=>{defaults();render();});$('designFamily').addEventListener('change',()=>{defaults();render();});$('productName').addEventListener('input',()=>{$('productName').dataset.edited='true';});
+    document.querySelectorAll('.motif-card[data-motif]').forEach(card=>card.addEventListener('click',()=>toggleMotif(card.dataset.motif)));
+    document.querySelectorAll('.mode-tab').forEach(tab=>tab.addEventListener('click',()=>setMode(tab.dataset.mode)));
+    updateMotifUI();defaults(true);render();
   }
-  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next};
+  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode};
 })();
 window.addEventListener('DOMContentLoaded',RACStudio.init);
