@@ -87,7 +87,8 @@ jobs:
           import json
           from pathlib import Path
           result = json.loads(Path('benchmark-results.json').read_text())
-          assert result['status'] == 'measured'
+          assert result['status'] in {'measured_locked', 'measured_unlocked'}
+          assert isinstance(result['certification_eligible'], bool)
           assert set(result['models']) == {
               'yolov8n',
               'detr_resnet50',
@@ -95,6 +96,8 @@ jobs:
               'ssdlite320_mobilenet_v3',
           }
           assert result['benchmark']['raw_row_count'] > 0
+          assert result['benchmark']['surrogate_models']
+          assert result['benchmark']['heldout_models']
           for name, model in result['models'].items():
               assert model['n'] > 0, name
               assert 0 <= model['baseline_detection_rate'] <= 1, name
@@ -112,11 +115,25 @@ jobs:
           name: measured-detector-benchmark-${{ github.run_id }}
           path: |
             benchmark-results.json
+            benchmarks/runtime/model-lock-proposal.json
             benchmarks/runtime/candidate.png
             benchmarks/runtime/candidate-config.json
             benchmarks/runtime/benchmark-rows.csv
             benchmarks/runtime/fixture/*.png
           retention-days: 30
+
+      - name: Enforce preregistered model lock for D2
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('benchmark-results.json').read_text())
+          if not result['certification_eligible']:
+              print('D2 BLOCKED: detector states are measured but not preregistered.')
+              print('\n'.join(result.get('lock_failures', [])))
+          else:
+              print('Detector ensemble matches preregistered state hashes.')
+          PY
 
       - name: Publish latest measured JSON to main
         if: github.event_name != 'pull_request'
