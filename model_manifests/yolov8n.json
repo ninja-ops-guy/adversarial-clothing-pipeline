@@ -17,8 +17,8 @@
   "decision_threshold": 0.5,
   "nms_threshold": null,
   "metadata": {
-    "role": "surrogate",
     "hash_scope": "loaded_state_dict",
-    "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32"
+    "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32",
+    "role_source": "model_sets/*; role is generation-specific"
   }
 }
