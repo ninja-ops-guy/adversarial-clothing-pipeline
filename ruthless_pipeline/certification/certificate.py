@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from enum import StrEnum
-from pathlib import Path
 
+from ..compat import StrEnum
 from .artifact_bundle import ArtifactBundle
 from .manifest import EvidenceState, PatternManifest
 from .protocol import CertificationProtocol
