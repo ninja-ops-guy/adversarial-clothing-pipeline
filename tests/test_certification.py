@@ -225,3 +225,69 @@ def test_manufacturing_flag_alone_cannot_unlock_m1(tmp_path: Path):
         assert "manufacturing/golden_sample.json" in str(exc)
     else:
         raise AssertionError("manufacturing boolean flag must not substitute for artifacts")
+
+
+def test_physical_trials_reject_nonfinite_and_duplicate_ids():
+    import math
+    from ruthless_pipeline.certification.physical import PhysicalTrial, summarize_physical_trials
+
+    bad = [
+        PhysicalTrial("T1", "C1", True, False, "CAM1", math.nan, 0, 0, "standing", "L1"),
+    ]
+    try:
+        summarize_physical_trials(bad)
+    except ValueError as exc:
+        assert "must be finite" in str(exc)
+    else:
+        raise AssertionError("non-finite physical measurements must fail")
+
+    dup = [
+        PhysicalTrial("T1", "C1", True, False, "CAM1", 1.0, 0, 0, "standing", "L1"),
+        PhysicalTrial("T1", "C2", True, False, "CAM1", 2.0, 0, 0, "walking", "L1"),
+    ]
+    try:
+        summarize_physical_trials(dup)
+    except ValueError as exc:
+        assert "duplicate trial_id" in str(exc)
+    else:
+        raise AssertionError("duplicate physical trial ids must fail")
+
+
+def test_manufacturing_rejects_nonfinite_measurements_duplicate_ids_and_bad_limits():
+    import math
+    from ruthless_pipeline.certification.manufacturing import (
+        ConformityLimits,
+        ConformityMeasurement,
+        evaluate_lot_conformity,
+    )
+
+    limits = ConformityLimits(3.0, 2.0, 5.0, 2.0)
+    ok, failures = evaluate_lot_conformity(
+        [ConformityMeasurement("S1", math.nan, 0.0, 0.0, 0.0)],
+        limits,
+    )
+    assert not ok
+    assert "S1: non-finite measurement" in failures
+
+    try:
+        evaluate_lot_conformity(
+            [
+                ConformityMeasurement("S1", 1.0, 0.0, 0.0, 0.0),
+                ConformityMeasurement("S1", 1.0, 0.0, 0.0, 0.0),
+            ],
+            limits,
+        )
+    except ValueError as exc:
+        assert "duplicate sample_id" in str(exc)
+    else:
+        raise AssertionError("duplicate manufacturing sample ids must fail")
+
+    try:
+        evaluate_lot_conformity(
+            [ConformityMeasurement("S2", 1.0, 0.0, 0.0, 0.0)],
+            ConformityLimits(-1.0, 2.0, 5.0, 2.0),
+        )
+    except ValueError as exc:
+        assert "finite and nonnegative" in str(exc)
+    else:
+        raise AssertionError("negative manufacturing limits must fail")
