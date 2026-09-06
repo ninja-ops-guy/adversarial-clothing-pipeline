@@ -5,6 +5,7 @@
     "retinanet_resnet50_fpn_v2",
     "fcos_resnet50_fpn"
   ],
-  "status": "LOCK_PENDING",
-  "source_manifest": "benchmarks/model_manifest.json"
+  "status": "PREREGISTERED",
+  "source_manifest": "benchmarks/model_manifest.json",
+  "lock_source_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4"
 }
