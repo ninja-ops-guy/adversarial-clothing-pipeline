@@ -40,6 +40,7 @@ jobs:
           if-no-files-found: ignore
 
   deployed-pages-smoke:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     needs: local-browser-matrix
     steps:
@@ -52,4 +53,12 @@ jobs:
       - name: Verify deployed site
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
-        run: npx playwright test --project=chromium-desktop --grep "all pattern generators|analysis produces|PNG, JSON, SVG"
+        run: |
+          for attempt in {1..12}; do
+            if npx playwright test --project=chromium-desktop --grep "all pattern generators|analysis produces|PNG, JSON, SVG"; then
+              exit 0
+            fi
+            echo "Pages smoke attempt $attempt failed; waiting for deployment propagation..."
+            sleep 10
+          done
+          exit 1
