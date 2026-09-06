@@ -1,0 +1,61 @@
+{
+  "generated_from_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4",
+  "inference_performed": false,
+  "models": {
+    "detr_resnet50": {
+      "decision_threshold": 0.5,
+      "display_name": "DETR ResNet-50",
+      "framework": "transformers",
+      "framework_version": "4.57.6",
+      "model_ref": "facebook/detr-resnet-50",
+      "role": "surrogate",
+      "state_dict_sha256": "ba2a4b1a72e362a84b8a31511e7a1dfa9a28226898d1738a5db4cb3673ce9ec7"
+    },
+    "fasterrcnn_mobilenet_v3_320": {
+      "decision_threshold": 0.5,
+      "display_name": "Faster R-CNN MobileNetV3 320 FPN",
+      "framework": "torchvision",
+      "framework_version": "0.29.0+cpu",
+      "model_ref": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT",
+      "role": "surrogate",
+      "state_dict_sha256": "e89b81090180d2b5894750544fb6401b1a546b328f31ee6da7348f4968b12e61"
+    },
+    "fcos_resnet50_fpn": {
+      "decision_threshold": 0.5,
+      "display_name": "FCOS ResNet-50 FPN",
+      "framework": "torchvision",
+      "framework_version": "0.29.0+cpu",
+      "model_ref": "FCOS_ResNet50_FPN_Weights.DEFAULT",
+      "role": "heldout",
+      "state_dict_sha256": "2ceeb6e946fdbbad8106ccbff6225d72cd53f732ab205fa33085212b6b6ab853"
+    },
+    "retinanet_resnet50_fpn_v2": {
+      "decision_threshold": 0.5,
+      "display_name": "RetinaNet ResNet-50 FPN V2",
+      "framework": "torchvision",
+      "framework_version": "0.29.0+cpu",
+      "model_ref": "RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
+      "role": "heldout",
+      "state_dict_sha256": "8f4b5b84900a522eb49a946deeb717ae334d27cd9f5e00c64f1461c909c3552f"
+    },
+    "ssdlite320_mobilenet_v3": {
+      "decision_threshold": 0.5,
+      "display_name": "SSDLite320 MobileNetV3",
+      "framework": "torchvision",
+      "framework_version": "0.29.0+cpu",
+      "model_ref": "SSDLite320_MobileNet_V3_Large_Weights.DEFAULT",
+      "role": "surrogate",
+      "state_dict_sha256": "711cd0e2d35ce1921972aad81b9924a1fedeff902e4bb61f64c05b6cac35a7e1"
+    },
+    "yolov8n": {
+      "decision_threshold": 0.5,
+      "display_name": "YOLOv8n",
+      "framework": "ultralytics",
+      "framework_version": "8.4.142",
+      "model_ref": "yolov8n.pt",
+      "role": "surrogate",
+      "state_dict_sha256": "fc3866bddeb949fed0de53bfb9498ccb51645936920c89888dc730df082a1776"
+    }
+  },
+  "schema_version": "2.0"
+}
