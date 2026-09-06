@@ -69,6 +69,19 @@ def main() -> int:
     bundle.write_json("digital/benchmark-results.json", result)
     bundle.write_json("digital/summary.json", result["benchmark"]["comparative_summary"])
     bundle.write_json("digital/model-lock.json", result["model_lock"])
+    for model_id in result["benchmark"]["surrogate_models"] + result["benchmark"]["heldout_models"]:
+        model_path = Path("model_manifests") / f"{model_id}.json"
+        if not model_path.exists():
+            raise SystemExit(f"missing frozen model manifest: {model_path}")
+        bundle.write_json(f"manifests/models/{model_id}.json", json.loads(model_path.read_text()))
+    for set_name in (protocol.surrogate_model_set, protocol.heldout_model_set):
+        set_path = Path("model_sets") / f"{set_name}.json"
+        if not set_path.exists():
+            raise SystemExit(f"missing model set: {set_path}")
+        set_payload = json.loads(set_path.read_text())
+        if set_payload.get("status") != "PREREGISTERED":
+            raise SystemExit(f"model set not preregistered: {set_name}")
+        bundle.write_json(f"manifests/model_sets/{set_name}.json", set_payload)
 
     cert = issue_certificate(
         bundle=bundle,
