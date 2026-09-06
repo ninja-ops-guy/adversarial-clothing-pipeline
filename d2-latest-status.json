@@ -1,0 +1,18 @@
+{
+  "bundle_verified": true,
+  "candidate_id": "RAC-POOL-005",
+  "certificate_id": "RAC-POOL-005-1.0.0-1.0",
+  "decision": "FAIL",
+  "evidence_state": "RAC-D0",
+  "heldout": {
+    "baseline_detection_rate": 1.0,
+    "baseline_mean": 0.9611404339472452,
+    "candidate_detection_rate": 0.7777777777777778,
+    "candidate_mean": 0.7275460147195392,
+    "mean_delta": -0.23359441922770607,
+    "n": 36,
+    "valid_n": 36
+  },
+  "invalid_condition_fraction": 0.0,
+  "verification_failures": []
+}
