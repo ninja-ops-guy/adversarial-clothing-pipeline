@@ -95,7 +95,11 @@ class EvidenceRecord:
         for name, digest in self.artifact_hashes.items():
             if not name or not _is_sha256(digest):
                 raise ValueError(f"invalid SHA-256 for artifact {name!r}")
-        if self.evidence_type == EvidenceType.DIGITAL and self.model_metadata:
+        measured_digital_states = {
+            EvidenceState.SURROGATE,
+            EvidenceState.DIGITAL_HELDOUT,
+        }
+        if self.rac_state in measured_digital_states:
             required = {"models", "preprocessing", "thresholds"}
             missing = required - set(self.model_metadata)
             if missing:
@@ -103,6 +107,8 @@ class EvidenceRecord:
                     "digital model evidence missing metadata: "
                     + ", ".join(sorted(missing))
                 )
+            if not self.model_metadata.get("models"):
+                raise ValueError("digital model evidence requires at least one model")
 
 
 @dataclass(frozen=True)
