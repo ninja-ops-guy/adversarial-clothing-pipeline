@@ -1,0 +1,61 @@
+name: Bootstrap Detector Model Lock
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmarks/model_manifest.json'
+      - 'scripts/bootstrap_model_lock.py'
+      - 'scripts/run_measured_benchmark.py'
+      - 'benchmarks/requirements.txt'
+      - '.github/workflows/model-lock-bootstrap.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: detector-model-lock-bootstrap
+  cancel-in-progress: true
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Check whether bootstrap is needed
+        id: lock
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('benchmarks/model_manifest.json').read_text())
+          ready=m.get('lock_status')=='PREREGISTERED' and all(len(str(x.get('state_dict_sha256','')))==64 for x in m['models'])
+          with open(__import__('os').environ['GITHUB_OUTPUT'],'a') as f:
+              f.write(f"needed={'false' if ready else 'true'}\n")
+          PY
+      - name: Install CPU PyTorch
+        if: steps.lock.outputs.needed == 'true'
+        run: python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+      - name: Install pipeline and detector adapters
+        if: steps.lock.outputs.needed == 'true'
+        run: |
+          python -m pip install -e . --no-deps
+          python -m pip install -r benchmarks/requirements.txt
+      - name: Bootstrap hashes without candidate inference
+        if: steps.lock.outputs.needed == 'true'
+        run: python scripts/bootstrap_model_lock.py
+      - name: Publish lock proposal
+        if: steps.lock.outputs.needed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add benchmarks/model-lock-proposal.json
+          git commit -m 'benchmark: publish detector model lock proposal [skip benchmark]' || exit 0
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
