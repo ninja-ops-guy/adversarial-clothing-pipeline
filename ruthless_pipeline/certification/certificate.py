@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 
 from .artifact_bundle import ArtifactBundle
@@ -9,7 +9,7 @@ from .manifest import EvidenceState, PatternManifest
 from .protocol import CertificationProtocol
 
 
-class CertificateDecision(StrEnum):
+class CertificateDecision(str, Enum):
     PASS = "PASS"
     FAIL = "FAIL"
 
