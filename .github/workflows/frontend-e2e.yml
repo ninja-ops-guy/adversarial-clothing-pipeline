@@ -64,7 +64,8 @@ jobs:
           import json
           from pathlib import Path
           p = json.loads(Path('/tmp/benchmark-results.json').read_text())
-          assert p.get('status') == 'measured'
+          assert p.get('status') in {'measured_locked', 'measured_unlocked'}
+          assert isinstance(p.get('certification_eligible'), bool)
           assert set(p.get('models', {})) >= {
               'yolov8n', 'detr_resnet50',
               'fasterrcnn_mobilenet_v3_320', 'ssdlite320_mobilenet_v3'
