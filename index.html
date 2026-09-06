@@ -107,9 +107,9 @@
                 </div>
                 <div class="section-divider"></div>
                 <div class="metrics-grid">
-                    <div class="metric-card"><div class="metric-label">Transfer Rate (Est.)</div><div class="metric-value" id="transferRate" style="color: var(--accent-green);">--%</div></div>
-                    <div class="metric-card"><div class="metric-label">Stealth Score</div><div class="metric-value" id="stealthScore" style="color: var(--accent-blue);">--/10</div></div>
-                    <div class="metric-card"><div class="metric-label">Printability</div><div class="metric-value" id="printabilityScore" style="color: var(--accent-orange);">--/10</div></div>
+                    <div class="metric-card"><div class="metric-label">Texture Energy</div><div class="metric-value" id="textureEnergyScore" style="color: var(--accent-green);">--/10</div></div>
+                    <div class="metric-card"><div class="metric-label">Color Diversity</div><div class="metric-value" id="colorDiversityScore" style="color: var(--accent-blue);">--/10</div></div>
+                    <div class="metric-card"><div class="metric-label">Edge Density</div><div class="metric-value" id="edgeDensityScore" style="color: var(--accent-orange);">--/10</div></div>
                     <div class="metric-card"><div class="metric-label">Complexity</div><div class="metric-value" id="complexityScore" style="color: var(--accent-purple);">--</div></div>
                 </div>
             </div>
@@ -126,10 +126,10 @@
             </div>
             <div class="tab-content" id="analysis">
                 <div class="panel-body">
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">YOLOv8 Attack Success</span><span class="progress-value" id="yoloRate">--%</span></div><div class="progress-bar"><div class="progress-fill blue" id="yoloBar" style="width: 0%"></div></div></div>
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">DETR Attack Success</span><span class="progress-value" id="detrRate">--%</span></div><div class="progress-bar"><div class="progress-fill green" id="detrBar" style="width: 0%"></div></div></div>
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Faster R-CNN Attack Success</span><span class="progress-value" id="rcnnRate">--%</span></div><div class="progress-bar"><div class="progress-fill orange" id="rcnnBar" style="width: 0%"></div></div></div>
-                    <div class="progress-container"><div class="progress-header"><span class="progress-label">SSD MobileNet Attack Success</span><span class="progress-value" id="ssdRate">--%</span></div><div class="progress-bar"><div class="progress-fill red" id="ssdBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Mean Luminance</span><span class="progress-value" id="luminanceRate">--</span></div><div class="progress-bar"><div class="progress-fill blue" id="luminanceBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Color Spread</span><span class="progress-value" id="colorSpreadRate">--</span></div><div class="progress-bar"><div class="progress-fill green" id="colorSpreadBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Horizontal Edge Density</span><span class="progress-value" id="edgeRate">--</span></div><div class="progress-bar"><div class="progress-fill orange" id="edgeBar" style="width: 0%"></div></div></div>
+                    <div class="progress-container"><div class="progress-header"><span class="progress-label">Heuristic Complexity</span><span class="progress-value" id="heuristicComplexityRate">--</span></div><div class="progress-bar"><div class="progress-fill red" id="heuristicComplexityBar" style="width: 0%"></div></div></div>
                     <div class="section-divider"></div>
                     <div class="control-group"><div class="control-label"><label>Frequency Spectrum</label></div><div class="canvas-container" style="min-height: 150px;"><canvas id="frequencyCanvas" width="512" height="150"></canvas></div></div>
                     <div class="section-divider"></div>
@@ -148,7 +148,7 @@
                 <div class="section-divider"></div>
                 <div class="control-group"><div class="control-label"><label>Pattern History</label><span class="control-value" id="historyCount">0</span></div><div style="max-height: 150px; overflow-y: auto;"><div id="patternHistory"></div></div></div>
                 <div class="section-divider"></div>
-                <div class="control-group"><div class="control-label"><label>Quick Actions</label></div><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Quick Optimize</button><button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button></div>
+                <div class="control-group"><div class="control-label"><label>Quick Actions</label></div><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button><button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Explore High-Complexity Seeds</button><button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button></div>
             </div>
         </div>
     </div>
