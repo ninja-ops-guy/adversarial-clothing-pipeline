@@ -184,3 +184,30 @@ test('showcase source provenance is recorded in exported manifest', async ({ pag
     asset: 'RAC Textile Generator Showcase'
   });
 });
+
+
+test('variation preset buttons each alter generator state and render output', async ({ page }) => {
+  const seen = new Set();
+  for (const preset of ['original', 'high_contrast', 'desaturated', 'alt_palette', 'scale_plus']) {
+    const button = page.locator(`.variation-card[data-variation="${preset}"]`);
+    await button.click();
+    await expect(button).toHaveClass(/selected/);
+    const tail = await page.locator('#studioPatternCanvas').evaluate(c => c.toDataURL().slice(-1200));
+    seen.add(tail);
+  }
+  expect(seen.size).toBeGreaterThanOrEqual(4);
+});
+
+test('4096 tile export button produces a non-empty download', async ({ page }) => {
+  const wait = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export 4096px POD Tile' }).click();
+  const download = await wait;
+  const path = await download.path();
+  expect(fs.statSync(path).size).toBeGreaterThan(1000);
+});
+
+test('showcase asset is fully loaded before source blending', async ({ page }) => {
+  await expect.poll(async () => page.locator('#showcaseReference').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  await page.locator('#useShowcaseSource').check();
+  await expect(page.locator('#studioStatus')).toContainText('READY');
+});
