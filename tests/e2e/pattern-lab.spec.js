@@ -3,7 +3,7 @@ const { test, expect } = require('@playwright/test');
 test.beforeEach(async ({ page }) => {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  await page.goto('/');
+  await page.goto(process.env.BASE_URL || '/');
   await expect(page.locator('#previewCanvas')).toBeVisible();
   await expect(page.locator('#historyCount')).not.toHaveText('0');
   page.__errors = errors;
