@@ -18,3 +18,15 @@ async function importMeasuredResults(file) {
         log(`Measured benchmark import failed: ${error.message}`, 'error');
     }
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+    const actions = document.querySelector('.header-actions');
+    if (!actions || document.getElementById('productStudioLink')) return;
+    const link = document.createElement('a');
+    link.id = 'productStudioLink';
+    link.className = 'btn btn-secondary';
+    link.href = 'product-studio.html';
+    link.style.textDecoration = 'none';
+    link.innerHTML = '<span>🧵</span> Product Studio';
+    actions.prepend(link);
+});
