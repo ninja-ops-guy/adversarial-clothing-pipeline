@@ -63,7 +63,7 @@ test('simulation works across every pose, fabric and lighting option', async ({ 
   await expect(page.locator('#warpIntensityValue')).toHaveText('80');
 });
 
-test('analysis produces visible numeric metrics and charts', async ({ page }) => {
+test('analysis produces visible heuristic metrics and charts', async ({ page }) => {
   await page.getByText('Analysis', { exact: true }).click();
   for (const id of ['yoloRate','detrRate','rcnnRate','ssdRate']) {
     await expect(page.locator('#'+id)).toHaveText(/\d+%/);
@@ -91,12 +91,12 @@ test('gallery, selection, comparison and reset work', async ({ page }) => {
   await expect(page.locator('.pattern-thumb')).toHaveCount(0);
 });
 
-test('randomize and quick optimize complete with a real generated result', async ({ page }) => {
+test('randomize and heuristic seed search complete with a real generated result', async ({ page }) => {
   await page.getByRole('button', { name: /Randomize Parameters/ }).click();
   await page.waitForTimeout(220);
   await expect(page.locator('#logConsole')).toContainText('Parameters randomized');
   await page.getByRole('button', { name: /Quick Optimize/ }).click();
-  await expect(page.locator('#logConsole')).toContainText(/Optimization complete/,{timeout:15000});
+  await expect(page.locator('#logConsole')).toContainText(/Heuristic seed search complete/,{timeout:15000});
   await expect(page.locator('#transferRate')).toHaveText(/\d+%/);
 });
 
@@ -136,4 +136,25 @@ test('mobile viewport remains usable', async ({ page }) => {
   await expect(page.locator('#gallery')).toBeVisible();
   await page.getByText('Preview', { exact: true }).click();
   await expect(page.locator('#previewCanvas')).toBeVisible();
+});
+
+
+test('measured benchmark imports are explicitly labeled and provenance is displayed', async ({ page }) => {
+  await page.getByText('Analysis', { exact: true }).click();
+  const payload = {
+    experiment_id: 'EXP-001',
+    config: { heldout_models: ['DET-HO-001'] },
+    summary: {
+      heldout: { baseline_detection_rate: 1.0, candidate_detection_rate: 0.4 },
+      invalid_condition_fraction: 0.0
+    }
+  };
+  await page.locator('#measuredResultsFile').setInputFiles({
+    name: 'benchmark.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(payload))
+  });
+  await expect(page.locator('#measuredEvidence')).toContainText('INTERNALLY MEASURED');
+  await expect(page.locator('#measuredEvidence')).toContainText('EXP-001');
+  await expect(page.locator('#measuredEvidence')).toContainText('DET-HO-001');
 });
