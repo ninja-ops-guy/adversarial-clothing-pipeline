@@ -199,3 +199,13 @@ test('4096 tile export button produces a non-empty download', async ({ page }) =
   const path = await download.path();
   expect(fs.statSync(path).size).toBeGreaterThan(1000);
 });
+
+
+test('showcase source is never rejected for low resolution', async ({ page }) => {
+  const toggle = page.locator('#useShowcaseSource');
+  await expect(toggle).toBeEnabled();
+  await toggle.check();
+  await expect(toggle).toBeChecked();
+  await expect(page.locator('.showcase-source-section')).not.toContainText('LOW-RES SOURCE REJECTED');
+  await expect(page.locator('.showcase-source-section')).not.toContainText('blocked from pattern sampling');
+});
