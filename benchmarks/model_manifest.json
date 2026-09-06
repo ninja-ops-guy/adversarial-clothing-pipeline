@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "task": "person_detection",
   "threshold": 0.5,
   "models": [
@@ -8,28 +8,40 @@
       "display_name": "YOLOv8n",
       "framework": "ultralytics",
       "model_ref": "yolov8n.pt",
-      "person_class": 0
-    },
-    {
-      "id": "detr_resnet50",
-      "display_name": "DETR ResNet-50",
-      "framework": "transformers",
-      "model_ref": "facebook/detr-resnet-50",
-      "person_class": "person"
+      "person_class": 0,
+      "role": "surrogate",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
     },
     {
       "id": "fasterrcnn_mobilenet_v3_320",
       "display_name": "Faster R-CNN MobileNetV3 320 FPN",
       "framework": "torchvision",
       "model_ref": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT",
-      "person_class": 1
+      "person_class": 1,
+      "role": "surrogate",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
+    },
+    {
+      "id": "detr_resnet50",
+      "display_name": "DETR ResNet-50",
+      "framework": "transformers",
+      "model_ref": "facebook/detr-resnet-50",
+      "person_class": "person",
+      "role": "heldout",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
     },
     {
       "id": "ssdlite320_mobilenet_v3",
       "display_name": "SSDLite320 MobileNetV3",
       "framework": "torchvision",
       "model_ref": "SSDLite320_MobileNet_V3_Large_Weights.DEFAULT",
-      "person_class": 1
+      "person_class": 1,
+      "role": "heldout",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_RUN_BOOTSTRAP_AND_COMMIT_HASH"
     }
   ],
   "fixture": {
@@ -40,8 +52,23 @@
     "note": "Convenience digital fixture for repeatable CI measurement only; not a physical-garment or population-level benchmark."
   },
   "transform_sweep": {
-    "brightness": [0.7, 1.0, 1.3],
-    "scale": [1.0],
-    "blur_sigma": [0.0, 0.8]
-  }
+    "brightness": [
+      0.7,
+      1,
+      1.3
+    ],
+    "scale": [
+      1
+    ],
+    "blur_sigma": [
+      0,
+      0.8
+    ],
+    "rotation_deg": [
+      -20,
+      0,
+      20
+    ]
+  },
+  "min_baseline_score": 0.5
 }
