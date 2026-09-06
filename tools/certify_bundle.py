@@ -45,7 +45,7 @@ def main() -> int:
     benchmark = json.loads(Path(args.benchmark).read_text())
     summary = benchmark.get("summary", benchmark)
     bundle = ArtifactBundle.create(args.bundle)
-    bundled_master = bundle.root / manifest.master.path
+    bundled_master = bundle.resolve_path(manifest.master.path)
     if args.master:
         source_master = Path(args.master)
         if not source_master.exists() or not source_master.is_file():
