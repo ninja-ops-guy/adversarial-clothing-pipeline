@@ -3,12 +3,12 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import asdict, dataclass, field
-from enum import StrEnum
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
 
-class EvidenceState(StrEnum):
+class EvidenceState(str, Enum):
     DESIGN = "RAC-D0"
     SURROGATE = "RAC-D1"
     DIGITAL_HELDOUT = "RAC-D2"
