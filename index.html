@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adversarial Pattern Lab - Simulation & Generation Testbed</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🔬 Adversarial Pattern Lab</h1>
+            <div class="subtitle">Simulation & Generation Testbed v2.0.0 | Black-Box Pipeline</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="resetAll()"><span>↺</span> Reset</button>
+            <button class="btn btn-secondary" onclick="exportConfig()"><span>📥</span> Export Config</button>
+            <button class="btn btn-success" onclick="generatePattern()"><span>⚡</span> Generate Pattern</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel">
+            <div class="panel-header">
+                <h3><span class="icon">🎛️</span> Generation Controls</h3>
+                <span class="badge badge-info">v2.0</span>
+            </div>
+            <div class="panel-body">
+                <div class="control-group">
+                    <div class="control-label"><label>Pattern Type</label></div>
+                    <select id="patternType" onchange="updatePatternType()">
+                        <option value="noise">High-Frequency Noise</option>
+                        <option value="geometric">Geometric Abstract</option>
+                        <option value="organic">Organic/Natural</option>
+                        <option value="checkered">Checkered/Grid</option>
+                        <option value="striped">Striped/Lined</option>
+                        <option value="circular">Circular/Radial</option>
+                        <option value="cellular">Cellular Automata</option>
+                        <option value="perlin">Perlin Noise</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Pattern Scale</label><span class="control-value" id="patternScaleValue">50</span></div>
+                    <input type="range" id="patternScale" min="5" max="100" value="50" oninput="updateSlider('patternScale')">
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Color Variance</label><span class="control-value" id="colorVarianceValue">70</span></div>
+                    <input type="range" id="colorVariance" min="0" max="100" value="70" oninput="updateSlider('colorVariance')">
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Edge Intensity</label><span class="control-value" id="edgeIntensityValue">60</span></div>
+                    <input type="range" id="edgeIntensity" min="0" max="100" value="60" oninput="updateSlider('edgeIntensity')">
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Symmetry</label><span class="control-value" id="symmetryValue">0</span></div>
+                    <input type="range" id="symmetry" min="0" max="4" value="0" oninput="updateSlider('symmetry')">
+                </div>
+                <div class="section-divider"></div>
+                <div class="control-group">
+                    <div class="control-label"><label>Color Palette</label></div>
+                    <select id="colorPalette" onchange="updateColorPalette()">
+                        <option value="vibrant">Vibrant/Multi</option>
+                        <option value="monochrome">Monochrome</option>
+                        <option value="earth">Earth Tones</option>
+                        <option value="cool">Cool Blues</option>
+                        <option value="warm">Warm Reds/Oranges</option>
+                        <option value="pastel">Pastel Soft</option>
+                        <option value="neon">Neon/Cyber</option>
+                        <option value="stealth">Stealth/Dark</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Seed (Randomness)</label><span class="control-value" id="seedValue">42</span></div>
+                    <input type="range" id="seed" min="0" max="999" value="42" oninput="updateSlider('seed')">
+                </div>
+                <div class="section-divider"></div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Enable Animation</span>
+                    <div class="toggle" id="animationToggle" onclick="toggleSwitch('animationToggle')"></div>
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Auto-Optimize</span>
+                    <div class="toggle" id="autoOptimizeToggle" onclick="toggleSwitch('autoOptimizeToggle')"></div>
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">High Contrast Mode</span>
+                    <div class="toggle" id="contrastToggle" onclick="toggleSwitch('contrastToggle')"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('preview', this)">Preview</div>
+                <div class="tab" onclick="switchTab('simulation', this)">Simulation</div>
+                <div class="tab" onclick="switchTab('analysis', this)">Analysis</div>
+                <div class="tab" onclick="switchTab('gallery', this)">Gallery</div>
+            </div>
+            <div class="tab-content active" id="preview">
+                <div class="canvas-container" style="min-height: 400px;">
+                    <canvas id="previewCanvas" width="512" height="512"></canvas>
+                    <div class="canvas-label">PATTERN PREVIEW</div>
+                    <div class="loading-overlay" id="previewLoading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Generating pattern...</div>
+                    </div>
+                </div>
+                <div class="section-divider"></div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Transfer Rate (Est.)</div>
+                        <div class="metric-value" id="transferRate" style="color: var(--accent-green);">--%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Stealth Score</div>
+                        <div class="metric-value" id="stealthScore" style="color: var(--accent-blue);">--/10</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Printability</div>
+                        <div class="metric-value" id="printabilityScore" style="color: var(--accent-orange);">--/10</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Complexity</div>
+                        <div class="metric-value" id="complexityScore" style="color: var(--accent-purple);">--</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="simulation">
+                <div class="canvas-container" style="min-height: 400px;">
+                    <canvas id="simulationCanvas" width="512" height="512"></canvas>
+                    <div class="canvas-label">FABRIC SIMULATION</div>
+                </div>
+                <div class="section-divider"></div>
+                <div class="control-group">
+                    <div class="control-label"><label>Pose</label></div>
+                    <select id="poseSelect" onchange="runSimulation()">
+                        <option value="standing">Standing</option>
+                        <option value="walking">Walking</option>
+                        <option value="sitting">Sitting</option>
+                        <option value="arms_raised">Arms Raised</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Fabric Type</label></div>
+                    <select id="fabricType" onchange="runSimulation()">
+                        <option value="cotton">Cotton</option>
+                        <option value="polyester">Polyester</option>
+                        <option value="silk">Silk</option>
+                        <option value="denim">Denim</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Warp Intensity</label><span class="control-value" id="warpIntensityValue">30</span></div>
+                    <input type="range" id="warpIntensity" min="0" max="100" value="30" oninput="updateSlider('warpIntensity')">
+                </div>
+                <div class="control-group">
+                    <div class="control-label"><label>Lighting</label></div>
+                    <select id="lightingSelect" onchange="runSimulation()">
+                        <option value="indoor">Indoor</option>
+                        <option value="outdoor">Outdoor</option>
+                        <option value="low_light">Low Light</option>
+                        <option value="direct_sun">Direct Sun</option>
+                    </select>
+                </div>
+            </div>
+            <div class="tab-content" id="analysis">
+                <div class="panel-body">
+                    <div class="progress-container">
+                        <div class="progress-header"><span class="progress-label">YOLOv8 Attack Success</span><span class="progress-value" id="yoloRate">--%</span></div>
+                        <div class="progress-bar"><div class="progress-fill blue" id="yoloBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-header"><span class="progress-label">DETR Attack Success</span><span class="progress-value" id="detrRate">--%</span></div>
+                        <div class="progress-bar"><div class="progress-fill green" id="detrBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-header"><span class="progress-label">Faster R-CNN Attack Success</span><span class="progress-value" id="rcnnRate">--%</span></div>
+                        <div class="progress-bar"><div class="progress-fill orange" id="rcnnBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-header"><span class="progress-label">SSD MobileNet Attack Success</span><span class="progress-value" id="ssdRate">--%</span></div>
+                        <div class="progress-bar"><div class="progress-fill red" id="ssdBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="section-divider"></div>
+                    <div class="control-group">
+                        <div class="control-label"><label>Frequency Spectrum</label></div>
+                        <div class="canvas-container" style="min-height: 150px;">
+                            <canvas id="frequencyCanvas" width="512" height="150"></canvas>
+                        </div>
+                    </div>
+                    <div class="section-divider"></div>
+                    <div class="control-group">
+                        <div class="control-label"><label>Color Distribution</label></div>
+                        <div class="canvas-container" style="min-height: 100px;">
+                            <canvas id="colorCanvas" width="512" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" id="gallery">
+                <div class="panel-body">
+                    <div class="pattern-gallery" id="patternGallery"></div>
+                    <div class="empty-state" id="galleryEmpty">
+                        <div class="icon">🎨</div>
+                        <p>Generate patterns to build your gallery</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h3><span class="icon">📊</span> Output & Logs</h3>
+            </div>
+            <div class="panel-body">
+                <div class="control-group">
+                    <div class="control-label"><label>Generation Log</label></div>
+                    <div class="log-console" id="logConsole">
+                        <div class="log-entry">
+                            <span class="log-time">[14:52:00]</span>
+                            <span class="log-level info">INFO</span>
+                            <span class="log-message">Adversarial Pattern Lab initialized</span>
+                        </div>
+                        <div class="log-entry">
+                            <span class="log-time">[14:52:01]</span>
+                            <span class="log-level success">READY</span>
+                            <span class="log-message">Black-box pipeline loaded</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-divider"></div>
+                <div class="control-group">
+                    <div class="control-label"><label>Export Pattern</label></div>
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportPattern('png')"><span>📷</span> Export as PNG</button>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="exportPattern('json')"><span>📋</span> Export Config (JSON)</button>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="exportPattern('svg')"><span>🎨</span> Export as SVG</button>
+                </div>
+                <div class="section-divider"></div>
+                <div class="control-group">
+                    <div class="control-label"><label>Pattern History</label><span class="control-value" id="historyCount">0</span></div>
+                    <div style="max-height: 150px; overflow-y: auto;">
+                        <div id="patternHistory"></div>
+                    </div>
+                </div>
+                <div class="section-divider"></div>
+                <div class="control-group">
+                    <div class="control-label"><label>Quick Actions</label></div>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="randomizePattern()"><span>🎲</span> Randomize Parameters</button>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="optimizePattern()"><span>⚡</span> Quick Optimize</button>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="comparePatterns()"><span>📊</span> Compare Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="core.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
