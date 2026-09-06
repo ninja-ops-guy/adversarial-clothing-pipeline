@@ -66,7 +66,7 @@ test('simulation works across every pose, fabric and lighting option', async ({ 
 test('analysis produces visible heuristic metrics and charts', async ({ page }) => {
   await page.getByText('Analysis', { exact: true }).click();
   for (const id of ['yoloRate','detrRate','rcnnRate','ssdRate']) {
-    await expect(page.locator('#'+id)).toHaveText(/\d+%/);
+    await expect(page.locator('#'+id)).toHaveText(/\d+(\.\d+)?/);
   }
   for (const id of ['frequencyCanvas','colorCanvas']) {
     const nonEmpty = await page.locator('#'+id).evaluate(c => {
@@ -95,9 +95,9 @@ test('randomize and heuristic seed search complete with a real generated result'
   await page.getByRole('button', { name: /Randomize Parameters/ }).click();
   await page.waitForTimeout(220);
   await expect(page.locator('#logConsole')).toContainText('Parameters randomized');
-  await page.getByRole('button', { name: /Quick Optimize/ }).click();
+  await page.getByRole('button', { name: /Heuristic Seed Search/ }).click();
   await expect(page.locator('#logConsole')).toContainText(/Heuristic seed search complete/,{timeout:15000});
-  await expect(page.locator('#transferRate')).toHaveText(/\d+%/);
+  await expect(page.locator('#complexityScore')).toHaveText(/\d+(\.\d+)?/);
 });
 
 test('animation advances seeds and can stop', async ({ page }) => {
