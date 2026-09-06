@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 
 from .artifact_bundle import ArtifactBundle
-from .manifest import EvidenceState, PatternManifest
+from .manifest import EvidenceState, PatternManifest, hash_file
 from .protocol import CertificationProtocol
 
 
@@ -44,6 +44,12 @@ def issue_certificate(
         raise ValueError("manifest protocol does not match certification protocol")
     if manifest.heldout_model_set != protocol.heldout_model_set:
         raise ValueError("held-out model set mismatch")
+
+    master_path = bundle.root / manifest.master.path
+    if not master_path.exists() or not master_path.is_file():
+        raise ValueError(f"missing master artifact: {manifest.master.path}")
+    if hash_file(master_path) != manifest.master.sha256:
+        raise ValueError("master artifact hash mismatch")
 
     heldout = digital_summary.get("heldout", {})
     invalid_fraction = float(
