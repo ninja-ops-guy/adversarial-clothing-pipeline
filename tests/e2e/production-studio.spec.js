@@ -40,7 +40,7 @@ test('generic template is explicitly draft-only and renders all normalized panel
   await expect(page.locator('.panel-row')).toHaveCount(6);
   const data = await page.locator('#panelMap').evaluate(c => c.toDataURL());
   expect(data.length).toBeGreaterThan(5000);
-  await expect(page.locator('#validationList')).toContainText('not vendor-ready');
+  await expect(page.locator('#validationList')).toContainText('draft-only');
 });
 
 test('imports exact vendor template and exposes panel dimensions', async ({ page }) => {
