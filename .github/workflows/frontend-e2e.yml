@@ -9,6 +9,8 @@ on:
       - 'core.js'
       - 'ui.js'
       - 'analysis.js'
+      - 'manual-import.js'
+      - 'benchmark-results.json'
       - 'package.json'
       - 'playwright.config.js'
       - 'tests/e2e/**'
@@ -49,7 +51,28 @@ jobs:
           node-version: '24'
       - run: npm install
       - run: npx playwright install --with-deps chromium
-      - name: Verify deployed site
+      - name: Verify deployed site interactions
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
-        run: npx playwright test --project=chromium-desktop --grep "all pattern generators|analysis produces|PNG, JSON, SVG"
+        run: npx playwright test --project=chromium-desktop --grep "all pattern generators|PNG, JSON, SVG"
+      - name: Verify deployed measured benchmark JSON when published
+        if: ${{ hashFiles('benchmark-results.json') != '' }}
+        run: |
+          for i in {1..18}; do
+            if curl -fsS 'https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/benchmark-results.json' -o /tmp/benchmark-results.json; then
+              if python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path('/tmp/benchmark-results.json').read_text())
+          assert p.get('status') == 'measured'
+          assert set(p.get('models', {})) >= {
+              'yolov8n', 'detr_resnet50',
+              'fasterrcnn_mobilenet_v3_320', 'ssdlite320_mobilenet_v3'
+          }
+          PY
+              then exit 0; fi
+            fi
+            sleep 10
+          done
+          echo 'Measured benchmark JSON was not available from deployed Pages in time.' >&2
+          exit 1
