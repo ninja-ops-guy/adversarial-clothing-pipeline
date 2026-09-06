@@ -72,20 +72,44 @@ def issue_certificate(
     )
 
     physical_needed = requested_state.value in protocol.physical_required_for
-    if physical_needed and not physical_evidence_present:
-        raise ValueError(f"{requested_state.value} requires physical evidence")
+    if physical_needed:
+        if not physical_evidence_present:
+            raise ValueError(f"{requested_state.value} requires physical evidence")
+        required_physical = [
+            bundle.root / "physical" / "summary.json",
+            bundle.root / "physical" / "trials.csv",
+        ]
+        missing = [str(path.relative_to(bundle.root)) for path in required_physical if not path.is_file()]
+        if missing:
+            raise ValueError(
+                f"{requested_state.value} requires bundled physical evidence artifacts: {', '.join(missing)}"
+            )
+
+    if requested_state == EvidenceState.DURABILITY:
+        durability_path = bundle.root / "physical" / "durability.json"
+        if not durability_path.is_file():
+            raise ValueError("RAC-P2 requires bundled durability evidence: physical/durability.json")
 
     manufacturing_states = {
         EvidenceState.GOLDEN_SAMPLE,
         EvidenceState.LOT_CONFORMITY,
     }
-    if (
-        requested_state in manufacturing_states
-        and not manufacturing_evidence_present
-    ):
-        raise ValueError(
-            f"{requested_state.value} requires manufacturing evidence"
+    if requested_state in manufacturing_states:
+        if not manufacturing_evidence_present:
+            raise ValueError(
+                f"{requested_state.value} requires manufacturing evidence"
+            )
+        required_name = (
+            "golden_sample.json"
+            if requested_state == EvidenceState.GOLDEN_SAMPLE
+            else "lot_conformity.json"
         )
+        required_path = bundle.root / "manufacturing" / required_name
+        if not required_path.is_file():
+            raise ValueError(
+                f"{requested_state.value} requires bundled manufacturing evidence: "
+                f"manufacturing/{required_name}"
+            )
 
     _, bundle_hash = bundle.seal()
     decision = CertificateDecision.PASS if digital_pass else CertificateDecision.FAIL
