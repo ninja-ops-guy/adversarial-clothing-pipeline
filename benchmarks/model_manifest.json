@@ -1,7 +1,9 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "3.0",
   "task": "person_detection",
   "threshold": 0.5,
+  "lock_status": "LOCK_PENDING",
+  "generation": "v2 rotate previously observed held-out models into surrogate ensemble; new held-out models receive no candidate inference until hashes are preregistered",
   "models": [
     {
       "id": "yolov8n",
@@ -29,7 +31,7 @@
       "framework": "transformers",
       "model_ref": "facebook/detr-resnet-50",
       "person_class": "person",
-      "role": "heldout",
+      "role": "surrogate",
       "decision_threshold": 0.5,
       "state_dict_sha256": "ba2a4b1a72e362a84b8a31511e7a1dfa9a28226898d1738a5db4cb3673ce9ec7"
     },
@@ -39,9 +41,29 @@
       "framework": "torchvision",
       "model_ref": "SSDLite320_MobileNet_V3_Large_Weights.DEFAULT",
       "person_class": 1,
-      "role": "heldout",
+      "role": "surrogate",
       "decision_threshold": 0.5,
       "state_dict_sha256": "711cd0e2d35ce1921972aad81b9924a1fedeff902e4bb61f64c05b6cac35a7e1"
+    },
+    {
+      "id": "retinanet_resnet50_fpn_v2",
+      "display_name": "RetinaNet ResNet-50 FPN V2",
+      "framework": "torchvision",
+      "model_ref": "RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
+      "person_class": 1,
+      "role": "heldout",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_BOOTSTRAP_ONLY"
+    },
+    {
+      "id": "fcos_resnet50_fpn",
+      "display_name": "FCOS ResNet-50 FPN",
+      "framework": "torchvision",
+      "model_ref": "FCOS_ResNet50_FPN_Weights.DEFAULT",
+      "person_class": 1,
+      "role": "heldout",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_BOOTSTRAP_ONLY"
     }
   ],
   "fixture": {
@@ -70,10 +92,6 @@
       20
     ]
   },
-  "min_baseline_score": 0.5,
-  "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32",
-  "lock_status": "PREREGISTERED",
-  "lock_note": "Hashes measured in a bootstrap run and committed before subsequent D2 candidate evaluation. The bootstrap candidate/result is not certification evidence.",
   "selection_sweep": {
     "brightness": [
       0.8,
@@ -98,6 +116,9 @@
       "candidate_mean:min",
       "candidate_id:lexical"
     ],
-    "boundary": "surrogate_only"
-  }
+    "boundary": "surrogate_only",
+    "version": "2.0",
+    "candidate_pool": "core+reference-inspired"
+  },
+  "min_baseline_score": 0.5
 }
