@@ -376,8 +376,10 @@ def main() -> int:
 
     all_aggregate = aggregate(list(benchmark.rows))
     generated_at = datetime.now(timezone.utc).isoformat()
+    experiment_id = f"{candidate_config.get('candidate_id', 'unidentified')}:{os.getenv('GITHUB_SHA', 'local')[:12]}"
     result = {
         "schema_version": "1.0",
+        "experiment_id": experiment_id,
         "status": "measured_locked" if locked else "measured_unlocked",
         "certification_eligible": locked,
         "lock_failures": mismatches,
@@ -404,7 +406,12 @@ def main() -> int:
             "brightness": list(config.brightness),
             "scale": list(config.scales),
             "blur_sigma": list(config.blur_sigmas),
-            "conditions_per_model": len(config.brightness) * len(config.scales) * len(config.blur_sigmas),
+            "conditions_per_model": (
+                len(config.brightness)
+                * len(config.scales)
+                * len(config.blur_sigmas)
+                * len(config.rotations_deg)
+            ),
             "raw_row_count": len(benchmark.rows),
             "comparative_summary": summary,
         },
