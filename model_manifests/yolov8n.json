@@ -1,0 +1,24 @@
+{
+  "model_id": "yolov8n",
+  "architecture": "YOLOv8n",
+  "weights_id": "yolov8n.pt",
+  "weights_sha256": "fc3866bddeb949fed0de53bfb9498ccb51645936920c89888dc730df082a1776",
+  "framework": "ultralytics",
+  "framework_version": "8.4.142",
+  "preprocessing": {
+    "source": "ultralytics.YOLO.predict",
+    "imgsz": 320,
+    "confidence_floor": 0.001,
+    "device": "cpu",
+    "input": "uint8 RGB arrays"
+  },
+  "target_class": "person",
+  "class_label": 0,
+  "decision_threshold": 0.5,
+  "nms_threshold": null,
+  "metadata": {
+    "role": "surrogate",
+    "hash_scope": "loaded_state_dict",
+    "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32"
+  }
+}
