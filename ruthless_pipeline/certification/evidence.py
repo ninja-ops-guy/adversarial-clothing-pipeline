@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Any, Iterable
+import math
 
 from .manifest import EvidenceState
 
@@ -113,6 +114,8 @@ class BenchmarkObservation:
     invalid_reason: str | None = None
 
     def validate(self) -> None:
+        if not math.isfinite(float(self.value)):
+            raise ValueError("benchmark observation value must be finite")
         if self.status == ObservationStatus.INVALID and not self.invalid_reason:
             raise ValueError("invalid observations require invalid_reason")
         if self.status == ObservationStatus.VALID and self.invalid_reason:
