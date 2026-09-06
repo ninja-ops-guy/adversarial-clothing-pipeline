@@ -116,3 +116,9 @@ def test_manufacturing_state_requires_physical_and_manufacturing_evidence() -> N
         EvidenceState.GOLDEN_SAMPLE,
         [physical, manufacturing],
     )
+
+
+def test_nonfinite_benchmark_observations_are_rejected() -> None:
+    observation = BenchmarkObservation(float("nan"), ObservationStatus.VALID)
+    with pytest.raises(ValueError, match="must be finite"):
+        observation.validate()
