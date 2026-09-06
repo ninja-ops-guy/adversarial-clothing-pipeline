@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import math
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,19 @@ class PhysicalSummary:
 def summarize_physical_trials(trials: list[PhysicalTrial]) -> PhysicalSummary:
     if not trials:
         raise ValueError("physical certification requires at least one trial")
+    trial_ids = [trial.trial_id for trial in trials]
+    if any(not trial_id for trial_id in trial_ids):
+        raise ValueError("trial_id is required")
+    if len(set(trial_ids)) != len(trial_ids):
+        raise ValueError("duplicate trial_id")
+    for trial in trials:
+        values = (trial.distance_m, trial.yaw_deg, trial.pitch_deg)
+        if any(not math.isfinite(v) for v in values):
+            raise ValueError(f"{trial.trial_id}: physical measurements must be finite")
+        if trial.distance_m < 0:
+            raise ValueError(f"{trial.trial_id}: distance_m must be nonnegative")
+        if not trial.camera_id or not trial.condition_id or not trial.pose or not trial.lighting_id:
+            raise ValueError(f"{trial.trial_id}: physical trial metadata is incomplete")
     valid = [trial for trial in trials if trial.control_detected]
     invalid = len(trials) - len(valid)
     if not valid:
