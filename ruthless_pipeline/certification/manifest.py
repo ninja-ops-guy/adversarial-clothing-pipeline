@@ -60,8 +60,23 @@ class PatternManifest:
             raise ValueError("pattern_id must start with RAC-")
         if not self.version or not self.source_commit:
             raise ValueError("version and source_commit are required")
-        if len(self.master.sha256) != 64:
+        master_path = Path(self.master.path)
+        if (
+            not self.master.path
+            or master_path.is_absolute()
+            or ".." in master_path.parts
+        ):
+            raise ValueError("master.path must be a safe relative bundle path")
+        if (
+            len(self.master.sha256) != 64
+            or any(ch not in "0123456789abcdefABCDEF" for ch in self.master.sha256)
+        ):
             raise ValueError("master.sha256 must be a SHA-256 hex digest")
+        if (
+            len(self.source_commit) not in {40, 64}
+            or any(ch not in "0123456789abcdefABCDEF" for ch in self.source_commit)
+        ):
+            raise ValueError("source_commit must be a full hexadecimal Git commit id")
         if self.surrogate_model_set == self.heldout_model_set:
             raise ValueError("surrogate and held-out model sets must be distinct")
 
