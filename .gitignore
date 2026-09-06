@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# Generated research artifacts
+outputs/
+artifacts/
+runs/
+checkpoints/
+
+# Large model/data material - keep outside git
+models/
+weights/
+datasets/
+*.ckpt
+*.safetensors
+*.pth
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+
+# Packaging
+build/
+dist/

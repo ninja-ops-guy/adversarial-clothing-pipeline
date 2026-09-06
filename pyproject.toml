@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ruthless-adversarial-pipeline"
+version = "3.0.0"
+description = "Research pipeline for machine-optimized apparel evaluation in owned/authorized computer-vision labs"
+requires-python = ">=3.10"
+dependencies = [
+  "torch>=2.1",
+  "numpy>=1.24",
+  "Pillow>=10",
+]
+
+[project.optional-dependencies]
+generative = ["diffusers>=0.30", "transformers>=4.40", "accelerate>=0.30", "safetensors>=0.4"]
+aesthetic = ["open_clip_torch>=2.24"]
+dev = ["pytest>=8", "ruff>=0.6", "build>=1.2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+
+[tool.setuptools.packages.find]
+include = ["ruthless_pipeline*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
