@@ -40,6 +40,19 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def sha256_state_dict(model: torch.nn.Module) -> str:
+    """Stable hash over parameter/buffer names, dtypes, shapes, and raw tensor bytes."""
+    h = hashlib.sha256()
+    state = model.state_dict()
+    for name in sorted(state):
+        tensor = state[name].detach().cpu().contiguous()
+        h.update(name.encode("utf-8"))
+        h.update(str(tensor.dtype).encode("ascii"))
+        h.update(str(tuple(tensor.shape)).encode("ascii"))
+        h.update(tensor.numpy().tobytes())
+    return h.hexdigest()
+
+
 def download(url: str, dst: Path) -> Path:
     dst.parent.mkdir(parents=True, exist_ok=True)
     request = urllib.request.Request(url, headers={"User-Agent": "Ruthless-Adversarial-Clothing-Benchmark/1.0"})
@@ -194,9 +207,10 @@ class DETRPersonEvaluator:
         return probabilities.max(dim=1).values.to(images.device)
 
 
-def build_evaluators(manifest: dict[str, Any]) -> tuple[list[Any], dict[str, dict[str, Any]]]:
+def build_evaluators(manifest: dict[str, Any]) -> tuple[list[Any], dict[str, dict[str, Any]], dict[str, str]]:
     evaluators: list[Any] = []
     provenance: dict[str, dict[str, Any]] = {}
+    state_hashes: dict[str, str] = {}
 
     for item in manifest["models"]:
         model_id = item["id"]
@@ -238,9 +252,10 @@ def build_evaluators(manifest: dict[str, Any]) -> tuple[list[Any], dict[str, dic
             }
         else:
             raise ValueError(f"Unsupported model id in manifest: {model_id}")
+        state_hashes[model_id] = sha256_state_dict(evaluator.model)
         evaluators.append(evaluator)
 
-    return evaluators, provenance
+    return evaluators, provenance, state_hashes
 
 
 def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -290,15 +305,50 @@ def main() -> int:
     candidate_config = json.loads(candidate_config_path.read_text())
     baseline, candidate, fixture_metadata = prepare_fixture(candidate_path, manifest, runtime_dir)
 
-    evaluators, model_provenance = build_evaluators(manifest)
+    evaluators, model_provenance, state_hashes = build_evaluators(manifest)
     sweep = manifest["transform_sweep"]
-    model_ids = tuple(item["id"] for item in manifest["models"])
+    surrogate_ids = tuple(item["id"] for item in manifest["models"] if item.get("role") == "surrogate")
+    heldout_ids = tuple(item["id"] for item in manifest["models"] if item.get("role") == "heldout")
+    if not surrogate_ids or not heldout_ids:
+        raise ValueError("manifest must define non-empty surrogate and heldout model roles")
+
+    lock_proposal = {
+        "schema_version": "1.0",
+        "generated_from_commit": os.getenv("GITHUB_SHA", "local"),
+        "models": {
+            item["id"]: {
+                "state_dict_sha256": state_hashes[item["id"]],
+                "display_name": item["display_name"],
+                "framework": item["framework"],
+                "model_ref": item["model_ref"],
+                "role": item["role"],
+                "decision_threshold": float(item["decision_threshold"]),
+            }
+            for item in manifest["models"]
+        },
+    }
+    (runtime_dir / "model-lock-proposal.json").write_text(json.dumps(lock_proposal, indent=2, sort_keys=True) + "\n")
+
+    mismatches = []
+    for item in manifest["models"]:
+        expected = str(item.get("state_dict_sha256", "")).lower()
+        actual = state_hashes[item["id"]]
+        if len(expected) != 64:
+            mismatches.append(f"{item['id']}: no preregistered state_dict_sha256")
+        elif expected != actual:
+            mismatches.append(f"{item['id']}: state_dict hash mismatch")
+    locked = not mismatches
+
     config = BenchmarkConfig(
-        threshold=float(manifest["threshold"]),
+        threshold=float(manifest.get("threshold", 0.5)),
+        thresholds={item["id"]: float(item["decision_threshold"]) for item in manifest["models"]},
         brightness=tuple(float(v) for v in sweep["brightness"]),
         scales=tuple(float(v) for v in sweep["scale"]),
         blur_sigmas=tuple(float(v) for v in sweep["blur_sigma"]),
-        heldout_models=model_ids,
+        rotations_deg=tuple(float(v) for v in sweep.get("rotation_deg", [0.0])),
+        surrogate_models=surrogate_ids,
+        heldout_models=heldout_ids,
+        min_baseline_score=float(manifest.get("min_baseline_score", 0.5)),
         seed=1337,
         device="cpu",
     )
@@ -310,17 +360,27 @@ def main() -> int:
         by_model[str(row["model"])].append(row)
 
     model_results: dict[str, Any] = {}
+    model_ids = surrogate_ids + heldout_ids
+    manifest_by_id = {item["id"]: item for item in manifest["models"]}
     for model_id in model_ids:
         model_results[model_id] = {
             **model_provenance[model_id],
-            **aggregate(by_model[model_id]),
+            "role": manifest_by_id[model_id]["role"],
+            "decision_threshold": float(manifest_by_id[model_id]["decision_threshold"]),
+            "state_dict_sha256": state_hashes[model_id],
+            "preregistered_hash_match": (
+                str(manifest_by_id[model_id].get("state_dict_sha256", "")).lower() == state_hashes[model_id]
+            ),
+            **aggregate([row for row in by_model[model_id] if row["baseline_qualified"]]),
         }
 
     all_aggregate = aggregate(list(benchmark.rows))
     generated_at = datetime.now(timezone.utc).isoformat()
     result = {
         "schema_version": "1.0",
-        "status": "measured",
+        "status": "measured_locked" if locked else "measured_unlocked",
+        "certification_eligible": locked,
+        "lock_failures": mismatches,
         "evidence_scope": "digital_ci_convenience_fixture",
         "generated_at": generated_at,
         "source_commit": os.getenv("GITHUB_SHA", "local"),
@@ -337,7 +397,10 @@ def main() -> int:
         },
         "fixture": fixture_metadata,
         "benchmark": {
-            "threshold": config.threshold,
+            "default_threshold": config.threshold,
+            "thresholds": config.thresholds,
+            "surrogate_models": list(config.surrogate_models),
+            "heldout_models": list(config.heldout_models),
             "brightness": list(config.brightness),
             "scale": list(config.scales),
             "blur_sigma": list(config.blur_sigmas),
@@ -347,7 +410,9 @@ def main() -> int:
         },
         "models": model_results,
         "aggregate": all_aggregate,
+        "model_lock": lock_proposal,
         "caveats": [
+            "D2 certification eligibility requires all detector state hashes to have been preregistered before this run.",
             "These are measured model-inference results for a two-crop digital convenience fixture, not a physical garment test.",
             "The pattern is digitally pasted into fixed torso-like ROIs; fabric drape, pose diversity, camera distance, and print processes are not represented by this CI fixture.",
             "The benchmark reports only the named model versions in this run and must not be generalized to untested surveillance systems.",
