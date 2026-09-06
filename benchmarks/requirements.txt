@@ -1,4 +1,4 @@
 ultralytics>=8.3,<9
-transformers>=4.48,<6
+transformers>=4.48,<5
 timm>=1.0,<2
 safetensors>=0.4
