@@ -51,6 +51,8 @@ const RACStudio=(()=>{
 
   let tile=null,manifest=null,mode='generate';
   const selectedMotifs=new Set();
+  const showcaseImage=new Image();
+  let showcaseReady=false;
   const $=id=>document.getElementById(id);
   function state(){
     const product=$('productType').value;
@@ -62,7 +64,10 @@ const RACStudio=(()=>{
       productName:($('productName').value||N[product]).trim().toUpperCase(),
       collection:($('collectionName').value||'URBAN WILDERNESS').trim().toUpperCase(),
       seed:+$('studioSeed').value,scale:+$('studioScale').value,density:+$('studioDensity').value,distress:+$('studioDistress').value,
-      featureMotifs:[...selectedMotifs]
+      featureMotifs:[...selectedMotifs],
+      useShowcaseSource:Boolean($('useShowcaseSource')&&$('useShowcaseSource').checked),
+      showcaseRegion:$('showcaseRegion')?$('showcaseRegion').value:'motifs',
+      showcaseStrength:$('showcaseStrength')?+$('showcaseStrength').value:28
     };
   }
   function defaults(force=false){
@@ -72,6 +77,39 @@ const RACStudio=(()=>{
     $('resolvedFamily').textContent=f.replaceAll('_',' ').toUpperCase();
   }
   function sync(id){const e=$(id+'Value');if(e)e.textContent=$(id).value;}
+  function showcaseCrop(region,img){
+    const w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;
+    if(region==='motifs')return{x:0,y:h*.055,w,h:h*.19};
+    if(region==='families')return{x:0,y:h*.215,w,h:h*.235};
+    if(region==='tiles')return{x:0,y:h*.44,w,h:h*.18};
+    return{x:0,y:0,w,h};
+  }
+  function applyShowcaseSource(ctx,size,s){
+    if(!s.useShowcaseSource||!showcaseReady)return;
+    const crop=showcaseCrop(s.showcaseRegion,showcaseImage);
+    const strength=Math.max(.05,Math.min(.7,s.showcaseStrength/100));
+    const block=document.createElement('canvas');
+    block.width=Math.max(64,Math.round(size/3));
+    block.height=block.width;
+    const bx=block.getContext('2d');
+    bx.imageSmoothingEnabled=false;
+    bx.drawImage(showcaseImage,crop.x,crop.y,crop.w,crop.h,0,0,block.width,block.height);
+    ctx.save();
+    ctx.globalAlpha=strength;
+    ctx.globalCompositeOperation='screen';
+    ctx.imageSmoothingEnabled=false;
+    const step=Math.max(96,Math.round(size*.34));
+    for(let y=-step;y<size+step;y+=step){
+      for(let x=-step;x<size+step;x+=step){
+        ctx.save();
+        ctx.translate(x+step/2,y+step/2);
+        ctx.rotate(((x+y+s.seed)%5-2)*.035);
+        ctx.drawImage(block,-step/2,-step/2,step,step);
+        ctx.restore();
+      }
+    }
+    ctx.restore();
+  }
   function makeTile(size,s=state()){
     const c=document.createElement('canvas');c.width=c.height=size;
     const x=c.getContext('2d');
@@ -79,7 +117,9 @@ const RACStudio=(()=>{
     const pal=colorPalettes[s.family==='error_garden'?'error_garden':'rac_reference'];
     const r=seededRandom(s.seed),g=patternGenerators[s.family];
     if(!g)throw new Error('Missing pattern family: '+s.family);
-    g(x,size,p,pal,r);return c;
+    g(x,size,p,pal,r);
+    applyShowcaseSource(x,size,s);
+    return c;
   }
   function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
   function fill(c,t,x,y,w,h,sz){for(let yy=y;yy<y+h;yy+=sz)for(let xx=x;xx<x+w;xx+=sz)c.drawImage(t,xx,yy,sz,sz);}
@@ -204,7 +244,7 @@ const RACStudio=(()=>{
     return {
       schema_version:'1.1',generated_at:new Date().toISOString(),brand:s.brand,collection:s.collection,product:s.product,product_name:s.productName,
       art_direction_profile:'canonical_launch_capsule_v1',reference_target:FAMILY_TITLE[s.family]||s.family,
-      design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,feature_motifs:s.featureMotifs,repeat:'tile',master_export_px:4096},
+      design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,feature_motifs:s.featureMotifs,showcase_source:{enabled:s.useShowcaseSource,region:s.showcaseRegion,strength:s.showcaseStrength,asset:'RAC Textile Generator Showcase'},repeat:'tile',master_export_px:4096},
       outputs:{reference_board_px:[W,H],production_tile_px:[4096,4096]},production_status:'digital_design_ready',pod_status:'requires provider-specific print-template mapping'
     };
   }
@@ -235,10 +275,18 @@ const RACStudio=(()=>{
     if(mode==='export'){$('studioStatus').textContent='EXPORT MODE · CHOOSE A VERIFIED OUTPUT';document.querySelector('.export-panel').scrollIntoView({behavior:'smooth',block:'center'});}
   }
   function init(){
-    ['studioSeed','studioScale','studioDensity','studioDistress'].forEach(id=>{sync(id);$(id).addEventListener('input',()=>sync(id));});
+    ['studioSeed','studioScale','studioDensity','studioDistress','showcaseStrength'].forEach(id=>{if($(id)){sync(id);$(id).addEventListener('input',()=>{sync(id);if(id==='showcaseStrength')render();});}});
     $('productType').addEventListener('change',()=>{defaults();render();});$('designFamily').addEventListener('change',()=>{defaults();render();});$('productName').addEventListener('input',()=>{$('productName').dataset.edited='true';});
     document.querySelectorAll('.motif-card[data-motif]').forEach(card=>card.addEventListener('click',()=>toggleMotif(card.dataset.motif)));
     document.querySelectorAll('.mode-tab').forEach(tab=>tab.addEventListener('click',()=>setMode(tab.dataset.mode)));
+    if($('useShowcaseSource'))$('useShowcaseSource').addEventListener('change',render);
+    if($('showcaseRegion'))$('showcaseRegion').addEventListener('change',render);
+    if($('showcaseReference')&&window.RAC_SHOWCASE_DATA_URI){
+      $('showcaseReference').src=window.RAC_SHOWCASE_DATA_URI;
+      showcaseImage.onload=()=>{showcaseReady=true;render();};
+      showcaseImage.onerror=()=>{$('studioStatus').textContent='SHOWCASE SOURCE ERROR · PROCEDURAL GENERATION STILL AVAILABLE';};
+      showcaseImage.src=window.RAC_SHOWCASE_DATA_URI;
+    }
     updateMotifUI();defaults(true);render();
   }
   return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode};
