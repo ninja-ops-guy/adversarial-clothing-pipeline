@@ -23,6 +23,10 @@ def main() -> int:
     issue.add_argument("--manifest", required=True)
     issue.add_argument("--protocol", required=True)
     issue.add_argument("--benchmark", required=True)
+    issue.add_argument(
+        "--master",
+        help="Optional path to the immutable master artifact. If supplied it is copied into the bundle at manifest.master.path.",
+    )
     issue.add_argument("--state", default="RAC-D2", choices=[state.value for state in EvidenceState])
     issue.add_argument("--physical-evidence", action="store_true")
     verify = sub.add_parser("verify")
@@ -40,8 +44,16 @@ def main() -> int:
     manifest = PatternManifest(**payload)
     benchmark = json.loads(Path(args.benchmark).read_text())
     summary = benchmark.get("summary", benchmark)
+    bundle = ArtifactBundle.create(args.bundle)
+    bundled_master = bundle.root / manifest.master.path
+    if args.master:
+        source_master = Path(args.master)
+        if not source_master.exists() or not source_master.is_file():
+            raise SystemExit(f"master artifact not found: {source_master}")
+        bundled_master.parent.mkdir(parents=True, exist_ok=True)
+        bundled_master.write_bytes(source_master.read_bytes())
     cert = issue_certificate(
-        bundle=ArtifactBundle.create(args.bundle),
+        bundle=bundle,
         manifest=manifest,
         protocol=load_protocol(args.protocol),
         digital_summary=summary,
