@@ -35,13 +35,12 @@
         <label class="source-toggle"><input id="useShowcaseSource" type="checkbox"> Use showcase as stylized source layer</label>
         <div class="field"><label>Source Region</label><select id="showcaseRegion"><option value="motifs">Motif Library</option><option value="families">Pattern Families</option><option value="tiles">Seamless Tile Row</option><option value="full">Full Showcase</option></select></div>
         <div class="field"><label>Source Strength <span id="showcaseStrengthValue">28</span></label><input id="showcaseStrength" type="range" min="5" max="70" value="28"></div>
-        <p class="mini-note">This uses the existing RAC Textile Generator showcase image already created in this project. It is sampled as a visual source layer; measured detector evidence remains separate.</p>
       </div>
     </div>
   </section>
 
   <section class="reference-section motif-section">
-    <div class="section-title"><span>MOTIF LIBRARY</span><small>REFERENCE-DERIVED VISUAL LANGUAGE</small></div>
+    <div class="section-title"><span>MOTIF LIBRARY</span></div>
     <div class="motif-strip">
       <button class="motif-card motif-eye" data-motif="canine_eye"><div class="motif-art"><span>◉</span></div><b>CANINE EYE</b></button>
       <button class="motif-card motif-human" data-motif="human_eye"><div class="motif-art"><span>◉</span></div><b>HUMAN EYE</b></button>
@@ -57,38 +56,38 @@
   </section>
 
   <section class="reference-section family-section">
-    <div class="section-title"><span>PATTERN FAMILIES</span><small>CONDITIONAL GENERATION</small></div>
+    <div class="section-title"><span>PATTERN FAMILIES</span></div>
     <div class="family-grid">
       <button class="family-card ghost" onclick="document.getElementById('designFamily').value='ghost_hound';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="eye">◉</span><span class="slash"></span></div>
-        <strong>GHOST HOUND</strong><small>CANINE / GLITCH / GEOMETRIC</small>
+        <strong>GHOST HOUND</strong>
       </button>
       <button class="family-card broken" onclick="document.getElementById('designFamily').value='broken_human';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="eye">◉</span><span class="rib">≋</span></div>
-        <strong>BROKEN HUMAN</strong><small>ANATOMY / GEOMETRIC / DATA</small>
+        <strong>BROKEN HUMAN</strong>
       </button>
       <button class="family-card garden" onclick="document.getElementById('designFamily').value='error_garden';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="flower">✣</span><span class="pixel">▦</span></div>
-        <strong>ERROR GARDEN</strong><small>FLORAL / PIXEL / ORGANIC</small>
+        <strong>ERROR GARDEN</strong>
       </button>
       <button class="family-card machine" onclick="document.getElementById('designFamily').value='machine_static';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="bars">╫</span></div>
-        <strong>MACHINE STATIC</strong><small>NOISE / LINES / SIGNAL</small>
+        <strong>MACHINE STATIC</strong>
       </button>
       <button class="family-card signal" onclick="document.getElementById('designFamily').value='signal_shadow';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="eye">◉</span><span class="shadow">▰</span></div>
-        <strong>SIGNAL SHADOW</strong><small>ABSTRACT / DISTORT / OVERLAY</small>
+        <strong>SIGNAL SHADOW</strong>
       </button>
     </div>
   </section>
 
   <section class="tile-band">
     <div>
-      <div class="section-title"><span>SEAMLESS TILE OUTPUT</span><small>4096 × 4096 PRODUCTION MASTER</small></div>
+      <div class="section-title"><span>SEAMLESS TILE OUTPUT</span></div>
       <div class="tile-frame"><canvas id="studioPatternCanvas" width="512" height="512"></canvas></div>
     </div>
     <div class="variation-rack">
-      <div class="section-title"><span>VARIATIONS</span><small>CONDITIONAL CONTROLS</small></div>
+      <div class="section-title"><span>VARIATIONS</span></div>
       <div class="variation-cards">
         <button class="variation-card v1 selected" data-variation="original"><span>ORIGINAL</span></button>
         <button class="variation-card v2" data-variation="high_contrast"><span>HIGH CONTRAST</span></button>
@@ -120,12 +119,11 @@
           <div class="field"><label>Product Name</label><input id="productName" type="text" value="MACHINE STATIC HOODIE"></div>
           <div class="field"><label>Collection</label><input id="collectionName" type="text" value="URBAN WILDERNESS"></div>
         </div>
-        <p class="mini-note">Reference profile: black technical ground, cream/gray fragments, electric blue and signal yellow, oversized eye/anatomy motifs, botanical collage, abrasion, glitch blocks and directional signal noise.</p>
       </div>
     </section>
 
     <section class="studio-panel mockup-panel">
-      <div class="panel-kicker">3D / GARMENT MOCKUP PREVIEW</div>
+      <div class="panel-kicker">GARMENT MOCKUP PREVIEW</div>
       <div class="canvas-wrap"><canvas id="mockupCanvas" width="1122" height="1402"></canvas></div>
     </section>
 
@@ -134,38 +132,23 @@
       <div class="studio-body">
         <div class="output-file"><span class="file-icon">▧</span><span>pattern_tile.png<small>4096 × 4096</small></span></div>
         <div class="output-file"><span class="file-icon">▧</span><span>reference_board.png<small>1122 × 1402</small></span></div>
-        <div class="output-file"><span class="file-icon">▤</span><span>pattern_metadata.json<small>conditional manifest</small></span></div>
-        <div class="output-file"><span class="file-icon">▦</span><span>production_map.zip<small>vendor mapping</small></span></div>
+        <div class="output-file"><span class="file-icon">▤</span><span>pattern_metadata.json</span></div>
+        <div class="output-file"><span class="file-icon">▦</span><span>production_map.zip</span></div>
         <div class="divider"></div>
         <div class="output-list">
           <button class="primary" onclick="RACStudio.exportTile()">Export 4096px POD Tile</button>
           <button onclick="RACStudio.exportMockup()">Export Reference Board PNG</button>
           <button onclick="RACStudio.exportManifest()">Export Production Manifest</button>
-          <a class="studio-link full" href="./production-studio.html">Open Seam-Aware Production Mapper</a>
+          <a class="studio-link full" href="./production-studio.html">Open Production Mapper</a>
         </div>
-        <div class="divider"></div>
-        <table class="spec-table"><tr><td>Tile</td><td>4096 × 4096 PNG</td></tr><tr><td>Mockup</td><td>1122 × 1402 PNG</td></tr><tr><td>Repeat</td><td>Procedural tile</td></tr><tr><td>Inventory</td><td>POD / zero stock</td></tr></table>
-        <p class="mini-note">Vendor-ready status is granted only after exact panel geometry, bleed, safe margins and template version are imported and mapped.</p>
       </div>
     </aside>
   </main>
-
-  <section class="pipeline-section">
-    <div class="section-title"><span>INTEGRATION WITH EXISTING SURROGATE PIPELINE</span><small>EVIDENCE BOUNDARY PRESERVED</small></div>
-    <div class="pipeline">
-      <div class="step"><b>1</b><strong>Generate Candidates</strong><small>conditional motif families</small></div><i>→</i>
-      <div class="step"><b>2</b><strong>Validate + Filter</strong><small>seamless, printable, aesthetic</small></div><i>→</i>
-      <div class="step"><b>3</b><strong>Surrogate Evaluation</strong><small>YOLO + FRCNN + DETR + SSD</small></div><i>→</i>
-      <div class="step"><b>4</b><strong>Select + Mutate</strong><small>top candidates only</small></div><i>→</i>
-      <div class="step"><b>5</b><strong>Robustness</strong><small>transform + deformation</small></div><i>→</i>
-      <div class="step"><b>6</b><strong>Freeze Winner</strong><small>lock pattern hash</small></div><i>→</i>
-      <div class="step accent"><b>7</b><strong>RAC-D2</strong><small>held-out certification</small></div>
-    </div>
-  </section>
 </div>
 <script src="showcase-asset.js"></script>
 <script src="core.js"></script>
 <script src="studio-patterns.js"></script>
+<script src="mockup-clean.js"></script>
 <script src="product-studio.js"></script>
 <script src="studio-bridge.js"></script>
 </body>
