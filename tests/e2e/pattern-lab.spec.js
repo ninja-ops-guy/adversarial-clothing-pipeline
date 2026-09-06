@@ -1,8 +1,61 @@
 const { test, expect } = require('@playwright/test');
 
+const measuredFixture = {
+  schema_version: '1.0',
+  status: 'measured',
+  evidence_scope: 'digital_ci_convenience_fixture',
+  generated_at: '2026-09-06T20:00:00Z',
+  source_commit: 'deadbeefcafebabe',
+  candidate: {
+    sha256: 'abc123',
+    config: {
+      patternType: 'noise',
+      patternScale: 50,
+      colorVariance: 70,
+      edgeIntensity: 60,
+      symmetry: 0,
+      colorPalette: 'vibrant',
+      seed: 42
+    }
+  },
+  fixture: { sample_count: 2, name: 'test-fixture' },
+  benchmark: { conditions_per_model: 6, raw_row_count: 48 },
+  aggregate: { relative_detection_suppression: 0.25 },
+  models: {
+    yolov8n: {
+      n: 12, baseline_detection_rate: 1.0, candidate_detection_rate: 0.8,
+      relative_detection_suppression: 0.2
+    },
+    detr_resnet50: {
+      n: 12, baseline_detection_rate: 1.0, candidate_detection_rate: 0.7,
+      relative_detection_suppression: 0.3
+    },
+    fasterrcnn_mobilenet_v3_320: {
+      n: 12, baseline_detection_rate: 1.0, candidate_detection_rate: 0.75,
+      relative_detection_suppression: 0.25
+    },
+    ssdlite320_mobilenet_v3: {
+      n: 12, baseline_detection_rate: 1.0, candidate_detection_rate: 0.85,
+      relative_detection_suppression: 0.15
+    }
+  },
+  caveats: ['Measured digital fixture only; not a physical garment claim.']
+};
+
 test.beforeEach(async ({ page }) => {
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
+
+  if (!process.env.BASE_URL) {
+    await page.route('**/benchmark-results.json*', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(measuredFixture)
+      });
+    });
+  }
+
   await page.goto(process.env.BASE_URL || '/');
   await expect(page.locator('#previewCanvas')).toBeVisible();
   await expect(page.locator('#historyCount')).not.toHaveText('0');
@@ -53,7 +106,8 @@ test('simulation works across every pose, fabric and lighting option', async ({ 
       for (const l of lights) {
         await page.selectOption('#lightingSelect', l);
         const pixel = await page.locator('#simulationCanvas').evaluate(c => {
-          const d=c.getContext('2d').getImageData(256,256,1,1).data; return [...d];
+          const d = c.getContext('2d').getImageData(256,256,1,1).data;
+          return [...d];
         });
         expect(pixel[3]).toBe(255);
       }
@@ -63,18 +117,37 @@ test('simulation works across every pose, fabric and lighting option', async ({ 
   await expect(page.locator('#warpIntensityValue')).toHaveText('80');
 });
 
-test('analysis produces visible heuristic metrics and charts', async ({ page }) => {
+test('analysis renders measured detector results with provenance and charts', async ({ page }) => {
   await page.getByText('Analysis', { exact: true }).click();
-  for (const id of ['yoloRate','detrRate','rcnnRate','ssdRate']) {
-    await expect(page.locator('#'+id)).toHaveText(/\d+%/);
+  if (!process.env.BASE_URL) {
+    await expect(page.locator('#benchmarkStatus')).toContainText('MEASURED');
+    await expect(page.locator('#benchmarkStatus')).toContainText('current pattern matches benchmark candidate');
+    await expect(page.locator('#benchmarkStatus')).toContainText('deadbeef');
+    await expect(page.locator('#benchmarkCaveat')).toContainText('not a physical garment claim');
+    await expect(page.locator('#yoloRate')).toHaveText('20.0%');
+    await expect(page.locator('#detrRate')).toHaveText('30.0%');
+    await expect(page.locator('#rcnnRate')).toHaveText('25.0%');
+    await expect(page.locator('#ssdRate')).toHaveText('15.0%');
+    await expect(page.locator('#transferRate')).toHaveText('25.0%');
   }
   for (const id of ['frequencyCanvas','colorCanvas']) {
     const nonEmpty = await page.locator('#'+id).evaluate(c => {
-      const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+      const d = c.getContext('2d').getImageData(0,0,c.width,c.height).data;
       return Array.from(d).some(v => v !== 0);
     });
     expect(nonEmpty).toBeTruthy();
   }
+});
+
+test('measured efficacy is not attributed to a different live pattern', async ({ page }) => {
+  if (process.env.BASE_URL) test.skip();
+  await expect(page.locator('#transferRate')).toHaveText('25.0%');
+  await page.locator('#seed').fill('99');
+  await page.getByRole('button', { name: /Generate Pattern/ }).click();
+  await page.waitForTimeout(180);
+  await expect(page.locator('#transferRate')).toHaveText('--');
+  await page.getByText('Analysis', { exact: true }).click();
+  await expect(page.locator('#benchmarkStatus')).toContainText('current pattern differs');
 });
 
 test('gallery, selection, comparison and reset work', async ({ page }) => {
@@ -91,13 +164,14 @@ test('gallery, selection, comparison and reset work', async ({ page }) => {
   await expect(page.locator('.pattern-thumb')).toHaveCount(0);
 });
 
-test('randomize and heuristic seed search complete with a real generated result', async ({ page }) => {
+test('randomize and local proxy optimization complete without inventing detector efficacy', async ({ page }) => {
   await page.getByRole('button', { name: /Randomize Parameters/ }).click();
   await page.waitForTimeout(220);
   await expect(page.locator('#logConsole')).toContainText('Parameters randomized');
   await page.getByRole('button', { name: /Quick Optimize/ }).click();
-  await expect(page.locator('#logConsole')).toContainText(/Heuristic seed search complete/,{timeout:15000});
-  await expect(page.locator('#transferRate')).toHaveText(/\d+%/);
+  await expect(page.locator('#logConsole')).toContainText(/Optimization complete\. Best local proxy score/,{timeout:15000});
+  await expect(page.locator('#complexityScore')).toHaveText(/\d+\.\d/);
+  await expect(page.locator('#printabilityScore')).toHaveText(/\d+\.\d\/10/);
 });
 
 test('animation advances seeds and can stop', async ({ page }) => {
@@ -138,23 +212,18 @@ test('mobile viewport remains usable', async ({ page }) => {
   await expect(page.locator('#previewCanvas')).toBeVisible();
 });
 
-
-test('measured benchmark imports are explicitly labeled and provenance is displayed', async ({ page }) => {
+test('manual measured benchmark import uses the same measured schema', async ({ page }) => {
   await page.getByText('Analysis', { exact: true }).click();
-  const payload = {
-    experiment_id: 'EXP-001',
-    config: { heldout_models: ['DET-HO-001'] },
-    summary: {
-      heldout: { baseline_detection_rate: 1.0, candidate_detection_rate: 0.4 },
-      invalid_condition_fraction: 0.0
-    }
-  };
+  const payload = JSON.parse(JSON.stringify(measuredFixture));
+  payload.source_commit = 'cafebabedeadbeef';
+  payload.aggregate.relative_detection_suppression = 0.4;
   await page.locator('#measuredResultsFile').setInputFiles({
-    name: 'benchmark.json',
+    name: 'benchmark-results.json',
     mimeType: 'application/json',
     buffer: Buffer.from(JSON.stringify(payload))
   });
-  await expect(page.locator('#measuredEvidence')).toContainText('INTERNALLY MEASURED');
-  await expect(page.locator('#measuredEvidence')).toContainText('EXP-001');
-  await expect(page.locator('#measuredEvidence')).toContainText('DET-HO-001');
+  await expect(page.locator('#measuredEvidence')).toContainText('Manual measured result loaded');
+  await expect(page.locator('#measuredEvidence')).toContainText('cafebabe');
+  await expect(page.locator('#benchmarkStatus')).toContainText('MEASURED');
+  await expect(page.locator('#transferRate')).toHaveText('40.0%');
 });
