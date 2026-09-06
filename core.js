@@ -174,7 +174,8 @@ let currentPattern = null;
                             value += noise(x * frequency, y * frequency) * amplitude;
                             amplitude *= 0.5; frequency *= 2;
                         }
-                        const colorIdx = Math.floor(value * colors.length) % colors.length;
+                        const rawIdx = Math.floor(value * colors.length);
+                        const colorIdx = ((rawIdx % colors.length) + colors.length) % colors.length;
                         const color = colors[colorIdx];
                         const r = parseInt(color.slice(1, 3), 16);
                         const g = parseInt(color.slice(3, 5), 16);
