@@ -122,3 +122,34 @@ def test_nonfinite_benchmark_observations_are_rejected() -> None:
     observation = BenchmarkObservation(float("nan"), ObservationStatus.VALID)
     with pytest.raises(ValueError, match="must be finite"):
         observation.validate()
+
+
+def test_measured_digital_evidence_requires_model_metadata() -> None:
+    evidence = EvidenceRecord(
+        rac_state=EvidenceState.DIGITAL_HELDOUT,
+        evidence_type=EvidenceType.DIGITAL,
+        source="pytest",
+        fixture_type="digital_fixture",
+        created_at="2026-09-06T17:44:00-04:00",
+        code_commit="deadbeef",
+        configuration={},
+        artifact_hashes={"pattern.png": SHA256},
+        model_metadata={},
+    )
+    with pytest.raises(ValueError, match="digital model evidence missing metadata"):
+        evidence.validate()
+
+
+def test_design_evidence_does_not_require_model_metadata() -> None:
+    evidence = EvidenceRecord(
+        rac_state=EvidenceState.DESIGN,
+        evidence_type=EvidenceType.DIGITAL,
+        source="pytest",
+        fixture_type="design_artifact",
+        created_at="2026-09-06T17:44:00-04:00",
+        code_commit="deadbeef",
+        configuration={},
+        artifact_hashes={"pattern.png": SHA256},
+        model_metadata={},
+    )
+    evidence.validate()
