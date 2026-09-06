@@ -146,4 +146,6 @@ jobs:
             exit 0
           fi
           git commit -m 'benchmark: publish latest measured detector results [skip benchmark]'
-          git push
+          git fetch origin main
+          git rebase origin/main
+          git push origin HEAD:main
