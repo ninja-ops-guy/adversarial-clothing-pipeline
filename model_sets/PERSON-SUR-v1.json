@@ -1,6 +1,10 @@
 {
   "model_set_id": "PERSON-SUR-v1",
   "role": "surrogate",
-  "models": [],
-  "status": "BLOCKED_UNTIL_REAL_FROZEN_MANIFESTS_EXIST"
+  "models": [
+    "yolov8n",
+    "fasterrcnn_mobilenet_v3_320"
+  ],
+  "status": "LOCK_PENDING",
+  "source_manifest": "benchmarks/model_manifest.json"
 }
