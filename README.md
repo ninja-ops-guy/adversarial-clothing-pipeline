@@ -1,22 +1,69 @@
-# Ruthless Adversarial Clothing Pipeline v3.0
+# Ruthless Adversarial Clothing Pipeline
 
-Production-oriented research package for **machine-optimized fashion engineered to reduce reliable visual classification across diverse computer-vision systems** in owned or explicitly authorized lab environments.
+Production-oriented research software for **machine-optimized fashion engineered to reduce reliable visual classification across diverse computer-vision systems** in owned or explicitly authorized lab environments.
+
+**Repository state reviewed:** 2026-09-06  
+**Python package version:** `3.0.0`  
+**Documentation baseline:** `main` at `a9e827e` (GitHub Pages workflow present)
+
+## Current repository state
+
+| Area | Current state | Evidence boundary |
+|---|---|---|
+| Python research package | Present under `ruthless_pipeline/` | Production-hardened software infrastructure; not a physical product claim |
+| Four deliverable entrypoints | Present | NAP, deformation, differentiable physics, comparative benchmark |
+| Pattern Lab web UI | Present at `index.html`, `styles.css`, `core.js`, `analysis.js` | Exploratory front end; not connected to the Python benchmark/model stack |
+| Pattern generators | 8 browser-side generators | Noise, geometric, organic, checkered, striped, circular, cellular, and Perlin-like procedural patterns |
+| Pattern Lab utilities | Present | Seeded generation, gallery/history, basic simulation controls, PNG/JSON export, static analysis panels |
+| GitHub Pages | Deployment workflow present | Deployment success is separate from research validation |
+| Python tests | 5 test files present | Prior local verification passed; see CI note below |
+| GitHub CI | **Not green at this review point** | The production-import run stopped at Ruff lint errors before the pytest step |
+| Physical garment validation | Not performed | No product-efficacy claim is supported yet |
+
+## Important Pattern Lab limitation
+
+The browser Pattern Lab is a **design and experiment-management prototype**, not a detector benchmark.
+
+`analysis.js` currently derives displayed model-style percentages from image statistics and uses randomized values for several top-level metrics. The “Quick optimize” control selects among seeds using those UI metrics. Those values therefore **must not be described as measured YOLO, DETR, Faster R-CNN, SSD, transfer-rate, stealth, or printability results**.
+
+Use the web UI for visual exploration, parameter capture, pattern history, exports, and future experiment orchestration. Use `ruthless_pipeline.benchmark` with frozen evaluator/model manifests for measured machine-vision results.
+
+## Architecture at a glance
+
+```text
+BROWSER EXPLORATION PLANE
+index.html + styles.css + core.js + analysis.js
+  -> procedural pattern candidates
+  -> visual/heuristic analysis
+  -> PNG / JSON export
+
+                 [not yet wired end-to-end]
+                           |
+                           v
+PYTHON RESEARCH PLANE
+texture prior / optimizer
+  -> neural deformation
+  -> differentiable cloth baseline
+  -> garment scene composition
+  -> evaluator adapters
+  -> held-out benchmark + reports
+```
+
+See `docs/ARCHITECTURE.md` for the full boundary model.
 
 ## What changed from the v2 prototypes
 
-- Removed silent random placeholders from production paths.
-- Fixed the NAP 512/513 tensor mismatch by preserving spatial dimensions with odd kernels.
-- Fixed query accounting: one authoritative budget counter with hard enforcement.
-- Fixed NAP optimization so black-box candidate updates stay inside the same `nn.Parameter` and do not sever surrogate gradients.
-- Added deterministic seeds, device validation, path creation, atomic metadata writes, checkpointing, and testable interfaces.
-- Replaced fake CLIP/diffusion outputs with explicit optional adapters. If those backends are selected but dependencies/models are unavailable, the pipeline fails loudly.
-- Reworked deformation training around real coordinate correspondences rather than minimizing displacement toward zero.
-- Fixed time-conditioning input dimensions and added uncertainty prediction.
-- Added a working differentiable native mass-spring cloth baseline so the physics path has real gradients instead of zero-force placeholders.
-- Added the previously missing comparative benchmark with surrogate vs held-out splits and transformation sweeps.
-- Added tests and runnable standalone wrappers for all four deliverables.
+- Removed silent random placeholders from production Python paths.
+- Fixed the NAP spatial mismatch and query-budget ownership.
+- Preserved optimizer gradient flow during black-box refinement.
+- Added explicit optional diffusion and OpenCLIP adapters that fail loudly when unavailable.
+- Reworked deformation fitting around observed coordinate correspondences and uncertainty.
+- Added a differentiable native mass-spring cloth baseline.
+- Added the previously missing comparative benchmark with surrogate/held-out splits and transformation sweeps.
+- Added a differentiable garment-scene compositor and evaluator interfaces.
+- Added a static Pattern Lab front end and GitHub Pages workflow **after** the v3 production import.
 
-## Quick start
+## Quick start: Python research package
 
 ```bash
 python -m pip install -e .
@@ -24,7 +71,7 @@ pytest
 python -m examples.smoke_test
 ```
 
-The four original-style entrypoints are also present:
+Original-style entrypoints remain available:
 
 ```bash
 python 01_enhanced_black_box_nap.py
@@ -33,45 +80,59 @@ python 03_differentiable_physics_pipeline.py
 python 04_comparative_benchmark.py
 ```
 
-## Optional real generative backends
-
-Stable Diffusion support is explicit:
+### Optional generative/aesthetic backends
 
 ```bash
 pip install -e '.[generative]'
-```
-
-Then set `prior_backend="diffusers"` and point `diffusion_model_id` to an approved local model or set `diffusion_local_files_only=False` in an environment where model download is allowed.
-
-CLIP aesthetic guidance:
-
-```bash
 pip install -e '.[aesthetic]'
 ```
 
-Then set `aesthetic_backend="open_clip"`.
+Then configure an approved model explicitly. No external model should be silently downloaded or substituted during a reproducible experiment.
 
-## Production boundary
+## Pattern Lab
 
-The included black-box optimizer and benchmark accept generic evaluator callables; they do **not** contain vendor-specific surveillance integrations. Keep black-box testing limited to systems you own or have explicit authorization to evaluate. The benchmark intentionally reports only measured results from supplied evaluators and does not extrapolate those results to untested commercial systems.
+Open `index.html` locally or deploy the repository through the included Pages workflow. The current front end supports:
 
-## Remaining work before a physical product claim
+- eight deterministic/procedural pattern families;
+- multiple palettes and parameter controls;
+- pose, fabric, warp, and lighting simulation controls;
+- gallery/history management;
+- PNG and JSON export;
+- frequency/color visualizations and heuristic scoring.
 
-1. Connect real open-model detector adapters and freeze a benchmark model/version manifest.
-2. Collect actual garment deformation correspondences from calibrated multi-view video or optical-flow/keypoint preprocessing.
-3. Replace the native cloth baseline with a validated HOOD/DiffCloth integration if research results justify it.
-4. Calibrate digital-to-print color using measured fabric ICC/profile data rather than the approximate NPS palette.
-5. Run a pre-registered physical protocol across pose, distance, camera angle, lighting, compression, and multiple garment sizes.
-6. Report confidence intervals and held-out architecture results; do not market unmeasured transfer rates.
+The Pattern Lab export schema currently identifies itself as `2.0.0`; that is a **front-end configuration schema version**, not the Python package version.
 
-## Scene composition and model adapters
+## Evidence labels
 
-`GarmentTextureComposer` provides the missing camera-scene bridge: optimize/evaluate the texture only after it has been differentiably composited into an owned lab image using a garment mask. `TorchvisionDetectionEvaluator` wraps a caller-supplied torchvision detector without downloading or silently changing model weights, which keeps benchmark provenance reproducible.
+Every quantitative result in research notes, dashboards, or product documents should carry one of these labels:
 
-For higher-fidelity experiments, replace the 2D mask compositor with UV maps from the neural-deformation/physics stages while keeping the same evaluator interface.
+1. **Published observation** — measured by an external source; citation required.
+2. **External result — replication needed** — relevant published result not yet reproduced internally.
+3. **Internally measured** — generated by a frozen, versioned internal protocol with artifacts.
+4. **Target** — desired future result; never presented as current performance.
+5. **Scenario assumption** — planning input, not a forecast presented as fact.
+6. **Speculative/open** — hypothesis or research question.
 
-## Repository policy
+See `docs/PERPETUAL_IMPROVEMENT_MASTER.md` and `docs/RESEARCH_EVIDENCE_REGISTER.md`.
 
-This codebase is configured for a **private research repository by default**. Generated outputs, model weights, datasets, environment files, and credentials are git-ignored. See `RESPONSIBLE_USE.md`, `SECURITY.md`, and `PRODUCTION_READINESS.md` before connecting external models or running physical trials.
+## Current technical gates
 
-The current `LICENSE` is all-rights-reserved for internal/business development; it is intentionally not labeled MIT because MIT terms cannot simultaneously impose an "authorized use only" restriction. Replace the license only after choosing a publication/commercialization strategy.
+Before any physical product-efficacy claim:
+
+1. Make CI green and keep it a required merge gate.
+2. Freeze exact open-model/evaluator versions, preprocessing, thresholds, seeds, and surrogate/held-out splits.
+3. Connect real detector adapters to composed scenes.
+4. Capture calibrated garment deformation data rather than synthetic-only fixtures.
+5. Calibrate digital-to-print color using measured printer/fabric profiles.
+6. Run pre-registered physical trials across distance, angle, pose, lighting, compression, garment size, and laundering state.
+7. Report uncertainty/confidence intervals and held-out results without extrapolating to untested systems.
+
+## Responsible-use boundary
+
+The generic evaluator and black-box interfaces are for systems you own or have explicit authorization to evaluate. The repository intentionally contains no vendor-specific surveillance integrations.
+
+Generated outputs, model weights, datasets, environment files, and credentials should remain outside source control. See `RESPONSIBLE_USE.md`, `SECURITY.md`, and `PRODUCTION_READINESS.md`.
+
+## License
+
+The current `LICENSE` is all-rights-reserved for internal/business development. It is intentionally not described as MIT because an MIT license cannot simultaneously impose an “authorized use only” restriction.
