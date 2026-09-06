@@ -79,6 +79,13 @@ def main() -> int:
             raise SystemExit(f"frozen model manifest hash mismatch: {model_id}")
         if float(model_manifest.get("decision_threshold")) != float(measured_model.get("decision_threshold")):
             raise SystemExit(f"frozen model threshold mismatch: {model_id}")
+        if str(model_manifest.get("framework")) != str(measured_model.get("framework")):
+            raise SystemExit(f"frozen model framework mismatch: {model_id}")
+        if str(model_manifest.get("framework_version")) != str(measured_model.get("framework_version")):
+            raise SystemExit(
+                f"frozen model framework version mismatch: {model_id}: "
+                f"{model_manifest.get('framework_version')} != {measured_model.get('framework_version')}"
+            )
         bundle.write_json(f"manifests/models/{model_id}.json", model_manifest)
     expected_sets = {
         protocol.surrogate_model_set: list(result["benchmark"]["surrogate_models"]),
@@ -105,6 +112,11 @@ def main() -> int:
     ok, failures = verify_certificate_bundle(bundle.root)
     status = {
         "candidate_id": candidate_id,
+        "protocol_id": protocol.protocol_id,
+        "protocol_version": protocol.version,
+        "surrogate_model_set": protocol.surrogate_model_set,
+        "heldout_model_set": protocol.heldout_model_set,
+        "source_commit": result["source_commit"],
         "decision": cert.decision.value,
         "evidence_state": cert.evidence_state.value,
         "certificate_id": cert.certificate_id,
