@@ -1,0 +1,2 @@
+trial_id,condition_id,control_detected,candidate_detected,camera_id,distance_m,yaw_deg,pitch_deg,pose,lighting_id,wash_state
+T001,C001,true,false,CAM-001,3.0,0,0,standing,LIGHT-001,W0
