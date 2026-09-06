@@ -21,7 +21,7 @@ async function main() {
       edgeIntensity: Number(process.env.BENCHMARK_EDGE_INTENSITY || 60),
       symmetry: Number(process.env.BENCHMARK_SYMMETRY || 0),
       colorPalette: process.env.BENCHMARK_COLOR_PALETTE || 'vibrant',
-      seed: Number(process.env.BENCHMARK_SEED || 42)
+      seed: Number(process.env.BENCHMARK_SEED || 314)
     };
 
     await page.selectOption('#patternType', config.patternType);
@@ -44,6 +44,7 @@ async function main() {
     fs.writeFileSync(path.join(outputDir, 'candidate.png'), png);
     fs.writeFileSync(path.join(outputDir, 'candidate-config.json'), JSON.stringify({
       schema_version: '1.0',
+      candidate_id: process.env.BENCHMARK_CANDIDATE_ID || 'RAC-PER-D2-0001',
       source: 'Pattern Lab browser canvas',
       width: payload.width,
       height: payload.height,
