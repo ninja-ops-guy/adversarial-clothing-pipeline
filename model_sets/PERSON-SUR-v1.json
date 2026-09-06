@@ -1,0 +1,6 @@
+{
+  "model_set_id": "PERSON-SUR-v1",
+  "role": "surrogate",
+  "models": [],
+  "status": "BLOCKED_UNTIL_REAL_FROZEN_MANIFESTS_EXIST"
+}
