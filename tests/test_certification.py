@@ -177,3 +177,51 @@ def test_certificate_issuance_rejects_missing_or_forged_master(tmp_path: Path):
         assert "master artifact hash mismatch" in str(exc)
     else:
         raise AssertionError("certificate issuance must verify the master hash")
+
+
+def test_physical_flag_alone_cannot_unlock_p1(tmp_path: Path):
+    protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
+    bundle = ArtifactBundle.create(tmp_path / "p1-flag-only")
+    (bundle.root / "master.png").write_bytes(b"pattern")
+    try:
+        issue_certificate(
+            bundle=bundle,
+            manifest=manifest(tmp_path),
+            protocol=protocol,
+            digital_summary={
+                "heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3},
+                "invalid_condition_fraction": 0.0,
+            },
+            requested_state=EvidenceState.PHYSICAL,
+            physical_evidence_present=True,
+        )
+    except ValueError as exc:
+        assert "requires bundled physical evidence artifacts" in str(exc)
+    else:
+        raise AssertionError("physical boolean flag must not substitute for artifacts")
+
+
+def test_manufacturing_flag_alone_cannot_unlock_m1(tmp_path: Path):
+    protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
+    bundle = ArtifactBundle.create(tmp_path / "m1-flag-only")
+    (bundle.root / "master.png").write_bytes(b"pattern")
+    (bundle.root / "physical").mkdir()
+    (bundle.root / "physical" / "summary.json").write_text("{}")
+    (bundle.root / "physical" / "trials.csv").write_text("trial_id\n")
+    try:
+        issue_certificate(
+            bundle=bundle,
+            manifest=manifest(tmp_path),
+            protocol=protocol,
+            digital_summary={
+                "heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3},
+                "invalid_condition_fraction": 0.0,
+            },
+            requested_state=EvidenceState.GOLDEN_SAMPLE,
+            physical_evidence_present=True,
+            manufacturing_evidence_present=True,
+        )
+    except ValueError as exc:
+        assert "manufacturing/golden_sample.json" in str(exc)
+    else:
+        raise AssertionError("manufacturing boolean flag must not substitute for artifacts")
