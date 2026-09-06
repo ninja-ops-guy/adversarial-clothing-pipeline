@@ -94,3 +94,28 @@ def test_physical_baseline_qualification_and_lot_conformity():
     )
     assert ok
     assert failures == []
+
+
+def test_bundle_verification_detects_certificate_tampering(tmp_path: Path):
+    protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
+    bundle = ArtifactBundle.create(tmp_path / "bundle-tamper")
+    bundle.write_json(
+        "digital/summary.json",
+        {"heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3}},
+    )
+    issue_certificate(
+        bundle=bundle,
+        manifest=manifest(tmp_path),
+        protocol=protocol,
+        digital_summary={
+            "heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3},
+            "invalid_condition_fraction": 0.0,
+        },
+        requested_state=EvidenceState.DIGITAL_HELDOUT,
+    )
+    certificate_path = bundle.root / "certificate.json"
+    certificate_path.write_text(certificate_path.read_text().replace('"PASS"', '"FAIL"', 1))
+
+    ok, failures = verify_certificate_bundle(bundle.root)
+    assert not ok
+    assert "hash mismatch: certificate.json" in failures
