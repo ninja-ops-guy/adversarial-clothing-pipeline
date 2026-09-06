@@ -30,16 +30,16 @@
   <section class="reference-section motif-section">
     <div class="section-title"><span>MOTIF LIBRARY</span><small>REFERENCE-DERIVED VISUAL LANGUAGE</small></div>
     <div class="motif-strip">
-      <article class="motif-card motif-eye"><div class="motif-art"><span>◉</span></div><b>CANINE EYE</b></article>
-      <article class="motif-card motif-human"><div class="motif-art"><span>◉</span></div><b>HUMAN EYE</b></article>
-      <article class="motif-card motif-rib"><div class="motif-art"><span>≋</span></div><b>SKULL / RIB</b></article>
-      <article class="motif-card motif-floral"><div class="motif-art"><span>✣</span></div><b>FLORAL FRAGMENT</b></article>
-      <article class="motif-card motif-glitch"><div class="motif-art"><span>▦</span></div><b>GLITCH BLOCK</b></article>
-      <article class="motif-card motif-slash"><div class="motif-art"><span>◢</span></div><b>GEOMETRIC SLASH</b></article>
-      <article class="motif-card motif-static"><div class="motif-art"><span>░</span></div><b>STATIC NOISE</b></article>
-      <article class="motif-card motif-leaf"><div class="motif-art"><span>⌁</span></div><b>BOTANICAL LEAF</b></article>
-      <article class="motif-card motif-data"><div class="motif-art"><span>╫</span></div><b>DATA LINES</b></article>
-      <article class="motif-card motif-mask"><div class="motif-art"><span>◐</span></div><b>ABSTRACT MASK</b></article>
+      <button class="motif-card motif-eye" data-motif="canine_eye"><div class="motif-art"><span>◉</span></div><b>CANINE EYE</b></button>
+      <button class="motif-card motif-human" data-motif="human_eye"><div class="motif-art"><span>◉</span></div><b>HUMAN EYE</b></button>
+      <button class="motif-card motif-rib" data-motif="rib"><div class="motif-art"><span>≋</span></div><b>SKULL / RIB</b></button>
+      <button class="motif-card motif-floral" data-motif="floral"><div class="motif-art"><span>✣</span></div><b>FLORAL FRAGMENT</b></button>
+      <button class="motif-card motif-glitch" data-motif="glitch"><div class="motif-art"><span>▦</span></div><b>GLITCH BLOCK</b></button>
+      <button class="motif-card motif-slash" data-motif="slash"><div class="motif-art"><span>◢</span></div><b>GEOMETRIC SLASH</b></button>
+      <button class="motif-card motif-static" data-motif="static"><div class="motif-art"><span>░</span></div><b>STATIC NOISE</b></button>
+      <button class="motif-card motif-leaf" data-motif="leaf"><div class="motif-art"><span>⌁</span></div><b>BOTANICAL LEAF</b></button>
+      <button class="motif-card motif-data" data-motif="data"><div class="motif-art"><span>╫</span></div><b>DATA LINES</b></button>
+      <button class="motif-card motif-mask" data-motif="mask"><div class="motif-art"><span>◐</span></div><b>ABSTRACT MASK</b></button>
     </div>
   </section>
 
@@ -89,7 +89,7 @@
   <main class="studio-grid">
     <section class="studio-panel controls-panel">
       <div class="panel-kicker">GENERATOR INTERFACE</div>
-      <div class="mode-tabs"><span class="active">Generate</span><span>Refine</span><span>Batch</span><span>Export</span></div>
+      <div class="mode-tabs"><button class="mode-tab active" data-mode="generate">Generate</button><button class="mode-tab" data-mode="refine">Refine</button><button class="mode-tab" data-mode="batch">Batch</button><button class="mode-tab" data-mode="export">Export</button></div>
       <div class="studio-body">
         <div id="studioStatus" class="status-box">INITIALIZING…</div>
         <div class="two-col-fields">
@@ -100,6 +100,7 @@
         <div class="field"><label>Motif Density <span id="studioDensityValue">72</span></label><input id="studioDensity" type="range" min="10" max="100" value="72"></div>
         <div class="field"><label>Distress / Grain <span id="studioDistressValue">76</span></label><input id="studioDistress" type="range" min="10" max="100" value="76"></div>
         <div class="field"><label>Seed <span id="studioSeedValue">118</span></label><input id="studioSeed" type="range" min="0" max="999" value="118"></div>
+        <div class="field"><label>Feature Mix <span id="motifCount">AUTO</span></label><div id="motifSelection" class="motif-selection">Click motifs above to add/remove stylized features from generated patterns.</div></div>
         <div class="divider"></div>
         <div class="meta-fields">
           <div class="field"><label>Brand</label><input id="brandName" type="text" value="RUTHLESS"></div>
