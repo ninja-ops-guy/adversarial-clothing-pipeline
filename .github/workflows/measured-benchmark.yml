@@ -159,6 +159,39 @@ jobs:
           print(json.dumps(status, indent=2))
           PY
 
+      - name: Publish D2 run summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, os
+          from pathlib import Path
+          print("# RAC D2 benchmark")
+          print()
+          print("- Source commit: `" + os.environ.get("GITHUB_SHA","unknown") + "`")
+          sel=Path("benchmarks/runtime/surrogate-selection.json")
+          if sel.exists():
+              s=json.loads(sel.read_text())
+              w=s.get("winner",{})
+              print("- Surrogate-only winner: `" + str(w.get("candidate_id","unknown")) + "`")
+              print("- Surrogate candidate detection rate: " + str(w.get("candidate_detection_rate","n/a")))
+          result=Path("benchmark-results.json")
+          if result.exists():
+              r=json.loads(result.read_text())
+              held=r.get("benchmark",{}).get("comparative_summary",{}).get("heldout",{})
+              print("- Held-out models: " + ", ".join(r.get("benchmark",{}).get("heldout_models",[])))
+              print("- Held-out baseline detection rate: " + str(held.get("baseline_detection_rate","n/a")))
+              print("- Held-out candidate detection rate: " + str(held.get("candidate_detection_rate","n/a")))
+              print("- Model lock eligible: " + str(r.get("certification_eligible","n/a")))
+          status=Path("d2-latest-status.json")
+          if status.exists():
+              d=json.loads(status.read_text())
+              print("- D2 decision: **" + str(d.get("decision","UNKNOWN")) + "**")
+              print("- Evidence state: `" + str(d.get("evidence_state","UNKNOWN")) + "`")
+              print("- Bundle verified: " + str(d.get("bundle_verified","n/a")))
+          else:
+              print("- D2 decision: not produced")
+          PY
+
       - name: Upload benchmark evidence
         uses: actions/upload-artifact@v4
         with:
