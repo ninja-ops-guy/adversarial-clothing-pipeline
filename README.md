@@ -4,7 +4,7 @@ Production-oriented research software for **machine-optimized fashion engineered
 
 **Repository state reviewed:** 2026-09-06  
 **Python package version:** `3.1.0`  
-**Documentation baseline:** `main` at `a9e827e` (GitHub Pages workflow present)
+**Documentation baseline:** current `main` (RAC v2 D2 pipeline present)
 
 ## RAC certification layer\n\nVersion 3.1 adds an internal fail-closed evidence certification layer under `ruthless_pipeline/certification/`, frozen protocol/model-set contracts, baseline qualification, sealed artifact bundles, physical/manufacturing conformity schemas, and a measured-result import boundary in Pattern Lab. See `docs/CERTIFICATION_SYSTEM.md`. Real detector weights, calibrated print data, physical trials, and production measurements remain required external evidence; the software does not manufacture them.\n\n## Current repository state
 
@@ -12,19 +12,19 @@ Production-oriented research software for **machine-optimized fashion engineered
 |---|---|---|
 | Python research package | Present under `ruthless_pipeline/` | Production-hardened software infrastructure; not a physical product claim |
 | Four deliverable entrypoints | Present | NAP, deformation, differentiable physics, comparative benchmark |
-| Pattern Lab web UI | Present at `index.html`, `styles.css`, `core.js`, `analysis.js` | Exploratory front end; not connected to the Python benchmark/model stack |
+| Pattern Lab web UI | Present at `index.html`, `styles.css`, `core.js`, `analysis.js` | Exploratory generation UI; measured benchmark imports are kept separate from heuristic analysis |
 | Pattern generators | 8 browser-side generators | Noise, geometric, organic, checkered, striped, circular, cellular, and Perlin-like procedural patterns |
 | Pattern Lab utilities | Present | Seeded generation, gallery/history, basic simulation controls, PNG/JSON export, static analysis panels |
 | GitHub Pages | Deployment workflow present | Deployment success is separate from research validation |
-| Python tests | 5 test files present | Prior local verification passed; see CI note below |
-| GitHub CI | **Not green at this review point** | The production-import run stopped at Ruff lint errors before the pytest step |
+| Python tests | Certification, model-lock, pipeline and UI coverage present | CI remains the authoritative gate |
+| GitHub CI | Workflow gates present | D2 publication requires preregistered model hashes, model-set membership, runtime-version checks and bundle verification |
 | Physical garment validation | Not performed | No product-efficacy claim is supported yet |
 
 ## Important Pattern Lab limitation
 
 The browser Pattern Lab is a **design and experiment-management prototype**, not a detector benchmark.
 
-`analysis.js` currently derives displayed model-style percentages from image statistics and uses randomized values for several top-level metrics. The “Quick optimize” control selects among seeds using those UI metrics. Those values therefore **must not be described as measured YOLO, DETR, Faster R-CNN, SSD, transfer-rate, stealth, or printability results**.
+`analysis.js` exposes deterministic image-statistic heuristics only; it does not present them as detector results. Measured detector evidence is produced by the Python benchmark and imported/displayed with its provenance boundary.
 
 Use the web UI for visual exploration, parameter capture, pattern history, exports, and future experiment orchestration. Use `ruthless_pipeline.benchmark` with frozen evaluator/model manifests for measured machine-vision results.
 
@@ -37,10 +37,9 @@ index.html + styles.css + core.js + analysis.js
   -> visual/heuristic analysis
   -> PNG / JSON export
 
-                 [not yet wired end-to-end]
                            |
                            v
-PYTHON RESEARCH PLANE
+PYTHON RESEARCH / CERTIFICATION PLANE
 texture prior / optimizer
   -> neural deformation
   -> differentiable cloth baseline
