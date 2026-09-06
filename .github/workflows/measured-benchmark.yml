@@ -50,8 +50,13 @@ jobs:
           from pathlib import Path
           m=json.loads(Path('benchmarks/model_manifest.json').read_text())
           hashes=[str(x.get('state_dict_sha256','')) for x in m['models']]
+          heldout=[x['id'] for x in m['models'] if x.get('role') == 'heldout']
           if m.get('lock_status') != 'PREREGISTERED' or not all(len(x)==64 for x in hashes):
               raise SystemExit('Measured candidate inference blocked until all detector states are preregistered.')
+          if m.get('lock_inference_performed') is not False:
+              raise SystemExit('D2 blocked: held-out lock must be created without candidate inference.')
+          if heldout != ['retinanet_resnet50_fpn_v2', 'fcos_resnet50_fpn']:
+              raise SystemExit(f'D2 blocked: unexpected held-out generation: {heldout}')
           PY
 
       - name: Setup Python
