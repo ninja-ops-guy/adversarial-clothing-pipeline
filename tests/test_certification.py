@@ -119,3 +119,21 @@ def test_bundle_verification_detects_certificate_tampering(tmp_path: Path):
     ok, failures = verify_certificate_bundle(bundle.root)
     assert not ok
     assert "hash mismatch: certificate.json" in failures
+
+
+def test_bundle_verification_rejects_malformed_hash_manifest(tmp_path: Path):
+    root = tmp_path / "bad-bundle"
+    root.mkdir()
+    (root / "hashes.sha256").write_text("not-a-valid-hash-line\n")
+    ok, failures = verify_certificate_bundle(root)
+    assert not ok
+    assert "malformed hash manifest line 1" in failures
+
+
+def test_bundle_verification_rejects_path_traversal(tmp_path: Path):
+    root = tmp_path / "bad-path-bundle"
+    root.mkdir()
+    (root / "hashes.sha256").write_text(("0" * 64) + "  ../outside.txt\n")
+    ok, failures = verify_certificate_bundle(root)
+    assert not ok
+    assert "invalid artifact path on line 1" in failures
