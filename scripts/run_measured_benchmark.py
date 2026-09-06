@@ -207,12 +207,16 @@ class DETRPersonEvaluator:
         return probabilities.max(dim=1).values.to(images.device)
 
 
-def build_evaluators(manifest: dict[str, Any]) -> tuple[list[Any], dict[str, dict[str, Any]], dict[str, str]]:
+def build_evaluators(
+    manifest: dict[str, Any], roles: set[str] | None = None
+) -> tuple[list[Any], dict[str, dict[str, Any]], dict[str, str]]:
     evaluators: list[Any] = []
     provenance: dict[str, dict[str, Any]] = {}
     state_hashes: dict[str, str] = {}
 
     for item in manifest["models"]:
+        if roles is not None and item.get("role") not in roles:
+            continue
         model_id = item["id"]
         if model_id == "yolov8n":
             evaluator = UltralyticsPersonEvaluator(model_id, item["model_ref"], int(item["person_class"]))
