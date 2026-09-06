@@ -120,7 +120,13 @@ jobs:
           }
           assert result['benchmark']['raw_row_count'] > 0
           assert result['benchmark']['surrogate_models']
-          assert result['benchmark']['heldout_models']
+          assert result['benchmark']['heldout_models'] == ['retinanet_resnet50_fpn_v2', 'fcos_resnet50_fpn']
+          assert result['benchmark']['surrogate_models'] == [
+              'yolov8n',
+              'fasterrcnn_mobilenet_v3_320',
+              'detr_resnet50',
+              'ssdlite320_mobilenet_v3',
+          ]
           for name, model in result['models'].items():
               assert model['n'] > 0, name
               assert 0 <= model['baseline_detection_rate'] <= 1, name
@@ -130,6 +136,20 @@ jobs:
               'candidate': result['candidate']['sha256'],
               'aggregate': result['aggregate'],
           }, indent=2))
+          PY
+
+      - name: Validate D2 generation status
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status=json.loads(Path('d2-latest-status.json').read_text())
+          assert status['candidate_id'] == 'RAC-PER-D2-0002'
+          assert status['protocol_version'] == '1.1'
+          assert status['surrogate_model_set'] == 'PERSON-SUR-v2'
+          assert status['heldout_model_set'] == 'PERSON-HO-v2'
+          assert status['bundle_verified'] is True
+          print(json.dumps(status, indent=2))
           PY
 
       - name: Upload benchmark evidence
