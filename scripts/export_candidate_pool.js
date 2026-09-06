@@ -4,7 +4,7 @@ const { chromium } = require('@playwright/test');
 
 const FAMILIES = [
   'noise', 'geometric', 'organic', 'checkered',
-  'machine_static', 'ghost_hound', 'broken_human', 'error_garden'
+  'signal_shadow', 'machine_static', 'ghost_hound', 'broken_human', 'error_garden'
 ];
 const SEEDS = [113, 271, 433, 619];
 
@@ -62,8 +62,8 @@ async function main() {
       }
     }
     fs.writeFileSync(path.join(outputDir, 'pool.json'), JSON.stringify({
-      schema_version: '2.0',
-      generation_policy: '32 fixed core/reference-inspired candidates; two-stage surrogate-only selection; no held-out feedback',
+      schema_version: '2.1',
+      generation_policy: '36 fixed core/reference-inspired candidates; two-stage surrogate-only selection; no held-out feedback',
       candidates: records
     }, null, 2));
     console.log(`Exported ${records.length} v2 candidates to ${outputDir}`);
