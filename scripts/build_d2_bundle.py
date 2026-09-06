@@ -73,14 +73,26 @@ def main() -> int:
         model_path = Path("model_manifests") / f"{model_id}.json"
         if not model_path.exists():
             raise SystemExit(f"missing frozen model manifest: {model_path}")
-        bundle.write_json(f"manifests/models/{model_id}.json", json.loads(model_path.read_text()))
-    for set_name in (protocol.surrogate_model_set, protocol.heldout_model_set):
+        model_manifest = json.loads(model_path.read_text())
+        measured_model = result["models"][model_id]
+        if model_manifest.get("weights_sha256") != measured_model.get("state_dict_sha256"):
+            raise SystemExit(f"frozen model manifest hash mismatch: {model_id}")
+        if float(model_manifest.get("decision_threshold")) != float(measured_model.get("decision_threshold")):
+            raise SystemExit(f"frozen model threshold mismatch: {model_id}")
+        bundle.write_json(f"manifests/models/{model_id}.json", model_manifest)
+    expected_sets = {
+        protocol.surrogate_model_set: list(result["benchmark"]["surrogate_models"]),
+        protocol.heldout_model_set: list(result["benchmark"]["heldout_models"]),
+    }
+    for set_name, measured_members in expected_sets.items():
         set_path = Path("model_sets") / f"{set_name}.json"
         if not set_path.exists():
             raise SystemExit(f"missing model set: {set_path}")
         set_payload = json.loads(set_path.read_text())
         if set_payload.get("status") != "PREREGISTERED":
             raise SystemExit(f"model set not preregistered: {set_name}")
+        if list(set_payload.get("models", [])) != measured_members:
+            raise SystemExit(f"model-set membership mismatch for {set_name}")
         bundle.write_json(f"manifests/model_sets/{set_name}.json", set_payload)
 
     cert = issue_certificate(
