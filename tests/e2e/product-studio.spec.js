@@ -15,7 +15,7 @@ test.afterEach(async ({ page }) => {
 });
 
 test('reference design families render distinct production tiles', async ({ page }) => {
-  const families = ['machine_static', 'ghost_hound', 'broken_human', 'error_garden'];
+  const families = ['signal_shadow', 'machine_static', 'ghost_hound', 'broken_human', 'error_garden'];
   const tails = new Set();
   for (const family of families) {
     await page.selectOption('#designFamily', family);
@@ -24,16 +24,41 @@ test('reference design families render distinct production tiles', async ({ page
     expect(data.length).toBeGreaterThan(5000);
     tails.add(data.slice(-700));
   }
-  expect(tails.size).toBe(4);
+  expect(tails.size).toBe(5);
 });
 
 test('all garment mockups render', async ({ page }) => {
-  for (const product of ['hoodie', 'beanie', 'cargo', 'mask', 'shirt']) {
+  for (const product of ['hoodie', 'hat', 'beanie', 'cargo', 'mask', 'shirt']) {
     await page.selectOption('#productType', product);
     await page.getByRole('button', { name: 'Render Design' }).click();
     const data = await page.locator('#mockupCanvas').evaluate(c => c.toDataURL());
     expect(data.length).toBeGreaterThan(10000);
   }
+});
+
+test('canonical launch capsule auto-maps products to reference families', async ({ page }) => {
+  await page.selectOption('#designFamily', 'auto');
+  const capsule = [
+    ['hat', 'SIGNAL SHADOW'],
+    ['mask', 'MACHINE STATIC'],
+    ['shirt', 'ERROR GARDEN'],
+    ['cargo', 'BROKEN HUMAN'],
+    ['beanie', 'GHOST HOUND']
+  ];
+  for (const [product, family] of capsule) {
+    await page.selectOption('#productType', product);
+    await expect(page.locator('#resolvedFamily')).toHaveText(family);
+    await expect(page.locator('#studioStatus')).toContainText(family);
+  }
+});
+
+test('signal shadow hat renders four-view reference board', async ({ page }) => {
+  await page.selectOption('#productType', 'hat');
+  await page.selectOption('#designFamily', 'auto');
+  await page.getByRole('button', { name: 'Render Design' }).click();
+  await expect(page.locator('#productName')).toHaveValue('SIGNAL SHADOW HAT');
+  const data = await page.locator('#mockupCanvas').evaluate(c => c.toDataURL());
+  expect(data.length).toBeGreaterThan(12000);
 });
 
 test('studio controls update deterministic variation', async ({ page }) => {
@@ -58,7 +83,7 @@ test('reference board and manifest exports download non-empty files', async ({ p
 
 test('product studio remains usable on mobile', async ({ page }) => {
   await expect(page.locator('.studio-grid')).toBeVisible();
-  await page.selectOption('#productType', 'mask');
+  await page.selectOption('#productType', 'hat');
   await page.getByRole('button', { name: 'Render Design' }).click();
   await expect(page.locator('#mockupCanvas')).toBeVisible();
 });
