@@ -1,0 +1,24 @@
+{
+  "protocol_id": "RAC-PERSON-DETECT",
+  "version": "1.0",
+  "task": "person_detection",
+  "surrogate_model_set": "PERSON-SUR-v1",
+  "heldout_model_set": "PERSON-HO-v1",
+  "transforms": {
+    "brightness": [0.7, 1.0, 1.3],
+    "scale": [0.65, 1.0, 1.35],
+    "blur_sigma": [0.0, 0.8, 1.6],
+    "jpeg_quality": [40, 70, 95],
+    "rotation_deg": [-20, 0, 20]
+  },
+  "criteria": {
+    "min_baseline_detection_rate": 0.9,
+    "max_candidate_detection_rate": 0.5,
+    "min_relative_reduction": 0.25,
+    "max_invalid_condition_fraction": 0.1,
+    "confidence_level": 0.95
+  },
+  "physical_required_for": ["RAC-P1", "RAC-P2", "RAC-M1", "RAC-M2"],
+  "preregistered": true,
+  "notes": "Internal owned/authorized-lab protocol. Thresholds are an initial engineering policy and must be revised only through a new protocol version, never after viewing held-out candidate results."
+}
