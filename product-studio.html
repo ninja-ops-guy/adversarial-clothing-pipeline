@@ -1,1 +1,157 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>RAC Product Studio</title><link rel="stylesheet" href="product-studio.css"></head><body><div class="studio-shell"><header class="studio-topbar"><div class="studio-brand"><h1>RAC PRODUCT STUDIO</h1><p>Pattern → technical apparel mockup → print-on-demand output</p></div><div class="studio-actions"><a class="studio-link" href="./index.html">← Pattern Lab</a><a class="studio-link" href="./production-studio.html">Production Mapper →</a><button onclick="RACStudio.nextVariation()">Next Variation</button><button class="primary" onclick="RACStudio.renderAll()">Render Design</button></div></header><main class="studio-grid"><section class="studio-panel"><h2>Design Controls</h2><div class="studio-body"><div id="studioStatus" class="status-box">INITIALIZING…</div><div class="field"><label>Product</label><select id="productType"><option value="hoodie">Hoodie</option><option value="hat">Baseball Hat</option><option value="beanie">Beanie</option><option value="cargo">Cargo Pants</option><option value="mask">Balaclava / Mask</option><option value="shirt">Oversized Shirt</option></select></div><div class="field"><label>Design Family <span id="resolvedFamily">—</span></label><select id="designFamily"><option value="auto">Auto by product</option><option value="signal_shadow">Signal Shadow</option><option value="machine_static">Machine Static</option><option value="ghost_hound">Ghost Hound</option><option value="broken_human">Broken Human</option><option value="error_garden">Error Garden</option></select></div><div class="field"><label>Pattern Scale <span id="studioScaleValue">52</span></label><input id="studioScale" type="range" min="20" max="100" value="52"></div><div class="field"><label>Motif Density <span id="studioDensityValue">72</span></label><input id="studioDensity" type="range" min="10" max="100" value="72"></div><div class="field"><label>Distress / Grain <span id="studioDistressValue">76</span></label><input id="studioDistress" type="range" min="10" max="100" value="76"></div><div class="field"><label>Seed <span id="studioSeedValue">118</span></label><input id="studioSeed" type="range" min="0" max="999" value="118"></div><div class="divider"></div><div class="field"><label>Brand</label><input id="brandName" type="text" value="RUTHLESS"></div><div class="field"><label>Product Name</label><input id="productName" type="text" value="MACHINE STATIC HOODIE"></div><div class="field"><label>Collection</label><input id="collectionName" type="text" value="URBAN WILDERNESS"></div><p class="mini-note">Canonical launch-capsule art direction is encoded as procedural rules: black technical grounds, cream/gray fragmented forms, electric-blue and signal-yellow accents, oversized eye/anatomy motifs, organic floral collage, and technical product-board presentation. No external image generator is used.</p></div></section><section class="studio-panel canvas-card"><h2>Technical Apparel Mockup</h2><div class="canvas-wrap"><canvas id="mockupCanvas" width="1122" height="1402"></canvas></div></section><aside class="studio-panel"><h2>Pattern & Production</h2><div class="studio-body"><canvas id="studioPatternCanvas" width="512" height="512"></canvas><div class="divider"></div><div class="output-list"><button class="primary" onclick="RACStudio.exportTile()">Export 4096px POD Tile</button><button onclick="RACStudio.exportMockup()">Export Reference Board PNG</button><button onclick="RACStudio.exportManifest()">Export Production Manifest</button><a class="studio-link" href="./production-studio.html">Open Seam-Aware Production Mapper</a></div><div class="divider"></div><table class="spec-table"><tr><td>Tile</td><td>4096 × 4096 PNG</td></tr><tr><td>Mockup</td><td>1122 × 1402 PNG</td></tr><tr><td>Repeat</td><td>Procedural tile</td></tr><tr><td>Inventory</td><td>POD / zero stock</td></tr></table><div class="divider"></div><p class="mini-note">Provider-specific cut-panel templates and seam-aware placement live in the Production Mapper. Vendor-ready status is only granted after an imported template supplies exact panel dimensions, bleed, safe margins and template version.</p></div></aside></main></div><script src="core.js"></script><script src="studio-patterns.js"></script><script src="product-studio.js"></script><script src="studio-bridge.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>RAC Textile Generator</title>
+  <link rel="stylesheet" href="product-studio.css">
+</head>
+<body>
+<div class="studio-shell">
+  <header class="studio-topbar">
+    <div class="studio-brand">
+      <div class="eyebrow">RUTHLESS // ADVERSARIAL APPAREL</div>
+      <h1>RAC TEXTILE GENERATOR</h1>
+      <p>HIGH-RESOLUTION CONDITIONAL PATTERN GENERATION</p>
+    </div>
+    <div class="header-meta">
+      <div>GENERATE<br>DISRUPT<br>ADAPT<br>WEAR<br>REMAIN</div>
+      <div class="rule"></div>
+      <div>RESEARCH +<br>PRODUCT STUDIO<br>EST. 2026</div>
+    </div>
+    <div class="studio-actions">
+      <a class="studio-link" href="./index.html">Pattern Lab</a>
+      <a class="studio-link" href="./production-studio.html">Production Mapper</a>
+      <button onclick="RACStudio.nextVariation()">Next Variation</button>
+      <button class="primary" onclick="RACStudio.renderAll()">Generate Pattern</button>
+    </div>
+  </header>
+
+  <section class="reference-section motif-section">
+    <div class="section-title"><span>MOTIF LIBRARY</span><small>REFERENCE-DERIVED VISUAL LANGUAGE</small></div>
+    <div class="motif-strip">
+      <article class="motif-card motif-eye"><div class="motif-art"><span>◉</span></div><b>CANINE EYE</b></article>
+      <article class="motif-card motif-human"><div class="motif-art"><span>◉</span></div><b>HUMAN EYE</b></article>
+      <article class="motif-card motif-rib"><div class="motif-art"><span>≋</span></div><b>SKULL / RIB</b></article>
+      <article class="motif-card motif-floral"><div class="motif-art"><span>✣</span></div><b>FLORAL FRAGMENT</b></article>
+      <article class="motif-card motif-glitch"><div class="motif-art"><span>▦</span></div><b>GLITCH BLOCK</b></article>
+      <article class="motif-card motif-slash"><div class="motif-art"><span>◢</span></div><b>GEOMETRIC SLASH</b></article>
+      <article class="motif-card motif-static"><div class="motif-art"><span>░</span></div><b>STATIC NOISE</b></article>
+      <article class="motif-card motif-leaf"><div class="motif-art"><span>⌁</span></div><b>BOTANICAL LEAF</b></article>
+      <article class="motif-card motif-data"><div class="motif-art"><span>╫</span></div><b>DATA LINES</b></article>
+      <article class="motif-card motif-mask"><div class="motif-art"><span>◐</span></div><b>ABSTRACT MASK</b></article>
+    </div>
+  </section>
+
+  <section class="reference-section family-section">
+    <div class="section-title"><span>PATTERN FAMILIES</span><small>CONDITIONAL GENERATION</small></div>
+    <div class="family-grid">
+      <button class="family-card ghost" onclick="document.getElementById('designFamily').value='ghost_hound';RACStudio.renderAll()">
+        <div class="family-art"><span class="eye">◉</span><span class="slash"></span></div>
+        <strong>GHOST HOUND</strong><small>CANINE / GLITCH / GEOMETRIC</small>
+      </button>
+      <button class="family-card broken" onclick="document.getElementById('designFamily').value='broken_human';RACStudio.renderAll()">
+        <div class="family-art"><span class="eye">◉</span><span class="rib">≋</span></div>
+        <strong>BROKEN HUMAN</strong><small>ANATOMY / GEOMETRIC / DATA</small>
+      </button>
+      <button class="family-card garden" onclick="document.getElementById('designFamily').value='error_garden';RACStudio.renderAll()">
+        <div class="family-art"><span class="flower">✣</span><span class="pixel">▦</span></div>
+        <strong>ERROR GARDEN</strong><small>FLORAL / PIXEL / ORGANIC</small>
+      </button>
+      <button class="family-card machine" onclick="document.getElementById('designFamily').value='machine_static';RACStudio.renderAll()">
+        <div class="family-art"><span class="bars">╫</span></div>
+        <strong>MACHINE STATIC</strong><small>NOISE / LINES / SIGNAL</small>
+      </button>
+      <button class="family-card signal" onclick="document.getElementById('designFamily').value='signal_shadow';RACStudio.renderAll()">
+        <div class="family-art"><span class="eye">◉</span><span class="shadow">▰</span></div>
+        <strong>SIGNAL SHADOW</strong><small>ABSTRACT / DISTORT / OVERLAY</small>
+      </button>
+    </div>
+  </section>
+
+  <section class="tile-band">
+    <div>
+      <div class="section-title"><span>SEAMLESS TILE OUTPUT</span><small>4096 × 4096 PRODUCTION MASTER</small></div>
+      <div class="tile-frame"><canvas id="studioPatternCanvas" width="512" height="512"></canvas></div>
+    </div>
+    <div class="variation-rack">
+      <div class="section-title"><span>VARIATIONS</span><small>CONDITIONAL CONTROLS</small></div>
+      <div class="variation-cards">
+        <div class="variation-card v1"><span>ORIGINAL</span></div>
+        <div class="variation-card v2"><span>HIGH CONTRAST</span></div>
+        <div class="variation-card v3"><span>DESATURATED</span></div>
+        <div class="variation-card v4"><span>ALT PALETTE</span></div>
+        <div class="variation-card v5"><span>SCALE +</span></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="studio-grid">
+    <section class="studio-panel controls-panel">
+      <div class="panel-kicker">GENERATOR INTERFACE</div>
+      <div class="mode-tabs"><span class="active">Generate</span><span>Refine</span><span>Batch</span><span>Export</span></div>
+      <div class="studio-body">
+        <div id="studioStatus" class="status-box">INITIALIZING…</div>
+        <div class="two-col-fields">
+          <div class="field"><label>Product</label><select id="productType"><option value="hoodie">Hoodie</option><option value="hat">Baseball Hat</option><option value="beanie">Beanie</option><option value="cargo">Cargo Pants</option><option value="mask">Balaclava / Mask</option><option value="shirt">Oversized Shirt</option></select></div>
+          <div class="field"><label>Design Family <span id="resolvedFamily">—</span></label><select id="designFamily"><option value="auto">Auto by product</option><option value="signal_shadow">Signal Shadow</option><option value="machine_static">Machine Static</option><option value="ghost_hound">Ghost Hound</option><option value="broken_human">Broken Human</option><option value="error_garden">Error Garden</option></select></div>
+        </div>
+        <div class="field"><label>Pattern Scale <span id="studioScaleValue">52</span></label><input id="studioScale" type="range" min="20" max="100" value="52"></div>
+        <div class="field"><label>Motif Density <span id="studioDensityValue">72</span></label><input id="studioDensity" type="range" min="10" max="100" value="72"></div>
+        <div class="field"><label>Distress / Grain <span id="studioDistressValue">76</span></label><input id="studioDistress" type="range" min="10" max="100" value="76"></div>
+        <div class="field"><label>Seed <span id="studioSeedValue">118</span></label><input id="studioSeed" type="range" min="0" max="999" value="118"></div>
+        <div class="divider"></div>
+        <div class="meta-fields">
+          <div class="field"><label>Brand</label><input id="brandName" type="text" value="RUTHLESS"></div>
+          <div class="field"><label>Product Name</label><input id="productName" type="text" value="MACHINE STATIC HOODIE"></div>
+          <div class="field"><label>Collection</label><input id="collectionName" type="text" value="URBAN WILDERNESS"></div>
+        </div>
+        <p class="mini-note">Reference profile: black technical ground, cream/gray fragments, electric blue and signal yellow, oversized eye/anatomy motifs, botanical collage, abrasion, glitch blocks and directional signal noise.</p>
+      </div>
+    </section>
+
+    <section class="studio-panel mockup-panel">
+      <div class="panel-kicker">3D / GARMENT MOCKUP PREVIEW</div>
+      <div class="canvas-wrap"><canvas id="mockupCanvas" width="1122" height="1402"></canvas></div>
+    </section>
+
+    <aside class="studio-panel export-panel">
+      <div class="panel-kicker">EXPORT OUTPUTS</div>
+      <div class="studio-body">
+        <div class="output-file"><span class="file-icon">▧</span><span>pattern_tile.png<small>4096 × 4096</small></span></div>
+        <div class="output-file"><span class="file-icon">▧</span><span>reference_board.png<small>1122 × 1402</small></span></div>
+        <div class="output-file"><span class="file-icon">▤</span><span>pattern_metadata.json<small>conditional manifest</small></span></div>
+        <div class="output-file"><span class="file-icon">▦</span><span>production_map.zip<small>vendor mapping</small></span></div>
+        <div class="divider"></div>
+        <div class="output-list">
+          <button class="primary" onclick="RACStudio.exportTile()">Export 4096px POD Tile</button>
+          <button onclick="RACStudio.exportMockup()">Export Reference Board PNG</button>
+          <button onclick="RACStudio.exportManifest()">Export Production Manifest</button>
+          <a class="studio-link full" href="./production-studio.html">Open Seam-Aware Production Mapper</a>
+        </div>
+        <div class="divider"></div>
+        <table class="spec-table"><tr><td>Tile</td><td>4096 × 4096 PNG</td></tr><tr><td>Mockup</td><td>1122 × 1402 PNG</td></tr><tr><td>Repeat</td><td>Procedural tile</td></tr><tr><td>Inventory</td><td>POD / zero stock</td></tr></table>
+        <p class="mini-note">Vendor-ready status is granted only after exact panel geometry, bleed, safe margins and template version are imported and mapped.</p>
+      </div>
+    </aside>
+  </main>
+
+  <section class="pipeline-section">
+    <div class="section-title"><span>INTEGRATION WITH EXISTING SURROGATE PIPELINE</span><small>EVIDENCE BOUNDARY PRESERVED</small></div>
+    <div class="pipeline">
+      <div class="step"><b>1</b><strong>Generate Candidates</strong><small>conditional motif families</small></div><i>→</i>
+      <div class="step"><b>2</b><strong>Validate + Filter</strong><small>seamless, printable, aesthetic</small></div><i>→</i>
+      <div class="step"><b>3</b><strong>Surrogate Evaluation</strong><small>YOLO + FRCNN + DETR + SSD</small></div><i>→</i>
+      <div class="step"><b>4</b><strong>Select + Mutate</strong><small>top candidates only</small></div><i>→</i>
+      <div class="step"><b>5</b><strong>Robustness</strong><small>transform + deformation</small></div><i>→</i>
+      <div class="step"><b>6</b><strong>Freeze Winner</strong><small>lock pattern hash</small></div><i>→</i>
+      <div class="step accent"><b>7</b><strong>RAC-D2</strong><small>held-out certification</small></div>
+    </div>
+  </section>
+</div>
+<script src="core.js"></script>
+<script src="studio-patterns.js"></script>
+<script src="product-studio.js"></script>
+<script src="studio-bridge.js"></script>
+</body>
+</html>
