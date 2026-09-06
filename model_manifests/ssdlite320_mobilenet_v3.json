@@ -1,0 +1,22 @@
+{
+  "model_id": "ssdlite320_mobilenet_v3",
+  "architecture": "SSDLite320 MobileNetV3 Large",
+  "weights_id": "SSDLite320_MobileNet_V3_Large_Weights.COCO_V1",
+  "weights_sha256": "711cd0e2d35ce1921972aad81b9924a1fedeff902e4bb61f64c05b6cac35a7e1",
+  "framework": "torchvision",
+  "framework_version": "0.29.0+cpu",
+  "preprocessing": {
+    "source": "torchvision detection model internal transform",
+    "input": "float32 RGB tensors [0,1]",
+    "device": "cpu"
+  },
+  "target_class": "person",
+  "class_label": 1,
+  "decision_threshold": 0.5,
+  "nms_threshold": null,
+  "metadata": {
+    "role": "heldout",
+    "hash_scope": "loaded_state_dict",
+    "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32"
+  }
+}
