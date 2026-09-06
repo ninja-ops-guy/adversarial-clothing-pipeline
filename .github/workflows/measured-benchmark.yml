@@ -13,6 +13,8 @@ on:
       - 'analysis.js'
       - 'manual-import.js'
       - 'scripts/export_benchmark_pattern.js'
+      - 'scripts/export_candidate_pool.js'
+      - 'scripts/select_surrogate_candidate.py'
       - 'scripts/run_measured_benchmark.py'
       - 'scripts/build_d2_bundle.py'
       - 'model_manifests/**'
@@ -72,7 +74,7 @@ jobs:
           npm install
           npx playwright install --with-deps chromium
 
-      - name: Export canonical Pattern Lab canvas
+      - name: Export preregistered candidate pool
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/pattern-lab-http.log 2>&1 &
           echo $! >/tmp/pattern-lab-http.pid
@@ -80,9 +82,12 @@ jobs:
             curl -fsS http://127.0.0.1:4173/ >/dev/null && break
             sleep 1
           done
-          node scripts/export_benchmark_pattern.js benchmarks/runtime
+          node scripts/export_candidate_pool.js benchmarks/runtime/pool
 
-      - name: Run real detector inference
+      - name: Select candidate on surrogate models only
+        run: python scripts/select_surrogate_candidate.py --final-id RAC-PER-D2-0001
+
+      - name: Run held-out measured detector inference on frozen winner
         run: python scripts/run_measured_benchmark.py
 
       - name: Build D2 evidence bundle
@@ -125,6 +130,8 @@ jobs:
             benchmarks/runtime/model-lock-proposal.json
             benchmarks/runtime/candidate.png
             benchmarks/runtime/candidate-config.json
+            benchmarks/runtime/surrogate-selection.json
+            benchmarks/runtime/pool/pool.json
             benchmarks/runtime/benchmark-rows.csv
             benchmarks/runtime/fixture/*.png
             certification_artifacts/latest-d2/**
