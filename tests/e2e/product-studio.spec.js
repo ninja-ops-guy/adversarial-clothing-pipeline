@@ -87,3 +87,21 @@ test('product studio remains usable on mobile', async ({ page }) => {
   await page.getByRole('button', { name: 'Render Design' }).click();
   await expect(page.locator('#mockupCanvas')).toBeVisible();
 });
+
+
+test('textile generator reference layout renders all major sections', async ({ page }) => {
+  await expect(page.getByText('RAC TEXTILE GENERATOR', { exact: true })).toBeVisible();
+  await expect(page.getByText('MOTIF LIBRARY', { exact: true })).toBeVisible();
+  await expect(page.getByText('PATTERN FAMILIES', { exact: true })).toBeVisible();
+  await expect(page.getByText('SEAMLESS TILE OUTPUT', { exact: true })).toBeVisible();
+  await expect(page.getByText('INTEGRATION WITH EXISTING SURROGATE PIPELINE', { exact: true })).toBeVisible();
+  await expect(page.locator('.motif-card')).toHaveCount(10);
+  await expect(page.locator('.family-card')).toHaveCount(5);
+});
+
+test('visual family cards update the conditional generator', async ({ page }) => {
+  await page.locator('.family-card.ghost').click();
+  await expect(page.locator('#designFamily')).toHaveValue('ghost_hound');
+  await expect(page.locator('#resolvedFamily')).toHaveText('GHOST HOUND');
+  await expect(page.locator('#studioStatus')).toContainText('GHOST HOUND');
+});
