@@ -49,7 +49,7 @@ const RACStudio=(()=>{
     signal_shadow:'SIGNAL SHADOW',machine_static:'MACHINE STATIC',ghost_hound:'GHOST HOUND',broken_human:'BROKEN HUMAN',error_garden:'ERROR GARDEN'
   };
 
-  let tile=null,manifest=null,mode='generate';
+  let tile=null,manifest=null,mode='generate',variationPreset='original';
   const selectedMotifs=new Set();
   const showcaseImage=new Image();
   let showcaseReady=false;
@@ -67,7 +67,8 @@ const RACStudio=(()=>{
       featureMotifs:[...selectedMotifs],
       useShowcaseSource:Boolean($('useShowcaseSource')&&$('useShowcaseSource').checked),
       showcaseRegion:$('showcaseRegion')?$('showcaseRegion').value:'motifs',
-      showcaseStrength:$('showcaseStrength')?+$('showcaseStrength').value:28
+      showcaseStrength:$('showcaseStrength')?+$('showcaseStrength').value:28,
+      variationPreset
     };
   }
   function defaults(force=false){
@@ -113,12 +114,23 @@ const RACStudio=(()=>{
   function makeTile(size,s=state()){
     const c=document.createElement('canvas');c.width=c.height=size;
     const x=c.getContext('2d');
-    const p={patternType:s.family,patternScale:s.scale,colorVariance:s.density,edgeIntensity:s.distress,symmetry:0,seed:s.seed,featureMotifs:s.featureMotifs};
+    const effectiveScale=s.variationPreset==='scale_plus'?Math.min(100,s.scale+24):s.scale;
+    const p={patternType:s.family,patternScale:effectiveScale,colorVariance:s.density,edgeIntensity:s.distress,symmetry:0,seed:s.seed,featureMotifs:s.featureMotifs};
     const pal=colorPalettes[s.family==='error_garden'?'error_garden':'rac_reference'];
     const r=seededRandom(s.seed),g=patternGenerators[s.family];
     if(!g)throw new Error('Missing pattern family: '+s.family);
     g(x,size,p,pal,r);
     applyShowcaseSource(x,size,s);
+    if(s.variationPreset!=='original'&&s.variationPreset!=='scale_plus'){
+      const copy=document.createElement('canvas');copy.width=copy.height=size;copy.getContext('2d').drawImage(c,0,0);
+      x.clearRect(0,0,size,size);
+      x.save();
+      if(s.variationPreset==='high_contrast')x.filter='contrast(175%) saturate(115%)';
+      if(s.variationPreset==='desaturated')x.filter='grayscale(100%) contrast(125%)';
+      if(s.variationPreset==='alt_palette')x.filter='hue-rotate(135deg) saturate(140%) contrast(115%)';
+      x.drawImage(copy,0,0);
+      x.restore();
+    }
     return c;
   }
   function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
@@ -244,7 +256,7 @@ const RACStudio=(()=>{
     return {
       schema_version:'1.1',generated_at:new Date().toISOString(),brand:s.brand,collection:s.collection,product:s.product,product_name:s.productName,
       art_direction_profile:'canonical_launch_capsule_v1',reference_target:FAMILY_TITLE[s.family]||s.family,
-      design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,feature_motifs:s.featureMotifs,showcase_source:{enabled:s.useShowcaseSource,region:s.showcaseRegion,strength:s.showcaseStrength,asset:'RAC Textile Generator Showcase'},repeat:'tile',master_export_px:4096},
+      design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,variation_preset:s.variationPreset,feature_motifs:s.featureMotifs,showcase_source:{enabled:s.useShowcaseSource,region:s.showcaseRegion,strength:s.showcaseStrength,asset:'RAC Textile Generator Showcase'},repeat:'tile',master_export_px:4096},
       outputs:{reference_board_px:[W,H],production_tile_px:[4096,4096]},production_status:'digital_design_ready',pod_status:'requires provider-specific print-template mapping'
     };
   }
@@ -266,6 +278,11 @@ const RACStudio=(()=>{
     if(selectedMotifs.has(name))selectedMotifs.delete(name);else selectedMotifs.add(name);
     updateMotifUI();render();
   }
+  function setVariation(name){
+    variationPreset=name;
+    document.querySelectorAll('.variation-card[data-variation]').forEach(card=>card.classList.toggle('selected',card.dataset.variation===name));
+    render();
+  }
   function setMode(nextMode){
     mode=nextMode;
     document.querySelectorAll('.mode-tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.mode===mode));
@@ -279,6 +296,7 @@ const RACStudio=(()=>{
     $('productType').addEventListener('change',()=>{defaults();render();});$('designFamily').addEventListener('change',()=>{defaults();render();});$('productName').addEventListener('input',()=>{$('productName').dataset.edited='true';});
     document.querySelectorAll('.motif-card[data-motif]').forEach(card=>card.addEventListener('click',()=>toggleMotif(card.dataset.motif)));
     document.querySelectorAll('.mode-tab').forEach(tab=>tab.addEventListener('click',()=>setMode(tab.dataset.mode)));
+    document.querySelectorAll('.variation-card[data-variation]').forEach(card=>card.addEventListener('click',()=>setVariation(card.dataset.variation)));
     if($('useShowcaseSource'))$('useShowcaseSource').addEventListener('change',render);
     if($('showcaseRegion'))$('showcaseRegion').addEventListener('change',render);
     if($('showcaseReference')&&window.RAC_SHOWCASE_DATA_URI){
@@ -289,6 +307,6 @@ const RACStudio=(()=>{
     }
     updateMotifUI();defaults(true);render();
   }
-  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode};
+  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode,setVariation};
 })();
 window.addEventListener('DOMContentLoaded',RACStudio.init);
