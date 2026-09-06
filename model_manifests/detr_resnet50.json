@@ -1,0 +1,23 @@
+{
+  "model_id": "detr_resnet50",
+  "architecture": "DETR ResNet-50",
+  "weights_id": "facebook/detr-resnet-50",
+  "weights_sha256": "ba2a4b1a72e362a84b8a31511e7a1dfa9a28226898d1738a5db4cb3673ce9ec7",
+  "framework": "transformers",
+  "framework_version": "4.57.6",
+  "preprocessing": {
+    "source": "AutoImageProcessor.from_pretrained",
+    "model_ref": "facebook/detr-resnet-50",
+    "input": "PIL RGB",
+    "device": "cpu"
+  },
+  "target_class": "person",
+  "class_label": 1,
+  "decision_threshold": 0.5,
+  "nms_threshold": null,
+  "metadata": {
+    "role": "heldout",
+    "hash_scope": "loaded_state_dict",
+    "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32"
+  }
+}
