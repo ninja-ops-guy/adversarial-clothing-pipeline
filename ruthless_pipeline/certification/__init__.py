@@ -6,12 +6,12 @@ from .registry import ModelManifest, ModelRegistry
 from .statistics import MetricSummary, summarize_values, wilson_interval
 from .artifact_bundle import ArtifactBundle
 from .certificate import Certificate, CertificateDecision, issue_certificate
-from .verification import verify_certificate_bundle
+from .verification import verify_certificate_bundle\nfrom .calibration import PrintCalibration, TextileProfile\nfrom .physical import PhysicalSummary, PhysicalTrial, summarize_physical_trials\nfrom .manufacturing import ConformityLimits, ConformityMeasurement, evaluate_lot_conformity
 
 __all__ = [
     "ArtifactRef", "EvidenceState", "PatternManifest", "hash_file", "sha256_bytes",
     "CertificationProtocol", "PassCriteria", "load_protocol",
     "ModelManifest", "ModelRegistry", "MetricSummary", "summarize_values", "wilson_interval",
     "ArtifactBundle", "Certificate", "CertificateDecision", "issue_certificate",
-    "verify_certificate_bundle",
+    "verify_certificate_bundle", "PrintCalibration", "TextileProfile",\n    "PhysicalSummary", "PhysicalTrial", "summarize_physical_trials",\n    "ConformityLimits", "ConformityMeasurement", "evaluate_lot_conformity",
 ]
