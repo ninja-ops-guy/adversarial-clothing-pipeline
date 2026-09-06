@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 const measuredFixture = {
   schema_version: '1.0',
-  status: 'measured',
+  status: 'measured_locked',
   evidence_scope: 'digital_ci_convenience_fixture',
   generated_at: '2026-09-06T20:00:00Z',
   source_commit: 'deadbeefcafebabe',
@@ -212,7 +212,7 @@ test('mobile viewport remains usable', async ({ page }) => {
   await expect(page.locator('#previewCanvas')).toBeVisible();
 });
 
-test('manual measured benchmark import uses the same measured schema', async ({ page }) => {
+test('manual measured benchmark import accepts current locked schema', async ({ page }) => {
   await page.getByText('Analysis', { exact: true }).click();
   const payload = JSON.parse(JSON.stringify(measuredFixture));
   payload.source_commit = 'cafebabedeadbeef';
@@ -226,4 +226,18 @@ test('manual measured benchmark import uses the same measured schema', async ({ 
   await expect(page.locator('#measuredEvidence')).toContainText('cafebabe');
   await expect(page.locator('#benchmarkStatus')).toContainText('MEASURED');
   await expect(page.locator('#transferRate')).toHaveText('40.0%');
+});
+
+
+test('manual import rejects obsolete or non-measured status', async ({ page }) => {
+  await page.getByText('Analysis', { exact: true }).click();
+  const payload = JSON.parse(JSON.stringify(measuredFixture));
+  payload.status = 'measured';
+  await page.locator('#measuredResultsFile').setInputFiles({
+    name: 'benchmark-results.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(payload))
+  });
+  await expect(page.locator('#measuredEvidence')).toContainText('Import failed');
+  await expect(page.locator('#measuredEvidence')).toContainText('measured_locked or measured_unlocked');
 });
