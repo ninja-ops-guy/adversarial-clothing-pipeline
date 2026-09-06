@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 from enum import Enum
 
@@ -57,6 +58,14 @@ def issue_certificate(
     )
     baseline_rate = float(heldout.get("baseline_detection_rate", 0.0))
     candidate_rate = float(heldout.get("candidate_detection_rate", 1.0))
+    rates = {
+        "baseline_detection_rate": baseline_rate,
+        "candidate_detection_rate": candidate_rate,
+        "invalid_condition_fraction": invalid_fraction,
+    }
+    for name, value in rates.items():
+        if not math.isfinite(value) or not 0.0 <= value <= 1.0:
+            raise ValueError(f"{name} must be a finite value within [0,1]")
     relative_reduction = (
         0.0
         if baseline_rate <= 0
