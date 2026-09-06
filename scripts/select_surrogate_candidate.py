@@ -3,7 +3,12 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from ruthless_pipeline.benchmark import BenchmarkConfig, ComparativeBenchmark
 from scripts.run_measured_benchmark import build_evaluators, prepare_fixture
