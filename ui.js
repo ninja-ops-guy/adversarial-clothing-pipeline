@@ -36,6 +36,7 @@ function updateSlider(id) {
         }
 
         function generatePattern() {
+            return new Promise((resolve) => {
             const loading = document.getElementById('previewLoading');
             loading.style.display = 'flex';
             setTimeout(() => {
@@ -63,7 +64,9 @@ function updateSlider(id) {
                 addToGallery(canvas);
                 loading.style.display = 'none';
                 log('Pattern generated successfully', 'success');
+                resolve(currentPattern);
             }, 100);
+            });
         }
 
         function applySymmetry(ctx, size, symmetryType) {
