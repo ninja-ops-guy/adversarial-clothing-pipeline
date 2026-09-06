@@ -2,16 +2,22 @@
 
 ## Purpose
 
-`product-studio.html` turns the repository's procedural pattern tooling into a product-design surface for print-on-demand apparel.
+The repository now has two linked apparel surfaces:
 
-The current flow is:
+- `product-studio.html` — deterministic procedural apparel design and technical mockups.
+- `production-studio.html` — vendor-template ingestion, seam-aware panel mapping, artifact hashing, panel-pack export, and batch seed ranking.
+
+The end-to-end flow is now:
 
 1. select a deterministic design family and seed;
-2. render a repeat tile;
-3. place it on a multi-view technical apparel mockup;
-4. export a 4096×4096 production tile;
-5. export a reference-board PNG;
-6. export a production manifest.
+2. render a repeat tile and technical garment mockup;
+3. persist the Product Studio design state;
+4. open the Production Mapper;
+5. load a normalized preview template or import an exact vendor template JSON;
+6. map the design independently across cut panels;
+7. validate continuity-group transforms;
+8. export exact-size panel PNGs, a ZIP panel pack, mapping JSON, and a hash-bound manifest;
+9. optionally generate and rank a batch of candidate seeds for collection development.
 
 ## Implemented design families
 
@@ -22,7 +28,7 @@ The current flow is:
 
 Changing the seed creates a new deterministic variation inside the same family.
 
-## Implemented mockups
+## Implemented Product Studio mockups
 
 The canvas renderer supports:
 
@@ -34,37 +40,114 @@ The canvas renderer supports:
 
 The reference-board renderer uses the supplied visual direction: large industrial product title, off-white technical sheet, multiple garment views, textile-detail crop, pattern-strategy copy, restrained technical typography and signal-color accents.
 
-## Export contract
+## Production Mapper
 
-### Production tile
+### Vendor-template contract
+
+`templates/vendor-template.schema.json` defines the supported adapter contract. A template records:
+
+- provider and product identifiers;
+- template version and source;
+- DPI and canvas dimensions;
+- exact panel rectangles;
+- bleed and safe margins;
+- required/optional panel status;
+- continuity groups;
+- optional seam relationships.
+
+The included `templates/generic-aop-hoodie-preview.json` is deliberately marked `vendor_ready: false`. It is normalized preview geometry only and must not be represented as a provider production template.
+
+Imported templates may set `vendor_ready: true`; the resulting manifest records this as an imported template claim, not as independent RAC verification of the provider source.
+
+### Seam-aware panel mapper
+
+Every panel has independent:
+
+- X/Y pattern offset;
+- pattern scale;
+- rotation.
+
+Panels may share a `continuity_group`. The mapper reports inconsistent transforms within a continuity group and provides an **Auto-Map Continuity Groups** action that copies a common transform across related panels.
+
+Bleed and safe-area guides are drawn in the mapper preview when provided by the template.
+
+### Panel-pack export
+
+The Production Mapper can export:
+
+- selected exact-size panel PNG;
+- mapping JSON;
+- evidence-bound manifest JSON;
+- one ZIP containing:
+  - `master/repeat_4096.png`;
+  - `panels/<panel-id>.png` for every panel;
+  - `manifest.json`;
+  - `mapping.json`;
+  - `template.json`.
+
+A generic template produces a `rac-draft-panel-pack-*` ZIP. An imported template that explicitly claims vendor readiness produces `rac-vendor-panel-pack-*`.
+
+## Evidence binding
+
+The production manifest binds the exported artifact set with SHA-256 hashes for:
+
+- the exact 4096×4096 master repeat PNG;
+- the imported template JSON;
+- the panel mapping configuration;
+- every exported panel PNG.
+
+The manifest declares that any artwork, template, or mapping change invalidates stale downstream evidence.
+
+This is the bridge needed for future RAC-D evidence to attach to an exact commercial SKU/artifact rather than to a visual concept alone.
+
+## Batch design factory
+
+The Production Mapper can generate up to 100 deterministic seed candidates for the active design family, rank them with the repository's local entropy/complexity/printability-style proxy, retain the top subset, apply a selected candidate back to the mapper, and export a shortlist JSON.
+
+The batch score is explicitly a local visual/printability proxy. It is **not detector efficacy and not RAC certification evidence**.
+
+## Current export contract
+
+### Product Studio master tile
 
 - PNG
 - 4096×4096
 - deterministic from family + seed + controls
-- intended as master repeat artwork for a print-on-demand template
+- master repeat artwork
 
-### Reference board
+### Product Studio reference board
 
 - PNG
 - 1122×1402
 - merchandising / art-direction mockup
 - not a vendor cut-panel file
 
-### Production manifest
+### Production Mapper panel files
 
-JSON records product, family, seed, pattern controls and required output dimensions.
+- PNG
+- exact pixel dimensions from the active template
+- independent per-panel transforms
+- template-aware bleed/safe-area metadata
 
-## Planned tester features
+### Evidence-bound manifest
 
-Provider-specific production files cannot be generated correctly until the actual vendor templates are available. The tester should add these features next:
+- JSON schema version 2.0
+- design artifact hash
+- template hash
+- mapping hash
+- per-panel hashes
+- explicit vendor/draft status and caveat
 
-1. **Provider template importer** — load Printful, Printify or Contrado PNG/SVG templates and record template version, safe area, bleed and seams.
-2. **Seam-aware panel mapper** — independently position front, back, sleeves, hood and leg panels while preserving continuity across adjoining seams.
-3. **Panel-pack exporter** — export every print area at the exact provider dimensions and fail when a required panel is absent or the dimensions are wrong.
-4. **Vendor mockup comparison** — import the vendor-generated mockup and compare scale, crop and seam placement against the studio reference board.
-5. **Batch design factory** — generate multiple deterministic seeds per design family, score them with existing local visual/printability metrics and queue selected candidates for the repository's digital evaluation flow.
-6. **Evidence binding** — bind downstream test evidence to the exact exported design hash so changing the artwork invalidates stale results.
+## Remaining production work
+
+1. Acquire real provider templates and convert them into the adapter JSON format without guessing dimensions.
+2. Add provider-specific template-version libraries only after source material is obtained and recorded.
+3. Add vendor-generated mockup comparison for scale/crop/seam validation.
+4. Connect selected batch candidates to the measured RAC digital evaluation workflow.
+5. Bind RAC-D result records to the manifest's exact design artifact hash.
+6. Order the first POD sample and start the physical feedback loop.
+7. Add RAC-P physical evidence only after measured garment testing exists.
 
 ## Status
 
-The visual design + mockup MVP is implemented. Vendor-specific template mapping remains planned rather than inventing provider dimensions.
+The repository now covers **design factory → template adapter → panel mapper → panel-pack export → artifact evidence binding**. The remaining blocker to a true vendor-ready POD upload is not software architecture; it is obtaining and ingesting the actual provider template specifications for the chosen products.
