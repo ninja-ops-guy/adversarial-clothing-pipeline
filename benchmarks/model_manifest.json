@@ -73,5 +73,31 @@
   "min_baseline_score": 0.5,
   "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32",
   "lock_status": "PREREGISTERED",
-  "lock_note": "Hashes measured in a bootstrap run and committed before subsequent D2 candidate evaluation. The bootstrap candidate/result is not certification evidence."
+  "lock_note": "Hashes measured in a bootstrap run and committed before subsequent D2 candidate evaluation. The bootstrap candidate/result is not certification evidence.",
+  "selection_sweep": {
+    "brightness": [
+      0.8,
+      1,
+      1.2
+    ],
+    "scale": [
+      1
+    ],
+    "blur_sigma": [
+      0,
+      0.8
+    ],
+    "rotation_deg": [
+      0
+    ]
+  },
+  "selection_policy": {
+    "pool": "scripts/export_candidate_pool.js",
+    "objective": [
+      "candidate_detection_rate:min",
+      "candidate_mean:min",
+      "candidate_id:lexical"
+    ],
+    "boundary": "surrogate_only"
+  }
 }
