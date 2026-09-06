@@ -3,10 +3,10 @@
 Production-oriented research software for **machine-optimized fashion engineered to reduce reliable visual classification across diverse computer-vision systems** in owned or explicitly authorized lab environments.
 
 **Repository state reviewed:** 2026-09-06  
-**Python package version:** `3.0.0`  
+**Python package version:** `3.1.0`  
 **Documentation baseline:** `main` at `a9e827e` (GitHub Pages workflow present)
 
-## Current repository state
+## RAC certification layer\n\nVersion 3.1 adds an internal fail-closed evidence certification layer under `ruthless_pipeline/certification/`, frozen protocol/model-set contracts, baseline qualification, sealed artifact bundles, physical/manufacturing conformity schemas, and a measured-result import boundary in Pattern Lab. See `docs/CERTIFICATION_SYSTEM.md`. Real detector weights, calibrated print data, physical trials, and production measurements remain required external evidence; the software does not manufacture them.\n\n## Current repository state
 
 | Area | Current state | Evidence boundary |
 |---|---|---|
