@@ -2,7 +2,7 @@
   "schema_version": "3.0",
   "task": "person_detection",
   "threshold": 0.5,
-  "lock_status": "LOCK_PENDING",
+  "lock_status": "PREREGISTERED",
   "generation": "v2 rotate previously observed held-out models into surrogate ensemble; new held-out models receive no candidate inference until hashes are preregistered",
   "models": [
     {
@@ -53,7 +53,7 @@
       "person_class": 1,
       "role": "heldout",
       "decision_threshold": 0.5,
-      "state_dict_sha256": "UNFROZEN_BOOTSTRAP_ONLY"
+      "state_dict_sha256": "8f4b5b84900a522eb49a946deeb717ae334d27cd9f5e00c64f1461c909c3552f"
     },
     {
       "id": "fcos_resnet50_fpn",
@@ -63,7 +63,7 @@
       "person_class": 1,
       "role": "heldout",
       "decision_threshold": 0.5,
-      "state_dict_sha256": "UNFROZEN_BOOTSTRAP_ONLY"
+      "state_dict_sha256": "2ceeb6e946fdbbad8106ccbff6225d72cd53f732ab205fa33085212b6b6ab853"
     }
   ],
   "fixture": {
@@ -120,5 +120,7 @@
     "version": "2.0",
     "candidate_pool": "core+reference-inspired"
   },
-  "min_baseline_score": 0.5
+  "min_baseline_score": 0.5,
+  "lock_source_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4",
+  "lock_inference_performed": false
 }
