@@ -10,6 +10,10 @@ on:
       - 'ui.js'
       - 'analysis.js'
       - 'manual-import.js'
+      - 'product-studio.html'
+      - 'product-studio.css'
+      - 'product-studio.js'
+      - 'studio-patterns.js'
       - 'benchmark-results.json'
       - 'package.json'
       - 'playwright.config.js'
@@ -55,6 +59,10 @@ jobs:
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
         run: npx playwright test --project=chromium-desktop --grep "all pattern generators|PNG, JSON, SVG"
+      - name: Verify deployed Product Studio
+        env:
+          BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
+        run: npx playwright test tests/e2e/product-studio.spec.js --project=chromium-desktop --grep "design families|garment mockups"
       - name: Verify deployed measured benchmark JSON when published
         if: ${{ hashFiles('benchmark-results.json') != '' }}
         run: |
