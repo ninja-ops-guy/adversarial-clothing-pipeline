@@ -46,23 +46,23 @@
   <section class="reference-section family-section">
     <div class="section-title"><span>PATTERN FAMILIES</span><small>CONDITIONAL GENERATION</small></div>
     <div class="family-grid">
-      <button class="family-card ghost" onclick="document.getElementById('designFamily').value='ghost_hound';RACStudio.renderAll()">
+      <button class="family-card ghost" onclick="document.getElementById('designFamily').value='ghost_hound';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="eye">◉</span><span class="slash"></span></div>
         <strong>GHOST HOUND</strong><small>CANINE / GLITCH / GEOMETRIC</small>
       </button>
-      <button class="family-card broken" onclick="document.getElementById('designFamily').value='broken_human';RACStudio.renderAll()">
+      <button class="family-card broken" onclick="document.getElementById('designFamily').value='broken_human';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="eye">◉</span><span class="rib">≋</span></div>
         <strong>BROKEN HUMAN</strong><small>ANATOMY / GEOMETRIC / DATA</small>
       </button>
-      <button class="family-card garden" onclick="document.getElementById('designFamily').value='error_garden';RACStudio.renderAll()">
+      <button class="family-card garden" onclick="document.getElementById('designFamily').value='error_garden';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="flower">✣</span><span class="pixel">▦</span></div>
         <strong>ERROR GARDEN</strong><small>FLORAL / PIXEL / ORGANIC</small>
       </button>
-      <button class="family-card machine" onclick="document.getElementById('designFamily').value='machine_static';RACStudio.renderAll()">
+      <button class="family-card machine" onclick="document.getElementById('designFamily').value='machine_static';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="bars">╫</span></div>
         <strong>MACHINE STATIC</strong><small>NOISE / LINES / SIGNAL</small>
       </button>
-      <button class="family-card signal" onclick="document.getElementById('designFamily').value='signal_shadow';RACStudio.renderAll()">
+      <button class="family-card signal" onclick="document.getElementById('designFamily').value='signal_shadow';document.getElementById('designFamily').dispatchEvent(new Event('change'))">
         <div class="family-art"><span class="eye">◉</span><span class="shadow">▰</span></div>
         <strong>SIGNAL SHADOW</strong><small>ABSTRACT / DISTORT / OVERLAY</small>
       </button>
