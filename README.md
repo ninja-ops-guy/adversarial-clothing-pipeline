@@ -4,7 +4,7 @@ Production-oriented research software for **machine-optimized fashion engineered
 
 **Repository state reviewed:** 2026-09-06  
 **Python package version:** `3.0.0`  
-**Documentation baseline:** `main` at `a9e827e` (GitHub Pages workflow present)
+**Documentation baseline:** post-`df43b4b` hardening branch (Pages + Pattern Lab export fixes present)
 
 ## Current repository state
 
@@ -17,14 +17,14 @@ Production-oriented research software for **machine-optimized fashion engineered
 | Pattern Lab utilities | Present | Seeded generation, gallery/history, basic simulation controls, PNG/JSON export, static analysis panels |
 | GitHub Pages | Deployment workflow present | Deployment success is separate from research validation |
 | Python tests | 5 test files present | Prior local verification passed; see CI note below |
-| GitHub CI | **Not green at this review point** | The production-import run stopped at Ruff lint errors before the pytest step |
+| GitHub CI | HARDENED / VALIDATION PENDING | Correctness lint is blocking; full Ruff debt is reported non-blocking; CPU-only test dependencies reduce runner bloat |
 | Physical garment validation | Not performed | No product-efficacy claim is supported yet |
 
 ## Important Pattern Lab limitation
 
 The browser Pattern Lab is a **design and experiment-management prototype**, not a detector benchmark.
 
-`analysis.js` currently derives displayed model-style percentages from image statistics and uses randomized values for several top-level metrics. The “Quick optimize” control selects among seeds using those UI metrics. Those values therefore **must not be described as measured YOLO, DETR, Faster R-CNN, SSD, transfer-rate, stealth, or printability results**.
+`analysis.js` now reports deterministic **visual heuristics only**: luminance, color spread, horizontal edge density, texture energy, and heuristic complexity. The seed-exploration action ranks candidates only by heuristic complexity. The browser UI no longer presents those values as YOLO, DETR, Faster R-CNN, SSD, transfer-rate, stealth, or printability results.
 
 Use the web UI for visual exploration, parameter capture, pattern history, exports, and future experiment orchestration. Use `ruthless_pipeline.benchmark` with frozen evaluator/model manifests for measured machine-vision results.
 
@@ -119,7 +119,7 @@ See `docs/PERPETUAL_IMPROVEMENT_MASTER.md` and `docs/RESEARCH_EVIDENCE_REGISTER.
 
 Before any physical product-efficacy claim:
 
-1. Make CI green and keep it a required merge gate.
+1. Validate the hardened CI workflow green, then keep the correctness/test/package jobs as required merge gates.
 2. Freeze exact open-model/evaluator versions, preprocessing, thresholds, seeds, and surrogate/held-out splits.
 3. Connect real detector adapters to composed scenes.
 4. Capture calibrated garment deformation data rather than synthetic-only fixtures.
