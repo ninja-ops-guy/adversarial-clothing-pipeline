@@ -6,7 +6,7 @@ function runAnalysis() {
             const data = imageData.data;
             drawFrequencySpectrum(data, size);
             drawColorDistribution(data, size);
-            estimateAttackSuccess(data, size);
+            updateVisualHeuristics(data, size);
             log('Analysis complete', 'success');
         }
 
@@ -57,45 +57,66 @@ function runAnalysis() {
             }
         }
 
-        function estimateAttackSuccess(data, size) {
-            let highFreqEnergy = 0; let colorVariance = 0; let edgeDensity = 0;
+        function updateVisualHeuristics(data, size) {
+            let luminanceSum = 0;
+            let colorDeviationSum = 0;
+            let edgeCount = 0;
             const colors = [];
+
             for (let y = 0; y < size; y += 2) {
                 for (let x = 0; x < size; x += 2) {
                     const idx = (y * size + x) * 4;
                     const brightness = (data[idx] + data[idx + 1] + data[idx + 2]) / 3;
-                    highFreqEnergy += brightness;
+                    luminanceSum += brightness;
                     colors.push([data[idx], data[idx + 1], data[idx + 2]]);
+
                     if (x < size - 2) {
                         const nextIdx = (y * size + x + 2) * 4;
                         const nextBrightness = (data[nextIdx] + data[nextIdx + 1] + data[nextIdx + 2]) / 3;
-                        if (Math.abs(brightness - nextBrightness) > 50) { edgeDensity++; }
+                        if (Math.abs(brightness - nextBrightness) > 50) {
+                            edgeCount++;
+                        }
                     }
                 }
             }
-            highFreqEnergy = highFreqEnergy / (colors.length * 255);
+
+            const sampleCount = Math.max(colors.length, 1);
+            const meanLuminance = luminanceSum / sampleCount / 255;
             const avgColor = [
-                colors.reduce((a, c) => a + c[0], 0) / colors.length,
-                colors.reduce((a, c) => a + c[1], 0) / colors.length,
-                colors.reduce((a, c) => a + c[2], 0) / colors.length
+                colors.reduce((sum, color) => sum + color[0], 0) / sampleCount,
+                colors.reduce((sum, color) => sum + color[1], 0) / sampleCount,
+                colors.reduce((sum, color) => sum + color[2], 0) / sampleCount
             ];
-            colorVariance = colors.reduce((a, c) => {
-                return a + Math.abs(c[0] - avgColor[0]) + Math.abs(c[1] - avgColor[1]) + Math.abs(c[2] - avgColor[2]);
-            }, 0) / colors.length / 255;
-            edgeDensity = edgeDensity / (colors.length / 2);
-            const baseRate = 0.5;
-            const yoloRate = Math.min(0.95, baseRate + highFreqEnergy * 0.3 + edgeDensity * 0.2);
-            const detrRate = Math.min(0.90, baseRate + highFreqEnergy * 0.25 + colorVariance * 0.15);
-            const rcnnRate = Math.min(0.92, baseRate + edgeDensity * 0.3 + highFreqEnergy * 0.2);
-            const ssdRate = Math.min(0.88, baseRate + colorVariance * 0.25 + edgeDensity * 0.15);
-            document.getElementById('yoloRate').textContent = (yoloRate * 100).toFixed(0) + '%';
-            document.getElementById('yoloBar').style.width = (yoloRate * 100) + '%';
-            document.getElementById('detrRate').textContent = (detrRate * 100).toFixed(0) + '%';
-            document.getElementById('detrBar').style.width = (detrRate * 100) + '%';
-            document.getElementById('rcnnRate').textContent = (rcnnRate * 100).toFixed(0) + '%';
-            document.getElementById('rcnnBar').style.width = (rcnnRate * 100) + '%';
-            document.getElementById('ssdRate').textContent = (ssdRate * 100).toFixed(0) + '%';
-            document.getElementById('ssdBar').style.width = (ssdRate * 100) + '%';
+
+            colorDeviationSum = colors.reduce((sum, color) => {
+                return sum
+                    + Math.abs(color[0] - avgColor[0])
+                    + Math.abs(color[1] - avgColor[1])
+                    + Math.abs(color[2] - avgColor[2]);
+            }, 0);
+
+            const colorSpread = Math.min(1, colorDeviationSum / sampleCount / (3 * 127.5));
+            const edgeDensity = Math.min(1, edgeCount / Math.max(sampleCount / 2, 1));
+            const textureEnergy = Math.min(1, (meanLuminance * 0.35) + (colorSpread * 0.25) + (edgeDensity * 0.40));
+            const complexity = Math.min(1, (colorSpread * 0.45) + (edgeDensity * 0.55));
+
+            const setProgress = (valueId, barId, value) => {
+                const bounded = Math.max(0, Math.min(1, value));
+                document.getElementById(valueId).textContent = bounded.toFixed(2);
+                document.getElementById(barId).style.width = (bounded * 100).toFixed(1) + '%';
+            };
+
+            setProgress('luminanceRate', 'luminanceBar', meanLuminance);
+            setProgress('colorSpreadRate', 'colorSpreadBar', colorSpread);
+            setProgress('edgeRate', 'edgeBar', edgeDensity);
+            setProgress('heuristicComplexityRate', 'heuristicComplexityBar', complexity);
+
+            document.getElementById('textureEnergyScore').textContent = (textureEnergy * 10).toFixed(1) + '/10';
+            document.getElementById('colorDiversityScore').textContent = (colorSpread * 10).toFixed(1) + '/10';
+            document.getElementById('edgeDensityScore').textContent = (edgeDensity * 10).toFixed(1) + '/10';
+            document.getElementById('complexityScore').textContent = (complexity * 10).toFixed(1);
+
+            return { meanLuminance, colorSpread, edgeDensity, textureEnergy, complexity };
         }
 
         function addToGallery(canvas) {
@@ -143,14 +164,10 @@ function runAnalysis() {
         }
 
         function updateMetrics() {
-            const transferRate = 65 + Math.random() * 20;
-            const stealthScore = 6 + Math.random() * 3;
-            const printability = 6 + Math.random() * 3;
-            const complexity = (Math.random() * 10).toFixed(1);
-            document.getElementById('transferRate').textContent = transferRate.toFixed(0) + '%';
-            document.getElementById('stealthScore').textContent = stealthScore.toFixed(1) + '/10';
-            document.getElementById('printabilityScore').textContent = printability.toFixed(1) + '/10';
-            document.getElementById('complexityScore').textContent = complexity;
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            updateVisualHeuristics(imageData.data, canvas.width);
         }
 
         function exportPattern(format) {
@@ -246,14 +263,14 @@ function runAnalysis() {
         }
 
         function optimizePattern() {
-            log('Quick optimize: Running 10 iterations...', 'info');
+            log('Seed exploration: scoring 10 candidates by visual complexity heuristic...', 'info');
             let bestSeed = parseInt(document.getElementById('seed').value);
             let bestScore = 0;
             for (let i = 0; i < 10; i++) {
                 document.getElementById('seed').value = Math.floor(Math.random() * 1000);
                 updateSlider('seed');
                 generatePattern();
-                const score = parseFloat(document.getElementById('transferRate').textContent);
+                const score = parseFloat(document.getElementById('complexityScore').textContent);
                 if (score > bestScore) {
                     bestScore = score;
                     bestSeed = parseInt(document.getElementById('seed').value);
@@ -262,7 +279,7 @@ function runAnalysis() {
             document.getElementById('seed').value = bestSeed;
             updateSlider('seed');
             generatePattern();
-            log(`Optimization complete. Best transfer rate: ${bestScore}%`, 'success');
+            log(`Seed exploration complete. Best heuristic complexity: ${bestScore.toFixed(1)}/10`, 'success');
         }
 
         function comparePatterns() {
