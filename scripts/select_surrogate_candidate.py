@@ -86,10 +86,10 @@ def main() -> int:
     shutil.copyfile(winner["pattern_path"], output_dir / "candidate.png")
     final_config = {
         "schema_version": "1.0",
+        **{k: v for k, v in winner["config"].items() if k not in {"png", "candidate_id"}},
         "candidate_id": args.final_id,
         "source_candidate_id": winner["candidate_id"],
         "source": "surrogate-only deterministic candidate selection",
-        **{k: v for k, v in winner["config"].items() if k != "png"},
     }
     (output_dir / "candidate-config.json").write_text(json.dumps(final_config, indent=2, sort_keys=True) + "\n")
     report = {
