@@ -34,6 +34,7 @@ def manifest(tmp_path: Path) -> PatternManifest:
 def test_digital_certificate_passes_and_bundle_verifies(tmp_path: Path):
     protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
     bundle = ArtifactBundle.create(tmp_path / "bundle")
+    (bundle.root / "master.png").write_bytes(b"pattern")
     bundle.write_json("digital/summary.json", {"heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3}})
     cert = issue_certificate(
         bundle=bundle,
@@ -53,6 +54,7 @@ def test_digital_certificate_passes_and_bundle_verifies(tmp_path: Path):
 def test_physical_state_fails_closed_without_physical_evidence(tmp_path: Path):
     protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
     bundle = ArtifactBundle.create(tmp_path / "bundle")
+    (bundle.root / "master.png").write_bytes(b"pattern")
     try:
         issue_certificate(
             bundle=bundle,
@@ -99,6 +101,7 @@ def test_physical_baseline_qualification_and_lot_conformity():
 def test_bundle_verification_detects_certificate_tampering(tmp_path: Path):
     protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
     bundle = ArtifactBundle.create(tmp_path / "bundle-tamper")
+    (bundle.root / "master.png").write_bytes(b"pattern")
     bundle.write_json(
         "digital/summary.json",
         {"heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3}},
@@ -137,3 +140,40 @@ def test_bundle_verification_rejects_path_traversal(tmp_path: Path):
     ok, failures = verify_certificate_bundle(root)
     assert not ok
     assert "invalid artifact path on line 1" in failures
+
+
+def test_certificate_issuance_rejects_missing_or_forged_master(tmp_path: Path):
+    protocol = load_protocol("protocols/RAC-PERSON-DETECT-1.0.json")
+    digital = {
+        "heldout": {"baseline_detection_rate": 1.0, "candidate_detection_rate": 0.3},
+        "invalid_condition_fraction": 0.0,
+    }
+
+    missing_bundle = ArtifactBundle.create(tmp_path / "missing-master")
+    try:
+        issue_certificate(
+            bundle=missing_bundle,
+            manifest=manifest(tmp_path),
+            protocol=protocol,
+            digital_summary=digital,
+            requested_state=EvidenceState.DIGITAL_HELDOUT,
+        )
+    except ValueError as exc:
+        assert "missing master artifact" in str(exc)
+    else:
+        raise AssertionError("certificate issuance must require the bundled master artifact")
+
+    forged_bundle = ArtifactBundle.create(tmp_path / "forged-master")
+    (forged_bundle.root / "master.png").write_bytes(b"forged")
+    try:
+        issue_certificate(
+            bundle=forged_bundle,
+            manifest=manifest(tmp_path),
+            protocol=protocol,
+            digital_summary=digital,
+            requested_state=EvidenceState.DIGITAL_HELDOUT,
+        )
+    except ValueError as exc:
+        assert "master artifact hash mismatch" in str(exc)
+    else:
+        raise AssertionError("certificate issuance must verify the master hash")
