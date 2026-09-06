@@ -4,8 +4,9 @@ async function importMeasuredResults(file) {
     try {
         const text = await file.text();
         const result = JSON.parse(text);
-        if (result.status !== 'measured' || !result.models) {
-            throw new Error('Expected a measured benchmark-results.json payload');
+        const measuredStatuses = new Set(['measured_locked', 'measured_unlocked']);
+        if (!measuredStatuses.has(result.status) || !result.models) {
+            throw new Error('Expected a measured_locked or measured_unlocked benchmark-results.json payload');
         }
         renderMeasuredBenchmark(result);
         if (evidence) {
