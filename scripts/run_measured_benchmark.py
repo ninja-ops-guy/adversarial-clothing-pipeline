@@ -20,10 +20,14 @@ from torchvision import __version__ as torchvision_version
 from torchvision.models.detection import (
     FCOS_ResNet50_FPN_Weights,
     FasterRCNN_MobileNet_V3_Large_320_FPN_Weights,
+    FasterRCNN_ResNet50_FPN_V2_Weights,
+    MaskRCNN_ResNet50_FPN_V2_Weights,
     RetinaNet_ResNet50_FPN_V2_Weights,
     SSDLite320_MobileNet_V3_Large_Weights,
     fcos_resnet50_fpn,
     fasterrcnn_mobilenet_v3_large_320_fpn,
+    fasterrcnn_resnet50_fpn_v2,
+    maskrcnn_resnet50_fpn_v2,
     retinanet_resnet50_fpn_v2,
     ssdlite320_mobilenet_v3_large,
 )
@@ -251,6 +255,26 @@ def build_evaluators(
         elif model_id == "ssdlite320_mobilenet_v3":
             weights = SSDLite320_MobileNet_V3_Large_Weights.DEFAULT
             model = ssdlite320_mobilenet_v3_large(weights=weights)
+            evaluator = TorchvisionDetectionEvaluator(name=model_id, model=model, class_label=int(item["person_class"]), device="cpu")
+            provenance[model_id] = {
+                "display_name": item["display_name"],
+                "framework": item["framework"],
+                "model_ref": str(weights),
+                "framework_version": torchvision_version,
+            }
+        elif model_id == "fasterrcnn_resnet50_fpn_v2":
+            weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+            model = fasterrcnn_resnet50_fpn_v2(weights=weights)
+            evaluator = TorchvisionDetectionEvaluator(name=model_id, model=model, class_label=int(item["person_class"]), device="cpu")
+            provenance[model_id] = {
+                "display_name": item["display_name"],
+                "framework": item["framework"],
+                "model_ref": str(weights),
+                "framework_version": torchvision_version,
+            }
+        elif model_id == "maskrcnn_resnet50_fpn_v2":
+            weights = MaskRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+            model = maskrcnn_resnet50_fpn_v2(weights=weights)
             evaluator = TorchvisionDetectionEvaluator(name=model_id, model=model, class_label=int(item["person_class"]), device="cpu")
             provenance[model_id] = {
                 "display_name": item["display_name"],
