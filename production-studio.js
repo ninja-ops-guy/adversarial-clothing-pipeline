@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const FAMILY_BY_PRODUCT={hoodie:'machine_static',beanie:'ghost_hound',cargo:'broken_human',mask:'machine_static',shirt:'error_garden'};
+const FAMILY_BY_PRODUCT={hoodie:'machine_static',hat:'signal_shadow',beanie:'ghost_hound',cargo:'broken_human',mask:'machine_static',shirt:'error_garden'};
 let template=null,mappings={},selectedPanel=null,currentTile=null,shortlist=[],lastManifest=null,renderQueued=false;
 
 function config(){return{family:$('family').value,seed:+$('seed').value,scale:+$('scale').value,density:+$('density').value,distress:+$('distress').value};}
@@ -12,13 +12,18 @@ async function sha256Text(text){return sha256Bytes(new TextEncoder().encode(text
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
 function canvasBlob(canvas,type='image/png'){return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Canvas export failed')),type));}
 function makeTile(size,cfg=config()){
-  const c=document.createElement('canvas');c.width=c.height=size;
-  const ctx=c.getContext('2d');
-  const params={patternType:cfg.family,patternScale:cfg.scale,colorVariance:cfg.density,edgeIntensity:cfg.distress,symmetry:0,seed:cfg.seed};
-  const palette=colorPalettes[cfg.family==='error_garden'?'error_garden':'rac_reference'];
-  const generator=patternGenerators[cfg.family];
-  if(!generator)throw new Error('Missing design family '+cfg.family);
-  generator(ctx,size,params,palette,seededRandom(cfg.seed));
+  const c=document.createElement('canvas');c.width=c.height=size;const ctx=c.getContext('2d');
+  if(window.RACPatternComposition&&window.RACStyleProfiles){
+    const product=cfg.product||Object.keys(FAMILY_BY_PRODUCT).find(k=>FAMILY_BY_PRODUCT[k]===cfg.family)||'hoodie';
+    const spec=RACPatternComposition.buildStyleSpec(cfg.family,{patternScale:cfg.scale,colorVariance:cfg.density,edgeIntensity:cfg.distress},cfg.seed,product,'reference');
+    RACPatternComposition.renderFamilyFromSpec(ctx,size,spec);
+    c.__racSpec=spec;
+  }else{
+    const params={patternType:cfg.family,patternScale:cfg.scale,colorVariance:cfg.density,edgeIntensity:cfg.distress,symmetry:0,seed:cfg.seed};
+    const palette=colorPalettes[cfg.family==='error_garden'?'error_garden':'rac_reference'],generator=patternGenerators[cfg.family];
+    if(!generator)throw new Error('Missing design family '+cfg.family);
+    generator(ctx,size,params,palette,seededRandom(cfg.seed));
+  }
   return c;
 }
 function syncValues(){['seed','scale','density','distress','offsetX','offsetY','panelScale','rotation'].forEach(id=>{const e=$(id+'Value');if(e&&$(id))e.textContent=$(id).value;});}
@@ -135,10 +140,22 @@ function zipStore(files){const enc=new TextEncoder(),locals=[],centrals=[];let o
 async function exportPack(){status('BUILDING PANEL PACK…');$('exportPackBtn').disabled=true;try{const {manifest,files}=await buildManifest(true);const zip=zipStore(files);const prefix=manifest.vendor_ready?'rac-vendor-panel-pack':'rac-draft-panel-pack';downloadBlob(new Blob([zip],{type:'application/zip'}),`${prefix}-${Date.now()}.zip`);renderValidation();}catch(e){status('PACK ERROR · '+e.message,'error');}finally{$('exportPackBtn').disabled=false;}}
 
 function localScore(canvas){const d=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data,w=canvas.width,h=canvas.height,bins=new Array(32).fill(0),colors=new Set();let samples=0,edges=0,comp=0;for(let y=0;y<h;y+=4)for(let x=0;x<w;x+=4){const i=(y*w+x)*4,r=d[i],g=d[i+1],b=d[i+2],gray=(r+g+b)/3;bins[Math.min(31,Math.floor(gray/8))]++;colors.add(`${r>>5}-${g>>5}-${b>>5}`);samples++;if(x+4<w){const j=(y*w+x+4)*4,ng=(d[j]+d[j+1]+d[j+2])/3;if(Math.abs(gray-ng)>48)edges++;comp++;}}let entropy=0;for(const n of bins)if(n){const p=n/samples;entropy-=p*Math.log2(p);}const entropyScore=Math.min(10,entropy/5*10),edgeDensity=edges/Math.max(1,comp),colorComplexity=Math.min(1,colors.size/128),complexity=Math.min(10,(edgeDensity*.65+colorComplexity*.35)*10),printability=Math.max(0,Math.min(10,10-edgeDensity*4-colorComplexity*2)),score=Math.max(0,Math.min(10,entropyScore*.45+complexity*.35+printability*.2));return{score,entropyScore,complexity,printability};}
-async function runBatch(){const count=Math.max(4,Math.min(100,+$('batchCount').value||24)),keep=Math.max(1,Math.min(20,+$('batchKeep').value||9)),base=config(),rows=[];$('runBatchBtn').disabled=true;$('batchGrid').innerHTML='<div class="hint">Generating candidates…</div>';await new Promise(r=>setTimeout(r,20));for(let i=0;i<count;i++){const seed=(base.seed+i*37)%1000,c=makeTile(128,{...base,seed}),m=localScore(c);rows.push({seed,...m,data:c.toDataURL('image/png')});}rows.sort((a,b)=>b.score-a.score);shortlist=rows.slice(0,Math.min(keep,rows.length));renderBatch();$('exportBatchBtn').disabled=false;$('runBatchBtn').disabled=false;}
-function renderBatch(){const g=$('batchGrid');g.innerHTML='';for(const row of shortlist){const card=document.createElement('div');card.className='candidate';card.dataset.seed=row.seed;const c=document.createElement('canvas');c.width=c.height=128;const im=new Image();im.onload=()=>c.getContext('2d').drawImage(im,0,0);im.src=row.data;const text=document.createElement('div');text.innerHTML=`SEED <strong>${row.seed}</strong><br>SCORE ${row.score.toFixed(2)}`;card.append(c,text);card.onclick=()=>{$('seed').value=row.seed;syncValues();document.querySelectorAll('.candidate').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');renderAll();};g.appendChild(card);}}
-function exportBatch(){const payload={schema_version:'1.0',created_at:new Date().toISOString(),family:$('family').value,base_controls:{scale:+$('scale').value,density:+$('density').value,distress:+$('distress').value},ranking_metric:'local_visual_printability_proxy',caveat:'Local visual/printability proxy only; not detector efficacy or RAC certification evidence.',candidates:shortlist.map(({data,...x})=>x)};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`rac-batch-shortlist-${Date.now()}.json`);}
-function loadStudioState(){try{const s=JSON.parse(localStorage.getItem('rac.productStudioState')||'null');if(!s)throw new Error('No saved Product Studio state');let f=s.designFamily;if(f==='auto')f=FAMILY_BY_PRODUCT[s.productType]||'machine_static';if(f&&patternGenerators[f])$('family').value=f;if(s.studioSeed!=null)$('seed').value=s.studioSeed;if(s.studioScale!=null)$('scale').value=s.studioScale;if(s.studioDensity!=null)$('density').value=s.studioDensity;if(s.studioDistress!=null)$('distress').value=s.studioDistress;syncValues();renderAll();status(`DESIGN LOADED · ${$('family').value.toUpperCase().replaceAll('_',' ')} · SEED ${$('seed').value}`,claimsVendorReady()?'ready':'draft');}catch(e){status('DESIGN LOAD · '+e.message,'error');}}
+async function runBatch(){
+  const count=Math.max(4,Math.min(100,+$('batchCount').value||24)),keep=Math.max(1,Math.min(20,+$('batchKeep').value||9)),base=config(),rows=[],ranking=$('batchRankingMode')?.value||'reference_fidelity';
+  $('runBatchBtn').disabled=true;$('batchGrid').innerHTML='<div class="hint">Generating candidates…</div>';await new Promise(r=>setTimeout(r,20));
+  const product=Object.keys(FAMILY_BY_PRODUCT).find(k=>FAMILY_BY_PRODUCT[k]===base.family)||'hoodie';
+  for(let i=0;i<count;i++){
+    const seed=(base.seed+i*37)%1000,c=makeTile(192,{...base,seed,product}),legacy=localScore(c);
+    if(ranking==='reference_fidelity'&&window.RACReferenceScorer&&window.RACPatternComposition){
+      const ctx=c.getContext('2d'),spec=c.__racSpec||RACPatternComposition.buildStyleSpec(base.family,{patternScale:base.scale,colorVariance:base.density,edgeIntensity:base.distress},seed,product,'reference'),analysis=RACPatternComposition.analyzeComposition(ctx,192,spec),fid=RACReferenceScorer.score({family:base.family,product,analysis,spec,mode:'reference'});
+      rows.push({seed,score:fid.score,subscores:fid.subscores,penalties:fid.penalties,legacy,data:c.toDataURL('image/png')});
+    }else rows.push({seed,...legacy,data:c.toDataURL('image/png')});
+  }
+  rows.sort((a,b)=>b.score-a.score);shortlist=rows.slice(0,Math.min(keep,rows.length));shortlist.rankingMode=ranking;shortlist.product=product;renderBatch();$('exportBatchBtn').disabled=false;$('runBatchBtn').disabled=false;
+}
+function renderBatch(){const g=$('batchGrid');g.innerHTML='';for(const row of shortlist){const card=document.createElement('div');card.className='candidate';card.dataset.seed=row.seed;const c=document.createElement('canvas');c.width=c.height=128;const im=new Image();im.onload=()=>c.getContext('2d').drawImage(im,0,0);im.src=row.data;const text=document.createElement('div');const detail=row.subscores?`<br>PALETTE ${row.subscores.palette.toFixed(0)} · HERO ${row.subscores.hero_motif.toFixed(0)} · FIT ${row.subscores.product_fit.toFixed(0)}`:'';text.innerHTML=`SEED <strong>${row.seed}</strong><br>SCORE ${row.score.toFixed(2)}${detail}`;card.append(c,text);card.onclick=()=>{$('seed').value=row.seed;syncValues();document.querySelectorAll('.candidate').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');renderAll();};g.appendChild(card);}}
+function exportBatch(){const ranking=shortlist.rankingMode||$('batchRankingMode')?.value||'reference_fidelity',product=shortlist.product||Object.keys(FAMILY_BY_PRODUCT).find(k=>FAMILY_BY_PRODUCT[k]===$('family').value)||'hoodie';const payload={schema_version:'2.0',created_at:new Date().toISOString(),family:$('family').value,product,ranking_mode:ranking,scorer_version:ranking==='reference_fidelity'?'reference-fidelity-v1':null,base_controls:{scale:+$('scale').value,density:+$('density').value,distress:+$('distress').value},caveat:ranking==='reference_fidelity'?'Reference style score only; not detector efficacy or RAC certification evidence.':'Local visual/printability proxy only; not detector efficacy or RAC certification evidence.',candidates:shortlist.map(({data,...x})=>x)};downloadBlob(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`rac-batch-shortlist-${Date.now()}.json`);}
+function loadStudioState(){try{const s=JSON.parse(localStorage.getItem('rac.productStudioState')||'null');if(!s)throw new Error('No saved Product Studio state');let f=s.resolvedDesignFamily||s.designFamily;if(f==='auto')f=FAMILY_BY_PRODUCT[s.productType]||'machine_static';if(f&&patternGenerators[f])$('family').value=f;if(s.studioSeed!=null)$('seed').value=s.studioSeed;if(s.studioScale!=null)$('scale').value=s.studioScale;if(s.studioDensity!=null)$('density').value=s.studioDensity;if(s.studioDistress!=null)$('distress').value=s.studioDistress;syncValues();renderAll();status(`DESIGN LOADED · ${$('family').value.toUpperCase().replaceAll('_',' ')} · SEED ${$('seed').value}`,claimsVendorReady()?'ready':'draft');}catch(e){status('DESIGN LOAD · '+e.message,'error');}}
 async function importTemplate(file){if(!file)return;try{const t=JSON.parse(await file.text());setTemplate(t,'imported');}catch(e){status('TEMPLATE ERROR · '+e.message,'error');}}
 async function downloadSchema(){try{const r=await fetch('templates/vendor-template.schema.json',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);downloadBlob(new Blob([await r.text()],{type:'application/json'}),'rac-vendor-template.schema.json');}catch(e){status('SCHEMA DOWNLOAD ERROR · '+e.message,'error');}}
 async function init(){
