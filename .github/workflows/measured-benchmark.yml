@@ -4,9 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 5 * * 1'
-  # D2-0003 is a completed historical generation. New candidate-generation
-  # code must not silently reuse its already-observed held-out set. Trigger manually
-  # only after preregistering a new candidate generation and fresh held-out set.
+  # D2-0004 is the current preregistered fresh generation. Trigger manually only
+  # after its no-inference detector lock has been frozen by model-lock-bootstrap.
 
 
 permissions:
@@ -34,11 +33,10 @@ jobs:
           import json
           from pathlib import Path
           m=json.loads(Path('benchmarks/model_manifest.json').read_text())
-          if m.get('generation_id') in {None, '', 'RAC-PER-D2-0003'}:
-              raise SystemExit(
-                  'D2 execution blocked: D2-0003 is historical. '
-                  'Preregister a new generation_id and fresh held-out model set first.'
-              )
+          if m.get('generation_id') != 'RAC-PER-D2-0004':
+              raise SystemExit('D2 execution blocked: expected preregistered generation RAC-PER-D2-0004.')
+          if m.get('lock_status') != 'PREREGISTERED':
+              raise SystemExit('D2 execution blocked: D2-0004 detector lock has not been frozen yet.')
           PY
 
       - name: Require preregistered detector lock and design policy
@@ -55,12 +53,12 @@ jobs:
               raise SystemExit('Measured candidate inference blocked until all detector states are preregistered.')
           if m.get('lock_inference_performed') is not False:
               raise SystemExit('D2 blocked: held-out lock must be created without candidate inference.')
-          if heldout != ['retinanet_resnet50_fpn_v2', 'fcos_resnet50_fpn']:
-              raise SystemExit(f'D2 blocked: unexpected held-out generation: {heldout}')
+          if heldout != ['fasterrcnn_resnet50_fpn_v2', 'maskrcnn_resnet50_fpn_v2']:
+              raise SystemExit(f'D2 blocked: unexpected fresh held-out generation: {heldout}')
           if policy.get('boundary') != 'surrogate_only' or policy.get('heldout_feedback_allowed') is not False:
               raise SystemExit('D2 blocked: candidate selection must remain surrogate-only.')
-          if policy.get('candidate_count') != 60 or profile.get('candidate_count') != 60:
-              raise SystemExit('D2 blocked: preregistered Product Studio pool must contain exactly 60 candidates.')
+          if policy.get('candidate_count') != 100 or profile.get('candidate_count') != 100:
+              raise SystemExit('D2 blocked: preregistered Product Studio pool must contain exactly 100 candidates.')
           if profile.get('heldout_feedback_allowed') is not False:
               raise SystemExit('D2 blocked: design profile must prohibit held-out feedback.')
           PY
@@ -113,7 +111,7 @@ jobs:
           from pathlib import Path
           p=json.loads(Path('benchmarks/runtime/pool/pool.json').read_text())
           assert p['schema_version'] == '3.0'
-          assert p['candidate_count'] == 60 == len(p['candidates'])
+          assert p['candidate_count'] == 100 == len(p['candidates'])
           assert p['heldout_feedback_allowed'] is False
           allowed={'signal_shadow','machine_static','ghost_hound','broken_human','error_garden'}
           assert {c['family'] for c in p['candidates']} == allowed
@@ -125,29 +123,41 @@ jobs:
           assert all(0 <= c['reference_fidelity_score'] <= 100 for c in p['candidates'])
           PY
 
-      - name: Select candidate on surrogate models only
-        run: python scripts/select_surrogate_candidate.py --final-id RAC-PER-D2-0003 --top-k 6
+      - name: Select reference-ranked candidate on surrogate models only
+        run: python scripts/select_surrogate_candidate.py --final-id RAC-ADAPT-SOURCE-D2-0004 --top-k 8
 
-      - name: Freeze selected Product Studio candidate before held-out inference
+      - name: Run environment-adaptive surrogate search
+        run: python scripts/adapt_surrogate_shortlist.py --top-k 4
+
+      - name: Freeze adaptive winner before held-out inference
+        run: python scripts/freeze_adaptive_candidate.py --candidate-id RAC-PER-D2-0004
+
+      - name: Validate frozen adaptive candidate boundary
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           cfg=json.loads(Path('benchmarks/runtime/candidate-config.json').read_text())
           sel=json.loads(Path('benchmarks/runtime/surrogate-selection.json').read_text())
-          assert cfg['candidate_id'] == 'RAC-PER-D2-0003'
+          adaptive=json.loads(Path('benchmarks/runtime/adaptive/adaptive-selection.json').read_text())
+          assert cfg['candidate_id'] == 'RAC-PER-D2-0004'
           assert cfg['selection_boundary'] == 'SURROGATE_ONLY'
+          assert cfg['heldout_models_loaded'] == []
+          assert cfg['heldout_feedback_used'] is False
           assert cfg['family'] in {'signal_shadow','machine_static','ghost_hound','broken_human','error_garden'}
           assert sel['heldout_models_loaded'] == []
           assert sel['heldout_feedback_used'] is False
-          assert sel['candidate_count'] == 60
+          assert sel['candidate_count'] == 100
+          assert adaptive['heldout_models_loaded'] == []
+          assert adaptive['heldout_feedback_used'] is False
+          assert adaptive['winner']['candidate_id'] == cfg['source_candidate_id']
           PY
 
       - name: Run held-out measured detector inference on frozen winner
         run: python scripts/run_measured_benchmark.py
 
       - name: Build D2 evidence bundle
-        run: python scripts/build_d2_bundle.py --protocol protocols/RAC-PERSON-DETECT-1.1.json
+        run: python scripts/build_d2_bundle.py --protocol protocols/RAC-PERSON-DETECT-1.2.json
 
       - name: Validate measured result schema
         run: |
@@ -157,7 +167,7 @@ jobs:
           result = json.loads(Path('benchmark-results.json').read_text())
           assert result['status'] in {'measured_locked', 'measured_unlocked'}
           assert isinstance(result['certification_eligible'], bool)
-          assert result['candidate']['config']['candidate_id'] == 'RAC-PER-D2-0003'
+          assert result['candidate']['config']['candidate_id'] == 'RAC-PER-D2-0004'
           assert set(result['models']) == {
               'yolov8n',
               'fasterrcnn_mobilenet_v3_320',
@@ -165,14 +175,18 @@ jobs:
               'ssdlite320_mobilenet_v3',
               'retinanet_resnet50_fpn_v2',
               'fcos_resnet50_fpn',
+              'fasterrcnn_resnet50_fpn_v2',
+              'maskrcnn_resnet50_fpn_v2',
           }
           assert result['benchmark']['raw_row_count'] > 0
-          assert result['benchmark']['heldout_models'] == ['retinanet_resnet50_fpn_v2', 'fcos_resnet50_fpn']
+          assert result['benchmark']['heldout_models'] == ['fasterrcnn_resnet50_fpn_v2', 'maskrcnn_resnet50_fpn_v2']
           assert result['benchmark']['surrogate_models'] == [
               'yolov8n',
               'fasterrcnn_mobilenet_v3_320',
               'detr_resnet50',
               'ssdlite320_mobilenet_v3',
+              'retinanet_resnet50_fpn_v2',
+              'fcos_resnet50_fpn',
           ]
           for name, model in result['models'].items():
               assert model['n'] > 0, name
@@ -191,10 +205,10 @@ jobs:
           import json
           from pathlib import Path
           status=json.loads(Path('d2-latest-status.json').read_text())
-          assert status['candidate_id'] == 'RAC-PER-D2-0003'
-          assert status['protocol_version'] == '1.1'
-          assert status['surrogate_model_set'] == 'PERSON-SUR-v2'
-          assert status['heldout_model_set'] == 'PERSON-HO-v2'
+          assert status['candidate_id'] == 'RAC-PER-D2-0004'
+          assert status['protocol_version'] == '1.2'
+          assert status['surrogate_model_set'] == 'PERSON-SUR-v3'
+          assert status['heldout_model_set'] == 'PERSON-HO-v3'
           assert status['bundle_verified'] is True
           print(json.dumps(status, indent=2))
           PY
@@ -213,7 +227,7 @@ jobs:
           status=json.loads(Path('print-test-kit-status.json').read_text())
           verification=json.loads(Path('print-test-kit/export-verification.json').read_text())
           trial=json.loads(Path('print-test-kit/physical_trial/manifest.json').read_text())
-          assert status['candidate_id'] == 'RAC-PER-D2-0003'
+          assert status['candidate_id'] == 'RAC-PER-D2-0004'
           assert status['ready_for_print_and_physical_test'] is True
           assert status['physical_validation_performed'] is False
           assert verification['status'] == 'digital_print_assets_verified'
@@ -276,6 +290,8 @@ jobs:
             benchmarks/runtime/candidate.png
             benchmarks/runtime/candidate-config.json
             benchmarks/runtime/surrogate-selection.json
+            benchmarks/runtime/adaptive/adaptive-selection.json
+            benchmarks/runtime/adaptive/*.png
             benchmarks/runtime/pool/pool.json
             benchmarks/runtime/benchmark-rows.csv
             benchmarks/runtime/fixture/*.png
