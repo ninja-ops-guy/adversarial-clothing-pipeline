@@ -35,7 +35,15 @@ def make_config(manifest: dict, surrogate_ids: tuple[str, ...], sweep: dict) -> 
     )
 
 
-def evaluate_candidate(item: dict, *, pool_dir: Path, manifest: dict, output_dir: Path, config: BenchmarkConfig, evaluators) -> dict:
+def evaluate_candidate(
+    item: dict,
+    *,
+    pool_dir: Path,
+    manifest: dict,
+    output_dir: Path,
+    config: BenchmarkConfig,
+    evaluators,
+) -> dict:
     pattern_path = pool_dir / item["png"]
     runtime = output_dir / f"selection-{item['candidate_id']}"
     baseline, candidate, _ = prepare_fixture(pattern_path, manifest, runtime)
@@ -51,24 +59,29 @@ def evaluate_candidate(item: dict, *, pool_dir: Path, manifest: dict, output_dir
         "candidate_detection_rate": sur["candidate_detection_rate"],
         "candidate_mean": sur["candidate_mean"],
         "invalid_condition_fraction": summary["invalid_condition_fraction"],
+        "printability_proxy": float(item.get("printability_proxy", 0.0)),
+        "art_direction_proxy": float(item.get("art_direction_proxy", 0.0)),
     }
 
 
-def sort_key(record: dict):
+def sort_key(record: dict) -> tuple[float, float, float, float, str]:
+    """Detector performance dominates; local design proxies only resolve ties."""
     return (
-        record["candidate_detection_rate"],
-        record["candidate_mean"],
-        record["candidate_id"],
+        float(record["candidate_detection_rate"]),
+        float(record["candidate_mean"]),
+        -float(record.get("printability_proxy", 0.0)),
+        -float(record.get("art_direction_proxy", 0.0)),
+        str(record["candidate_id"]),
     )
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Select a D2 candidate using surrogate models only.")
+    parser = argparse.ArgumentParser(description="Select a print-test candidate using surrogate models only.")
     parser.add_argument("--manifest", default="benchmarks/model_manifest.json")
     parser.add_argument("--pool", default="benchmarks/runtime/pool/pool.json")
     parser.add_argument("--output-dir", default="benchmarks/runtime")
-    parser.add_argument("--final-id", default="RAC-PER-D2-0002")
-    parser.add_argument("--top-k", type=int, default=4)
+    parser.add_argument("--final-id", default="RAC-PER-D2-0003")
+    parser.add_argument("--top-k", type=int, default=6)
     args = parser.parse_args()
 
     manifest = json.loads(Path(args.manifest).read_text())
@@ -77,12 +90,18 @@ def main() -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    if pool.get("heldout_feedback_allowed") is not False:
+        raise SystemExit("candidate pool must explicitly prohibit held-out feedback")
+    if int(pool.get("candidate_count", 0)) != len(pool.get("candidates", [])):
+        raise SystemExit("candidate pool count does not match candidate records")
+    if not pool.get("design_profile_sha256"):
+        raise SystemExit("candidate pool missing preregistered design-profile hash")
+
     evaluators, provenance, state_hashes = build_evaluators(manifest, roles={"surrogate"})
     surrogate_ids = tuple(item["id"] for item in manifest["models"] if item.get("role") == "surrogate")
     if not surrogate_ids:
         raise SystemExit("no surrogate models configured")
 
-    # Stage A cheaply screens the entire preregistered pool at nominal conditions.
     nominal = {"brightness": [1.0], "scale": [1.0], "blur_sigma": [0.0], "rotation_deg": [0.0]}
     nominal_config = make_config(manifest, surrogate_ids, nominal)
     stage_a = [
@@ -101,7 +120,6 @@ def main() -> int:
         raise SystemExit("all candidates invalid during nominal surrogate screening")
     finalists = sorted(stage_a_eligible, key=sort_key)[: max(1, args.top_k)]
 
-    # Stage B applies the full preregistered surrogate robustness sweep only to finalists.
     full_sweep = manifest.get("selection_sweep", manifest["transform_sweep"])
     full_config = make_config(manifest, surrogate_ids, full_sweep)
     item_by_id = {item["candidate_id"]: item for item in pool["candidates"]}
@@ -123,21 +141,29 @@ def main() -> int:
 
     shutil.copyfile(winner["pattern_path"], output_dir / "candidate.png")
     final_config = {
-        "schema_version": "2.0",
+        "schema_version": "3.0",
         **{k: v for k, v in winner["config"].items() if k not in {"png", "candidate_id"}},
         "candidate_id": args.final_id,
         "source_candidate_id": winner["candidate_id"],
-        "source": "two-stage surrogate-only deterministic candidate selection",
+        "source": "two-stage surrogate-only Product Studio candidate selection",
+        "selection_boundary": "SURROGATE_ONLY",
+        "selection_objective": pool.get("selection_order", []),
+        "design_profile_sha256": pool["design_profile_sha256"],
     }
     (output_dir / "candidate-config.json").write_text(json.dumps(final_config, indent=2, sort_keys=True) + "\n")
+
     report = {
-        "schema_version": "2.0",
+        "schema_version": "3.0",
         "selection_boundary": "SURROGATE_ONLY",
         "surrogate_models": list(surrogate_ids),
         "heldout_models_loaded": [],
+        "heldout_feedback_used": False,
         "model_state_hashes": state_hashes,
         "model_provenance": provenance,
-        "objective": ["candidate_detection_rate:min", "candidate_mean:min", "candidate_id:lexical"],
+        "design_profile": pool.get("design_profile"),
+        "design_profile_sha256": pool["design_profile_sha256"],
+        "candidate_count": pool["candidate_count"],
+        "objective": pool.get("selection_order", []),
         "stage_a_policy": nominal,
         "stage_b_policy": full_sweep,
         "top_k": args.top_k,
