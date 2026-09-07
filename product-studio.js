@@ -21,7 +21,7 @@ const RACStudio=(()=>{
   const VERBS={signal_shadow:[],machine_static:[],ghost_hound:[],broken_human:[],error_garden:[]};
   const FAMILY_TITLE={signal_shadow:'SIGNAL SHADOW',machine_static:'MACHINE STATIC',ghost_hound:'GHOST HOUND',broken_human:'BROKEN HUMAN',error_garden:'ERROR GARDEN'};
 
-  let tile=null,manifest=null,mode='generate',variationPreset='original',lastFidelity=null;
+  let tile=null,manifest=null,mode='generate',variationPreset='original',lastFidelity=null,frozenTileOverride=null,frozenTileMetadata=null;
   let renderRevision=0,renderFrame=0;
   const selectedMotifs=new Set();
   const $=id=>document.getElementById(id);
@@ -52,6 +52,32 @@ const RACStudio=(()=>{
     x.putImageData(image,0,0);
   }
   function makeTile(size,s=state(),scoreIt=true){const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');const effectiveScale=s.variationPreset==='scale_plus'?Math.min(100,s.scale+24):s.scale;let spec=null;if(window.RACPatternComposition&&window.RACStyleProfiles){spec=RACPatternComposition.buildStyleSpec(s.family,{patternScale:effectiveScale,colorVariance:s.density,edgeIntensity:s.distress},s.seed,s.product,s.generationMode||'reference');RACPatternComposition.renderFamilyFromSpec(x,size,spec);}else{const p={patternType:s.family,patternScale:effectiveScale,colorVariance:s.density,edgeIntensity:s.distress,symmetry:0,seed:s.seed,featureMotifs:s.featureMotifs};const pal=colorPalettes[s.family==='error_garden'?'error_garden':'rac_reference'],g=patternGenerators[s.family];if(!g)throw new Error('Missing pattern family: '+s.family);g(x,size,p,pal,seededRandom(s.seed));}applyVariationPixels(c,s.variationPreset);if(scoreIt&&spec&&window.RACReferenceScorer){const analysis=RACPatternComposition.analyzeComposition(x,size,spec);lastFidelity=RACReferenceScorer.score({family:s.family,product:s.product,analysis,spec,mode:s.generationMode||'reference'});const status=$('referenceProfileStatus');if(status)status.textContent=`REFERENCE PROFILE · ${s.family.replaceAll('_',' ').toUpperCase()} · FIDELITY ${lastFidelity.score.toFixed(1)}/100`;}return c;}
+  function cloneTile(source,size){
+    const c=document.createElement('canvas');c.width=c.height=size;
+    c.getContext('2d').drawImage(source,0,0,size,size);
+    return c;
+  }
+  function loadFrozenTile(dataUrl,metadata={}){
+    return new Promise((resolve,reject)=>{
+      const img=new Image();
+      img.onload=()=>{
+        const c=document.createElement('canvas');
+        const side=Math.max(512,Math.min(4096,Math.max(img.naturalWidth||512,img.naturalHeight||512)));
+        c.width=c.height=side;
+        c.getContext('2d').drawImage(img,0,0,side,side);
+        frozenTileOverride=c;
+        frozenTileMetadata={...metadata,width:img.naturalWidth,height:img.naturalHeight};
+        if(metadata.reference_fidelity_score!=null){
+          lastFidelity={score:Number(metadata.reference_fidelity_score),subscores:metadata.reference_fidelity_subscores||{},penalties:[],warnings:['score inherited from frozen candidate metadata']};
+        }
+        render();
+        resolve(frozenTileMetadata);
+      };
+      img.onerror=()=>reject(new Error('Unable to load frozen candidate tile'));
+      img.src=dataUrl;
+    });
+  }
+  function clearFrozenTile(){frozenTileOverride=null;frozenTileMetadata=null;render();}
   function rr(c,x,y,w,h,r){r=Math.min(r,w/2,h/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
   function fill(c,t,x,y,w,h,sz){for(let yy=y;yy<y+h;yy+=sz)for(let xx=x;xx<x+w;xx+=sz)c.drawImage(t,xx,yy,sz,sz);}
   function clip(c,p,t,b,sz){c.save();c.clip(p);fill(c,t,b.x,b.y,b.w,b.h,sz);c.restore();}
@@ -67,12 +93,12 @@ const RACStudio=(()=>{
   function product(c,t,type,x,y,sc,v,s){if(type==='hoodie')return hoodie(c,t,x,y,sc,v,s);if(type==='hat')return hat(c,t,x,y,sc,v,s);if(type==='beanie')return beanie(c,t,x,y,sc,v,s);if(type==='cargo')return cargo(c,t,x,y,sc,v,s);if(type==='mask')return mask(c,t,x,y,sc,v,s);return shirt(c,t,x,y,sc,v,s);}
   function macro(c,t,x,y,w,h){c.save();rr(c,x,y,w,h,2);c.clip();fill(c,t,x-w*.15,y-h*.2,w*1.3,h*1.4,Math.min(w,h)*.62);c.globalAlpha=.16;c.strokeStyle='#f5f2e7';for(let i=-h;i<w+h;i+=8){c.beginPath();c.moveTo(x+i,y);c.lineTo(x+i-h,y+h);c.stroke();}c.restore();}
   function board(t,s,cv=$('mockupCanvas'),scaleX=1,scaleY=scaleX){const c=cv.getContext('2d');cv.width=Math.round(LOGICAL_W*scaleX);cv.height=Math.round(LOGICAL_H*scaleY);c.setTransform(1,0,0,1,0,0);c.fillStyle='#f3f1ec';c.fillRect(0,0,cv.width,cv.height);c.setTransform(scaleX,0,0,scaleY,0,0);if(s.product==='hoodie'||s.product==='shirt'){product(c,t,s.product,300,470,1.08,'front',s);product(c,t,s.product,820,470,1.08,'back',s);}else if(s.product==='hat'){product(c,t,'hat',300,330,1.06,'front',s);product(c,t,'hat',820,330,1.06,'side',s);product(c,t,'hat',300,655,1.06,'back',s);product(c,t,'hat',820,655,1.06,'top',s);}else if(s.product==='beanie'){product(c,t,'beanie',300,330,1.08,'front',s);product(c,t,'beanie',820,330,1.08,'side',s);product(c,t,'beanie',300,655,1.08,'back',s);product(c,t,'beanie',820,655,1.08,'slouch',s);}else if(s.product==='cargo'){product(c,t,'cargo',235,485,.9,'front',s);product(c,t,'cargo',560,485,.9,'back',s);product(c,t,'cargo',885,485,.9,'side',s);}else{product(c,t,'mask',245,470,1.18,'front',s);product(c,t,'mask',560,470,1.18,'side',s);product(c,t,'mask',875,470,1.18,'back',s);}macro(c,t,31,930,510,302);c.setTransform(1,0,0,1,0,0);}
-  function mkManifest(s){return{schema_version:'1.4',generated_at:new Date().toISOString(),brand:s.brand,collection:s.collection,product:s.product,product_name:s.productName,art_direction_profile:'canonical_launch_capsule_v1',generation_mode:s.generationMode,reference_profile:s.family,reference_target:FAMILY_TITLE[s.family]||s.family,reference_fidelity:{score:lastFidelity?.score??null,subscores:lastFidelity?.subscores??null,penalties:lastFidelity?.penalties??[],scorer_version:'reference-fidelity-v1',evidence_scope:'design_reference_only_not_rac_certification'},design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,variation_preset:s.variationPreset,feature_motifs:s.featureMotifs,repeat:'tile',master_export_px:4096},outputs:{reference_board_px:[EXPORT_W,EXPORT_H],preview_board_px:[LOGICAL_W,LOGICAL_H],production_tile_px:[4096,4096]},production_status:'digital_design_ready',pod_status:'requires provider-specific print-template mapping'};}
-  function render(){const s=state();tile=makeTile(1024,s);const p=$('studioPatternCanvas'),x=p.getContext('2d');x.clearRect(0,0,p.width,p.height);x.drawImage(tile,0,0,p.width,p.height);board(tile,s);manifest=mkManifest(s);renderRevision+=1;const cv=$('mockupCanvas');cv.dataset.renderRevision=String(renderRevision);cv.dataset.renderProduct=s.product;cv.dataset.renderFamily=s.family;cv.dataset.renderSeed=String(s.seed);cv.dataset.renderVariation=s.variationPreset;cv.dataset.exportWidth=String(EXPORT_W);cv.dataset.exportHeight=String(EXPORT_H);$('studioStatus').textContent=`READY · ${s.family.replaceAll('_',' ').toUpperCase()} · SEED ${s.seed}`;}
+  function mkManifest(s){return{schema_version:'1.4',generated_at:new Date().toISOString(),brand:s.brand,collection:s.collection,product:s.product,product_name:s.productName,art_direction_profile:'canonical_launch_capsule_v1',generation_mode:s.generationMode,reference_profile:s.family,reference_target:FAMILY_TITLE[s.family]||s.family,reference_fidelity:{score:lastFidelity?.score??null,subscores:lastFidelity?.subscores??null,penalties:lastFidelity?.penalties??[],scorer_version:'reference-fidelity-v1',evidence_scope:'design_reference_only_not_rac_certification'},design:{family:s.family,seed:s.seed,scale:s.scale,density:s.density,distress:s.distress,variation_preset:s.variationPreset,feature_motifs:s.featureMotifs,repeat:'tile',master_export_px:4096},outputs:{reference_board_px:[EXPORT_W,EXPORT_H],preview_board_px:[LOGICAL_W,LOGICAL_H],production_tile_px:[4096,4096]},production_status:'digital_design_ready',pod_status:'requires provider-specific print-template mapping',frozen_tile_override:frozenTileMetadata?{...frozenTileMetadata,active:true}:null};}
+  function render(){const s=state();tile=frozenTileOverride?cloneTile(frozenTileOverride,1024):makeTile(1024,s);const p=$('studioPatternCanvas'),x=p.getContext('2d');x.clearRect(0,0,p.width,p.height);x.drawImage(tile,0,0,p.width,p.height);board(tile,s);manifest=mkManifest(s);renderRevision+=1;const cv=$('mockupCanvas');cv.dataset.renderRevision=String(renderRevision);cv.dataset.renderProduct=s.product;cv.dataset.renderFamily=s.family;cv.dataset.renderSeed=String(s.seed);cv.dataset.renderVariation=s.variationPreset;cv.dataset.exportWidth=String(EXPORT_W);cv.dataset.exportHeight=String(EXPORT_H);cv.dataset.frozenTile=frozenTileOverride?'true':'false';$('studioStatus').textContent=`READY · ${s.family.replaceAll('_',' ').toUpperCase()} · SEED ${s.seed}`;}
   function scheduleRender(){if(renderFrame)cancelAnimationFrame(renderFrame);renderFrame=requestAnimationFrame(()=>{renderFrame=0;render();});}
   function dl(url,name){const a=document.createElement('a');a.download=name;a.href=url;a.click();}
-  function exportMockup(){const s=state();$('studioStatus').textContent=`BUILDING ${EXPORT_W} PX REFERENCE BOARD…`;requestAnimationFrame(()=>{const hiTile=makeTile(2048,s),cv=document.createElement('canvas');board(hiTile,s,cv,EXPORT_SCALE_X,EXPORT_SCALE_Y);dl(cv.toDataURL('image/png'),`rac_${s.product}_${Date.now()}_reference-board-${EXPORT_W}px.png`);$('studioStatus').textContent=`READY · ${EXPORT_W} PX REFERENCE BOARD EXPORTED`;});}
-  function exportTile(){const s=state();$('studioStatus').textContent='BUILDING 4096 PX PRODUCTION TILE…';requestAnimationFrame(()=>{const t=makeTile(4096,s);dl(t.toDataURL('image/png'),`rac_${s.family}_seed-${s.seed}_4096.png`);$('studioStatus').textContent='READY · 4096 PX TILE EXPORTED';});}
+  function exportMockup(){const s=state();$('studioStatus').textContent=`BUILDING ${EXPORT_W} PX REFERENCE BOARD…`;requestAnimationFrame(()=>{const hiTile=frozenTileOverride?cloneTile(frozenTileOverride,2048):makeTile(2048,s),cv=document.createElement('canvas');board(hiTile,s,cv,EXPORT_SCALE_X,EXPORT_SCALE_Y);dl(cv.toDataURL('image/png'),`rac_${s.product}_${Date.now()}_reference-board-${EXPORT_W}px.png`);$('studioStatus').textContent=`READY · ${EXPORT_W} PX REFERENCE BOARD EXPORTED`;});}
+  function exportTile(){const s=state();$('studioStatus').textContent='BUILDING 4096 PX PRODUCTION TILE…';requestAnimationFrame(()=>{const t=frozenTileOverride?cloneTile(frozenTileOverride,4096):makeTile(4096,s);dl(t.toDataURL('image/png'),`rac_${s.family}_seed-${s.seed}_4096.png`);$('studioStatus').textContent='READY · 4096 PX TILE EXPORTED';});}
   function exportManifest(){if(!manifest)render();const b=new Blob([JSON.stringify(manifest,null,2)],{type:'application/json'}),a=document.createElement('a');a.download=`rac_${state().product}_${Date.now()}_manifest.json`;a.href=URL.createObjectURL(b);a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
   function next(){$('studioSeed').value=(+$('studioSeed').value+37)%1000;sync('studioSeed');render();}
   function updateMotifUI(){document.querySelectorAll('.motif-card[data-motif]').forEach(card=>card.classList.toggle('selected',selectedMotifs.has(card.dataset.motif)));const names=[...selectedMotifs].map(v=>v.replaceAll('_',' ').toUpperCase());$('motifCount').textContent=names.length?String(names.length):'AUTO';$('motifSelection').textContent=names.length?names.join(' + '):'Click motifs above to add/remove stylized features from generated patterns.';}
@@ -90,6 +116,6 @@ const RACStudio=(()=>{
     updateMotifUI();defaults(true);render();
   }
   async function findBestMatch({count=24}={}){const base=state(),start=base.seed;let best={seed:start,score:-1};for(let i=0;i<count;i++){const seed=(start+i*37)%1000,s={...base,seed},cv=makeTile(256,s,false),ctx=cv.getContext('2d'),spec=RACPatternComposition.buildStyleSpec(s.family,{patternScale:s.scale,colorVariance:s.density,edgeIntensity:s.distress},seed,s.product,s.generationMode),analysis=RACPatternComposition.analyzeComposition(ctx,256,spec),result=RACReferenceScorer.score({family:s.family,product:s.product,analysis,spec,mode:s.generationMode});if(result.score>best.score)best={seed,score:result.score,result};}$('studioSeed').value=best.seed;sync('studioSeed');render();return best;}
-  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode,setVariation,findBestMatch,getRenderRevision:()=>renderRevision,getReferenceFidelity:()=>lastFidelity};
+  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode,setVariation,findBestMatch,loadFrozenTile,clearFrozenTile,getRenderRevision:()=>renderRevision,getReferenceFidelity:()=>lastFidelity,getFrozenTileMetadata:()=>frozenTileMetadata};
 })();
 window.addEventListener('DOMContentLoaded',RACStudio.init);
