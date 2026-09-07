@@ -1,3 +1,4 @@
+import importlib.util
 import json
 import subprocess
 import sys
@@ -5,7 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from scripts.build_d2_bundle import _weight_reference_compatible, verify_frozen_model_contract
+
+_BUILD_D2_PATH = Path(__file__).resolve().parents[1] / "scripts" / "build_d2_bundle.py"
+_BUILD_D2_SPEC = importlib.util.spec_from_file_location("rac_build_d2_bundle", _BUILD_D2_PATH)
+assert _BUILD_D2_SPEC is not None and _BUILD_D2_SPEC.loader is not None
+_BUILD_D2 = importlib.util.module_from_spec(_BUILD_D2_SPEC)
+_BUILD_D2_SPEC.loader.exec_module(_BUILD_D2)
+_weight_reference_compatible = _BUILD_D2._weight_reference_compatible
+verify_frozen_model_contract = _BUILD_D2.verify_frozen_model_contract
 
 
 def test_d2_bundle_rejects_stale_or_unlocked_result(tmp_path: Path):
