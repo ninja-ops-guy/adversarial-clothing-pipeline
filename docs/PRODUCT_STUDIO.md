@@ -43,6 +43,10 @@ The hoodie remains available as a **Machine Static** extension product but is no
 
 Changing the seed creates a deterministic variation inside the same family. No external image-generation API is used.
 
+Variation presets are now applied with deterministic pixel transforms rather than browser-dependent canvas filters. This keeps high-contrast, desaturated, alternate-palette, and scale variations reproducible across Chromium and WebKit/iPhone-class browsers.
+
+The obsolete low-resolution showcase image path has been fully removed from Product Studio: no showcase DOM controls, source script, rendering state, compositing path, or showcase-specific CSS remain.
+
 ## Implemented Product Studio mockups
 
 The canvas renderer supports:
@@ -54,7 +58,7 @@ The canvas renderer supports:
 - balaclava/mask — front/side/back;
 - oversized shirt — front/back.
 
-The reference-board renderer follows the canonical presentation language: oversized industrial product title, off-white technical sheet, multiple garment views, textile-detail crop, family-specific pattern-strategy copy, small technical typography, restrained signal accents and product-specific slogans.
+The browser preview uses a 1122×1402 logical board for interactive performance. Export re-renders the board at production-review resolution rather than upscaling the preview bitmap.
 
 ## Product Studio export contract
 
@@ -68,16 +72,21 @@ The reference-board renderer follows the canonical presentation language: oversi
 ### Reference board
 
 - PNG
-- 1122×1402
+- **4096×5119 export**
+- 1122×1402 interactive browser preview
+- re-rendered from the garment geometry and textile tile at export scale
 - merchandising / art-direction mockup
 - not a vendor cut-panel file
 
 ### Product manifest
 
-- JSON schema version 1.1
+- JSON schema version 1.3
 - `art_direction_profile: canonical_launch_capsule_v1`
 - product and family identity
-- seed, scale, density and distress controls
+- seed, scale, density, distress, variation preset, and selected motif features
+- `outputs.reference_board_px: [4096, 5119]`
+- `outputs.preview_board_px: [1122, 1402]`
+- `outputs.production_tile_px: [4096, 4096]`
 - explicit digital-design/POD-template status
 
 ## Production Mapper
@@ -118,11 +127,28 @@ The production manifest binds the exact 4096×4096 design artifact, imported tem
 
 This is the bridge for future RAC-D records to attach to the exact commercial design artifact rather than to a visual concept alone.
 
+Measured detector results remain scoped to their recorded evidence domain. A digital CI convenience fixture is not a physical-garment claim and does not establish broad surveillance resistance.
+
 ## Batch design factory
 
 The Production Mapper can generate up to 100 deterministic seed candidates for the active family, rank them with the repository's local entropy/complexity/printability-style proxy, retain a shortlist and load a selected candidate back into mapping.
 
 The local score is **not detector efficacy and not RAC certification evidence**. The reference-inspired candidate-pool exporter now includes Signal Shadow alongside the other Product Studio families.
+
+## Browser regression coverage
+
+Frontend E2E now covers:
+
+- all six garment mockups;
+- all five design families;
+- live seed / scale / density / distress updates;
+- motif selection;
+- deterministic variation presets;
+- mobile/WebKit usability;
+- 4096×4096 tile export;
+- 4096×5119 reference-board PNG dimensions;
+- manifest output dimensions;
+- continued absence of the obsolete low-resolution showcase source.
 
 ## Remaining production work
 
@@ -136,4 +162,4 @@ The local score is **not detector efficacy and not RAC certification evidence**.
 
 ## Status
 
-The repository now covers **canonical capsule art direction → deterministic design factory → template adapter → panel mapper → panel-pack export → artifact evidence binding**. The remaining blocker to a true vendor-ready POD upload remains obtaining and ingesting actual provider template specifications for the chosen products.
+The repository now covers **canonical capsule art direction → deterministic design factory → high-resolution reference-board export → template adapter → panel mapper → panel-pack export → artifact evidence binding**. The remaining blocker to a true vendor-ready POD upload remains obtaining and ingesting actual provider template specifications for the chosen products.
