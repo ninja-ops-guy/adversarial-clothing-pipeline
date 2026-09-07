@@ -1,9 +1,9 @@
 {
-  "schema_version": "3.1",
+  "schema_version": "4.0",
   "task": "person_detection",
   "threshold": 0.5,
-  "lock_status": "PREREGISTERED",
-  "generation": "v2 detector lock with Product Studio v3 candidate selection preregistered before held-out evaluation",
+  "lock_status": "BOOTSTRAP_REQUIRED",
+  "generation": "v3 fresh held-out generation: prior D2 models rotated into surrogate ensemble; new torchvision held-out models locked without candidate inference",
   "models": [
     {
       "id": "yolov8n",
@@ -51,7 +51,7 @@
       "framework": "torchvision",
       "model_ref": "RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
       "person_class": 1,
-      "role": "heldout",
+      "role": "surrogate",
       "decision_threshold": 0.5,
       "state_dict_sha256": "8f4b5b84900a522eb49a946deeb717ae334d27cd9f5e00c64f1461c909c3552f"
     },
@@ -61,9 +61,29 @@
       "framework": "torchvision",
       "model_ref": "FCOS_ResNet50_FPN_Weights.DEFAULT",
       "person_class": 1,
-      "role": "heldout",
+      "role": "surrogate",
       "decision_threshold": 0.5,
       "state_dict_sha256": "2ceeb6e946fdbbad8106ccbff6225d72cd53f732ab205fa33085212b6b6ab853"
+    },
+    {
+      "id": "fasterrcnn_resnet50_fpn_v2",
+      "display_name": "Faster R-CNN ResNet-50 FPN V2",
+      "framework": "torchvision",
+      "model_ref": "FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT",
+      "person_class": 1,
+      "role": "heldout",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_BOOTSTRAP_REQUIRED"
+    },
+    {
+      "id": "maskrcnn_resnet50_fpn_v2",
+      "display_name": "Mask R-CNN ResNet-50 FPN V2",
+      "framework": "torchvision",
+      "model_ref": "MaskRCNN_ResNet50_FPN_V2_Weights.DEFAULT",
+      "person_class": 1,
+      "role": "heldout",
+      "decision_threshold": 0.5,
+      "state_dict_sha256": "UNFROZEN_BOOTSTRAP_REQUIRED"
     }
   ],
   "fixture": {
@@ -74,34 +94,63 @@
     "note": "Convenience digital fixture for repeatable CI measurement only; not a physical-garment or population-level benchmark."
   },
   "transform_sweep": {
-    "brightness": [0.7, 1, 1.3],
-    "scale": [1],
-    "blur_sigma": [0, 0.8],
-    "rotation_deg": [-20, 0, 20]
+    "brightness": [
+      0.7,
+      1,
+      1.3
+    ],
+    "scale": [
+      1
+    ],
+    "blur_sigma": [
+      0,
+      0.8
+    ],
+    "rotation_deg": [
+      -20,
+      0,
+      20
+    ]
   },
   "selection_sweep": {
-    "brightness": [0.8, 1, 1.2],
-    "scale": [1],
-    "blur_sigma": [0, 0.8],
-    "rotation_deg": [0]
+    "brightness": [
+      0.8,
+      1,
+      1.2
+    ],
+    "scale": [
+      1
+    ],
+    "blur_sigma": [
+      0,
+      0.8
+    ],
+    "rotation_deg": [
+      0
+    ]
   },
   "selection_policy": {
     "pool": "scripts/export_candidate_pool.js",
     "design_profile": "design_profiles/ruthless_reference_v1.json",
-    "candidate_count": 60,
+    "candidate_count": 100,
     "objective": [
       "candidate_detection_rate:min",
       "candidate_mean:min",
+      "reference_fidelity_score:max",
       "printability_proxy:max",
       "art_direction_proxy:max",
       "candidate_id:lexical"
     ],
     "boundary": "surrogate_only",
     "heldout_feedback_allowed": false,
-    "version": "3.0",
-    "candidate_pool": "product-studio-reference-inspired-only"
+    "version": "4.0",
+    "candidate_pool": "product-studio-reference-fidelity-v2"
   },
   "min_baseline_score": 0.5,
-  "lock_source_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4",
-  "lock_inference_performed": false
+  "lock_source_commit": null,
+  "lock_inference_performed": false,
+  "generation_id": "RAC-PER-D2-0004",
+  "surrogate_model_set": "PERSON-SUR-v3",
+  "heldout_model_set": "PERSON-HO-v3",
+  "protocol_version": "1.2"
 }
