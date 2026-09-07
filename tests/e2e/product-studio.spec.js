@@ -122,14 +122,21 @@ test('studio controls update deterministic variation', async ({ page }) => {
   expect(after).not.toBe(before);
 });
 
-test('reference board and manifest exports download non-empty files', async ({ page }) => {
-  for (const name of ['Export Reference Board PNG', 'Export Production Manifest']) {
-    const wait = page.waitForEvent('download');
-    await page.getByRole('button', { name }).click();
-    const download = await wait;
-    const path = await download.path();
-    expect(fs.statSync(path).size).toBeGreaterThan(200);
-  }
+test('reference board exports true 4096px output and manifest remains non-empty', async ({ page }) => {
+  const boardWait = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export Reference Board PNG' }).click();
+  const boardDownload = await boardWait;
+  const boardPath = await boardDownload.path();
+  const png = fs.readFileSync(boardPath);
+  expect(png.length).toBeGreaterThan(1000);
+  expect(png.readUInt32BE(16)).toBe(4096);
+  expect(png.readUInt32BE(20)).toBe(5119);
+
+  const manifestWait = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export Production Manifest' }).click();
+  const manifestDownload = await manifestWait;
+  const manifestPath = await manifestDownload.path();
+  expect(fs.statSync(manifestPath).size).toBeGreaterThan(200);
 });
 
 test('product studio remains usable on mobile', async ({ page }) => {
@@ -178,6 +185,8 @@ test('manifest records selected stylized motif features', async ({ page }) => {
   const path = await download.path();
   const manifest = JSON.parse(fs.readFileSync(path, 'utf8'));
   expect(manifest.design.feature_motifs).toEqual(expect.arrayContaining(['canine_eye', 'slash']));
+  expect(manifest.outputs.reference_board_px).toEqual([4096, 5119]);
+  expect(manifest.outputs.preview_board_px).toEqual([1122, 1402]);
 });
 
 test('variation preset buttons each alter generator and mockup state', async ({ page }) => {
