@@ -9,6 +9,11 @@ from .capgen import (
     initialize_pattern_logits,
     render_palette_patch,
 )
+from .candidate_optimizer import (
+    CandidateArtifact,
+    CandidateGenerationConfig,
+    DetectorDrivenCandidateOptimizer,
+)
 from .deformation import NeuralDeformationConfig, DeformationObservation, NeuralDeformationModule, synthetic_observation
 from .physics import DifferentiablePhysicsConfig, DifferentiablePhysicsPipeline
 from .benchmark import BenchmarkConfig, CallableEvaluator, ComparativeBenchmark
@@ -34,6 +39,7 @@ __all__ = [
     "BlackBoxMode", "BlackBoxNAPConfig", "EnhancedBlackBoxNAP",
     "EnvironmentAdaptiveConfig", "EnvironmentAdaptivePatchGenerator", "EnvironmentAdaptiveResult",
     "extract_base_colors", "initialize_pattern_logits", "render_palette_patch",
+    "CandidateArtifact", "CandidateGenerationConfig", "DetectorDrivenCandidateOptimizer",
     "NeuralDeformationConfig", "DeformationObservation", "NeuralDeformationModule", "synthetic_observation",
     "DifferentiablePhysicsConfig", "DifferentiablePhysicsPipeline",
     "BenchmarkConfig", "CallableEvaluator", "ComparativeBenchmark",
