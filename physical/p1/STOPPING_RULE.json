@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "RAC-P1-STOP-2026-001",
+  "machinery": "ruthless_pipeline.certification.trial_statistics.PreregisteredStoppingRule",
+  "min_valid_trials": 93,
+  "max_valid_trials": 144,
+  "target_interval_width": 0.2,
+  "confidence_z": 1.959963984540054,
+  "require_interval_below_half": true,
+  "derivation": {
+    "min_valid_trials": "minimum_valid_trials(target_interval_width=0.20) = 93 (worst-case Wilson half-width at p=0.5, z=1.959963984540054)",
+    "max_valid_trials": "full planned grid: 3 distances (1/3/5 m) x 3 yaw (-45/0/+45 deg) x 1 pitch x 1 locked lighting variant x 2 poses (standing/seated) x 8 repetitions = 144 matched-pair trials",
+    "matched_pair_semantics": "On valid trials the physical control detection rate is 1.0 BY CONSTRUCTION (split_valid_invalid keeps only control-detected trials). The paired risk difference therefore equals 1 - candidate_rate and its interval derives from the candidate-rate bootstrap (trial_statistics._bootstrap_risk_difference_interval). This semantics applies HERE in the P1 physical path, unlike D2-0005 where it was inapplicable.",
+    "frozen_before_data": "This file is preregistered: it must be committed before the first P1 garment capture and may not be edited after data collection begins."
+  },
+  "invalid_condition_rule": "Control-undetected trials are invalid measurement conditions, never candidate successes; they are accounted via invalid_condition_report and excluded from valid_trials.",
+  "evidence_label": "internally_measured"
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "RAC-P1-CALIBRATION-TEMPLATE",
+  "purpose": "Calibration session template for the P1 physical print-and-photograph experiment. Fill every FILL-IN field before capture; the completed manifest becomes the calibration_profile stage evidence referenced by the session ExperimentArtifact.",
+  "target": {
+    "target_id": "RAC-CALT-P1-0001",
+    "manifest": "physical/p1/calibration-target/calibration-target-manifest.json",
+    "print_note": "Print at 100% scale on the same printer/substrate profile used for garments; verify the 100 mm scale bar with a ruler before use."
+  },
+  "camera": {
+    "camera_id": "FILL-IN: e.g. RAC-CAM-01",
+    "camera_model": "FILL-IN: body model",
+    "lens": "FILL-IN: lens + fixed focal length",
+    "distance_m": "FILL-IN: fixed camera-to-garment distance, e.g. 1.0",
+    "height_m": "FILL-IN: fixed camera height",
+    "settings": {
+      "mode": "manual",
+      "exposure_lock": true,
+      "iso": "FILL-IN: fixed ISO",
+      "aperture": "FILL-IN: fixed aperture",
+      "shutter": "FILL-IN: fixed shutter speed",
+      "white_balance": "FILL-IN: fixed Kelvin, no auto WB",
+      "raw_capture": true
+    }
+  },
+  "lighting": {
+    "lighting_id": "FILL-IN: e.g. RAC-LIGHT-01",
+    "fixture_count": "FILL-IN",
+    "positions_mm": "FILL-IN: (x, y, z) per fixture relative to garment plane origin",
+    "color_temperature_k": "FILL-IN: e.g. 5000",
+    "warmup_minutes": 15,
+    "ambient_control": "windowless room or blackout; ambient lux at garment plane FILL-IN"
+  },
+  "capture_angles": {
+    "calibration_capture": "single perpendicular (0 deg yaw, 0 deg pitch) capture of the full target at the session camera distance",
+    "session_angles_deg": {"yaw": [-45, 0, 45], "pitch": [0]}
+  },
+  "patch_measurement_procedure": [
+    "1. Photograph the calibration target under the locked session rig before any garment capture and after the last garment capture (bracketing).",
+    "2. Locate the four fiducials; compute the homography to the manifest fiducial coordinates (mm).",
+    "3. Rectify the capture; verify each fiducial against its nominal mm coordinate (registration error, mm).",
+    "4. Verify the scale bar: measured px per mm against the manifest 100 mm length (scale error, %).",
+    "5. Sample each patch centre (inner 50% of the patch) and convert sRGB to CIELAB D65/2.",
+    "6. Record PatchMeasurement / ScaleMeasurement / RegistrationMeasurement objects and build a PrintCameraProfile (ruthless_pipeline.certification.calibration_ingest).",
+    "7. Evaluate PrintCameraProfile.acceptance(); a session may start only if it passes. Re-run after the final garment capture; drift failure invalidates the session."
+  ],
+  "acceptance_criteria": {
+    "source": "ruthless_pipeline.certification.calibration_ingest.PrintCameraProfile.acceptance",
+    "max_mean_delta_e_2000": 6.0,
+    "max_scale_error_pct": 2.0,
+    "max_registration_error_mm": 3.0
+  },
+  "profile_id_format": "RAC-PCP-<version>-<seq> (validated by PrintCameraProfile.validate)",
+  "evidence_label": "internally_measured",
+  "evidence_labels_note": "Completed profiles are internally_measured; they become RAC-P evidence only when bound into a session whose ExperimentArtifact carries the physical_session stage."
+}

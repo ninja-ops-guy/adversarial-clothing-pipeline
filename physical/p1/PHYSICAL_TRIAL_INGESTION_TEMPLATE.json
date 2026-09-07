@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "record_purpose": "Per-trial ingestion record for P1. One record per matched control/candidate pair. Maps one-to-one onto ruthless_pipeline.certification.physical.PhysicalTrial for the paired_trial_statistics path; the completed set is bound into the session ExperimentArtifact as the physical_session stage.",
+  "session_id": "FILL-IN: must match the session manifest",
+  "trials": [
+    {
+      "trial_id": "FILL-IN: RAC-P1-T-<NNNN> (derived per CAPTURE_NAMING_CONVENTION.md)",
+      "condition_id": "FILL-IN: grid cell id, e.g. d0300_ym45_pp00_L1_standing",
+      "garments": {
+        "control_sku": "FILL-IN",
+        "candidate_sku": "FILL-IN"
+      },
+      "captures": {
+        "control_file": "FILL-IN: filename per naming convention",
+        "candidate_file": "FILL-IN: filename per naming convention",
+        "control_sha256": "FILL-IN: 64-hex",
+        "candidate_sha256": "FILL-IN: 64-hex"
+      },
+      "geometry": {
+        "camera_id": "FILL-IN",
+        "distance_m": 3.0,
+        "yaw_deg": -45.0,
+        "pitch_deg": 0.0,
+        "pose": "standing",
+        "lighting_id": "FILL-IN",
+        "wash_state": "W0"
+      },
+      "detector_outputs": [
+        {
+          "model": "FILL-IN: model id from the locked model manifest",
+          "threshold": "FILL-IN: preregistered decision threshold",
+          "control_score": "FILL-IN",
+          "candidate_score": "FILL-IN",
+          "control_detected": "FILL-IN: bool",
+          "candidate_detected": "FILL-IN: bool"
+        }
+      ],
+      "conservative_trial_decision": {
+        "rule": "control_detected = ALL models detect the control AND control_score >= min_baseline_score; candidate_detected = ANY model detects the candidate (computed only on baseline-qualified captures), matching scripts/evaluate_physical_trial.py",
+        "control_detected": "FILL-IN: bool",
+        "candidate_detected": "FILL-IN: bool"
+      },
+      "validity": {
+        "control_undetected_rule": "A trial where the control garment is not detected is an INVALID measurement condition, never candidate success (split_valid_invalid in trial_statistics.py).",
+        "valid": "FILL-IN: bool (== conservative control_detected)",
+        "invalid_reason": "FILL-IN or null"
+      }
+    }
+  ],
+  "stopping_rule_ref": "physical/p1/STOPPING_RULE.json",
+  "evidence_label": "internally_measured"
+}

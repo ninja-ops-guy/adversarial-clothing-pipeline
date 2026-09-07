@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "session_id": "RAC-P1-SESSION-YYYYMMDD-NN",
+  "date_utc": "FILL-IN: ISO-8601 date",
+  "operator": "FILL-IN",
+  "rig": {
+    "camera_id": "FILL-IN (must match CALIBRATION_MANIFEST camera_id)",
+    "lighting_id": "FILL-IN (must match CALIBRATION_MANIFEST lighting_id)",
+    "distance_m": "FILL-IN",
+    "camera_height_m": "FILL-IN",
+    "background": "matte 18% gray seamless",
+    "mounting": "FILL-IN: flat-board | torso-form"
+  },
+  "calibration": {
+    "target_id": "RAC-CALT-P1-0001",
+    "profile_id": "FILL-IN: RAC-PCP-<version>-<seq> from the bracketing calibration",
+    "acceptance_passed": true,
+    "acceptance_thresholds": {
+      "max_mean_delta_e_2000": 6.0,
+      "max_scale_error_pct": 2.0,
+      "max_registration_error_mm": 3.0
+    }
+  },
+  "garments": {
+    "candidate_skus": ["FILL-IN: adversarial candidate SKU(s)"],
+    "control_skus": ["FILL-IN: matched control SKU(s)"],
+    "reserve_skus": ["FILL-IN: reserve garments held for damage/replacement"]
+  },
+  "environment": {
+    "temperature_c": "FILL-IN",
+    "relative_humidity_pct": "FILL-IN",
+    "ambient_lux_at_garment": "FILL-IN",
+    "light_meter_baseline": "FILL-IN"
+  },
+  "capture_grid": {
+    "distances_m": [1.0, 3.0, 5.0],
+    "yaw_deg": [-45, 0, 45],
+    "pitch_deg": [0],
+    "poses": ["standing", "seated"],
+    "lighting_variants": ["session-locked"],
+    "repetitions_per_cell": 8,
+    "planned_valid_trials": 144,
+    "note": "Each cell yields one matched control/candidate pair (one trial). planned_valid_trials is the full grid = stopping-rule max_valid_trials."
+  },
+  "captures": [
+    {
+      "capture_file": "FILL-IN: filename per CAPTURE_NAMING_CONVENTION.md",
+      "trial_id": "FILL-IN: RAC-P1-T-<NNNN>",
+      "role": "control | candidate",
+      "sha256": "FILL-IN: 64-hex digest recorded at capture time"
+    }
+  ],
+  "evidence_label": "internally_measured"
+}
