@@ -119,3 +119,38 @@ def test_model_contract_keeps_state_hash_authoritative():
     measured["state_dict_sha256"] = "b" * 64
     with pytest.raises(ValueError, match="hash mismatch"):
         verify_frozen_model_contract("retinanet_resnet50_fpn_v2", frozen, measured)
+
+
+def test_v3_fresh_protocol_and_model_sets_are_preregistered():
+    manifest = json.loads(Path("benchmarks/model_manifest.json").read_text())
+    protocol = json.loads(Path("protocols/RAC-PERSON-DETECT-1.2.json").read_text())
+    surrogate = json.loads(Path("model_sets/PERSON-SUR-v3.json").read_text())
+    heldout = json.loads(Path("model_sets/PERSON-HO-v3.json").read_text())
+
+    assert manifest["generation_id"] == "RAC-PER-D2-0004"
+    assert manifest["lock_status"] == "PREREGISTERED"
+    assert manifest["lock_inference_performed"] is False
+    assert protocol["version"] == "1.2"
+    assert protocol["generation_id"] == "RAC-PER-D2-0004"
+    assert protocol["surrogate_model_set"] == surrogate["model_set_id"]
+    assert protocol["heldout_model_set"] == heldout["model_set_id"]
+    assert surrogate["status"] == "PREREGISTERED"
+    assert heldout["status"] == "PREREGISTERED"
+    assert heldout["candidate_inference_performed"] is False
+    assert set(surrogate["models"]).isdisjoint(heldout["models"])
+    assert heldout["models"] == [
+        "fasterrcnn_resnet50_fpn_v2",
+        "maskrcnn_resnet50_fpn_v2",
+    ]
+
+
+def test_v3_fresh_heldout_manifests_are_hash_locked_without_candidate_inference():
+    for model_id in ("fasterrcnn_resnet50_fpn_v2", "maskrcnn_resnet50_fpn_v2"):
+        payload = json.loads(Path(f"model_manifests/{model_id}.json").read_text())
+        digest = payload["weights_sha256"]
+        assert len(digest) == 64
+        int(digest, 16)
+        assert payload["framework"] == "torchvision"
+        assert payload["framework_version"]
+        assert payload["metadata"]["generation_id"] == "RAC-PER-D2-0004"
+        assert payload["metadata"]["candidate_inference_performed_during_lock"] is False
