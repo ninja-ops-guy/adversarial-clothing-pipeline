@@ -22,14 +22,57 @@ function pngDimensions(file) {
   return [b.readUInt32BE(16), b.readUInt32BE(20)];
 }
 
-async function saveDownload(page, buttonName, destination) {
+async function saveDownload(page, buttonName, destination, minBytes = 1000) {
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: buttonName, exact: true }).click();
   const download = await downloadPromise;
   await download.saveAs(destination);
-  if (!fs.existsSync(destination) || fs.statSync(destination).size < 1000) {
-    throw new Error(`Export failed or empty: ${destination}`);
+  if (!fs.existsSync(destination)) {
+    throw new Error(`Export did not create destination: ${destination}`);
   }
+  const size = fs.statSync(destination).size;
+  if (size < minBytes) {
+    throw new Error(`Export too small: ${destination} (${size} bytes; expected >= ${minBytes})`);
+  }
+  return size;
+}
+
+function validateStudioManifest(file, cfg, primaryProduct, family) {
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (err) {
+    throw new Error(`Product Studio manifest is not valid JSON: ${file}: ${err.message}`);
+  }
+
+  const required = {
+    schema_version: '1.3',
+    product: primaryProduct,
+    production_status: 'digital_design_ready'
+  };
+  for (const [key, expected] of Object.entries(required)) {
+    if (manifest[key] !== expected) {
+      throw new Error(`Product Studio manifest mismatch for ${key}: ${manifest[key]} !== ${expected}`);
+    }
+  }
+  if (!manifest.design || manifest.design.family !== family) {
+    throw new Error(`Product Studio manifest family mismatch: ${manifest.design?.family} !== ${family}`);
+  }
+  if (Number(manifest.design.seed) !== Number(cfg.seed)) {
+    throw new Error(`Product Studio manifest seed mismatch: ${manifest.design.seed} !== ${cfg.seed}`);
+  }
+  if (Number(manifest.design.master_export_px) !== 4096) {
+    throw new Error(`Product Studio manifest must declare a 4096px master export`);
+  }
+  const board = manifest.outputs?.reference_board_px;
+  const tile = manifest.outputs?.production_tile_px;
+  if (!Array.isArray(board) || board[0] !== 4096 || board[1] !== 5119) {
+    throw new Error(`Product Studio manifest reference-board dimensions are not 4096x5119`);
+  }
+  if (!Array.isArray(tile) || tile[0] !== 4096 || tile[1] !== 4096) {
+    throw new Error(`Product Studio manifest production-tile dimensions are not 4096x4096`);
+  }
+  return manifest;
 }
 
 async function applyCandidate(page, cfg, product) {
@@ -85,7 +128,10 @@ async function main() {
     const studioManifest = path.join(outputDir, 'design', 'product_studio_manifest.json');
     await saveDownload(page, 'Export 4096px POD Tile', tilePath);
     await saveDownload(page, 'Export Reference Board PNG', primaryBoard);
-    await saveDownload(page, 'Export Production Manifest', studioManifest);
+    // JSON manifests are intentionally compact and may be smaller than image exports.
+    // Validate their schema/content rather than applying the PNG-oriented 1 KB floor.
+    await saveDownload(page, 'Export Production Manifest', studioManifest, 100);
+    validateStudioManifest(studioManifest, cfg, primaryProduct, family);
 
     const mockups = {};
     for (const product of PRODUCTS) {
