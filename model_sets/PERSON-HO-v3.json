@@ -1,0 +1,13 @@
+{
+  "model_set_id": "PERSON-HO-v3",
+  "role": "heldout",
+  "models": [
+    "fasterrcnn_resnet50_fpn_v2",
+    "maskrcnn_resnet50_fpn_v2"
+  ],
+  "status": "LOCK_PENDING",
+  "source_manifest": "benchmarks/model_manifest.json",
+  "generation_id": "RAC-PER-D2-0004",
+  "lock_source_commit": null,
+  "candidate_inference_performed": false
+}
