@@ -1,0 +1,255 @@
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from dataclasses import asdict
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from ruthless_pipeline.certification.experiment import ExperimentArtifact, ExperimentRegistry, StageRef
+from ruthless_pipeline.certification.physical import PhysicalTrial
+from ruthless_pipeline.certification.trial_statistics import (
+    PreregisteredStoppingRule,
+    evaluate_stopping_rule,
+    invalid_condition_report,
+    paired_trial_statistics,
+)
+
+
+def canonical(payload: dict[str, Any]) -> bytes:
+    return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+
+
+def sha256_payload(payload: dict[str, Any]) -> str:
+    return hashlib.sha256(canonical(payload)).hexdigest()
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load_rule(path: Path) -> PreregisteredStoppingRule:
+    raw = json.loads(path.read_text())
+    return PreregisteredStoppingRule(
+        rule_id=raw["rule_id"],
+        min_valid_trials=int(raw["min_valid_trials"]),
+        max_valid_trials=int(raw["max_valid_trials"]),
+        target_interval_width=float(raw["target_interval_width"]),
+        confidence_z=float(raw["confidence_z"]),
+        require_interval_below_half=bool(raw["require_interval_below_half"]),
+    )
+
+
+def conservative_still_decision(inference: dict[str, Any]) -> tuple[bool, bool, dict[str, Any]]:
+    outcomes = inference["paired_summary"]["model_outcomes"]
+    control = bool(outcomes) and all(bool(v["control_detected"]) for v in outcomes.values())
+    candidate = any(bool(v["candidate_detected"]) for v in outcomes.values()) if control else False
+    return control, candidate, outcomes
+
+
+def conservative_motion_decision(inference: dict[str, Any]) -> tuple[bool, bool, dict[str, Any]]:
+    sequences = inference.get("motion", {}).get("sequences", {})
+    control_sequences = [v for v in sequences.values() if v["arm"] == "control"]
+    candidate_sequences = [v for v in sequences.values() if v["arm"] == "candidate"]
+    if not control_sequences or not candidate_sequences:
+        raise ValueError("motion P1 ingestion requires both control and candidate sequences")
+
+    model_ids = list(inference["models"])
+    detail: dict[str, Any] = {}
+    for model_id in model_ids:
+        control_detected = all(bool(seq["models"][model_id]["sequence_detected"]) for seq in control_sequences)
+        candidate_detected = any(bool(seq["models"][model_id]["sequence_detected"]) for seq in candidate_sequences)
+        detail[model_id] = {
+            "control_detected": control_detected,
+            "candidate_detected": candidate_detected,
+            "valid": control_detected,
+            "invalid_reason": None if control_detected else "control_not_detected",
+        }
+    control = bool(detail) and all(v["control_detected"] for v in detail.values())
+    candidate = any(v["candidate_detected"] for v in detail.values()) if control else False
+    return control, candidate, detail
+
+
+def build_trial(session: dict[str, Any], inference: dict[str, Any], source: str) -> tuple[PhysicalTrial, dict[str, Any]]:
+    if source == "motion":
+        control, candidate, detail = conservative_motion_decision(inference)
+    else:
+        control, candidate, detail = conservative_still_decision(inference)
+    condition = "|".join([
+        f"d={session.get('distance_m', 0)}m",
+        f"yaw={session.get('yaw_deg', 0)}",
+        f"pose={session.get('pose', 'unspecified')}",
+        f"light={session.get('lighting_id', 'unspecified')}",
+        f"source={source}",
+    ])
+    trial = PhysicalTrial(
+        trial_id=f"{session['session_id']}:{source}",
+        condition_id=condition,
+        control_detected=control,
+        candidate_detected=candidate,
+        camera_id=str(session["camera_id"]),
+        distance_m=float(session.get("distance_m", 0)),
+        yaw_deg=float(session.get("yaw_deg", 0)),
+        pitch_deg=float(session.get("pitch_deg", 0)),
+        pose=str(session.get("pose", "unspecified")),
+        lighting_id=str(session.get("lighting_id", "unspecified")),
+        wash_state=str(session.get("wash_state", "W0")),
+        metadata={
+            "experiment_id": str(session["experiment_id"]),
+            "session_id": str(session["session_id"]),
+            "inference_sha256": str(inference["result_sha256"]),
+            "observation_source": source,
+            "evidence_class": str(session["evidence_class"]),
+        },
+    )
+    return trial, detail
+
+
+def trial_payload(trial: PhysicalTrial, session: dict[str, Any], inference: dict[str, Any], detail: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "trial_id": trial.trial_id,
+        "session_id": session["session_id"],
+        "condition_id": trial.condition_id,
+        "garments": {
+            "control_sku": session["control"]["artifact_id"],
+            "candidate_sku": session["candidate"]["artifact_id"],
+        },
+        "captures": session["captures"],
+        "geometry": {
+            "camera_id": trial.camera_id,
+            "distance_m": trial.distance_m,
+            "yaw_deg": trial.yaw_deg,
+            "pitch_deg": trial.pitch_deg,
+            "pose": trial.pose,
+            "lighting_id": trial.lighting_id,
+            "wash_state": trial.wash_state,
+        },
+        "detector_outputs": detail,
+        "conservative_trial_decision": {
+            "rule": "control_detected = ALL frozen models detect control; candidate_detected = ANY frozen model detects candidate, only when control qualifies",
+            "control_detected": trial.control_detected,
+            "candidate_detected": trial.candidate_detected,
+        },
+        "validity": {
+            "valid": trial.control_detected,
+            "invalid_reason": None if trial.control_detected else "control undetected (invalid measurement condition)",
+        },
+        "inference_result_sha256": inference["result_sha256"],
+    }
+
+
+def register_experiment(
+    session: dict[str, Any],
+    physical_artifact_path: Path,
+    registry_path: Path,
+    calibration_sha256: str | None,
+) -> ExperimentArtifact:
+    candidate = session.get("candidate", {})
+    generation = session.get("generation", {})
+    for label, payload in (("candidate", candidate), ("generation", generation)):
+        if not payload.get("artifact_id") or len(str(payload.get("sha256", ""))) != 64:
+            raise ValueError(f"{label} artifact id and frozen SHA-256 are required for Research OS registration")
+
+    stages = [
+        StageRef("candidate", str(candidate["artifact_id"]), str(candidate["sha256"])),
+        StageRef("generation", str(generation["artifact_id"]), str(generation["sha256"])),
+    ]
+    if calibration_sha256:
+        stages.append(StageRef("calibration_profile", str(session.get("calibration_profile_id", "CAPTURE-CALIBRATION")), calibration_sha256))
+    stages.append(StageRef("physical_session", str(session["session_id"]), sha256_file(physical_artifact_path)))
+
+    artifact = ExperimentArtifact(
+        experiment_id=str(session["experiment_id"]),
+        hypothesis_id=str(session.get("hypothesis_id", "UNSPECIFIED")),
+        generation_id=str(generation["artifact_id"]),
+        created_utc=datetime.now(timezone.utc).isoformat(),
+        stages=stages,
+        evidence_label="internally_measured" if session["evidence_class"] == "physical_garment_p1" else "scenario_assumption",
+        validity_flags={
+            "capture_evidence_class": session["evidence_class"],
+            "physical_evidence_eligible": session["evidence_class"] == "physical_garment_p1",
+            "calibration_pass": bool(session.get("calibration_pass")),
+        },
+    )
+    registry = ExperimentRegistry.from_json(registry_path.read_text()) if registry_path.exists() else ExperimentRegistry()
+    registry.add(artifact)
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry_path.write_text(registry.to_json() + "\n")
+    return artifact
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Convert sealed Capture Lab inference into P1 statistics and Research OS lineage.")
+    parser.add_argument("session_json")
+    parser.add_argument("inference_json")
+    parser.add_argument("--source", choices=("still", "motion"), default="still")
+    parser.add_argument("--stopping-rule", default="physical/p1/STOPPING_RULE.json")
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--registry", default=None)
+    parser.add_argument("--calibration-profile", default=None)
+    args = parser.parse_args()
+
+    session_path = Path(args.session_json)
+    inference_path = Path(args.inference_json)
+    session = json.loads(session_path.read_text())
+    inference = json.loads(inference_path.read_text())
+    if not session.get("sealed"):
+        raise SystemExit("ingestion blocked: session is not sealed")
+    if inference.get("session_id") != session.get("session_id") or inference.get("experiment_id") != session.get("experiment_id"):
+        raise SystemExit("ingestion blocked: session/inference lineage mismatch")
+    if inference.get("capture_hash_verification") != "PASS":
+        raise SystemExit("ingestion blocked: capture integrity did not pass")
+    if session["evidence_class"] == "physical_garment_p1" and not session.get("calibration_pass"):
+        raise SystemExit("ingestion blocked: P1 calibration gate did not pass")
+
+    trial, detail = build_trial(session, inference, args.source)
+    stats = paired_trial_statistics([trial], bootstrap_resamples=1000) if trial.control_detected else None
+    invalid = invalid_condition_report([trial])
+    rule = load_rule(Path(args.stopping_rule))
+    stopping = evaluate_stopping_rule(rule, stats) if stats else None
+
+    out = Path(args.output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    trial_record = {
+        "schema_version": "1.0",
+        "evidence_label": "internally_measured" if session["evidence_class"] == "physical_garment_p1" else "scenario_assumption",
+        "trials": [trial_payload(trial, session, inference, detail)],
+        "stopping_rule_ref": args.stopping_rule,
+    }
+    trial_path = out / "trial-records.json"
+    trial_path.write_text(json.dumps(trial_record, indent=2, sort_keys=True) + "\n")
+    statistics_payload = {
+        "schema_version": "1.0",
+        "evidence_class": session["evidence_class"],
+        "physical_evidence_eligible": session["evidence_class"] == "physical_garment_p1",
+        "statistics": asdict(stats) if stats else None,
+        "invalid_conditions": asdict(invalid),
+        "stopping_rule": asdict(rule),
+        "stopping_decision": asdict(stopping) if stopping else None,
+        "warning": "A single Capture Lab session is one matched trial; continue collection until the preregistered stopping rule is satisfied.",
+    }
+    stats_path = out / "statistics.json"
+    stats_path.write_text(json.dumps(statistics_payload, indent=2, sort_keys=True) + "\n")
+
+    experiment = None
+    if args.registry:
+        calibration_hash = sha256_file(Path(args.calibration_profile)) if args.calibration_profile else None
+        experiment = register_experiment(session, trial_path, Path(args.registry), calibration_hash)
+        (out / "experiment-artifact.json").write_bytes(experiment.canonical_json() + b"\n")
+
+    summary = {
+        "trial_records": str(trial_path),
+        "statistics": str(stats_path),
+        "trial_valid": trial.control_detected,
+        "candidate_detected": trial.candidate_detected if trial.control_detected else None,
+        "may_stop": stopping.may_stop if stopping else False,
+        "experiment_registered": experiment.experiment_id if experiment else None,
+    }
+    print(json.dumps(summary, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
