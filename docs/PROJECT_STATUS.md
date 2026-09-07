@@ -1,8 +1,8 @@
 # Adversarial Clothing Pipeline — Project Status
 
-**Date:** 2026-09-06  
+**Date:** 2026-09-07  
 **Repository:** `ninja-ops-guy/adversarial-clothing-pipeline`  
-**Status basis:** current `main` plus implemented Product Studio / Production Mapper documentation and the Reference Fidelity v1 implementation spec.
+**Status basis:** current `main`. For authoritative live completion tracking, use `docs/PROJECT_PROGRESS.md`; this document is the architecture/readiness narrative.
 
 ## Executive Summary
 
@@ -122,7 +122,7 @@ The existing family renderers are reference-inspired and recognizably differenti
 
 ### Target Outcome
 
-The next implementation should move generation from:
+Reference Fidelity v1 has moved generation from:
 
 > seeded visual family
 
@@ -130,7 +130,7 @@ into:
 
 > seeded visual family + explicit style contract + garment-aware composition + measurable reference similarity
 
-This is the highest-priority creative software milestone.
+The framework milestone is complete; remaining work is empirical tuning and physical/product validation.
 
 ---
 
@@ -260,34 +260,17 @@ RAC-P and RAC-M must remain unavailable until actual physical and manufacturing 
 
 ### Current `main`
 
-`cf5d21c7276acad1e350df7511adec5626c1c700`
+The repository has advanced materially beyond the historical baseline originally recorded in this document. The authoritative current ledger is `docs/PROJECT_PROGRESS.md`.
 
-Latest change: `fix: prevent master-copy path traversal in CLI`.
+As of 2026-09-07, Research OS Waves A/B, P1 statistics, calibration ingestion, reporting, failure taxonomy, telemetry contracts and content-addressed releases are on `main`. Wave B was reported green at **168/168 tests** on the pushed tree.
 
-### GitHub Pages
+### Active execution
 
-The explicit Pages deployment for the current head completed successfully.
+D2-0004 is the active fresh held-out generation. The published `d2-latest-status.json` intentionally remains D2-0003 until D2-0004 closes. Do not mutate the frozen generation or interpret the old published status as the new outcome.
 
-### Python CI
+### CI / deployment rule
 
-Current CI is **red**.
-
-Observed blockers:
-
-- Python 3.10 / 3.11 / 3.12 test jobs stop at the **Lint** step, so downstream test, smoke-test, and certification-contract steps are skipped in those matrix jobs;
-- `dependency-audit` fails at `pip-audit`;
-- package build succeeds.
-
-This means deployment can be healthy while the repository is **not globally CI-green**.
-
-### CI Priority
-
-Before calling the repo release-ready:
-
-1. clear the lint gate;
-2. inspect and resolve or explicitly triage the dependency-audit finding;
-3. allow Python test / smoke / certification-contract jobs to execute fully;
-4. retain frontend / Pages smoke coverage.
+CI remains the authoritative software gate. Documentation should record the exact tested commit/run when making a release claim rather than preserving stale historical CI status in this narrative.
 
 ---
 
@@ -299,7 +282,7 @@ Before calling the repo release-ready:
 | Canonical design families | ✅ | Implemented |
 | Canonical product mapping | ✅ | Implemented |
 | Reference-style boards | ✅ | Implemented, needs fidelity polish |
-| Reference Fidelity v1 | ⏳ | Detailed implementation spec only |
+| Reference Fidelity v1 | ✅ | Implemented; empirical tuning remains |
 | High-res master artwork | ✅ | Implemented |
 | Generic panel mapper | ✅ | Implemented |
 | Seam-aware mapping | ✅ | Implemented |
