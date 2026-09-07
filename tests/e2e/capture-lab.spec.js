@@ -44,3 +44,18 @@ test('synthetic dry-run evidence class remains explicit', async ({ page }) => {
   const state = await page.evaluate(() => window.RACCaptureLab.getState());
   expect(state.frozen.evidence_class).toBe('synthetic_pipeline_validation_only');
 });
+
+
+test('frozen ensemble includes deterministic motion sampling contract', async ({ page }) => {
+  const manifest = JSON.parse(await page.locator('#modelManifest').inputValue());
+  expect(manifest.motion_sampling).toEqual({
+    fps: 2.0,
+    max_frames: 120,
+    aggregation: 'sequence_fraction'
+  });
+  await page.selectOption('#ensemblePreset', 'heldout');
+  const heldout = JSON.parse(await page.locator('#modelManifest').inputValue());
+  expect(heldout.models).toEqual(['fasterrcnn_resnet50_fpn_v2', 'maskrcnn_resnet50_fpn_v2']);
+  expect(heldout.motion_sampling.fps).toBe(2.0);
+  expect(heldout.identity_mode).toBe('disabled');
+});
