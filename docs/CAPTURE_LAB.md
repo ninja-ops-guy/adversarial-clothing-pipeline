@@ -1,6 +1,6 @@
 # RAC Capture Lab
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Surface:** `capture-lab.html`
 
 Capture Lab turns the P1/printed-prototype SOP into a sequential browser workflow.
@@ -78,15 +78,31 @@ Control-undetected conditions remain INVALID downstream.
 
 GitHub Pages is HTTPS, so modern browsers can expose `getUserMedia` after user permission. Device/browser support varies. The app fails visibly when camera permission is denied or unsupported.
 
-## Next integration
+## Frozen local inference runner
 
-The next backend layer should be an authorized local Capture Lab runner that:
+Implemented in `scripts/analyze_capture_session.py`. The runner:
 
-- opens a sealed session;
-- validates hashes;
-- runs the frozen detector ensemble;
-- writes `inference.json`;
-- computes sequence summaries;
-- emits PhysicalTrial-compatible records;
-- refuses identity matching unless an explicit closed-set consent manifest exists;
-- hands the sealed result to calibration/statistics/release tooling.
+- requires a sealed session by default;
+- verifies every capture hash;
+- verifies model IDs, state hashes and thresholds against the frozen benchmark/model manifests;
+- loads only the models named by the session analysis contract;
+- runs real person-detection inference on captured stills;
+- retains raw boxes, labels, scores and target-person scores;
+- writes content-hashed `inference.json` with per-model control/candidate summaries;
+- marks control-undetected model conditions invalid;
+- keeps still/frame observations explicitly nested rather than treating them as independent trials;
+- refuses any identity-matching mode.
+
+Capture Lab ships a SUR-v3 preset for ordinary authorized research and an HO-v3 preset visibly labeled fresh held-out. HO-v3 must not be used for optimization or candidate selection.
+
+Run locally after exporting a sealed session directory:
+
+```bash
+python scripts/analyze_capture_session.py RAC-CAP-...-session.json --output inference.json
+```
+
+Install the benchmark detector dependencies before first use. Model downloads/cache behavior follows the existing benchmark stack.
+
+### Motion analysis
+
+Motion capture is stored and hash-bound now. Frame extraction and sequence-level video inference remain the next implementation step; until then the runner analyzes still captures only. This limitation is explicit rather than silently treating video as analyzed.
