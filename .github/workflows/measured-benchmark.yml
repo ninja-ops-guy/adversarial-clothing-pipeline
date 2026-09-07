@@ -20,7 +20,7 @@ concurrency:
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 360
     env:
       HF_HOME: ${{ github.workspace }}/.model-cache/huggingface
       TORCH_HOME: ${{ github.workspace }}/.model-cache/torch
