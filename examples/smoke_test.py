@@ -1,6 +1,7 @@
 import torch
 from ruthless_pipeline import (
     BlackBoxNAPConfig, EnhancedBlackBoxNAP,
+    CandidateGenerationConfig, DetectorDrivenCandidateOptimizer, EnvironmentAdaptiveConfig,
     NeuralDeformationConfig, NeuralDeformationModule, synthetic_observation,
     DifferentiablePhysicsConfig, DifferentiablePhysicsPipeline,
     BenchmarkConfig, CallableEvaluator, ComparativeBenchmark,
@@ -19,3 +20,19 @@ renders=physics.forward(warped,brightness_values=(1.0,))["renders"]
 
 bench=ComparativeBenchmark(BenchmarkConfig(brightness=(1.0,),scales=(1.0,),blur_sigmas=(0.0,),device="cpu"), [CallableEvaluator("proxy",lambda x:x.mean((1,2,3)))])
 print(bench.run(pattern,renders[:1]))
+
+
+cap = DetectorDrivenCandidateOptimizer(
+    CandidateGenerationConfig(candidate_id="RAC-SMOKE-CAP"),
+    EnvironmentAdaptiveConfig(
+        num_iterations=1,
+        eot_samples=1,
+        max_palette_pixels=256,
+        kmeans_iterations=2,
+        seed=9,
+    ),
+)
+seed = torch.rand((1,3,32,32))
+env = [torch.rand((1,3,32,32))]
+artifact = cap.optimize(seed, env, lambda x: {"proxy": x.mean()}, ["proxy"])
+assert artifact.metadata["heldout_models_used"] == []
