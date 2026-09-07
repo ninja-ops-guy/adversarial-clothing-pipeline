@@ -66,12 +66,11 @@ def evaluate_candidate(
     }
 
 
-def sort_key(record: dict) -> tuple[float, float, float, float, float, str]:
-    """Detector performance dominates; reference/style signals only resolve ties."""
+def sort_key(record: dict) -> tuple[float, float, float, float, str]:
+    """Detector performance dominates; preregistered v3 design proxies resolve ties."""
     return (
         float(record["candidate_detection_rate"]),
         float(record["candidate_mean"]),
-        -float(record.get("reference_fidelity_score", 0.0)),
         -float(record.get("printability_proxy", 0.0)),
         -float(record.get("art_direction_proxy", 0.0)),
         str(record["candidate_id"]),
