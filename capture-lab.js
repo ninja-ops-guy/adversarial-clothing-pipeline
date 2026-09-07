@@ -56,7 +56,7 @@ function preset(name){
  };
  if(name==='custom')return;
  const models=sets[name].models,thresholds=Object.fromEntries(models.map(m=>[m,0.5]));
- $('modelManifest').value=JSON.stringify({models,thresholds,preprocessing:{source:'frozen model manifests'},motion_sampling:{fps:2.0,max_frames:120,aggregation:'sequence_fraction'},identity_mode:'disabled'},null,2)
+ $('modelManifest').value=JSON.stringify({models,thresholds,preprocessing:{source:'frozen model manifests'},motion_sampling:{fps:2.0,max_frames:120,aggregation:'sequence_fraction',sequence_detection_threshold:0.5},identity_mode:'disabled'},null,2)
 }
 function init(){renderSteps(0);count();$('ensemblePreset').onchange=()=>preset($('ensemblePreset').value);$('freezeBtn').onclick=freeze;$('cameraBtn').onclick=camera;$('stillBtn').onclick=still;$('recordBtn').onclick=startRecord;$('stopBtn').onclick=stopRecord;$('reviewBtn').onclick=review;$('analyzeBtn').onclick=analyze;$('exportBtn').onclick=exportBundle;$('sealBtn').onclick=seal;document.querySelectorAll('.arm').forEach(b=>b.onclick=()=>switchArm(b.dataset.arm));$('calibrationPass').onchange=()=>{$('calibrationGate').querySelector('span').textContent=$('calibrationPass').checked?'PASS':'Pending'}}
 window.RACCaptureLab={manifest,freeze,review,analyze,seal,getState:()=>({frozen,sealed,captures})};window.addEventListener('DOMContentLoaded',init)
