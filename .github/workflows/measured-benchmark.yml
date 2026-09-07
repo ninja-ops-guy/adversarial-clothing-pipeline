@@ -2,6 +2,10 @@ name: Measured Detector Benchmark
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'generations/RAC-PER-D2-0004.json'
   schedule:
     - cron: '17 5 * * 1'
   # D2-0004 is the current preregistered fresh generation. Trigger manually only
