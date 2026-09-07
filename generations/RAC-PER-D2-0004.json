@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "generation_id": "RAC-PER-D2-0004",
+  "status": "READY_FOR_FRESH_HELDOUT_RUN",
+  "protocol": "protocols/RAC-PERSON-DETECT-1.2.json",
+  "surrogate_model_set": "PERSON-SUR-v3",
+  "heldout_model_set": "PERSON-HO-v3",
+  "heldout_models": [
+    "fasterrcnn_resnet50_fpn_v2",
+    "maskrcnn_resnet50_fpn_v2"
+  ],
+  "heldout_feedback_allowed": false,
+  "lock_status": "PREREGISTERED",
+  "lock_source_commit": "fd9b3b4ebc06b549ee057fe00a59385d3073008f",
+  "lock_inference_performed": false,
+  "candidate_pool": {
+    "design_profile": "ruthless-reference-v1.1",
+    "candidate_count": 100,
+    "reference_fidelity_scorer": "reference-fidelity-v1",
+    "adaptive_surrogate_search": true
+  },
+  "selection_boundary": "SURROGATE_ONLY",
+  "notes": [
+    "All models observed in D2-0003 are surrogate-only in this generation.",
+    "Fresh held-out weights were hashed and frozen without candidate inference.",
+    "This marker intentionally triggers the D2-0004 workflow after preregistration."
+  ]
+}
