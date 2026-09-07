@@ -2,12 +2,12 @@
 ## Open Research Questions & Cutting-Edge Development Framework
 
 **Document ID:** PIM-2026-09-06-001  
-**Version:** 1.1.0  
-**Date:** September 6, 2026  
+**Version:** 1.2.0  
+**Date:** September 7, 2026  
 **Classification:** Internal - Strategic  
 **Review Cycle:** Quarterly  
 **Owner:** Founder/CTO  
-**Repository baseline reviewed:** `main` at `a9e827e`
+**Repository baseline reviewed:** `main` at `277cc0e`
 
 ---
 
@@ -540,12 +540,109 @@ That is the durable competitive advantage: not a single pattern, but a repeatabl
 
 ---
 
+# Part V-b — Computational Textile R&D Roadmap (35-Point Integration)
+
+**Source:** Founder strategy memo, September 7, 2026.  
+**Thesis:** Move from a sophisticated procedural design/benchmark platform to a **closed-loop computational textile R&D system**. The highest-value work is not more UI or more pattern families; it is better optimization, simulation, physical transfer, evidence quality, and manufacturing feedback.
+
+Each item below is mapped against the live repository state at `main` (`277cc0e`) so roadmap language cannot drift ahead of implemented capability.
+
+## Status legend
+
+- **Implemented** — present and exercised on current main
+- **Partial** — meaningful substrate exists; the full capability does not
+- **Open** — not started in-repo
+
+## A. Optimization & Generation
+
+| # | Roadmap item | Repo status | PIM linkage |
+|---|---|---|---|
+| 1 | Multi-objective optimizer with Pareto frontier (transfer proxy, fidelity, printability, aesthetics, robustness, complexity) | **Open** — current surrogate selection uses a single sort key with reference fidelity as first tie-break | Extends RQ-A-002/005; **Top-5 build order #1** |
+| 2 | Learned generative textile prior (latent/diffusion) alongside the deterministic procedural baseline | **Partial** — enhanced NAP path has optional diffusion/OpenCLIP adapters; no trained textile prior | RQ-H-002 |
+| 3 | Garment-aware optimization from the start (panels, seams, occlusion) instead of the flat 4096 tile | **Open** — optimization target is still the flat tile; Product Studio has product-aware zones for design only | Feeds RQ-B-003/007 |
+| 4 | Differentiable garment rendering inside the candidate loop (texture → drape → camera → detector) | **Partial** — neural deformation, mass-spring cloth, and differentiable compositor exist but are not in candidate evaluation | RQ-B-007 |
+| 5 | Materially calibrated / higher-fidelity cloth solver | **Partial** — mass-spring baseline only; no material calibration | RQ-M-002; P2 cloth-backend decision |
+
+## B. Robustness & Evaluation
+
+| # | Roadmap item | Repo status | PIM linkage |
+|---|---|---|---|
+| 6 | Full EOT/robustness engine (distance, resolution, rotation, pose, deformation, lighting, exposure, blur, JPEG, occlusion, background, camera) with performance **surfaces** | **Partial** — protocol 1.2 sweeps brightness/blur/rotation/scale only | RQ-B-001/002/005; **Top-5 #3** |
+| 7 | Versioned model zoo spanning one-stage, two-stage, transformer, segmentation families | **Partial** — SUR-v3 has 6 detectors across 5 families; no ViT/foundation backbones yet | RQ-A-002, RQ-F-001/002 |
+| 8 | Automatic model-generation rotation (observed held-out → surrogate pool; fresh held-out provisioning) | **Partial** — D2-0004 executed this manually: HO-v2 models demoted to surrogate-only, HO-v3 frozen without inference, one-shot reuse block active | Now a standing rule; automate next |
+| 9 | Statistical certification (bootstrap CIs, Wilson intervals, effect sizes, paired comparisons, preregistered stopping rules) | **Open** — D2 certification is threshold-based only | Upgrades G1–G5 gates |
+| 10 | Serious authorized evaluation corpus (many subjects/scenes/garments/conditions, strict split hygiene) | **Open** — convenience fixture only | **Top-5 #2**; RQ-B series |
+| 11 | Synthetic scene factory (thousands of reproducible garment scenes) | **Partial** — differentiable compositor exists; no scene factory | Feeds #10 |
+| 12 | Environment-conditioned generation as first-class subsystem (scan → statistics → recolor → surrogate optimize → freeze) | **Partial** — reference-conditioning and CAPGen-inspired module exist; not closed-loop | RQ-B-006 |
+| 13 | Beyond-RGB behavior (grayscale, low-light, IR-like, depth silhouettes) with claims scoped to tested sensors | **Open** | RQ-C series; claim-scope rule applies |
+
+## C. Design Quality & Product Topology
+
+| # | Roadmap item | Repo status | PIM linkage |
+|---|---|---|---|
+| 14 | Full Reference Fidelity system (style profiles, hero/suppression zones, composition analysis, deterministic sub-seeds, 0–100 scoring, Find Best Match) | **Implemented** on main — including monotonic Find Best Match after the 277cc0e fix; motif wiring through style-spec rendering restored same commit | **Top-5 #4** — now substantially complete |
+| 15 | Learned perceptual/aesthetic scoring alongside deterministic fidelity, explicitly separate from detector efficacy | **Partial** — optional OpenCLIP adapter exists; not integrated into fidelity scorer | RQ-H-001/002 |
+| 16 | Product-aware pattern topology (motifs crossing legs/pockets/seams; crown/brim continuity; mask exclusion zones) | **Partial** — product-aware zones and family profiles exist; topology-aware motif placement does not | Extends #14 |
+| 17 | Seam-continuity as an optimization objective | **Partial** — Production Mapper warns on discontinuity and auto-maps; no objective-function search | Manufacturing feedback loop |
+| 18 | Printer/fabric color calibration (printed target → measured profile → gamut-constrained optimization) | **Open** — printability is an uncalibrated proxy | RQ-M-001; **P0** |
+| 19 | Physical digital-twin calibration loop (photograph sample → estimate transfer error → update rendering → re-optimize) | **Open** | **Top-5 #5**; RQ-M-001/004 |
+
+## D. Physical Validation & Manufacturing Feedback
+
+| # | Roadmap item | Repo status | PIM linkage |
+|---|---|---|---|
+| 20 | Automated physical P1 capture harness (camera/distance/angle/lighting/pose/size/fabric/wash metadata → immutable RAC bundles) | **Open** — print-test kit prepares artifacts; no capture harness | G2 gate; RAC-PHYSICAL-PRINT-TEST-1.0 |
+| 21 | Durability as longitudinal experiment (W0/W1/W5/W10 degradation curve, not pass/fail) | **Open** | RQ-B-004, RQ-M-006; G3 gate |
+| 22 | Manufacturing variance in robustness (scaling error, misregistration, color drift, seam displacement, stretch) | **Open** | Extends #17/18 |
+
+## E. Evidence Infrastructure
+
+| # | Roadmap item | Repo status | PIM linkage |
+|---|---|---|---|
+| 23 | Automatic experiment registry (IDs, SHAs, hashes, manifests, conditions, metrics, artifacts) | **Partial** — evidence bundles + generation markers exist; no unified registry | Part VIII schema |
+| 24 | Content-addressed artifacts (hash = identity; one-pixel change → new artifact) | **Partial** — candidate PNGs, model states, and locks are SHA-256 bound; not yet universal | Extends D2 evidence binding |
+| 25 | Lineage graphs (reference → generator → candidate → optimization → frozen master → D2 → print → P1 → wash → lot) | **Partial** — source candidate IDs, lock commits, and provenance fields survive; no queryable graph | Extends #23/24 |
+| 26 | Adversarial evaluation of our own methodology (false-positive hunts: leakage, cherry-picked transforms, post-hoc thresholds, regeneration, hash mismatches) | **Partial** — contract tests enforce lock/boundary integrity and held-out isolation | RQ-D series; CI #32 |
+| 27 | Challenge sets / failure archive evaluated per generation without contaminating certification sets | **Open** | Extends #8 rotation |
+| 28 | Scaling-law tracking (candidates × surrogate diversity × EOT samples × scenes vs held-out transfer) | **Open** | RQ-A-002/004 |
+| 29 | Ablation infrastructure (did adaptation/cloth/fidelity/surrogate-n actually help?) | **Open** | Publishable-research backbone; RQ-A-005, RQ-B-007, RQ-H-001 |
+| 30 | Generation-centric research dashboard (D0→D2 lineage, Pareto fronts, per-model results, heatmaps, CIs, hashes, physical status) | **Open** — d2-latest-status.json is a single-generation status file only | Part IX metrics |
+
+## F. Architecture & Process
+
+| # | Roadmap item | Repo status | PIM linkage |
+|---|---|---|---|
+| 31 | Architectural separation into Design Studio / Research-Optimization / Certification-Manufacturing planes with explicit interfaces | **Open** — repo currently grows across all three | Prevents monolith drift |
+| 32 | Scientifically aware CI (determinism, provenance leakage, model-set isolation, reproducibility, artifact identity, statistics, certificate integrity, generation boundaries) | **Partial** — contract tests cover locks, boundaries, held-out isolation, integrity; CI green since 277cc0e | G0 gate (now met) |
+| 33 | Reproducible GPU experiment containers (pinned CUDA/PyTorch/models, container digests) | **Open** | Part VII |
+| 34 | Dataset governance (versioning, provenance/permissions, sample hashes, contamination prevention, immutable splits) | **Partial** — model manifests and held-out isolation exist; dataset governance does not | Part VIII |
+| 35 | Paper written alongside software; software auto-generates tables/ablations | **Open** | Conference tracking, Part XIII |
+
+## Standing build order (founder memo, 2026-09-07)
+
+1. **Multi-objective surrogate optimization + Pareto archive** (#1)
+2. **Large authorized synthetic/digital scene corpus** (#10, #11)
+3. **Garment-aware differentiable deformation/EOT loop** (#3, #4, #6)
+4. **Reference Fidelity v1 + product-specific composition** (#14 — substantially implemented; #16 remainder)
+5. **Calibrated print → photograph → physical P1 feedback loop** (#18, #19, #20)
+
+## Interaction with P0 gates
+
+The founder build order does **not** override the P0 evidence gates in Part V. Items #1–#5 proceed *on top of* the frozen-manifest / green-CI / one-shot-generation discipline established by D2-0004, not in place of it. Any optimizer, corpus, or calibration output that feeds a certification path must enter through the evidence labels in Part II and the generation-boundary rules now enforced by CI.
+
+## Explicitly de-prioritized by the memo
+
+Adding more UI features or pattern families without improvements to optimization, simulation, physical transfer, evidence quality, or manufacturing feedback. This supersedes any backlog item whose only effect is presentational.
+
+---
+
 ## Document Control
 
 | Version | Date | Changes |
 |---|---|---|
 | 1.0.0 | 2026-09-06 | Initial perpetual-improvement framework |
 | 1.1.0 | 2026-09-06 | Aligned to live repository state; reset unsupported baseline metrics; separated Pattern Lab heuristics from benchmark evidence; reprioritized research; corrected literature/conference framing |
+| 1.2.0 | 2026-09-07 | Integrated 35-point computational-textile R&D roadmap with per-item repo-state mapping and founder build order; recorded Reference Fidelity v1 + motif/Find-Best-Match fixes as implemented at 277cc0e; CI green (G0 met) |
 
 ## Next Review
 
