@@ -53,11 +53,12 @@
     "fcos_resnet50_fpn": 0.5
   },
   "preprocessing": {"source": "frozen model manifests"},
+  "motion_sampling": {"fps": 2.0, "max_frames": 120, "aggregation": "sequence_fraction"},
   "identity_mode": "disabled"
 }</textarea>
 <button id="reviewBtn">Validate Capture Pair</button>
 <button id="analyzeBtn" disabled>Freeze Ensemble Analysis Contract</button>
-<div class="note">After export, run: <code>python scripts/analyze_capture_session.py &lt;session.json&gt; --output inference.json</code></div>
+<div class="note">After export, run: <code>python scripts/analyze_capture_session.py &lt;session.json&gt; --include-motion --output inference.json</code></div>
 <div id="analysisStatus" class="analysis">No analysis run.</div>
 <div class="divider"></div>
 <button id="exportBtn" disabled>Export Session Bundle</button>
