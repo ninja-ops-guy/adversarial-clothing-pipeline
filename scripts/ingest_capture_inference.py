@@ -188,7 +188,7 @@ def main() -> int:
     parser.add_argument("--stopping-rule", default="physical/p1/STOPPING_RULE.json")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--registry", default=None)
-    parser.add_argument("--calibration-profile", default=None)
+    parser.add_argument("--calibration-profile", default=None)\n    parser.add_argument("--trial-store", default=None, help="Append this session to a cumulative matched-trial store and analyze all stored trials.")
     args = parser.parse_args()
 
     session_path = Path(args.session_json)
@@ -228,7 +228,7 @@ def main() -> int:
         "invalid_conditions": asdict(invalid),
         "stopping_rule": asdict(rule),
         "stopping_decision": asdict(stopping) if stopping else None,
-        "warning": "A single Capture Lab session is one matched trial; continue collection until the preregistered stopping rule is satisfied.",
+        "warning": "Each Capture Lab session/source is one matched trial; frames remain nested. Continue collection until the preregistered stopping rule is satisfied.",\n        "cumulative_trial_count": len(analysis_trials),
     }
     stats_path = out / "statistics.json"
     stats_path.write_text(json.dumps(statistics_payload, indent=2, sort_keys=True) + "\n")
@@ -244,7 +244,7 @@ def main() -> int:
         "statistics": str(stats_path),
         "trial_valid": trial.control_detected,
         "candidate_detected": trial.candidate_detected if trial.control_detected else None,
-        "may_stop": stopping.may_stop if stopping else False,
+        "may_stop": stopping.may_stop if stopping else False,\n        "cumulative_trial_count": len(analysis_trials),
         "experiment_registered": experiment.experiment_id if experiment else None,
     }
     print(json.dumps(summary, indent=2, sort_keys=True))
