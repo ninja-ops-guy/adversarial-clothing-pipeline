@@ -61,14 +61,17 @@ def evaluate_candidate(
         "invalid_condition_fraction": summary["invalid_condition_fraction"],
         "printability_proxy": float(item.get("printability_proxy", 0.0)),
         "art_direction_proxy": float(item.get("art_direction_proxy", 0.0)),
+        "reference_fidelity_score": float(item.get("reference_fidelity_score") or 0.0),
+        "reference_fidelity_subscores": item.get("reference_fidelity_subscores"),
     }
 
 
-def sort_key(record: dict) -> tuple[float, float, float, float, str]:
-    """Detector performance dominates; local design proxies only resolve ties."""
+def sort_key(record: dict) -> tuple[float, float, float, float, float, str]:
+    """Detector performance dominates; reference/style signals only resolve ties."""
     return (
         float(record["candidate_detection_rate"]),
         float(record["candidate_mean"]),
+        -float(record.get("reference_fidelity_score", 0.0)),
         -float(record.get("printability_proxy", 0.0)),
         -float(record.get("art_direction_proxy", 0.0)),
         str(record["candidate_id"]),
