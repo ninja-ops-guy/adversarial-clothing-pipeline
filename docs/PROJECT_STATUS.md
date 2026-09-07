@@ -22,7 +22,7 @@ The five-piece canonical launch capsule is now defined and partially implemented
 
 A Machine Static hoodie remains an extension product.
 
-The largest remaining visual-development gap is **reference fidelity**. The current generators implement the five families and canonical product mapping, but the more rigorous `reference-fidelity-v1` architecture — style profiles, garment-aware composition zones, explicit visual scoring, Reference Match mode, and fidelity-ranked search — is still a specification and has not yet been implemented as its own modules.
+Reference Fidelity v1 is now implemented in the live Product Studio/Production Mapper path: explicit family style profiles, product-aware composition zones, guided multi-pass rendering, a deterministic 0–100 style scorer, Reference Match mode, Find Best Match, and fidelity-ranked batch generation. The next creative gap is empirical art-direction tuning against the canonical launch references, not missing framework code.
 
 The largest remaining production gap is **real POD provider geometry**. The software can produce artwork, mockups, draft panel packs, and evidence-bound manifests, but true provider-ready uploads still require exact templates from the selected POD provider.
 
@@ -100,25 +100,25 @@ The existing family renderers are reference-inspired and recognizably differenti
 
 ## 2. Reference Fidelity v1
 
-### Planned / Specified
+### Implemented
 
 `docs/REFERENCE_FIDELITY_IMPLEMENTATION_SPEC.md` defines the next visual-quality milestone.
 
 | Capability | Status |
 | --- | --- |
-| `studio-style-profiles.js` | ⏳ Specified, not implemented |
-| Explicit per-family palette ratios | ⏳ |
-| Product-specific hero zones | ⏳ |
-| Product-specific suppression / safe zones | ⏳ |
-| Guided multi-pass composition | ⏳ |
-| Named deterministic sub-seeds | ⏳ |
-| Composition analysis | ⏳ |
-| `reference-fidelity.js` scorer | ⏳ |
-| 0–100 reference fidelity score | ⏳ |
-| Reference Match vs Creative mode | ⏳ |
-| `Find Best Match` local seed search | ⏳ |
-| Fidelity-ranked batch generation | ⏳ |
-| Fidelity metadata in manifests | ⏳ |
+| `studio-style-profiles.js` | ✅ Implemented |
+| Explicit per-family palette ratios | ✅ |
+| Product-specific hero zones | ✅ |
+| Product-specific suppression / safe zones | ✅ |
+| Guided multi-pass composition | ✅ |
+| Named deterministic sub-seeds | ✅ |
+| Composition analysis | ✅ |
+| `reference-fidelity.js` scorer | ✅ |
+| 0–100 reference fidelity score | ✅ |
+| Reference Match vs Creative mode | ✅ |
+| `Find Best Match` local seed search | ✅ |
+| Fidelity-ranked batch generation | ✅ |
+| Fidelity metadata in manifests | ✅ |
 
 ### Target Outcome
 
@@ -220,7 +220,7 @@ API integration is secondary to proving the first exact template workflow.
 
 The existing local score is **not a reference-similarity score and not adversarial efficacy**.
 
-Reference Fidelity v1 should replace generic visual ranking as the primary ranking signal for launch-capsule design selection while retaining the existing proxy as a secondary printability/complexity signal.
+Reference Fidelity v1 is now the default creative ranking signal in Production Mapper. The legacy entropy/complexity/printability proxy remains available as a secondary ranking mode and is still explicitly non-certification data.
 
 ---
 
@@ -323,18 +323,11 @@ Before calling the repo release-ready:
 - resolve / triage `pip-audit` failure;
 - ensure certification contract tests actually run on all supported Python versions.
 
-### Priority 1 — Implement Reference Fidelity v1
+### Priority 1 — Tune and Validate Reference Fidelity v1
 
-Build the already-specified:
+The framework is implemented. Next: freeze canonical reference metrics, run deterministic seed sweeps across all five capsule families, compare top-ranked vs random seeds, and tune profile ranges/weights only through versioned changes.
 
-1. style profiles;
-2. product composition zones;
-3. guided composition renderer;
-4. reference fidelity scorer;
-5. Reference Match mode;
-6. best-seed search and ranked shortlist.
-
-**Success condition:** top-ranked candidates are consistently closer to the five canonical references than arbitrary seeds.
+**Success condition:** top-ranked candidates are consistently closer to the five canonical references than arbitrary seeds without degrading printability or reproducibility.
 
 ### Priority 2 — Produce One Real POD SKU
 
@@ -377,7 +370,7 @@ The software side is strongest in:
 
 The two gaps that now matter most are:
 
-1. **creative fidelity** — getting generated garments to look consistently as strong and deliberate as the supplied reference boards;
+1. **creative calibration** — tuning the implemented reference-fidelity scorer and style profiles until ranked outputs consistently match the canonical boards;
 2. **physical grounding** — ingesting one real POD template and ordering the first sample.
 
 The correct short-term objective is therefore not to add more garment families or more certification levels. It is:
@@ -385,3 +378,18 @@ The correct short-term objective is therefore not to add more garment families o
 > **Make the five canonical designs visually excellent, convert one into an exact provider-ready SKU, and close the loop with a real physical sample.**
 
 That is the shortest path from the current repository to a credible commercial proof-of-concept.
+
+
+---
+
+## Current Measured Digital Truth
+
+Latest published locked run: **RAC-PER-D2-0003** (`machine_static`) from source commit `65646777151966729ab6c06cdbdfe71671e5266d`.
+
+- Surrogate set: baseline detection rate 1.00 → candidate 0.7222 across 72 valid conditions.
+- Held-out set (`PERSON-HO-v2`): baseline detection rate 1.00 → candidate 1.00 across 36 valid conditions.
+- Model lock: verified / certification-eligible as a locked digital run.
+- D2 certificate decision: **FAIL**; evidence state remains **RAC-D0**.
+- Bundle verification: **PASS**.
+
+This is useful negative evidence: the candidate reduced mean held-out confidence but did not cross the preregistered detection-rate criteria. It must not be described as D2-certified or as a physical garment result.
