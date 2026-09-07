@@ -43,6 +43,8 @@ This page is the navigation layer for the RAC documentation stack. Use the docum
 
 ## Physical program
 
+- [Capture Lab](CAPTURE_LAB.md) — sequential camera capture, matched control/candidate workflow, analysis contract, and session sealing.
+
 - [Physical Test Infrastructure](PHYSICAL_TEST_INFRASTRUCTURE.md)
 - [Calibration Target Spec](CALIBRATION_TARGET_SPEC.md)
 - [P1 Capture Rig Spec](P1_CAPTURE_RIG_SPEC.md)
