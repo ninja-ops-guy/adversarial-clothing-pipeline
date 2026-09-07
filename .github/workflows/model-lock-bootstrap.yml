@@ -7,6 +7,7 @@ on:
     paths:
       - 'benchmarks/model_manifest.json'
       - 'scripts/bootstrap_model_lock.py'
+      - 'scripts/apply_bootstrap_lock.py'
       - 'scripts/run_measured_benchmark.py'
       - 'benchmarks/requirements.txt'
       - '.github/workflows/model-lock-bootstrap.yml'
@@ -49,13 +50,17 @@ jobs:
       - name: Bootstrap hashes without candidate inference
         if: steps.lock.outputs.needed == 'true'
         run: python scripts/bootstrap_model_lock.py
-      - name: Publish lock proposal
+      - name: Apply no-inference lock to preregistered generation
+        if: steps.lock.outputs.needed == 'true'
+        run: python scripts/apply_bootstrap_lock.py
+
+      - name: Publish frozen model lock
         if: steps.lock.outputs.needed == 'true'
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add benchmarks/model-lock-proposal.json
-          git commit -m 'benchmark: publish detector model lock proposal [skip benchmark]' || exit 0
+          git add benchmarks/model-lock-proposal.json benchmarks/model_manifest.json model_sets/ model_manifests/
+          git commit -m 'benchmark: freeze preregistered detector model lock [skip benchmark]' || exit 0
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
