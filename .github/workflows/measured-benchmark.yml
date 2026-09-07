@@ -12,11 +12,19 @@ on:
       - 'ui.js'
       - 'analysis.js'
       - 'manual-import.js'
+      - 'product-studio.html'
+      - 'product-studio.js'
+      - 'studio-patterns.js'
+      - 'studio-bridge.js'
+      - 'reference-conditioning.js'
+      - 'design_profiles/**'
       - 'scripts/export_benchmark_pattern.js'
       - 'scripts/export_candidate_pool.js'
       - 'scripts/select_surrogate_candidate.py'
       - 'scripts/run_measured_benchmark.py'
       - 'scripts/build_d2_bundle.py'
+      - 'scripts/build_print_test_kit.js'
+      - 'scripts/package_print_test_kit.py'
       - 'model_manifests/**'
       - 'model_sets/**'
       - 'protocols/**'
@@ -43,20 +51,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Require preregistered detector lock
+      - name: Require preregistered detector lock and design policy
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           m=json.loads(Path('benchmarks/model_manifest.json').read_text())
+          profile=json.loads(Path('design_profiles/ruthless_reference_v1.json').read_text())
           hashes=[str(x.get('state_dict_sha256','')) for x in m['models']]
           heldout=[x['id'] for x in m['models'] if x.get('role') == 'heldout']
+          policy=m.get('selection_policy',{})
           if m.get('lock_status') != 'PREREGISTERED' or not all(len(x)==64 for x in hashes):
               raise SystemExit('Measured candidate inference blocked until all detector states are preregistered.')
           if m.get('lock_inference_performed') is not False:
               raise SystemExit('D2 blocked: held-out lock must be created without candidate inference.')
           if heldout != ['retinanet_resnet50_fpn_v2', 'fcos_resnet50_fpn']:
               raise SystemExit(f'D2 blocked: unexpected held-out generation: {heldout}')
+          if policy.get('boundary') != 'surrogate_only' or policy.get('heldout_feedback_allowed') is not False:
+              raise SystemExit('D2 blocked: candidate selection must remain surrogate-only.')
+          if policy.get('candidate_count') != 60 or profile.get('candidate_count') != 60:
+              raise SystemExit('D2 blocked: preregistered Product Studio pool must contain exactly 60 candidates.')
+          if profile.get('heldout_feedback_allowed') is not False:
+              raise SystemExit('D2 blocked: design profile must prohibit held-out feedback.')
           PY
 
       - name: Setup Python
@@ -90,18 +106,48 @@ jobs:
           npm install
           npx playwright install --with-deps chromium
 
-      - name: Export preregistered candidate pool
+      - name: Start Product Studio server and export preregistered candidate pool
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/pattern-lab-http.log 2>&1 &
           echo $! >/tmp/pattern-lab-http.pid
           for i in {1..20}; do
-            curl -fsS http://127.0.0.1:4173/ >/dev/null && break
+            curl -fsS http://127.0.0.1:4173/product-studio.html >/dev/null && break
             sleep 1
           done
-          node scripts/export_candidate_pool.js benchmarks/runtime/pool
+          node scripts/export_candidate_pool.js benchmarks/runtime/pool design_profiles/ruthless_reference_v1.json
+
+      - name: Validate product candidate pool boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('benchmarks/runtime/pool/pool.json').read_text())
+          assert p['schema_version'] == '3.0'
+          assert p['candidate_count'] == 60 == len(p['candidates'])
+          assert p['heldout_feedback_allowed'] is False
+          allowed={'signal_shadow','machine_static','ghost_hound','broken_human','error_garden'}
+          assert {c['family'] for c in p['candidates']} == allowed
+          assert all(c['patternType'] in allowed for c in p['candidates'])
+          assert all(len(c['png_sha256']) == 64 for c in p['candidates'])
+          PY
 
       - name: Select candidate on surrogate models only
-        run: python scripts/select_surrogate_candidate.py --final-id RAC-PER-D2-0002
+        run: python scripts/select_surrogate_candidate.py --final-id RAC-PER-D2-0003 --top-k 6
+
+      - name: Freeze selected Product Studio candidate before held-out inference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          cfg=json.loads(Path('benchmarks/runtime/candidate-config.json').read_text())
+          sel=json.loads(Path('benchmarks/runtime/surrogate-selection.json').read_text())
+          assert cfg['candidate_id'] == 'RAC-PER-D2-0003'
+          assert cfg['selection_boundary'] == 'SURROGATE_ONLY'
+          assert cfg['family'] in {'signal_shadow','machine_static','ghost_hound','broken_human','error_garden'}
+          assert sel['heldout_models_loaded'] == []
+          assert sel['heldout_feedback_used'] is False
+          assert sel['candidate_count'] == 60
+          PY
 
       - name: Run held-out measured detector inference on frozen winner
         run: python scripts/run_measured_benchmark.py
@@ -117,6 +163,7 @@ jobs:
           result = json.loads(Path('benchmark-results.json').read_text())
           assert result['status'] in {'measured_locked', 'measured_unlocked'}
           assert isinstance(result['certification_eligible'], bool)
+          assert result['candidate']['config']['candidate_id'] == 'RAC-PER-D2-0003'
           assert set(result['models']) == {
               'yolov8n',
               'fasterrcnn_mobilenet_v3_320',
@@ -126,7 +173,6 @@ jobs:
               'fcos_resnet50_fpn',
           }
           assert result['benchmark']['raw_row_count'] > 0
-          assert result['benchmark']['surrogate_models']
           assert result['benchmark']['heldout_models'] == ['retinanet_resnet50_fpn_v2', 'fcos_resnet50_fpn']
           assert result['benchmark']['surrogate_models'] == [
               'yolov8n',
@@ -151,7 +197,7 @@ jobs:
           import json
           from pathlib import Path
           status=json.loads(Path('d2-latest-status.json').read_text())
-          assert status['candidate_id'] == 'RAC-PER-D2-0002'
+          assert status['candidate_id'] == 'RAC-PER-D2-0003'
           assert status['protocol_version'] == '1.1'
           assert status['surrogate_model_set'] == 'PERSON-SUR-v2'
           assert status['heldout_model_set'] == 'PERSON-HO-v2'
@@ -159,21 +205,50 @@ jobs:
           print(json.dumps(status, indent=2))
           PY
 
-      - name: Publish D2 run summary
+      - name: Build high-resolution print-test assets
+        run: node scripts/build_print_test_kit.js benchmarks/runtime/candidate-config.json print-test-kit
+
+      - name: Seal print-and-test kit
+        run: python scripts/package_print_test_kit.py --kit-dir print-test-kit --zip print-test-kit.zip
+
+      - name: Validate print-test kit boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          status=json.loads(Path('print-test-kit-status.json').read_text())
+          verification=json.loads(Path('print-test-kit/export-verification.json').read_text())
+          trial=json.loads(Path('print-test-kit/physical_trial/manifest.json').read_text())
+          assert status['candidate_id'] == 'RAC-PER-D2-0003'
+          assert status['ready_for_print_and_physical_test'] is True
+          assert status['physical_validation_performed'] is False
+          assert verification['status'] == 'digital_print_assets_verified'
+          assert verification['pattern_tile']['dimensions'] == [4096,4096]
+          assert verification['primary_reference_board']['dimensions'] == [4096,5119]
+          assert set(verification['mockups']) == {'hoodie','hat','beanie','cargo','mask','shirt'}
+          assert trial['expected_pair_count'] == 108 == len(trial['trials'])
+          assert trial['camera_id'] == 'SET_BEFORE_EVALUATION'
+          assert Path('print-test-kit.zip').stat().st_size > 1000
+          PY
+
+      - name: Publish run summary
         if: always()
         run: |
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json, os
           from pathlib import Path
-          print("# RAC D2 benchmark")
+          print("# RAC print-test candidate")
           print()
           print("- Source commit: `" + os.environ.get("GITHUB_SHA","unknown") + "`")
           sel=Path("benchmarks/runtime/surrogate-selection.json")
           if sel.exists():
               s=json.loads(sel.read_text())
               w=s.get("winner",{})
-              print("- Surrogate-only winner: `" + str(w.get("candidate_id","unknown")) + "`")
+              print("- Surrogate-only Product Studio winner: `" + str(w.get("candidate_id","unknown")) + "`")
+              print("- Design family: `" + str(w.get("config",{}).get("family","unknown")) + "`")
               print("- Surrogate candidate detection rate: " + str(w.get("candidate_detection_rate","n/a")))
+              print("- Printability proxy: " + str(w.get("printability_proxy","n/a")))
+              print("- Art-direction proxy: " + str(w.get("art_direction_proxy","n/a")))
           result=Path("benchmark-results.json")
           if result.exists():
               r=json.loads(result.read_text())
@@ -182,20 +257,25 @@ jobs:
               print("- Held-out baseline detection rate: " + str(held.get("baseline_detection_rate","n/a")))
               print("- Held-out candidate detection rate: " + str(held.get("candidate_detection_rate","n/a")))
               print("- Model lock eligible: " + str(r.get("certification_eligible","n/a")))
-          status=Path("d2-latest-status.json")
-          if status.exists():
-              d=json.loads(status.read_text())
+          d2=Path("d2-latest-status.json")
+          if d2.exists():
+              d=json.loads(d2.read_text())
               print("- D2 decision: **" + str(d.get("decision","UNKNOWN")) + "**")
               print("- Evidence state: `" + str(d.get("evidence_state","UNKNOWN")) + "`")
               print("- Bundle verified: " + str(d.get("bundle_verified","n/a")))
-          else:
-              print("- D2 decision: not produced")
+          kit=Path("print-test-kit-status.json")
+          if kit.exists():
+              k=json.loads(kit.read_text())
+              print("- Print-test kit ready: **" + str(k.get("ready_for_print_and_physical_test",False)) + "**")
+              print("- Primary product: `" + str(k.get("primary_product","unknown")) + "`")
+              print("- Kit SHA-256: `" + str(k.get("kit_zip_sha256","unknown")) + "`")
+              print("- Physical validation performed: **False**")
           PY
 
-      - name: Upload benchmark evidence
+      - name: Upload measured evidence and print-test kit
         uses: actions/upload-artifact@v4
         with:
-          name: measured-detector-benchmark-${{ github.run_id }}
+          name: rac-print-test-kit-${{ github.run_id }}
           path: |
             benchmark-results.json
             benchmarks/runtime/model-lock-proposal.json
@@ -207,6 +287,10 @@ jobs:
             benchmarks/runtime/fixture/*.png
             certification_artifacts/latest-d2/**
             d2-latest-status.json
+            design_profiles/ruthless_reference_v1.json
+            print-test-kit/**
+            print-test-kit.zip
+            print-test-kit-status.json
           retention-days: 30
 
       - name: Enforce preregistered model lock for D2
@@ -222,17 +306,17 @@ jobs:
               print('Detector ensemble matches preregistered state hashes.')
           PY
 
-      - name: Publish latest measured JSON to main
+      - name: Publish latest measured status to main
         if: github.event_name != 'pull_request'
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add benchmark-results.json d2-latest-status.json
+          git add benchmark-results.json d2-latest-status.json print-test-kit-status.json
           if git diff --cached --quiet; then
-            echo 'Measured result unchanged.'
+            echo 'Measured status unchanged.'
             exit 0
           fi
-          git commit -m 'benchmark: publish latest measured detector results [skip benchmark]'
+          git commit -m 'benchmark: publish latest print-test candidate status [skip benchmark]'
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
