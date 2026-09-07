@@ -210,7 +210,9 @@ def main() -> int:
     parser.add_argument("session_json")
     parser.add_argument("--benchmark-manifest", default="benchmarks/model_manifest.json")
     parser.add_argument("--output", default=None)
-    parser.add_argument("--allow-unsealed", action="store_true", help="Development only; output is ineligible for physical evidence.")\n    parser.add_argument("--include-motion", action="store_true", help="Extract and analyze videos using the frozen motion_sampling contract.")\n    parser.add_argument("--motion-work-dir", default=None)
+    parser.add_argument("--allow-unsealed", action="store_true", help="Development only; output is ineligible for physical evidence.")
+    parser.add_argument("--include-motion", action="store_true", help="Extract and analyze videos using the frozen motion_sampling contract.")
+    parser.add_argument("--motion-work-dir", default=None)
     args = parser.parse_args()
 
     session_path = Path(args.session_json).resolve()
@@ -239,7 +241,18 @@ def main() -> int:
 
     records = collect_stills(session_path, session)
     predictions, summaries = analyze_stills(records, evaluators, {k: float(v) for k, v in contract["thresholds"].items()})
-    pair = derive_pair_outcome(predictions, list(map(str, contract["models"])))\n\n    motion_predictions: list[dict[str, Any]] = []\n    motion_sequences: dict[str, Any] = {}\n    has_motion = any(session.get("captures", {}).get(arm, {}).get("videos", []) for arm in ("control", "candidate"))\n    if args.include_motion and has_motion:\n        from scripts.analyze_capture_motion import analyze_motion\n        work_dir = Path(args.motion_work_dir) if args.motion_work_dir else session_path.parent / ".rac-motion-frames"\n        motion_predictions, motion_sequences = analyze_motion(\n            session_path, session, contract, evaluators,\n            {k: float(v) for k, v in contract["thresholds"].items()}, work_dir\n        )
+    pair = derive_pair_outcome(predictions, list(map(str, contract["models"])))
+
+    motion_predictions: list[dict[str, Any]] = []
+    motion_sequences: dict[str, Any] = {}
+    has_motion = any(session.get("captures", {}).get(arm, {}).get("videos", []) for arm in ("control", "candidate"))
+    if args.include_motion and has_motion:
+        from scripts.analyze_capture_motion import analyze_motion
+        work_dir = Path(args.motion_work_dir) if args.motion_work_dir else session_path.parent / ".rac-motion-frames"
+        motion_predictions, motion_sequences = analyze_motion(
+            session_path, session, contract, evaluators,
+            {k: float(v) for k, v in contract["thresholds"].items()}, work_dir
+        )
 
     result = {
         "schema_version": "1.0",
@@ -256,10 +269,17 @@ def main() -> int:
         "runtime_provenance": provenance,
         "predictions": predictions,
         "model_summaries": summaries,
-        "paired_summary": pair,\n        "motion": {\n            "requested": bool(args.include_motion),\n            "source_videos_present": has_motion,\n            "predictions": motion_predictions,\n            "sequences": motion_sequences,\n        },
+        "paired_summary": pair,
+        "motion": {
+            "requested": bool(args.include_motion),
+            "source_videos_present": has_motion,
+            "predictions": motion_predictions,
+            "sequences": motion_sequences,
+        },
         "identity_mode": "disabled",
         "limitations": [
-            "This runner performs person-detection analysis only.",\n            "Motion frames are deterministically sampled under the frozen motion_sampling contract when --include-motion is used.",
+            "This runner performs person-detection analysis only.",
+            "Motion frames are deterministically sampled under the frozen motion_sampling contract when --include-motion is used.",
             "Still/frame outputs are nested observations and are not independent physical trials.",
             "Printed-flat prototype results are not RAC-P1 garment evidence.",
             "Results apply only to the frozen models, thresholds, preprocessing, captures, and conditions recorded here.",

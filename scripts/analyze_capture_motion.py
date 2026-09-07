@@ -17,7 +17,8 @@ from scripts.analyze_capture_session import CaptureEvaluator, FrameRecord, analy
 class MotionSamplingSpec:
     fps: float = 2.0
     max_frames: int = 120
-    aggregation: str = "sequence_fraction"\n    sequence_detection_threshold: float = 0.5
+    aggregation: str = "sequence_fraction"
+    sequence_detection_threshold: float = 0.5
 
     @classmethod
     def from_contract(cls, contract: dict[str, Any]) -> "MotionSamplingSpec":
@@ -27,13 +28,16 @@ class MotionSamplingSpec:
         spec = cls(
             fps=float(raw.get("fps", 0)),
             max_frames=int(raw.get("max_frames", 0)),
-            aggregation=str(raw.get("aggregation", "")),\n            sequence_detection_threshold=float(raw.get("sequence_detection_threshold", 0.5)),
+            aggregation=str(raw.get("aggregation", "")),
+            sequence_detection_threshold=float(raw.get("sequence_detection_threshold", 0.5)),
         )
         if not math.isfinite(spec.fps) or spec.fps <= 0 or spec.fps > 30:
             raise ValueError("motion_sampling.fps must be finite and in (0,30]")
         if not 1 <= spec.max_frames <= 10000:
             raise ValueError("motion_sampling.max_frames must be in [1,10000]")
-        if not math.isfinite(spec.sequence_detection_threshold) or not 0 <= spec.sequence_detection_threshold <= 1:\n            raise ValueError("motion_sampling.sequence_detection_threshold must be in [0,1]")\n        if spec.aggregation not in {"sequence_fraction", "any_detected", "majority_detected"}:
+        if not math.isfinite(spec.sequence_detection_threshold) or not 0 <= spec.sequence_detection_threshold <= 1:
+            raise ValueError("motion_sampling.sequence_detection_threshold must be in [0,1]")
+        if spec.aggregation not in {"sequence_fraction", "any_detected", "majority_detected"}:
             raise ValueError("unsupported motion_sampling.aggregation")
         return spec
 
@@ -104,7 +108,9 @@ def aggregate_sequence(rows: list[dict[str, Any]], spec: MotionSamplingSpec) -> 
         "longest_detected_run_frames": longest_true_run(detected),
         "longest_gap_frames": longest_false_run(detected),
         "aggregation": spec.aggregation,
-        "sequence_outcome": outcome,\n        "sequence_detected": (fraction >= spec.sequence_detection_threshold) if fraction is not None else None,\n        "sequence_detection_threshold": spec.sequence_detection_threshold,
+        "sequence_outcome": outcome,
+        "sequence_detected": (fraction >= spec.sequence_detection_threshold) if fraction is not None else None,
+        "sequence_detection_threshold": spec.sequence_detection_threshold,
         "note": "Frames are nested within this sequence and are not independent inferential units.",
     }
 
