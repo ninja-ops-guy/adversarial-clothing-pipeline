@@ -1,18 +1,23 @@
 {
   "bundle_verified": true,
-  "candidate_id": "RAC-POOL-005",
-  "certificate_id": "RAC-POOL-005-1.0.0-1.0",
+  "candidate_id": "RAC-PER-D2-0003",
+  "certificate_id": "RAC-PER-D2-0003-1.0.0-1.1",
   "decision": "FAIL",
   "evidence_state": "RAC-D0",
   "heldout": {
     "baseline_detection_rate": 1.0,
-    "baseline_mean": 0.9611404339472452,
-    "candidate_detection_rate": 0.7777777777777778,
-    "candidate_mean": 0.7275460147195392,
-    "mean_delta": -0.23359441922770607,
+    "baseline_mean": 0.8689593970775604,
+    "candidate_detection_rate": 1.0,
+    "candidate_mean": 0.6593023472362094,
+    "mean_delta": -0.20965704984135097,
     "n": 36,
     "valid_n": 36
   },
+  "heldout_model_set": "PERSON-HO-v2",
   "invalid_condition_fraction": 0.0,
+  "protocol_id": "RAC-PERSON-DETECT",
+  "protocol_version": "1.1",
+  "source_commit": "f8fd32f05cbf59239234eaa208cf866ef178c309",
+  "surrogate_model_set": "PERSON-SUR-v2",
   "verification_failures": []
 }
