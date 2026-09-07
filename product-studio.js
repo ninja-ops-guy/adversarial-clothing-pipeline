@@ -90,6 +90,6 @@ const RACStudio=(()=>{
     updateMotifUI();defaults(true);render();
   }
   async function findBestMatch({count=24}={}){const base=state(),start=base.seed;let best={seed:start,score:-1};for(let i=0;i<count;i++){const seed=(start+i*37)%1000,s={...base,seed},cv=makeTile(256,s,false),ctx=cv.getContext('2d'),spec=RACPatternComposition.buildStyleSpec(s.family,{patternScale:s.scale,colorVariance:s.density,edgeIntensity:s.distress},seed,s.product,s.generationMode),analysis=RACPatternComposition.analyzeComposition(ctx,256,spec),result=RACReferenceScorer.score({family:s.family,product:s.product,analysis,spec,mode:s.generationMode});if(result.score>best.score)best={seed,score:result.score,result};}$('studioSeed').value=best.seed;sync('studioSeed');render();return best;}
-  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode,setVariation,findBestMatch,getRenderRevision:()=>renderRevision};
+  return{init,renderAll:render,exportMockup,exportTile,exportManifest,nextVariation:next,toggleMotif,setMode,setVariation,findBestMatch,getRenderRevision:()=>renderRevision,getReferenceFidelity:()=>lastFidelity};
 })();
 window.addEventListener('DOMContentLoaded',RACStudio.init);
