@@ -1,6 +1,6 @@
 # RAC Capture Lab
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Surface:** `capture-lab.html`
 
 Capture Lab turns the P1/printed-prototype SOP into a sequential browser workflow.
@@ -105,4 +105,4 @@ Install the benchmark detector dependencies before first use. Model downloads/ca
 
 ### Motion analysis
 
-Motion capture is stored and hash-bound now. Frame extraction and sequence-level video inference remain the next implementation step; until then the runner analyzes still captures only. This limitation is explicit rather than silently treating video as analyzed.
+Implemented in `scripts/analyze_capture_motion.py` and integrated behind `--include-motion` in the main runner. Motion analysis requires `ffmpeg` and `ffprobe` on the local workstation. The session freezes a `motion_sampling` contract before analysis; current Capture Lab presets use 2 fps, at most 120 frames per video, and `sequence_fraction` aggregation.\n\nThe runner deterministically extracts frames, executes the same frozen person-detection ensemble, and records per sequence/model:\n\n- frame count;\n- detection fraction;\n- mean/max target confidence;\n- longest continuous detected run;\n- longest detection gap;\n- frozen aggregation rule.\n\nFrames remain nested within a video sequence. Sequence summaries, not raw frame count, are the appropriate inputs to later physical inference.\n\nRun both still and motion analysis with:\n\n```bash\npython scripts/analyze_capture_session.py RAC-CAP-...-session.json --include-motion --output inference.json\n```\n\nThe runner still refuses identity matching. Motion support is for person-detection research under the frozen authorized ensemble.
