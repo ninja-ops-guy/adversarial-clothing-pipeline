@@ -24,7 +24,8 @@ This page is the navigation layer for the RAC documentation stack. Use the docum
 - [Certification System](CERTIFICATION_SYSTEM.md)
 - [Engineering Constitution](ENGINEERING_CONSTITUTION.md)
 - [Research Release Format](RESEARCH_RELEASE_FORMAT.md)
-- [Paper Series](PAPER_SERIES.md)
+- [Paper Series Plan](PAPER_SERIES.md)
+- [Manuscript Workspace](papers/README.md) — five active pre-results paper drafts
 - [CAPGen Integration](CAPGEN_INTEGRATION.md)
 
 ## Design / production
