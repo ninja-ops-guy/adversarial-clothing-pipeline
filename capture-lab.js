@@ -10,13 +10,13 @@ function hex(buf){return crypto.subtle.digest('SHA-256',buf).then(d=>[...new Uin
 function renderSteps(active=0){$('sopStrip').innerHTML=STEPS.map((s,i)=>'<div class="sop-step '+(i<active?'done ':i===active?'active':'')+'">'+(i+1)+' · '+s.toUpperCase()+'</div>').join('')}
 function count(){for(const a of ['control','candidate'])$(a+'Count').textContent=captures[a].stills.length+' stills · '+captures[a].videos.length+' videos'}
 function manifest(){
- return {schema_version:'1.0',session_id:'RAC-CAP-'+Date.now(),experiment_id:$('experimentId').value,protocol_version:$('protocolVersion').value,evidence_class:$('evidenceClass').value,candidate:{artifact_id:$('candidateId').value,sha256:$('candidateSha').value.toLowerCase()},control:{artifact_id:$('controlId').value},actor_id:$('actorId').value,camera_id:$('cameraId').value,lighting_id:$('lightingId').value,distance_m:+$('distance').value,yaw_deg:+$('yaw').value,pose:$('pose').value,created_at:now(),capture_blinding:'outcomes_hidden_until_capture_pair_complete',statistical_unit:'garment_x_actor_x_session',frames_are_nested:true}
+ return {schema_version:'1.0',session_id:'RAC-CAP-'+Date.now(),experiment_id:$('experimentId').value,protocol_version:$('protocolVersion').value,evidence_class:$('evidenceClass').value,generation:{artifact_id:$('generationId').value,sha256:$('generationSha').value.toLowerCase()},candidate:{artifact_id:$('candidateId').value,sha256:$('candidateSha').value.toLowerCase()},control:{artifact_id:$('controlId').value},actor_id:$('actorId').value,camera_id:$('cameraId').value,lighting_id:$('lightingId').value,distance_m:+$('distance').value,yaw_deg:+$('yaw').value,pose:$('pose').value,created_at:now(),capture_blinding:'outcomes_hidden_until_capture_pair_complete',statistical_unit:'garment_x_actor_x_session',frames_are_nested:true}
 }
 async function freeze(){
  const m=manifest(); if(!m.experiment_id||!m.actor_id||!m.camera_id) return alert('Experiment, actor, and camera IDs are required.');
- if(m.candidate.sha256&&!/^[0-9a-f]{64}$/.test(m.candidate.sha256)) return alert('Candidate SHA-256 must be 64 hex characters or blank for a pre-freeze prototype.');
+ if(m.candidate.sha256&&!/^[0-9a-f]{64}$/.test(m.candidate.sha256)) return alert('Candidate SHA-256 must be 64 hex characters or blank for a pre-freeze prototype.');\n if(m.generation.sha256&&!/^[0-9a-f]{64}$/.test(m.generation.sha256)) return alert('Generation SHA-256 must be 64 hex characters or blank for a prototype.');
  const bytes=new TextEncoder().encode(JSON.stringify(m,Object.keys(m).sort()));m.freeze_sha256=await hex(bytes);frozen=m;
- ['experimentId','protocolVersion','evidenceClass','candidateId','candidateSha','controlId','actorId','cameraId','lightingId','distance','yaw','pose'].forEach(id=>$(id).disabled=true);
+ ['experimentId','protocolVersion','evidenceClass','generationId','generationSha','candidateId','candidateSha','controlId','actorId','cameraId','lightingId','distance','yaw','pose'].forEach(id=>$(id).disabled=true);
  $('freezeBtn').disabled=true;$('stillBtn').disabled=!stream;$('recordBtn').disabled=!stream;$('instrumentStatus').textContent='FROZEN · '+m.freeze_sha256.slice(0,16)+'…';$('conditionBanner').textContent='CONTROL · '+cond();renderSteps(1)
 }
 async function camera(){try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});$('camera').srcObject=stream;$('cameraBtn').textContent='Camera Ready';$('cameraBtn').disabled=true;$('stillBtn').disabled=!frozen;$('recordBtn').disabled=!frozen;$('capturePrompt').textContent='FRAMING GUIDE · OUTCOMES BLINDED'}catch(e){$('instrumentStatus').textContent='CAMERA ERROR · '+e.message}}
@@ -38,7 +38,7 @@ function analyze(){
  let mm;try{mm=JSON.parse($('modelManifest').value)}catch(e){return alert('Model manifest JSON is invalid.')}
  if(!Array.isArray(mm.models)||typeof mm.thresholds!=='object')return alert('Frozen model manifest requires models[] and thresholds{}.');
  $('modelManifest').disabled=true;$('analyzeBtn').disabled=true;
- const payload={schema_version:'1.0',status:'analysis_pending_local_runner',session_freeze_sha256:frozen.freeze_sha256,models:mm.models,thresholds:mm.thresholds,preprocessing:mm.preprocessing||{},identity_mode:mm.identity_mode||'disabled',note:'Use scripts/analyze_capture_session.py or an authorized local runner. Browser does not fabricate inference.'};
+ const payload={schema_version:'1.0',status:'analysis_pending_local_runner',session_freeze_sha256:frozen.freeze_sha256,models:mm.models,thresholds:mm.thresholds,preprocessing:mm.preprocessing||{},motion_sampling:mm.motion_sampling||null,identity_mode:mm.identity_mode||'disabled',note:'Use scripts/analyze_capture_session.py or an authorized local runner. Browser does not fabricate inference.'};
  $('analysisStatus').textContent='ANALYSIS CONTRACT FROZEN · '+mm.models.length+' models · export bundle for local runner.';frozen.analysis_contract=payload
 }
 async function exportBundle(){
