@@ -1,4 +1,7 @@
-ultralytics>=8.3,<9
-transformers>=4.48,<5
+# Exact pins tied to the preregistered frozen model manifests
+# (model_manifests/*/framework_version). Do not widen without a new
+# frozen model lock: version drift invalidates measured runs.
+ultralytics==8.4.142
+transformers==4.57.6
 timm>=1.0,<2
 safetensors>=0.4

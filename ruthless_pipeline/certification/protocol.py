@@ -27,6 +27,7 @@ class CertificationProtocol:
     physical_required_for: tuple[str, ...] = ("RAC-P1", "RAC-P2", "RAC-M1", "RAC-M2")
     preregistered: bool = True
     notes: str = ""
+    generation_id: str = ""
 
     def validate(self) -> None:
         if not self.protocol_id.startswith("RAC-"):
