@@ -25,8 +25,8 @@
     "Fresh held-out weights were hashed and frozen without candidate inference.",
     "This marker intentionally triggers the D2-0004 workflow after preregistration."
   ],
-  "trigger_revision": 3,
-  "trigger_reason": "Retrigger after workflow timeout increase (adaptive search 90→300 min, measured benchmark 90→360 min) so the 100-candidate surrogate selection can complete.",
+  "trigger_revision": 4,
+  "trigger_reason": "Retrigger after fixture fetch fix: the zidane fixture is now downloaded once per workspace, hash-pinned (source_sha256) with fallback URLs, instead of being re-downloaded per candidate without integrity checks.",
   "required_commits": [
     "9d24ef60e9f8e6c5df5018a923e68e3429f0a642",
     "10dedb85fe6857da6ac0bda618275ed27b3b5b27",

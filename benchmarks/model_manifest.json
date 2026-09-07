@@ -89,6 +89,11 @@
   "fixture": {
     "name": "ultralytics-zidane-two-crop-convenience-fixture",
     "source_url": "https://ultralytics.com/images/zidane.jpg",
+    "source_fallback_urls": [
+      "https://www.ultralytics.com/images/zidane.jpg",
+      "https://raw.githubusercontent.com/ultralytics/ultralytics/main/ultralytics/assets/zidane.jpg"
+    ],
+    "source_sha256": "16d73869e3267a7d4ed00de8e860833bd1657c1b252e94c0c348277adc7b6edb",
     "samples": 2,
     "image_size": 320,
     "note": "Convenience digital fixture for repeatable CI measurement only; not a physical-garment or population-level benchmark."

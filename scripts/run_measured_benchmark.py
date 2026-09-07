@@ -7,6 +7,7 @@ import json
 import os
 import platform
 import sys
+import time
 import urllib.request
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -61,12 +62,53 @@ def sha256_state_dict(model: torch.nn.Module) -> str:
     return h.hexdigest()
 
 
-def download(url: str, dst: Path) -> Path:
+FIXTURE_SOURCE_CACHE = ROOT / "benchmarks" / "runtime" / "fixture-source"
+
+
+def download(url: str, dst: Path, *, retries: int = 3, expected_sha256: str | None = None) -> Path:
     dst.parent.mkdir(parents=True, exist_ok=True)
-    request = urllib.request.Request(url, headers={"User-Agent": "Ruthless-Adversarial-Clothing-Benchmark/1.0"})
-    with urllib.request.urlopen(request, timeout=60) as response, dst.open("wb") as fh:
-        fh.write(response.read())
-    return dst
+    if dst.exists() and dst.stat().st_size > 0:
+        if expected_sha256 is None or sha256_file(dst) == expected_sha256:
+            return dst
+        dst.unlink()
+    errors: list[str] = []
+    for attempt in range(1, retries + 1):
+        try:
+            request = urllib.request.Request(url, headers={"User-Agent": "Ruthless-Adversarial-Clothing-Benchmark/1.0"})
+            with urllib.request.urlopen(request, timeout=60) as response, dst.open("wb") as fh:
+                fh.write(response.read())
+            if expected_sha256 is not None and sha256_file(dst) != expected_sha256:
+                raise RuntimeError(f"sha256 mismatch for {url}")
+            return dst
+        except Exception as exc:  # noqa: BLE001 - retried with backoff below
+            errors.append(f"attempt {attempt}: {exc}")
+            if dst.exists():
+                dst.unlink()
+            time.sleep(min(2**attempt, 30))
+    raise RuntimeError(f"failed to download {url} after {retries} attempts: " + "; ".join(errors))
+
+
+def fetch_fixture_source(fixture: dict[str, Any]) -> Path:
+    """Fetch the pinned fixture image once per workspace, with hash verification.
+
+    The fixture is a preregistered input: when the manifest pins
+    ``source_sha256`` the bytes are verified on every use, and a shared cache
+    prevents per-candidate re-downloads of an external URL.
+    """
+    expected = fixture.get("source_sha256")
+    cache_path = FIXTURE_SOURCE_CACHE / "source-zidane.jpg"
+    if cache_path.exists() and cache_path.stat().st_size > 0:
+        if expected is None or sha256_file(cache_path) == expected:
+            return cache_path
+        cache_path.unlink()
+    urls = [fixture["source_url"], *fixture.get("source_fallback_urls", [])]
+    errors: list[str] = []
+    for url in urls:
+        try:
+            return download(url, cache_path, expected_sha256=expected)
+        except RuntimeError as exc:
+            errors.append(str(exc))
+    raise RuntimeError("fixture source unavailable from all URLs: " + "; ".join(errors))
 
 
 def image_tensor(image: Image.Image) -> torch.Tensor:
@@ -75,8 +117,7 @@ def image_tensor(image: Image.Image) -> torch.Tensor:
 
 def prepare_fixture(pattern_path: Path, manifest: dict[str, Any], runtime_dir: Path) -> tuple[torch.Tensor, torch.Tensor, dict[str, Any]]:
     fixture = manifest["fixture"]
-    source_path = runtime_dir / "source-zidane.jpg"
-    download(fixture["source_url"], source_path)
+    source_path = fetch_fixture_source(fixture)
 
     source = Image.open(source_path).convert("RGB")
     pattern = Image.open(pattern_path).convert("RGB")
