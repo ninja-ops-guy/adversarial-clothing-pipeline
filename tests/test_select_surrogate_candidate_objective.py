@@ -163,7 +163,7 @@ def test_cvar_objective_changes_stage_b_winner(monkeypatch, tmp_path):
 
 def test_cvar_alpha_is_threaded(monkeypatch, tmp_path):
     # alpha = 1.0 is the single-worst (max) objective: cand-b wins by 0.4 < 0.9.
-    report = _run(monkeypatch, tmp_path, ["--objective", "cvar", "--cvar-alpha", "1.0"])
+    report = _run_selection(monkeypatch, tmp_path, ["--objective", "cvar", "--cvar-alpha", "1.0"])
     assert report["winner"]["candidate_id"] == "cand-b"
     assert report["surrogate_objective"]["alpha"] == pytest.approx(1.0)
 
