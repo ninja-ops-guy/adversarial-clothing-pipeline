@@ -1,7 +1,7 @@
 # RAC Project Progress Ledger
 
 **Version:** 1.0.0  
-**Last updated:** 2026-09-07  
+**Last updated:** 2026-09-08  
 **Tracking baseline:** `main` at `81cc794` plus the active D2-0004 generation marker.  
 **Purpose:** Single source of truth for what has been completed, what is in progress, what is externally blocked, and what constitutes the next production/research gates.
 
@@ -314,5 +314,17 @@ The project should now be measured by **closed evidence loops**, not feature cou
 - Recorded Research OS Wave B: telemetry contract, schema, content-addressed release format.
 - Recorded 168/168 green validation reported for Wave B pushed tree.
 - Reframed completion tracking around closed experimental/production loops rather than UI or feature count.
+
+### 2026-09-08
+
+- Recorded Wave D (commit 49902d7 + fixup ef14a0a): preregistered D2-0005 selection objectives in certification/objectives.py (mean and CVaR-0.5 worst-k, k = max(1, ceil((1-alpha)*n)), deterministic model-id tie-break), select_surrogate_candidate.py --objective/--cvar-alpha/--objective-telemetry with default mean path byte-identical to legacy, full validation matrix (ties, n=1/3/5/7, empty/NaN rejection, mean-arm legacy parity, pristine-checkout byte comparison).
+- Recorded Wave E (commits 9cd2707 + 1554dce): certification/paired_arm_statistics.py (paired arm Delta = R_M - R_C, Wilson intervals, deterministic SHA-256-seeded bootstrap 10000 resamples seed 20260907, discordant b/c counts, success/negative/null/inconclusive decision regions with 0.20 width budget), and PREREGISTRATION_D2-0005.md amendments A1-A4 (evidence label internally_measured; paired-arm statistics module; Stage-A mean screen declared shared nuisance/preselection; objective telemetry mandatory for both arms), section 9 amendment log.
+- Recorded Wave F Track E (commit b1116c6): PREREGISTRATION_D2-0006_DRAFT.md — interpretation-policy decision tree keyed to D2-0005 outcome regions; no directional hypothesis; not armed.
+- Recorded Wave F Track C (commits b7b7575, 463f4a7, fixups 5b0ec4b/18111382): P1 executable artifacts — deterministic calibration-target generator (RAC-CALT-P1-0001, 48 CIELAB-referenced patches), calibration manifest, camera/lighting setup sheet, rig measurement checklist, session manifest template, capture naming convention, physical trial ingestion template, frozen stopping rule RAC-P1-STOP-2026-001 (min 93 valid trials, max 144), and synthetic end-to-end dry run that fails closed against RAC-P evidence promotion.
+- Recorded Wave F Track D: manuscript_export.py — paper1_longitudinal.csv, paper5_arms.csv, paper5_comparison.json exporters plus 8 deterministic figure-input scaffolds (F1-F8) with declared data lineage; empty/awaiting_data states only, zero fabricated results.
+- Recorded Wave F Track B: Production Alpha resolution — Printful product_id 388 (AOP recycled unisex hoodie, cut-and-sew sublimation; fallback product_id 257 crew-neck tee) with v1 catalog IDs verified unauthenticated; printfile/template archive and v2 mapping auth-gated (user action); SKU_MANIFEST_DRAFT.json with explicit UNKNOWN fields; ORDER_CHECKLIST.md (ordering is a user action).
+- Recorded user-side RAC Capture Lab addition (commits 9a55dac..2546c57): physical research workflow, session validator, evidence boundaries, SOP coverage.
+- Recorded D2-0004 run 34147902820 infrastructure failure at workflow step 18 (Build D2 evidence bundle, exit 1) after steps 1-17 succeeded including held-out inference; steps 19-27 skipped, no artifact upload, no status publish — held-out outcome never recorded or observed, informational one-shot boundary intact; generation remains READY_FOR_FRESH_HELDOUT_RUN; D2-0004 has no infrastructure-rerun clause, so re-run is a user governance decision pending root-cause diagnosis.
+- Validation: full suite 271 passed on the integrated tree.
 
 Update this ledger whenever a hard gate closes, an evidence state changes, a production artifact is frozen, or a new research generation is opened/closed.
