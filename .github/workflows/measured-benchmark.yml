@@ -4,35 +4,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 5 * * 1'
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'core.js'
-      - 'ui.js'
-      - 'analysis.js'
-      - 'manual-import.js'
-      - 'product-studio.html'
-      - 'product-studio.js'
-      - 'studio-patterns.js'
-      - 'studio-style-profiles.js'
-      - 'reference-fidelity.js'
-      - 'studio-bridge.js'
-      - 'reference-conditioning.js'
-      - 'design_profiles/**'
-      - 'scripts/export_benchmark_pattern.js'
-      - 'scripts/export_candidate_pool.js'
-      - 'scripts/select_surrogate_candidate.py'
-      - 'scripts/run_measured_benchmark.py'
-      - 'scripts/build_d2_bundle.py'
-      - 'scripts/build_print_test_kit.js'
-      - 'scripts/package_print_test_kit.py'
-      - 'model_manifests/**'
-      - 'model_sets/**'
-      - 'protocols/**'
-      - 'benchmarks/model_manifest.json'
-      - 'benchmarks/requirements.txt'
-      - '.github/workflows/measured-benchmark.yml'
+  # D2-0003 is a completed historical generation. New candidate-generation
+  # code must not silently reuse its already-observed held-out set. Trigger manually
+  # only after preregistering a new candidate generation and fresh held-out set.
+
 
 permissions:
   contents: write
@@ -52,6 +27,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Require explicit fresh D2 generation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('benchmarks/model_manifest.json').read_text())
+          if m.get('generation_id') in {None, '', 'RAC-PER-D2-0003'}:
+              raise SystemExit(
+                  'D2 execution blocked: D2-0003 is historical. '
+                  'Preregister a new generation_id and fresh held-out model set first.'
+              )
+          PY
 
       - name: Require preregistered detector lock and design policy
         run: |
