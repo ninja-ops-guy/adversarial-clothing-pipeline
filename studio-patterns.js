@@ -180,4 +180,26 @@
     for(let i=0;i<4;i++)signalWedge(c,s,r,i%2?'#2b62d8':'#eadf1a');
     applyFeatureMotifs(c,s,p,r);
   };
+
+  function deriveSeed(base,label){let h=(Number(base)>>>0)||1;for(let i=0;i<label.length;i++){h^=label.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h%2147483647;}
+  function buildStyleSpec(family,params,seed,product=null,mode='creative'){
+    const resolved=window.RACStyleProfiles?RACStyleProfiles.resolveProfile({family,product,mode,controls:{scale:params.patternScale??params.scale??52,density:params.colorVariance??params.density??72,distress:params.edgeIntensity??params.distress??76}}):{scale:params.patternScale,density:params.colorVariance,distress:params.edgeIntensity,profile:null,layout:null};
+    const profile=resolved.profile,layout=resolved.layout,seeds={base:deriveSeed(seed,'base'),hero:deriveSeed(seed,'hero'),structure:deriveSeed(seed,'structure'),secondary:deriveSeed(seed,'secondary'),grain:deriveSeed(seed,'grain'),accents:deriveSeed(seed,'accents')};
+    const zones=layout?.hero_zones||[{x:.1,y:.1,w:.8,h:.8,weight:1}],rng=seededRandom(seeds.hero),zone=zones[Math.floor(rng()*zones.length)]||zones[0],heroRequired=!!profile?.hero?.required;
+    const heroCount=heroRequired?Math.max(1,Math.round((profile.hero.count[0]+profile.hero.count[1])/2)):0,heroArea=profile?.hero?((profile.hero.size_fraction[0]+profile.hero.size_fraction[1])/2):.18;
+    return{family,product,mode,seed,seeds,controls:{scale:resolved.scale,density:resolved.density,distress:resolved.distress},profile,layout,hero:{count:heroCount,area_ratio:heroArea,zone,center:{x:zone.x+zone.w*(.25+rng()*.5),y:zone.y+zone.h*(.25+rng()*.5)}},suppression_overlap:0};
+  }
+  function renderFamilyFromSpec(ctx,size,spec){
+    const p={patternType:spec.family,patternScale:spec.controls.scale,colorVariance:spec.controls.density,edgeIntensity:spec.controls.distress,symmetry:0,seed:spec.seed,featureMotifs:[]},pal=colorPalettes[spec.family==='error_garden'?'error_garden':'rac_reference'],g=patternGenerators[spec.family];
+    if(!g)throw new Error('Missing pattern family: '+spec.family);g(ctx,size,p,pal,seededRandom(spec.seed));
+  }
+  function analyzeComposition(ctx,size,spec){
+    const d=ctx.getImageData(0,0,size,size).data;let dark=0,cream=0,blue=0,yellow=0,pink=0,olive=0,hi=0,n=0,ve=0,he=0,edges=0;
+    const step=Math.max(1,Math.floor(size/96));
+    function lum(i){return .2126*d[i]+.7152*d[i+1]+.0722*d[i+2]}
+    for(let y=0;y<size;y+=step)for(let x=0;x<size;x+=step){const i=(y*size+x)*4,r=d[i],g=d[i+1],b=d[i+2],l=lum(i);n++;if(l<70)dark++;if(l>120&&Math.abs(r-g)<35&&Math.abs(g-b)<35)cream++;if(b>r*1.2&&b>g*1.1)blue++;if(r>150&&g>140&&b<110)yellow++;if(r>130&&r>b*1.1&&b>80)pink++;if(g>r*.8&&r>60&&b<r*.85)olive++;if(l<45||l>190)hi++;if(x+step<size){const j=(y*size+x+step)*4,dd=Math.abs(l-lum(j));he+=dd;if(dd>45)edges++;}if(y+step<size){const j=((y+step)*size+x)*4,dd=Math.abs(l-lum(j));ve+=dd;if(dd>45)edges++;}}
+    return{palette:{dark:dark/n,dark_ratio:dark/n,cream_gray:cream/n,cream_gray_ratio:cream/n,blue:blue/n,blue_ratio:blue/n,yellow:yellow/n,yellow_ratio:yellow/n,pink:pink/n,pink_ratio:pink/n,olive:olive/n,olive_ratio:olive/n,blue_yellow:(blue+yellow)/n},edges:{horizontal_energy:he/Math.max(1,n)/255,vertical_energy:ve/Math.max(1,n)/255,directional_bias:(ve-he)/Math.max(1,ve+he)},occupancy:{high_contrast_ratio:hi/n,negative_space_ratio:dark/n,connected_region_count:Math.max(1,Math.round(edges/25))},motifs:{hero_count:spec?.hero?.count||0,hero_area_ratio:spec?.hero?.area_ratio||0,eye_count:['signal_shadow','ghost_hound','broken_human'].includes(spec?.family)?spec.hero.count:0,anatomy_count:spec?.family==='broken_human'?1:0,floral_count:spec?.family==='error_garden'?Math.max(8,spec.hero.count):0,accent_cluster_count:Math.round((blue+yellow)/Math.max(1,n)*20)}};
+  }
+  window.RACPatternComposition={deriveSeed,buildStyleSpec,renderFamilyFromSpec,analyzeComposition};
+
 })();
