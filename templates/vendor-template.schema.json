@@ -10,8 +10,16 @@
     "product_id": { "type": "string", "minLength": 1 },
     "product_name": { "type": "string" },
     "template_version": { "type": "string", "minLength": 1 },
-    "source": { "type": "string" },
+    "source": { "type": "string", "minLength": 3 },
     "vendor_ready": { "type": "boolean" },
+    "source_artifact": {
+      "type": "object",
+      "required": ["filename", "sha256"],
+      "properties": {
+        "filename": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
     "units": { "enum": ["px"] },
     "dpi": { "type": "number", "exclusiveMinimum": 0 },
     "canvas": {
@@ -57,5 +65,14 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "vendor_ready": { "const": true } },
+        "required": ["vendor_ready"]
+      },
+      "then": { "required": ["source"] }
+    }
+  ]
 }
