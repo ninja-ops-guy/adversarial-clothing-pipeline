@@ -15,6 +15,8 @@ on:
       - 'product-studio.html'
       - 'product-studio.js'
       - 'studio-patterns.js'
+      - 'studio-style-profiles.js'
+      - 'reference-fidelity.js'
       - 'studio-bridge.js'
       - 'reference-conditioning.js'
       - 'design_profiles/**'
@@ -129,6 +131,10 @@ jobs:
           assert {c['family'] for c in p['candidates']} == allowed
           assert all(c['patternType'] in allowed for c in p['candidates'])
           assert all(len(c['png_sha256']) == 64 for c in p['candidates'])
+          assert p['creative_ranking'] == 'reference_fidelity'
+          assert p['reference_fidelity_scorer'] == 'reference-fidelity-v1'
+          assert all(c['reference_fidelity_score'] is not None for c in p['candidates'])
+          assert all(0 <= c['reference_fidelity_score'] <= 100 for c in p['candidates'])
           PY
 
       - name: Select candidate on surrogate models only
