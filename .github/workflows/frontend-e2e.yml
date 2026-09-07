@@ -18,6 +18,7 @@ on:
       - 'production-studio.html'
       - 'production-studio.css'
       - 'production-studio.js'
+      - 'vendor-template-guard.js'
       - 'templates/**'
       - 'benchmark-results.json'
       - 'package.json'
