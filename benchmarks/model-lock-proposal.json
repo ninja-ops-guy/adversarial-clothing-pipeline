@@ -1,5 +1,5 @@
 {
-  "generated_from_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4",
+  "generated_from_commit": "32f98ddcb62888568a89c863cf75048d0f128240",
   "inference_performed": false,
   "models": {
     "detr_resnet50": {
@@ -20,14 +20,32 @@
       "role": "surrogate",
       "state_dict_sha256": "e89b81090180d2b5894750544fb6401b1a546b328f31ee6da7348f4968b12e61"
     },
+    "fasterrcnn_resnet50_fpn_v2": {
+      "decision_threshold": 0.5,
+      "display_name": "Faster R-CNN ResNet-50 FPN V2",
+      "framework": "torchvision",
+      "framework_version": "0.29.0+cpu",
+      "model_ref": "FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT",
+      "role": "heldout",
+      "state_dict_sha256": "ec9b1a9ec6e1dc18271db0a03c2cb4c8e6bb644eb426a0800a8e9f7c8107e89b"
+    },
     "fcos_resnet50_fpn": {
       "decision_threshold": 0.5,
       "display_name": "FCOS ResNet-50 FPN",
       "framework": "torchvision",
       "framework_version": "0.29.0+cpu",
       "model_ref": "FCOS_ResNet50_FPN_Weights.DEFAULT",
-      "role": "heldout",
+      "role": "surrogate",
       "state_dict_sha256": "2ceeb6e946fdbbad8106ccbff6225d72cd53f732ab205fa33085212b6b6ab853"
+    },
+    "maskrcnn_resnet50_fpn_v2": {
+      "decision_threshold": 0.5,
+      "display_name": "Mask R-CNN ResNet-50 FPN V2",
+      "framework": "torchvision",
+      "framework_version": "0.29.0+cpu",
+      "model_ref": "MaskRCNN_ResNet50_FPN_V2_Weights.DEFAULT",
+      "role": "heldout",
+      "state_dict_sha256": "2aac86077794e905240cb41f80bab9fcb419f7eb8c96c33d5aa7f75cb91b261e"
     },
     "retinanet_resnet50_fpn_v2": {
       "decision_threshold": 0.5,
@@ -35,7 +53,7 @@
       "framework": "torchvision",
       "framework_version": "0.29.0+cpu",
       "model_ref": "RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
-      "role": "heldout",
+      "role": "surrogate",
       "state_dict_sha256": "8f4b5b84900a522eb49a946deeb717ae334d27cd9f5e00c64f1461c909c3552f"
     },
     "ssdlite320_mobilenet_v3": {
