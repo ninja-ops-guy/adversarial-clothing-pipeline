@@ -41,7 +41,7 @@ reflective surfaces in frame.
 ## Garment mounting / flattening
 
 1. Garment on a flat, rigid, matte board (or torso form for worn trials —
-   record which in the session manifest).
+record which in the session manifest).
 2. Smooth from centre outward; no tension wrinkles across the printed
    region. Use low-tack clips at the hem only, outside the capture area.
 3. Garment plane parallel to the sensor plane (check with the calibration
