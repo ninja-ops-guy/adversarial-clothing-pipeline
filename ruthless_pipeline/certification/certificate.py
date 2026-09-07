@@ -80,6 +80,18 @@ def issue_certificate(
         and invalid_fraction <= criteria.max_invalid_condition_fraction
     )
 
+    manufacturing_states = {
+        EvidenceState.GOLDEN_SAMPLE,
+        EvidenceState.LOT_CONFORMITY,
+    }
+    # Manufacturing states require their own evidence gate in addition to any
+    # lower-level physical evidence. Check this boundary first so a physical
+    # presence flag can never stand in for manufacturing evidence.
+    if requested_state in manufacturing_states and not manufacturing_evidence_present:
+        raise ValueError(
+            f"{requested_state.value} requires manufacturing evidence"
+        )
+
     physical_needed = requested_state.value in protocol.physical_required_for
     if physical_needed:
         if not physical_evidence_present:
@@ -99,15 +111,7 @@ def issue_certificate(
         if not durability_path.is_file():
             raise ValueError("RAC-P2 requires bundled durability evidence: physical/durability.json")
 
-    manufacturing_states = {
-        EvidenceState.GOLDEN_SAMPLE,
-        EvidenceState.LOT_CONFORMITY,
-    }
     if requested_state in manufacturing_states:
-        if not manufacturing_evidence_present:
-            raise ValueError(
-                f"{requested_state.value} requires manufacturing evidence"
-            )
         required_name = (
             "golden_sample.json"
             if requested_state == EvidenceState.GOLDEN_SAMPLE
