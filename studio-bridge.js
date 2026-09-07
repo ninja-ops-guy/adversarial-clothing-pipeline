@@ -11,6 +11,7 @@
     state.resolvedDesignFamily=state.designFamily;
     state.referenceProfile=state.resolvedDesignFamily;
     state.artDirectionProfile='canonical_launch_capsule_v1';
+    if(window.RACStudio&&typeof window.RACStudio.getReferenceFidelity==='function')state.reference_fidelity=window.RACStudio.getReferenceFidelity();
     const conditioner=window.RACReferenceConditioner;
     state.reference_profile=conditioner&&typeof conditioner.getProfile==='function'?conditioner.getProfile():null;
     state.reference_source_mode=state.reference_profile?'scalar_style_conditioning':'canonical_profile';
