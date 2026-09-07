@@ -5,9 +5,9 @@
     "fasterrcnn_resnet50_fpn_v2",
     "maskrcnn_resnet50_fpn_v2"
   ],
-  "status": "LOCK_PENDING",
+  "status": "PREREGISTERED",
   "source_manifest": "benchmarks/model_manifest.json",
   "generation_id": "RAC-PER-D2-0004",
-  "lock_source_commit": null,
+  "lock_source_commit": "fd9b3b4ebc06b549ee057fe00a59385d3073008f",
   "candidate_inference_performed": false
 }

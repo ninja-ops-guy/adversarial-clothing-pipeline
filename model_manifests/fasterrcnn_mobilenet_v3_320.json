@@ -1,7 +1,7 @@
 {
   "model_id": "fasterrcnn_mobilenet_v3_320",
-  "architecture": "FasterRCNN MobileNetV3 Large 320 FPN",
-  "weights_id": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.COCO_V1",
+  "architecture": "Faster R-CNN MobileNetV3 320 FPN",
+  "weights_id": "FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT",
   "weights_sha256": "e89b81090180d2b5894750544fb6401b1a546b328f31ee6da7348f4968b12e61",
   "framework": "torchvision",
   "framework_version": "0.29.0+cpu",
@@ -16,7 +16,9 @@
   "nms_threshold": null,
   "metadata": {
     "hash_scope": "loaded_state_dict",
-    "lock_source_commit": "7ba1878fd383eb1f704d1b00437d96e3e8257b32",
-    "role_source": "model_sets/*; role is generation-specific"
+    "lock_source_commit": "fd9b3b4ebc06b549ee057fe00a59385d3073008f",
+    "role_source": "model_sets/*; role is generation-specific",
+    "generation_id": "RAC-PER-D2-0004",
+    "candidate_inference_performed_during_lock": false
   }
 }

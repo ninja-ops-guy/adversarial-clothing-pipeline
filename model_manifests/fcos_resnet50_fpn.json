@@ -16,7 +16,9 @@
   "nms_threshold": null,
   "metadata": {
     "hash_scope": "loaded_state_dict",
-    "lock_source_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4",
-    "role_source": "model_sets/*; role is generation-specific"
+    "lock_source_commit": "fd9b3b4ebc06b549ee057fe00a59385d3073008f",
+    "role_source": "model_sets/*; role is generation-specific",
+    "generation_id": "RAC-PER-D2-0004",
+    "candidate_inference_performed_during_lock": false
   }
 }

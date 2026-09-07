@@ -1,5 +1,5 @@
 {
-  "generated_from_commit": "32f98ddcb62888568a89c863cf75048d0f128240",
+  "generated_from_commit": "fd9b3b4ebc06b549ee057fe00a59385d3073008f",
   "inference_performed": false,
   "models": {
     "detr_resnet50": {

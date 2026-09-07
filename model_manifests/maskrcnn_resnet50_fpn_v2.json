@@ -1,12 +1,12 @@
 {
-  "model_id": "retinanet_resnet50_fpn_v2",
-  "architecture": "RetinaNet ResNet-50 FPN V2",
-  "weights_id": "RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
-  "weights_sha256": "8f4b5b84900a522eb49a946deeb717ae334d27cd9f5e00c64f1461c909c3552f",
+  "model_id": "maskrcnn_resnet50_fpn_v2",
+  "architecture": "Mask R-CNN ResNet-50 FPN V2",
+  "weights_id": "MaskRCNN_ResNet50_FPN_V2_Weights.DEFAULT",
+  "weights_sha256": "2aac86077794e905240cb41f80bab9fcb419f7eb8c96c33d5aa7f75cb91b261e",
   "framework": "torchvision",
   "framework_version": "0.29.0+cpu",
   "preprocessing": {
-    "source": "torchvision detection model internal transform",
+    "source": "model runtime internal transform",
     "input": "float32 RGB tensors [0,1]",
     "device": "cpu"
   },
@@ -17,8 +17,8 @@
   "metadata": {
     "hash_scope": "loaded_state_dict",
     "lock_source_commit": "fd9b3b4ebc06b549ee057fe00a59385d3073008f",
-    "role_source": "model_sets/*; role is generation-specific",
     "generation_id": "RAC-PER-D2-0004",
+    "role_source": "model_sets/*; role is generation-specific",
     "candidate_inference_performed_during_lock": false
   }
 }
