@@ -107,6 +107,10 @@ async function main() {
   const configPath = path.resolve(process.argv[2] || 'benchmarks/runtime/candidate-config.json');
   const outputDir = path.resolve(process.argv[3] || 'print-test-kit');
   const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  const frozenCandidatePath = cfg.frozen_candidate_png ? path.resolve(cfg.frozen_candidate_png) : null;
+  if (frozenCandidatePath && !fs.existsSync(frozenCandidatePath)) {
+    throw new Error(`Frozen candidate artwork missing: ${frozenCandidatePath}`);
+  }
   const family = cfg.family || cfg.patternType;
   if (!PRIMARY_BY_FAMILY[family]) throw new Error(`Unsupported Product Studio family: ${family}`);
 
@@ -121,6 +125,23 @@ async function main() {
   try {
     await page.goto(`${baseURL}/product-studio.html`, { waitUntil: 'networkidle' });
     await page.waitForFunction(() => window.RACStudio && document.querySelector('#studioStatus')?.textContent.includes('READY'));
+    if (frozenCandidatePath) {
+      const dataUrl = 'data:image/png;base64,' + fs.readFileSync(frozenCandidatePath).toString('base64');
+      const frozenMeta = {
+        candidate_id: cfg.candidate_id,
+        sha256: sha256(frozenCandidatePath),
+        reference_fidelity_score: cfg.reference_fidelity_score ?? null,
+        reference_fidelity_subscores: cfg.reference_fidelity_subscores ?? null,
+        evidence_scope: 'frozen_surrogate_selected_artwork'
+      };
+      await page.evaluate(async ({ dataUrl, frozenMeta }) => {
+        if (!window.RACStudio || typeof window.RACStudio.loadFrozenTile !== 'function') {
+          throw new Error('Product Studio frozen-tile API unavailable');
+        }
+        await window.RACStudio.loadFrozenTile(dataUrl, frozenMeta);
+      }, { dataUrl, frozenMeta });
+      await page.waitForFunction(() => document.querySelector('#mockupCanvas')?.dataset.frozenTile === 'true');
+    }
     await applyCandidate(page, cfg, primaryProduct);
 
     const tilePath = path.join(outputDir, 'design', 'pattern_tile_4096.png');
@@ -158,6 +179,12 @@ async function main() {
       primary_product: primaryProduct,
       design_profile: cfg.art_direction_profile || null,
       design_profile_sha256: cfg.design_profile_sha256 || null,
+      frozen_candidate_source: frozenCandidatePath ? {
+        path: path.relative(process.cwd(), frozenCandidatePath).replaceAll('\\', '/'),
+        sha256: sha256(frozenCandidatePath),
+        candidate_id: cfg.candidate_id,
+        adaptive: true
+      } : null,
       pattern_tile: {
         path: 'design/pattern_tile_4096.png',
         sha256: sha256(tilePath),
