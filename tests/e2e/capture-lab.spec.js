@@ -56,6 +56,14 @@ test('frozen ensemble includes deterministic motion sampling contract', async ({
   await page.selectOption('#ensemblePreset', 'heldout');
   const heldout = JSON.parse(await page.locator('#modelManifest').inputValue());
   expect(heldout.models).toEqual(['fasterrcnn_resnet50_fpn_v2', 'maskrcnn_resnet50_fpn_v2']);
-  expect(heldout.motion_sampling.fps).toBe(2.0);
+  expect(heldout.motion_sampling.fps).toBe(2.0);\n  expect(heldout.motion_sampling.sequence_detection_threshold).toBe(0.5);
   expect(heldout.identity_mode).toBe('disabled');
+});
+
+
+test('session setup exposes Research OS lineage fields', async ({ page }) => {
+  await expect(page.locator('#experimentId')).toHaveValue('RAC-EXP-2026-001');
+  await expect(page.locator('#hypothesisId')).toHaveValue('RQ-P1-CAPTURE-001');
+  await expect(page.locator('#generationId')).toBeVisible();
+  await expect(page.locator('#generationSha')).toBeVisible();
 });
