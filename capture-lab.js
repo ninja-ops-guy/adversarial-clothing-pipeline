@@ -49,6 +49,15 @@ async function exportBundle(){
 }
 function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 async function seal(){if(!$('calibrationPass').checked)return alert('Calibration must pass before sealing a physical evidence session.');if(!captures.control.stills.length||!captures.candidate.stills.length)return alert('Matched capture pair incomplete.');sealed=true;$('sealBtn').disabled=true;$('stillBtn').disabled=true;$('recordBtn').disabled=true;$('reviewBtn').disabled=true;$('sealStatus').textContent='SEALED · IMMUTABLE CAPTURE SESSION';renderSteps(6);await exportBundle()}
-function init(){renderSteps(0);count();$('freezeBtn').onclick=freeze;$('cameraBtn').onclick=camera;$('stillBtn').onclick=still;$('recordBtn').onclick=startRecord;$('stopBtn').onclick=stopRecord;$('reviewBtn').onclick=review;$('analyzeBtn').onclick=analyze;$('exportBtn').onclick=exportBundle;$('sealBtn').onclick=seal;document.querySelectorAll('.arm').forEach(b=>b.onclick=()=>switchArm(b.dataset.arm));$('calibrationPass').onchange=()=>{$('calibrationGate').querySelector('span').textContent=$('calibrationPass').checked?'PASS':'Pending'}}
+function preset(name){
+ const sets={
+  surrogate:{models:['yolov8n','fasterrcnn_mobilenet_v3_320','detr_resnet50','ssdlite320_mobilenet_v3','retinanet_resnet50_fpn_v2','fcos_resnet50_fpn']},
+  heldout:{models:['fasterrcnn_resnet50_fpn_v2','maskrcnn_resnet50_fpn_v2']}
+ };
+ if(name==='custom')return;
+ const models=sets[name].models,thresholds=Object.fromEntries(models.map(m=>[m,0.5]));
+ $('modelManifest').value=JSON.stringify({models,thresholds,preprocessing:{source:'frozen model manifests'},identity_mode:'disabled'},null,2)
+}
+function init(){renderSteps(0);count();$('ensemblePreset').onchange=()=>preset($('ensemblePreset').value);$('freezeBtn').onclick=freeze;$('cameraBtn').onclick=camera;$('stillBtn').onclick=still;$('recordBtn').onclick=startRecord;$('stopBtn').onclick=stopRecord;$('reviewBtn').onclick=review;$('analyzeBtn').onclick=analyze;$('exportBtn').onclick=exportBundle;$('sealBtn').onclick=seal;document.querySelectorAll('.arm').forEach(b=>b.onclick=()=>switchArm(b.dataset.arm));$('calibrationPass').onchange=()=>{$('calibrationGate').querySelector('span').textContent=$('calibrationPass').checked?'PASS':'Pending'}}
 window.RACCaptureLab={manifest,freeze,review,analyze,seal,getState:()=>({frozen,sealed,captures})};window.addEventListener('DOMContentLoaded',init)
 })();
