@@ -15,6 +15,7 @@ def main() -> int:
         default="benchmarks/runtime/adaptive/adaptive-selection.json",
     )
     parser.add_argument("--output-dir", default="benchmarks/runtime")
+    parser.add_argument("--pool", default="benchmarks/runtime/pool/pool.json")
     parser.add_argument("--candidate-id", default="RAC-PER-D2-0004")
     args = parser.parse_args()
 
@@ -37,6 +38,12 @@ def main() -> int:
     if not winner_path.is_file():
         raise SystemExit(f"adaptive winner PNG missing: {winner_path}")
 
+    pool = json.loads(Path(args.pool).read_text())
+    pool_by_id = {item["candidate_id"]: item for item in pool.get("candidates", [])}
+    source = pool_by_id.get(winner["source_candidate_id"])
+    if source is None:
+        raise SystemExit("adaptive source candidate missing from preregistered pool")
+
     candidate_path = output_dir / "candidate.png"
     shutil.copyfile(winner_path, candidate_path)
 
@@ -46,17 +53,30 @@ def main() -> int:
         "source_candidate_id": winner["candidate_id"],
         "pre_adaptation_candidate_id": winner["source_candidate_id"],
         "family": winner["family"],
+        "patternType": source["patternType"],
         "product": winner["product"],
         "seed": winner["seed"],
+        "patternScale": source["patternScale"],
+        "colorVariance": source["colorVariance"],
+        "edgeIntensity": source["edgeIntensity"],
+        "symmetry": source.get("symmetry", 0),
+        "colorPalette": source.get("colorPalette"),
+        "variationPreset": source.get("variationPreset", "original"),
+        "featureMotifs": source.get("featureMotifs", []),
+        "design_variant": source.get("design_variant"),
+        "art_direction_profile": source.get("art_direction_profile"),
         "reference_fidelity_score": winner.get("reference_fidelity_score"),
+        "reference_fidelity_subscores": source.get("reference_fidelity_subscores"),
         "environment_colors": winner["environment_colors"],
         "temperature": winner["temperature"],
         "blend": winner["blend"],
+        "frozen_candidate_png": str(candidate_path),
         "source": "surrogate-only reference-ranked + environment-adaptive candidate selection",
         "selection_boundary": "SURROGATE_ONLY",
         "heldout_models_loaded": [],
         "heldout_feedback_used": False,
         "adaptive_report": str(adaptive_path),
+        "design_profile_sha256": pool.get("design_profile_sha256"),
     }
     (output_dir / "candidate-config.json").write_text(
         json.dumps(config, indent=2, sort_keys=True) + "\n"
