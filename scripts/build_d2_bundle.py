@@ -16,6 +16,70 @@ from ruthless_pipeline.certification import (
 )
 
 
+def _weight_reference_compatible(*, framework: str, frozen_ref: str, measured_ref: str) -> bool:
+    """Accept only semantic aliases that cannot change the frozen model state.
+
+    Torchvision's ``Weights.DEFAULT`` is an alias for a concrete enum member such
+    as ``Weights.COCO_V1``. ``str(Weights.DEFAULT)`` therefore resolves to the
+    concrete member at runtime even though the preregistered manifest correctly
+    records ``DEFAULT``. The loaded state-dict SHA-256 remains the authoritative
+    identity gate; this helper only prevents that documented alias from causing a
+    false metadata mismatch.
+    """
+    frozen_ref = frozen_ref.strip()
+    measured_ref = measured_ref.strip()
+    if not frozen_ref or not measured_ref:
+        return False
+    if frozen_ref == measured_ref:
+        return True
+    if frozen_ref in measured_ref or measured_ref in frozen_ref:
+        return True
+    if framework != "torchvision" or not frozen_ref.endswith(".DEFAULT"):
+        return False
+    frozen_enum = frozen_ref.rsplit(".", 1)[0]
+    measured_enum = measured_ref.rsplit(".", 1)[0]
+    return bool(frozen_enum) and frozen_enum == measured_enum
+
+
+def verify_frozen_model_contract(model_id: str, model_manifest: dict, measured_model: dict) -> None:
+    """Fail closed unless measured inference matches the preregistered model contract."""
+    frozen_hash = str(model_manifest.get("weights_sha256", ""))
+    measured_hash = str(measured_model.get("state_dict_sha256", ""))
+    if frozen_hash != measured_hash:
+        raise ValueError(f"frozen model manifest hash mismatch: {model_id}")
+
+    if float(model_manifest.get("decision_threshold")) != float(measured_model.get("decision_threshold")):
+        raise ValueError(f"frozen model threshold mismatch: {model_id}")
+
+    framework = str(model_manifest.get("framework", ""))
+    measured_framework = str(measured_model.get("framework", ""))
+    if framework != measured_framework:
+        raise ValueError(f"frozen model framework mismatch: {model_id}")
+
+    frozen_version = str(model_manifest.get("framework_version", ""))
+    measured_version = str(measured_model.get("framework_version", ""))
+    if frozen_version != measured_version:
+        raise ValueError(
+            f"frozen model framework version mismatch: {model_id}: "
+            f"{frozen_version} != {measured_version}"
+        )
+
+    preprocessing = model_manifest.get("preprocessing")
+    if not isinstance(preprocessing, dict) or not preprocessing:
+        raise ValueError(f"missing frozen preprocessing contract: {model_id}")
+
+    frozen_ref = str(model_manifest.get("weights_id", ""))
+    measured_ref = str(measured_model.get("model_ref", ""))
+    if frozen_ref and not _weight_reference_compatible(
+        framework=framework,
+        frozen_ref=frozen_ref,
+        measured_ref=measured_ref,
+    ):
+        raise ValueError(
+            f"frozen model reference mismatch: {model_id}: {frozen_ref} != {measured_ref}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the first RAC-D2 evidence bundle from a locked measured benchmark.")
     parser.add_argument("--result", default="benchmark-results.json")
@@ -47,7 +111,7 @@ def main() -> int:
         task="person_detection",
         source_commit=result["source_commit"],
         optimizer="PatternLabDeterministicGenerator",
-        optimizer_version="2.1.0",
+        optimizer_version="3.0.0",
         seed=int(candidate_config["seed"]),
         master=ArtifactRef(path="pattern/master.png", sha256=master_sha, media_type="image/png"),
         protocol_id=protocol.protocol_id,
@@ -56,8 +120,12 @@ def main() -> int:
         evidence_state=EvidenceState.DESIGN,
         metadata={
             "pattern_type": candidate_config.get("patternType"),
+            "pattern_family": candidate_config.get("family"),
             "pattern_scale": candidate_config.get("patternScale"),
             "color_palette": candidate_config.get("colorPalette"),
+            "design_variant": candidate_config.get("design_variant"),
+            "art_direction_profile": candidate_config.get("art_direction_profile"),
+            "source_candidate_id": candidate_config.get("source_candidate_id"),
             "evidence_scope": result.get("evidence_scope"),
         },
     )
@@ -75,27 +143,12 @@ def main() -> int:
             raise SystemExit(f"missing frozen model manifest: {model_path}")
         model_manifest = json.loads(model_path.read_text())
         measured_model = result["models"][model_id]
-        if model_manifest.get("weights_sha256") != measured_model.get("state_dict_sha256"):
-            raise SystemExit(f"frozen model manifest hash mismatch: {model_id}")
-        if float(model_manifest.get("decision_threshold")) != float(measured_model.get("decision_threshold")):
-            raise SystemExit(f"frozen model threshold mismatch: {model_id}")
-        if str(model_manifest.get("framework")) != str(measured_model.get("framework")):
-            raise SystemExit(f"frozen model framework mismatch: {model_id}")
-        if str(model_manifest.get("framework_version")) != str(measured_model.get("framework_version")):
-            raise SystemExit(
-                f"frozen model framework version mismatch: {model_id}: "
-                f"{model_manifest.get('framework_version')} != {measured_model.get('framework_version')}"
-            )
-        frozen_ref = str(model_manifest.get("weights_id", ""))
-        measured_ref = str(measured_model.get("model_ref", ""))
-        if frozen_ref and frozen_ref not in measured_ref and measured_ref not in frozen_ref:
-            raise SystemExit(
-                f"frozen model reference mismatch: {model_id}: {frozen_ref} != {measured_ref}"
-            )
-        preprocessing = model_manifest.get("preprocessing")
-        if not isinstance(preprocessing, dict) or not preprocessing:
-            raise SystemExit(f"missing frozen preprocessing contract: {model_id}")
+        try:
+            verify_frozen_model_contract(model_id, model_manifest, measured_model)
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
         bundle.write_json(f"manifests/models/{model_id}.json", model_manifest)
+
     expected_sets = {
         protocol.surrogate_model_set: list(result["benchmark"]["surrogate_models"]),
         protocol.heldout_model_set: list(result["benchmark"]["heldout_models"]),
