@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>RAC Textile Generator</title>
   <link rel="stylesheet" href="product-studio.css">
+  <link rel="stylesheet" href="reference-conditioning.css">
 </head>
 <body>
 <div class="studio-shell">
@@ -67,6 +68,18 @@
         <strong>SIGNAL SHADOW</strong>
       </button>
     </div>
+  </section>
+
+  <section class="reference-conditioning" aria-label="Reference conditioning">
+    <div class="section-title"><span>REFERENCE PROFILE</span></div>
+    <div class="reference-conditioning-row">
+      <input id="referenceInput" type="file" accept="image/*" multiple>
+      <button id="analyzeReference" type="button">Analyze</button>
+      <button id="applyReference" type="button">Apply</button>
+      <button id="resetReference" type="button">Reset</button>
+      <div id="referenceStatus" class="reference-status">NO REFERENCE PROFILE</div>
+    </div>
+    <div id="referenceSwatches" class="reference-swatches" aria-label="Extracted palette"></div>
   </section>
 
   <section class="tile-band">
@@ -137,6 +150,7 @@
 <script src="studio-patterns.js"></script>
 <script src="mockup-clean.js"></script>
 <script src="product-studio.js"></script>
+<script src="reference-conditioning.js"></script>
 <script src="studio-bridge.js"></script>
 </body>
 </html>
