@@ -25,12 +25,15 @@
     "Fresh held-out weights were hashed and frozen without candidate inference.",
     "This marker intentionally triggers the D2-0004 workflow after preregistration."
   ],
-  "trigger_revision": 2,
-  "trigger_reason": "Retrigger after frozen adaptive artwork was wired through Product Studio and print-test kit exports.",
+  "trigger_revision": 3,
+  "trigger_reason": "Retrigger after workflow timeout increase (adaptive search 90→300 min, measured benchmark 90→360 min) so the 100-candidate surrogate selection can complete.",
   "required_commits": [
     "9d24ef60e9f8e6c5df5018a923e68e3429f0a642",
     "10dedb85fe6857da6ac0bda618275ed27b3b5b27",
     "9e6fbba89cb967f313b26e38b55f8b2889ae96e5",
-    "ef2f5247a29373f06b46f5988044c6f09fbc8aa3"
+    "ef2f5247a29373f06b46f5988044c6f09fbc8aa3",
+    "85dc777ea6de86cca06423e52f2f48ab5214aebc",
+    "feb399131b751030b1d7bfc97ae20b5b89924597",
+    "277cc0ed71921086b168abd78b87ba9dec1d86ec"
   ]
 }
