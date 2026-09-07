@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "generation_id": "RAC-PER-D2-0005",
+  "status": "PREREGISTERED",
+  "protocol": "protocols/RAC-PERSON-DETECT-1.2.json",
+  "surrogate_model_set": "PERSON-SUR-v3",
+  "heldout_model_set": "PERSON-HO-v3",
+  "heldout_models": [
+    "fasterrcnn_resnet50_fpn_v2",
+    "maskrcnn_resnet50_fpn_v2"
+  ],
+  "heldout_feedback_allowed": false,
+  "lock_status": "PREREGISTERED",
+  "lock_source_commit": null,
+  "lock_inference_performed": false,
+  "preregistration": "docs/PREREGISTRATION_D2-0005.md",
+  "ablation": {
+    "hypothesis": "H1: candidates optimized against a CVaR/worst-case objective over the surrogate ensemble transfer better (lower held-out detection rate) to fresh held-out detector architectures than candidates optimized against a mean objective.",
+    "differs_only_in": "surrogate_optimization_objective",
+    "shared_candidate_pool": {
+      "design_profile": "ruthless-reference-v1.1",
+      "candidate_count": 100,
+      "seed": 1337,
+      "reference_fidelity_scorer": "reference-fidelity-v1",
+      "note": "One pool generated once with seed 1337 (matching the benchmark seed); both arms search the identical pool so the comparison is fully paired."
+    },
+    "arms": [
+      {
+        "arm_id": "M",
+        "objective": "mean",
+        "objective_detail": "Minimize mean per-surrogate detection rate over PERSON-SUR-v3 (the D2-0004 objective; within-generation control/baseline arm).",
+        "candidate_pool": {
+          "design_profile": "ruthless-reference-v1.1",
+          "candidate_count": 100,
+          "seed": 1337,
+          "shared_pool": true,
+          "reference_fidelity_scorer": "reference-fidelity-v1",
+          "adaptive_surrogate_search": true
+        }
+      },
+      {
+        "arm_id": "C",
+        "objective": "cvar",
+        "objective_detail": "Minimize CVaR (expected shortfall) of per-surrogate detection rates over PERSON-SUR-v3.",
+        "cvar_alpha": 0.5,
+        "candidate_pool": {
+          "design_profile": "ruthless-reference-v1.1",
+          "candidate_count": 100,
+          "seed": 1337,
+          "shared_pool": true,
+          "reference_fidelity_scorer": "reference-fidelity-v1",
+          "adaptive_surrogate_search": true
+        }
+      }
+    ]
+  },
+  "telemetry_contract": "ruthless_pipeline/certification/telemetry_contract.py (CONTRACT_VERSION 1.0)",
+  "selection_boundary": "SURROGATE_ONLY",
+  "notes": [
+    "All models observed in D2-0003/D2-0004 are surrogate-only in this generation.",
+    "Held-out weights must be hashed and frozen without candidate inference before this generation opens.",
+    "D2-0005 must not be opened or executed while D2-0004 is still closing; this file is a frozen PREREGISTERED skeleton only.",
+    "Trigger fields are present but NOT armed: trigger_revision is unchanged from D2-0004 and measured-benchmark.yml triggers only on the D2-0004 path, so committing this file cannot fire CI.",
+    "Both arms search one shared 100-candidate pool generated once with seed 1337; the surrogate objective is the only difference (fully paired comparison).",
+    "Preregistered precondition: the CVaR_0.5 objective lands as reviewed code + unit tests in scripts/select_surrogate_candidate.py before execution; its commit precedes the D2-0005 model-lock freeze and is recorded at freeze.",
+    "lock_source_commit and required_commits are intentionally null/empty; they are filled ONLY at the D2-0005 model-lock freeze after D2-0004 closes."
+  ],
+  "trigger_revision": 4,
+  "trigger_reason": "NOT ARMED. Retained only for schema parity with RAC-PER-D2-0004. Arming D2-0005 requires a separate reviewed change after D2-0004 closes and a fresh model-lock freeze.",
+  "required_commits": []
+}
