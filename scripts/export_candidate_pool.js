@@ -48,7 +48,8 @@ async function main() {
             variationPreset: variant.variation,
             featureMotifs: familyConfig.motifs,
             design_variant: variant.name,
-            art_direction_profile: profile.profile_id
+            art_direction_profile: profile.profile_id,
+            generation_mode: 'reference'
           };
 
           const rendered = await page.evaluate(cfg => {
@@ -66,8 +67,20 @@ async function main() {
               seed: cfg.seed,
               featureMotifs: cfg.featureMotifs
             };
-            const palette = colorPalettes[cfg.family === 'error_garden' ? 'error_garden' : 'rac_reference'];
-            patternGenerators[cfg.family](ctx, 512, params, palette, seededRandom(cfg.seed));
+            let spec = null;
+            if (window.RACPatternComposition && window.RACStyleProfiles) {
+              spec = RACPatternComposition.buildStyleSpec(
+                cfg.family,
+                params,
+                cfg.seed,
+                cfg.product,
+                'reference'
+              );
+              RACPatternComposition.renderFamilyFromSpec(ctx, 512, spec);
+            } else {
+              const palette = colorPalettes[cfg.family === 'error_garden' ? 'error_garden' : 'rac_reference'];
+              patternGenerators[cfg.family](ctx, 512, params, palette, seededRandom(cfg.seed));
+            }
 
             if (!['original', 'scale_plus'].includes(cfg.variationPreset)) {
               const image = ctx.getImageData(0, 0, 512, 512);
@@ -129,8 +142,20 @@ async function main() {
             const artDirectionProxy = Math.max(0, Math.min(1,
               1 - (Math.abs(darkFraction - .55) * .55 + Math.abs(accentFraction - .18) * .7 + Math.abs(edgeDensity - .42) * .45)
             ));
+            let referenceFidelity = null;
+            if (spec && window.RACReferenceScorer) {
+              const analysis = RACPatternComposition.analyzeComposition(ctx, 512, spec);
+              referenceFidelity = RACReferenceScorer.score({
+                family: cfg.family,
+                product: cfg.product,
+                analysis,
+                spec,
+                mode: 'reference'
+              });
+            }
             return {
               dataUrl: c.toDataURL('image/png'),
+              reference_fidelity: referenceFidelity,
               visual_profile: {
                 dark_fraction: darkFraction,
                 accent_fraction: accentFraction,
@@ -151,7 +176,11 @@ async function main() {
             png_sha256: crypto.createHash('sha256').update(png).digest('hex'),
             visual_profile: rendered.visual_profile,
             printability_proxy: rendered.printability_proxy,
-            art_direction_proxy: rendered.art_direction_proxy
+            art_direction_proxy: rendered.art_direction_proxy,
+            reference_fidelity_score: rendered.reference_fidelity ? rendered.reference_fidelity.score : null,
+            reference_fidelity_subscores: rendered.reference_fidelity ? rendered.reference_fidelity.subscores : null,
+            reference_profile: family,
+            product_target: familyConfig.primary_product
           });
         }
       }
@@ -168,6 +197,8 @@ async function main() {
       design_profile_sha256: sha256File(profilePath),
       candidate_count: records.length,
       selection_order: profile.selection_order,
+      creative_ranking: 'reference_fidelity',
+      reference_fidelity_scorer: 'reference-fidelity-v1',
       heldout_feedback_allowed: false,
       candidates: records
     };
