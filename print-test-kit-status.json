@@ -2,11 +2,11 @@
   "candidate_id": "RAC-PER-D2-0003",
   "d2_decision": "FAIL",
   "d2_evidence_state": "RAC-D0",
-  "family": "signal_shadow",
+  "family": "machine_static",
   "kit_zip": "print-test-kit.zip",
-  "kit_zip_sha256": "98fd69e269bf992448c3bea46e510a88f94c77bf1e84c5385fb6ef8219c58243",
-  "pattern_sha256": "23de63c5c81e54b1c73f87917d0d58a5d3dc12469360431bd62fcff0f9d09b49",
+  "kit_zip_sha256": "b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548",
+  "pattern_sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
   "physical_validation_performed": false,
-  "primary_product": "hat",
+  "primary_product": "hoodie",
   "ready_for_print_and_physical_test": true
 }
