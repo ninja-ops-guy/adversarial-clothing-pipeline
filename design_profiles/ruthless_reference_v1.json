@@ -1,69 +1,276 @@
 {
-  "schema_version": "1.0",
-  "profile_id": "ruthless-reference-v1",
+  "schema_version": "1.1",
+  "profile_id": "ruthless-reference-v1.1",
   "status": "PREREGISTERED_DESIGN_PROFILE",
-  "purpose": "Constrain automatic candidate generation to the approved Ruthless visual language before held-out evaluation.",
+  "purpose": "Constrain D2-0004 automatic candidate generation to the approved Ruthless visual language with broader reference-fidelity search before held-out evaluation.",
   "evidence_boundary": "art-direction configuration only; not detector or physical evidence",
   "families": {
     "signal_shadow": {
       "primary_product": "hat",
-      "products": ["hat", "hoodie", "mask"],
-      "motifs": ["human_eye", "data", "slash"],
+      "products": [
+        "hat",
+        "hoodie",
+        "mask"
+      ],
+      "motifs": [
+        "human_eye",
+        "data",
+        "slash"
+      ],
       "variants": [
-        {"name": "balanced", "scale": 48, "density": 72, "distress": 72, "variation": "original"},
-        {"name": "dense", "scale": 34, "density": 88, "distress": 86, "variation": "high_contrast"},
-        {"name": "large", "scale": 72, "density": 68, "distress": 70, "variation": "scale_plus"}
+        {
+          "name": "balanced",
+          "scale": 48,
+          "density": 72,
+          "distress": 72,
+          "variation": "original"
+        },
+        {
+          "name": "dense",
+          "scale": 34,
+          "density": 88,
+          "distress": 86,
+          "variation": "high_contrast"
+        },
+        {
+          "name": "large",
+          "scale": 72,
+          "density": 68,
+          "distress": 70,
+          "variation": "scale_plus"
+        },
+        {
+          "name": "sparse",
+          "scale": 60,
+          "density": 60,
+          "distress": 66,
+          "variation": "original"
+        },
+        {
+          "name": "fragmented",
+          "scale": 52,
+          "density": 80,
+          "distress": 84,
+          "variation": "desaturated"
+        }
       ]
     },
     "machine_static": {
       "primary_product": "hoodie",
-      "products": ["hoodie", "mask", "shirt"],
-      "motifs": ["glitch", "static", "data"],
+      "products": [
+        "hoodie",
+        "mask",
+        "shirt"
+      ],
+      "motifs": [
+        "glitch",
+        "static",
+        "data"
+      ],
       "variants": [
-        {"name": "balanced", "scale": 50, "density": 78, "distress": 82, "variation": "original"},
-        {"name": "dense", "scale": 32, "density": 92, "distress": 92, "variation": "high_contrast"},
-        {"name": "large", "scale": 70, "density": 72, "distress": 78, "variation": "scale_plus"}
+        {
+          "name": "balanced",
+          "scale": 50,
+          "density": 78,
+          "distress": 82,
+          "variation": "original"
+        },
+        {
+          "name": "dense",
+          "scale": 32,
+          "density": 92,
+          "distress": 92,
+          "variation": "high_contrast"
+        },
+        {
+          "name": "large",
+          "scale": 70,
+          "density": 72,
+          "distress": 78,
+          "variation": "scale_plus"
+        },
+        {
+          "name": "sparse",
+          "scale": 44,
+          "density": 70,
+          "distress": 74,
+          "variation": "desaturated"
+        },
+        {
+          "name": "fragmented",
+          "scale": 58,
+          "density": 86,
+          "distress": 90,
+          "variation": "alt_palette"
+        }
       ]
     },
     "ghost_hound": {
       "primary_product": "beanie",
-      "products": ["beanie", "hoodie", "mask"],
-      "motifs": ["canine_eye", "slash", "static"],
+      "products": [
+        "beanie",
+        "hoodie",
+        "mask"
+      ],
+      "motifs": [
+        "canine_eye",
+        "slash",
+        "static"
+      ],
       "variants": [
-        {"name": "balanced", "scale": 54, "density": 74, "distress": 78, "variation": "original"},
-        {"name": "dense", "scale": 38, "density": 84, "distress": 88, "variation": "high_contrast"},
-        {"name": "large", "scale": 76, "density": 66, "distress": 72, "variation": "scale_plus"}
+        {
+          "name": "balanced",
+          "scale": 54,
+          "density": 74,
+          "distress": 78,
+          "variation": "original"
+        },
+        {
+          "name": "dense",
+          "scale": 38,
+          "density": 84,
+          "distress": 88,
+          "variation": "high_contrast"
+        },
+        {
+          "name": "large",
+          "scale": 76,
+          "density": 66,
+          "distress": 72,
+          "variation": "scale_plus"
+        },
+        {
+          "name": "sparse",
+          "scale": 68,
+          "density": 60,
+          "distress": 66,
+          "variation": "original"
+        },
+        {
+          "name": "fragmented",
+          "scale": 58,
+          "density": 80,
+          "distress": 82,
+          "variation": "desaturated"
+        }
       ]
     },
     "broken_human": {
       "primary_product": "cargo",
-      "products": ["cargo", "hoodie", "shirt"],
-      "motifs": ["human_eye", "rib", "glitch"],
+      "products": [
+        "cargo",
+        "hoodie",
+        "shirt"
+      ],
+      "motifs": [
+        "human_eye",
+        "rib",
+        "glitch"
+      ],
       "variants": [
-        {"name": "balanced", "scale": 56, "density": 72, "distress": 78, "variation": "original"},
-        {"name": "dense", "scale": 40, "density": 86, "distress": 90, "variation": "high_contrast"},
-        {"name": "large", "scale": 80, "density": 64, "distress": 74, "variation": "scale_plus"}
+        {
+          "name": "balanced",
+          "scale": 56,
+          "density": 72,
+          "distress": 78,
+          "variation": "original"
+        },
+        {
+          "name": "dense",
+          "scale": 40,
+          "density": 86,
+          "distress": 90,
+          "variation": "high_contrast"
+        },
+        {
+          "name": "large",
+          "scale": 80,
+          "density": 64,
+          "distress": 74,
+          "variation": "scale_plus"
+        },
+        {
+          "name": "sparse",
+          "scale": 74,
+          "density": 62,
+          "distress": 64,
+          "variation": "original"
+        },
+        {
+          "name": "fragmented",
+          "scale": 62,
+          "density": 80,
+          "distress": 80,
+          "variation": "desaturated"
+        }
       ]
     },
     "error_garden": {
       "primary_product": "shirt",
-      "products": ["shirt", "hoodie", "cargo"],
-      "motifs": ["floral", "leaf", "glitch"],
+      "products": [
+        "shirt",
+        "hoodie",
+        "cargo"
+      ],
+      "motifs": [
+        "floral",
+        "leaf",
+        "glitch"
+      ],
       "variants": [
-        {"name": "balanced", "scale": 52, "density": 76, "distress": 68, "variation": "original"},
-        {"name": "dense", "scale": 38, "density": 90, "distress": 82, "variation": "high_contrast"},
-        {"name": "large", "scale": 74, "density": 70, "distress": 64, "variation": "alt_palette"}
+        {
+          "name": "balanced",
+          "scale": 52,
+          "density": 76,
+          "distress": 68,
+          "variation": "original"
+        },
+        {
+          "name": "dense",
+          "scale": 38,
+          "density": 90,
+          "distress": 82,
+          "variation": "high_contrast"
+        },
+        {
+          "name": "large",
+          "scale": 74,
+          "density": 70,
+          "distress": 64,
+          "variation": "alt_palette"
+        },
+        {
+          "name": "sparse",
+          "scale": 70,
+          "density": 66,
+          "distress": 52,
+          "variation": "original"
+        },
+        {
+          "name": "fragmented",
+          "scale": 58,
+          "density": 82,
+          "distress": 68,
+          "variation": "desaturated"
+        }
       ]
     }
   },
-  "seeds": [113, 271, 433, 619],
-  "candidate_count": 60,
+  "seeds": [
+    113,
+    271,
+    433,
+    619
+  ],
+  "candidate_count": 100,
   "selection_order": [
     "candidate_detection_rate:min",
     "candidate_mean:min",
+    "reference_fidelity_score:max",
     "printability_proxy:max",
     "art_direction_proxy:max",
     "candidate_id:lexical"
   ],
-  "heldout_feedback_allowed": false
+  "heldout_feedback_allowed": false,
+  "generation_id": "RAC-PER-D2-0004"
 }
