@@ -356,7 +356,7 @@ def classify_failure(
     signals = tuple(signal for _, sigs, _ in fired for signal in sigs)
     confidence = "high" if len(fired) == 1 else "medium"
     if len(fired) > 1:
-        others = ", ".join(c.value for c, _, in fired[1:])
+        others = ", ".join(c.value for c, _, _ in fired[1:])
         explanation = f"{explanation} (also matched: {others})"
     record = FailureRecord(
         record_id=record_id or f"FR-{uuid.uuid4().hex[:12]}",
