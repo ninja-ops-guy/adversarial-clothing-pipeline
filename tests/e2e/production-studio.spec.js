@@ -56,6 +56,19 @@ test('imports exact vendor template and exposes panel dimensions', async ({ page
   await expect(page.locator('#validationList')).toContainText('pass local validation');
 });
 
+test('rejects vendor-ready template without provider source provenance', async ({ page }) => {
+  const missingSource = JSON.parse(JSON.stringify(vendorTemplate));
+  delete missingSource.source;
+  await page.locator('#templateFile').setInputFiles({
+    name: 'vendor-template-no-source.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(missingSource))
+  });
+  await expect(page.locator('#productionStatus')).toContainText('TEMPLATE ERROR');
+  await expect(page.locator('#productionStatus')).toContainText('provider source reference');
+  await expect(page.locator('#templateMeta')).toContainText('GENERIC_PREVIEW');
+});
+
 test('panel transforms trigger continuity warning and auto-map clears it', async ({ page }) => {
   await page.locator('#templateFile').setInputFiles({
     name: 'vendor-template.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(vendorTemplate))
@@ -103,6 +116,8 @@ test('exports a hash-bound vendor panel pack zip', async ({ page, browserName })
   expect(text).toContain('master/repeat_4096.png');
   expect(text).toContain('panels/front.png');
   expect(text).toContain('manifest.json');
+  expect(text).toContain('source_artifact');
+  expect(text).toContain('vendor-template.json');
   await expect(page.locator('#hashMetrics')).toContainText('Design SHA-256');
 });
 
