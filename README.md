@@ -2,11 +2,24 @@
 
 Production-oriented research software for **machine-optimized fashion engineered to reduce reliable visual classification across diverse computer-vision systems** in owned or explicitly authorized lab environments.
 
-**Repository state reviewed:** 2026-09-06  
+**Repository state reviewed:** 2026-09-07  
 **Python package version:** `3.1.0`  
-**Documentation baseline:** current `main` (RAC v2 D2 pipeline present)
+**Documentation baseline:** current `main` — see `docs/PROJECT_PROGRESS.md` for the authoritative live progress ledger
 
-## RAC certification layer\n\nVersion 3.1 adds an internal fail-closed evidence certification layer under `ruthless_pipeline/certification/`, frozen protocol/model-set contracts, baseline qualification, sealed artifact bundles, physical/manufacturing conformity schemas, and a measured-result import boundary in Pattern Lab. See `docs/CERTIFICATION_SYSTEM.md`. Real detector weights, calibrated print data, physical trials, and production measurements remain required external evidence; the software does not manufacture them.\n\n## Environment-adaptive candidate generation
+## RAC certification layer\n\nVersion 3.1 adds an internal fail-closed evidence certification layer under `ruthless_pipeline/certification/`, frozen protocol/model-set contracts, baseline qualification, sealed artifact bundles, physical/manufacturing conformity schemas, and a measured-result import boundary in Pattern Lab. See `docs/CERTIFICATION_SYSTEM.md`. Real detector weights, calibrated print data, physical trials, and production measurements remain required external evidence; the software does not manufacture them.\n\n
+## Documentation and live progress
+
+Start with **`docs/README.md`** for the documentation map and **`docs/PROJECT_PROGRESS.md`** for the authoritative project ledger. The ledger tracks completed engineering, active D2 generations, Production Alpha/Beta/v1 gates, physical blockers, research-paper gates, and the distinction between software-complete capability and real evidence.
+
+Current headline status as of 2026-09-07:
+
+- the design factory, certification architecture, statistics layer, and Research OS are substantially implemented;
+- D2-0003 remains a retained FAIL / RAC-D0 negative result;
+- D2-0004 is the active fresh held-out generation and must remain untouched until closure;
+- Production Alpha is blocked on exact provider IDs/template and placing the matched control/candidate order;
+- RAC-P and RAC-M remain open because real physical/manufacturing evidence has not yet been collected.
+
+## Environment-adaptive candidate generation
 
 RAC now includes an original environment-adaptive optimizer inspired by CAPGen (arXiv:2412.07253) and informed by the architecture of the external YOLOv5 adversarial-patch repository. No AGPL implementation code is vendored.
 
