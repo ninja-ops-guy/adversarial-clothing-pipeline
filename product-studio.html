@@ -109,6 +109,9 @@
           <div class="field"><label>Product</label><select id="productType"><option value="hoodie">Hoodie</option><option value="hat">Baseball Hat</option><option value="beanie">Beanie</option><option value="cargo">Cargo Pants</option><option value="mask">Balaclava / Mask</option><option value="shirt">Oversized Shirt</option></select></div>
           <div class="field"><label>Design Family <span id="resolvedFamily">—</span></label><select id="designFamily"><option value="auto">Auto by product</option><option value="signal_shadow">Signal Shadow</option><option value="machine_static">Machine Static</option><option value="ghost_hound">Ghost Hound</option><option value="broken_human">Broken Human</option><option value="error_garden">Error Garden</option></select></div>
         </div>
+        <div class="field"><label>Generation Mode</label><select id="generationMode"><option value="reference">Reference Match</option><option value="creative">Creative</option></select></div>
+        <div id="referenceProfileStatus" class="profile-status">REFERENCE PROFILE · INITIALIZING</div>
+        <button type="button" id="findBestMatchBtn" onclick="RACStudio.findBestMatch()">Find Best Match</button>
         <div class="field"><label>Pattern Scale <span id="studioScaleValue">52</span></label><input id="studioScale" type="range" min="20" max="100" value="52"></div>
         <div class="field"><label>Motif Density <span id="studioDensityValue">72</span></label><input id="studioDensity" type="range" min="10" max="100" value="72"></div>
         <div class="field"><label>Distress / Grain <span id="studioDistressValue">76</span></label><input id="studioDistress" type="range" min="10" max="100" value="76"></div>
@@ -147,7 +150,9 @@
   </main>
 </div>
 <script src="core.js"></script>
+<script src="studio-style-profiles.js"></script>
 <script src="studio-patterns.js"></script>
+<script src="reference-fidelity.js"></script>
 <script src="mockup-clean.js"></script>
 <script src="product-studio.js"></script>
 <script src="studio-global.js"></script>
