@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  const IDS=['productType','designFamily','studioScale','studioDensity','studioDistress','studioSeed','brandName','productName','collectionName'];
+  const IDS=['productType','designFamily','studioScale','studioDensity','studioDistress','studioSeed','brandName','productName','collectionName','generationMode'];
   const FAMILY_BY_PRODUCT={hoodie:'machine_static',hat:'signal_shadow',beanie:'ghost_hound',cargo:'broken_human',mask:'machine_static',shirt:'error_garden'};
 
   function snapshot(){
@@ -9,6 +9,8 @@
     for(const id of IDS){const el=document.getElementById(id);if(el)state[id]=el.value;}
     if(state.designFamily==='auto')state.designFamily=FAMILY_BY_PRODUCT[state.productType]||'machine_static';
     state.resolvedDesignFamily=state.designFamily;
+    state.referenceProfile=state.resolvedDesignFamily;
+    state.artDirectionProfile='canonical_launch_capsule_v1';
     const conditioner=window.RACReferenceConditioner;
     state.reference_profile=conditioner&&typeof conditioner.getProfile==='function'?conditioner.getProfile():null;
     state.reference_source_mode=state.reference_profile?'scalar_style_conditioning':'canonical_profile';
