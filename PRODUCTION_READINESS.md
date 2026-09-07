@@ -19,13 +19,13 @@ Status language is intentionally strict: **PASS** means the repository contains 
 | Pattern Lab static UI | PRESENT | `index.html`, `styles.css`, `core.js`, `analysis.js` |
 | Pattern Lab candidate generators | PRESENT | Eight procedural browser generators plus palettes/controls |
 | Pattern Lab history/export | PRESENT | Gallery/history and PNG/JSON exports are implemented |
-| Pattern Lab model-backed efficacy scoring | **NOT IMPLEMENTED** | Current model-named percentages are heuristics; several dashboard metrics are randomized |
-| Pattern Lab ↔ Python pipeline integration | **NOT IMPLEMENTED** | No job/API/result bridge exists yet |
+| Pattern Lab measured-result display | **IMPLEMENTED** | Browser heuristics remain separate; measured benchmark JSON is imported with provenance and candidate-match checks |
+| Product Studio / benchmark integration | **IMPLEMENTED FOR FILE/CI FLOW** | Candidate pool → surrogate-only selection → frozen candidate → measured benchmark → evidence bundle; not a live service API |
 | GitHub Pages workflow | PRESENT | Static-site deployment workflow exists; deployment availability is operational evidence only |
-| GitHub CI release gate | **BLOCKED** | First v3 import run reported 58 Ruff findings; fix lint and require a green workflow before treating CI as a release gate |
+| GitHub CI release gate | **ACTIVE, VERIFY RUN STATUS** | Current workflows include Python, frontend, model-lock, measured-benchmark, and evidence-boundary gates; release readiness still requires a green current head |
 | Real Stable Diffusion prior | READY TO INTEGRATE | Optional adapter present; dependency/model was not exercised during v3 hardening |
 | Real CLIP aesthetic guidance | READY TO INTEGRATE | Optional adapter present; runtime was not exercised during v3 hardening |
-| Real detector ensemble | BLOCKED ON MANIFEST/WEIGHTS | Freeze open-model adapters, weights, preprocessing, thresholds, and versions |
+| Frozen digital detector ensemble | **IMPLEMENTED FOR CURRENT GENERATION** | Six-model contract with preregistered hashes, surrogate/held-out split and versioned manifests; D2-0003 failed criteria despite valid lock |
 | Real multi-view deformation capture | BLOCKED ON CALIBRATED DATA | Calibrated capture + correspondence preprocessing required |
 | HOOD/DiffCloth high-fidelity backend | NOT YET | Native baseline is functional; external solver must be integrated and validated separately |
 | ICC/fabric print calibration | NOT YET | Replace approximate NPS palette with measured printer/ink/fabric profile data |
@@ -35,13 +35,13 @@ Status language is intentionally strict: **PASS** means the repository contains 
 
 ## Immediate production-readiness order
 
-1. **Make CI green.** Resolve Ruff findings and keep pytest/smoke/package jobs behind the same required gate.
-2. **Freeze benchmark provenance.** Model IDs, exact weights, preprocessing, thresholds, seed policy, transform grid, surrogate/held-out split, and artifact hashes.
-3. **Remove ambiguity from Pattern Lab.** Keep heuristic fields clearly labeled `DEMO/HEURISTIC` until model-backed results are imported from the Python benchmark.
-4. **Connect real open-model evaluators.** Do not use browser-estimated model percentages as substitutes.
-5. **Collect calibrated deformation and print data.** Synthetic fixtures remain useful for CI but are not physical evidence.
-6. **Run physical degradation studies.** Resolution/distance, pose/angle, stretch, laundering, lighting, weather where appropriate.
-7. **Only then approve claims.** Product copy should state tested conditions and avoid extrapolation to arbitrary surveillance systems.
+1. **Verify current-head CI is green.** Keep Python, frontend, evidence-boundary and packaging checks as required merge gates.
+2. **Do not reuse observed held-out models for a fresh candidate generation.** D2-0003 is historical and failed; a new generation requires preregistration and a fresh held-out set.
+3. **Tune reference fidelity as style evidence only.** Keep style scores separate from detector efficacy and RAC certification.
+4. **Acquire one exact POD provider template.** Map one canonical SKU with exact bleed/safe-area/panel geometry and preserve artwork/template/mapping hashes.
+5. **Collect calibrated print and deformation data.** Synthetic fixtures remain useful for CI but are not physical evidence.
+6. **Run pre-registered physical trials.** Distance, angle, pose, lighting, compression/stretch, garment size and laundering state.
+7. **Only then approve physical or product efficacy claims.** State tested conditions and avoid extrapolation to arbitrary systems.
 
 ## Evidence labels required for readiness reporting
 
@@ -57,3 +57,8 @@ No percentage belongs in a “Current” column unless it is internally measured
 ## Release criterion
 
 Do not label this research system or any garment **product validated** until the external gates from model provenance through held-out physical testing are complete. The current repository is a serious software/research platform plus an exploratory Pattern Lab front end; it is **not evidence that a garment will evade an arbitrary real-world surveillance system**.
+
+
+## Latest locked digital result
+
+Published run **RAC-PER-D2-0003** is locked and reproducible, but it **failed** the preregistered D2 pass criteria. Held-out detection rate remained 1.00 (baseline 1.00) over 36 valid conditions, although mean confidence decreased. Bundle verification passed and the evidence state correctly remained RAC-D0. This negative result is retained as evidence and must not be promoted to a D2 or physical claim.
