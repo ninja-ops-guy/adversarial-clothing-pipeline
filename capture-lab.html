@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RAC Capture Lab</title><link rel="stylesheet" href="capture-lab.css">
+</head>
+<body>
+<header class="topbar"><div><div class="eyebrow">RUTHLESS // RESEARCH INSTRUMENT</div><h1>RAC CAPTURE LAB</h1><p>Preregistered physical capture → frozen analysis → evidence ingestion</p></div><nav><a href="product-studio.html">Product Studio</a><a href="production-studio.html">Production Mapper</a><a href="index.html">Pattern Lab</a></nav></header>
+<div class="sop-strip" id="sopStrip"></div>
+<main class="layout">
+<section class="panel setup">
+<h2>Experiment</h2><div class="body">
+<div id="instrumentStatus" class="status">LOAD OR CREATE A SESSION</div>
+<label>Experiment ID<input id="experimentId" value="RAC-P1-0001"></label>
+<label>Protocol version<input id="protocolVersion" value="P1-DRAFT"></label>
+<label>Evidence class<select id="evidenceClass"><option value="printed_flat_prototype">PRINTED-FLAT / PAPER-PROTOTYPE</option><option value="physical_garment_p1">PHYSICAL GARMENT / P1</option><option value="synthetic_pipeline_validation_only">SYNTHETIC DRY RUN</option></select></label>
+<label>Candidate artifact ID<input id="candidateId" placeholder="RAC-PER-D2-..."></label>
+<label>Candidate SHA-256<input id="candidateSha" pattern="[0-9a-fA-F]{64}" placeholder="64 hex characters"></label>
+<label>Control artifact ID<input id="controlId" value="CONTROL-01"></label>
+<label>Actor ID<input id="actorId" value="ACT-01"></label>
+<label>Camera ID<input id="cameraId" value="CAM-PHONE-MAIN-01"></label>
+<label>Lighting ID<input id="lightingId" value="LUX-INDOOR-OFFICE"></label>
+<div class="row"><label>Distance m<input id="distance" type="number" step=".1" value="2"></label><label>Yaw°<input id="yaw" type="number" value="0"></label></div>
+<label>Pose<select id="pose"><option>standing-front</option><option>standing-back</option><option>standing-left</option><option>standing-right</option><option>walk-cycle</option><option>rotation-360</option></select></label>
+<button id="freezeBtn" class="primary">Freeze Session Manifest</button>
+</div></section>
+
+<section class="panel camera">
+<h2>Capture</h2><div class="body">
+<div class="camera-shell"><video id="camera" autoplay playsinline muted></video><div class="guide"><span></span><b id="capturePrompt">CAMERA OFF</b></div></div>
+<div class="toolbar"><button id="cameraBtn">Enable Camera</button><button id="stillBtn" disabled>Capture Still</button><button id="recordBtn" disabled>Record Motion</button><button id="stopBtn" disabled>Stop Motion</button></div>
+<div class="pair-switch"><button data-arm="control" class="arm active">CONTROL</button><button data-arm="candidate" class="arm">CANDIDATE</button></div>
+<div id="conditionBanner" class="condition">Freeze the session to begin.</div>
+<div class="capture-grid"><div><h3>CONTROL</h3><div id="controlCount">0 stills · 0 videos</div></div><div><h3>CANDIDATE</h3><div id="candidateCount">0 stills · 0 videos</div></div></div>
+</div></section>
+
+<aside class="panel review">
+<h2>Review / Analyze / Seal</h2><div class="body">
+<div class="gate" id="calibrationGate"><b>CALIBRATION</b><span>Pending</span></div>
+<label class="check"><input id="calibrationPass" type="checkbox"> Calibration acceptance gate passed</label>
+<div class="divider"></div>
+<h3>Frozen ensemble</h3>
+<p class="note">Capture is blinded to outcomes. Analysis happens only after capture. Person/object inference is performed by the authorized local analyzer; browser heuristics are never evidence.</p>
+<textarea id="modelManifest" rows="7" spellcheck="false">{
+  "models": [],
+  "thresholds": {},
+  "preprocessing": {},
+  "identity_mode": "disabled"
+}</textarea>
+<button id="reviewBtn">Validate Capture Pair</button>
+<button id="analyzeBtn" disabled>Prepare Frozen Ensemble Analysis</button>
+<div id="analysisStatus" class="analysis">No analysis run.</div>
+<div class="divider"></div>
+<button id="exportBtn" disabled>Export Session Bundle</button>
+<button id="sealBtn" class="danger" disabled>Seal Session</button>
+<div id="sealStatus" class="seal">UNSEALED</div>
+</div></aside>
+</main>
+<section class="results panel"><h2>Trial ledger</h2><div class="body"><table><thead><tr><th>Time</th><th>Arm</th><th>Type</th><th>Condition</th><th>SHA-256</th></tr></thead><tbody id="ledger"></tbody></table></div></section>
+<script src="capture-lab.js"></script>
+</body></html>
