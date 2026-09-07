@@ -155,3 +155,44 @@ test('rejects duplicate panel ids and broken seam references', async ({ page }) 
   await expect(page.locator('#productionStatus')).toContainText('TEMPLATE ERROR');
   await expect(page.locator('#productionStatus')).toContainText(/duplicate panel id|missing panel/);
 });
+
+
+test('reference fidelity is the default Production Mapper ranking mode', async ({ page }) => {
+  await expect(page.locator('#batchRankingMode')).toHaveValue('reference_fidelity');
+  await expect(page.locator('body')).toContainText('REFERENCE STYLE SCORE — NOT RAC CERTIFICATION');
+});
+
+test('reference-ranked batch exports scorer metadata', async ({ page }) => {
+  await page.locator('#family').selectOption('ghost_hound');
+  await page.locator('#batchCount').fill('8');
+  await page.locator('#batchKeep').fill('4');
+  await page.getByRole('button', { name: 'Generate & Rank Seeds' }).click();
+  await expect(page.locator('.candidate')).toHaveCount(4);
+  await expect(page.locator('.candidate').first()).toContainText('PALETTE');
+
+  const wait = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export Shortlist JSON' }).click();
+  const download = await wait;
+  const path = await download.path();
+  const payload = JSON.parse(fs.readFileSync(path, 'utf8'));
+  expect(payload.schema_version).toBe('2.0');
+  expect(payload.ranking_mode).toBe('reference_fidelity');
+  expect(payload.scorer_version).toBe('reference-fidelity-v1');
+  expect(payload.candidates[0].subscores).toHaveProperty('hero_motif');
+});
+
+test('Production Mapper prefers resolved Product Studio family including hat', async ({ page }) => {
+  await page.evaluate(() => localStorage.setItem('rac.productStudioState', JSON.stringify({
+    schema_version: '2.0',
+    productType: 'hat',
+    designFamily: 'auto',
+    resolvedDesignFamily: 'signal_shadow',
+    studioSeed: '433',
+    studioScale: '54',
+    studioDensity: '67',
+    studioDistress: '73'
+  })));
+  await page.getByRole('button', { name: 'Load Current Product Studio Design' }).click();
+  await expect(page.locator('#family')).toHaveValue('signal_shadow');
+  await expect(page.locator('#seed')).toHaveValue('433');
+});
