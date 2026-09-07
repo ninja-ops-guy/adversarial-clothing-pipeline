@@ -1,4 +1,4 @@
-from scripts.package_print_test_kit import capture_rows
+from ruthless_pipeline.physical_protocol import capture_rows
 
 
 def test_capture_matrix_contains_108_unique_matched_pairs() -> None:
