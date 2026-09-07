@@ -24,5 +24,13 @@
     "All models observed in D2-0003 are surrogate-only in this generation.",
     "Fresh held-out weights were hashed and frozen without candidate inference.",
     "This marker intentionally triggers the D2-0004 workflow after preregistration."
+  ],
+  "trigger_revision": 2,
+  "trigger_reason": "Retrigger after frozen adaptive artwork was wired through Product Studio and print-test kit exports.",
+  "required_commits": [
+    "9d24ef60e9f8e6c5df5018a923e68e3429f0a642",
+    "10dedb85fe6857da6ac0bda618275ed27b3b5b27",
+    "9e6fbba89cb967f313b26e38b55f8b2889ae96e5",
+    "ef2f5247a29373f06b46f5988044c6f09fbc8aa3"
   ]
 }
