@@ -41,15 +41,15 @@ reflective surfaces in frame.
 ## Garment mounting / flattening
 
 1. Garment on a flat, rigid, matte board (or torso form for worn trials —
-record which in the session manifest).
+   record which in the session manifest).
 2. Smooth from centre outward; no tension wrinkles across the printed
-region. Use low-tack clips at the hem only, outside the capture area.
+   region. Use low-tack clips at the hem only, outside the capture area.
 3. Garment plane parallel to the sensor plane (check with the calibration
-target fiducials: left/right scale must agree within the 2% scale
-acceptance bound).
+   target fiducials: left/right scale must agree within the 2% scale
+   acceptance bound).
 4. Orientation mark (top of garment) aligned to the taped rig axis so the
-yaw grid (-45 / 0 / +45 deg) is reproducible by rotating the board on
-taped angle marks.
+   yaw grid (-45 / 0 / +45 deg) is reproducible by rotating the board on
+   taped angle marks.
 
 ## Lock-in rule
 
