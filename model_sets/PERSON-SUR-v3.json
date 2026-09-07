@@ -1,0 +1,16 @@
+{
+  "model_set_id": "PERSON-SUR-v3",
+  "role": "surrogate",
+  "models": [
+    "yolov8n",
+    "fasterrcnn_mobilenet_v3_320",
+    "detr_resnet50",
+    "ssdlite320_mobilenet_v3",
+    "retinanet_resnet50_fpn_v2",
+    "fcos_resnet50_fpn"
+  ],
+  "status": "LOCK_PENDING",
+  "source_manifest": "benchmarks/model_manifest.json",
+  "generation_id": "RAC-PER-D2-0004",
+  "lock_source_commit": null
+}
