@@ -218,3 +218,28 @@ test('obsolete low-resolution showcase source is absent', async ({ page }) => {
   const scripts = await page.locator('script[src]').evaluateAll(nodes => nodes.map(n => n.getAttribute('src')));
   expect(scripts).not.toContain('showcase-asset.js');
 });
+
+
+test('reference match mode is default and reports deterministic fidelity', async ({ page }) => {
+  await expect(page.locator('#generationMode')).toHaveValue('reference');
+  const first = await page.locator('#referenceProfileStatus').textContent();
+  await page.evaluate(() => RACStudio.renderAll());
+  const second = await page.locator('#referenceProfileStatus').textContent();
+  expect(first).toBe(second);
+  expect(second).toMatch(/FIDELITY \d+\.\d\/100/);
+});
+
+test('find best match preserves or improves reference fidelity', async ({ page }) => {
+  const score = async () => Number((await page.locator('#referenceProfileStatus').textContent()).match(/FIDELITY (\d+\.\d)/)[1]);
+  const before = await score();
+  await page.getByRole('button', { name: 'Find Best Match' }).click();
+  await expect.poll(score).toBeGreaterThanOrEqual(before);
+});
+
+test('reference profile clamps effective controls deterministically', async ({ page }) => {
+  const result = await page.evaluate(() => {
+    const r = RACStyleProfiles.resolveProfile({family:'signal_shadow',product:'hat',mode:'reference',controls:{scale:100,density:1,distress:1}});
+    return {scale:r.scale,density:r.density,distress:r.distress};
+  });
+  expect(result).toEqual({scale:68,density:58,distress:60});
+});
