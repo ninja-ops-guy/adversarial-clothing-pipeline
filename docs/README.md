@@ -34,6 +34,13 @@ This page is the navigation layer for the RAC documentation stack. Use the docum
 - [Reference Fidelity Implementation Spec](REFERENCE_FIDELITY_IMPLEMENTATION_SPEC.md)
 - [Production Alpha SKU](PRODUCTION_ALPHA_SKU.md)
 
+
+## Operating procedures
+
+- [End-to-End Research SOP](END_TO_END_RESEARCH_SOP.md) — full design → D2 → Printful → calibration → P1 → durability → manufacturing → paper workflow.
+- [Printful Production Alpha SOP](PRINTFUL_PRODUCTION_SOP.md) — exact matched control/candidate ordering and provenance procedure.
+- [Experiment Pickup Guide](EXPERIMENT_PICKUP_GUIDE.md) — short resume-from-here checklist for each project state.
+
 ## Physical program
 
 - [Physical Test Infrastructure](PHYSICAL_TEST_INFRASTRUCTURE.md)
