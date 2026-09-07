@@ -243,3 +243,29 @@ test('reference profile clamps effective controls deterministically', async ({ p
   });
   expect(result).toEqual({scale:68,density:58,distress:60});
 });
+
+
+test('frozen candidate tile overrides generated pattern for print-bound mockups', async ({ page }) => {
+  const before = await canvasSignature(page);
+  const result = await page.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const x = c.getContext('2d');
+    x.fillStyle = '#050505'; x.fillRect(0, 0, 64, 64);
+    x.fillStyle = '#155bd8'; x.fillRect(0, 0, 32, 64);
+    x.fillStyle = '#e7df16'; x.fillRect(32, 0, 32, 32);
+    return RACStudio.loadFrozenTile(c.toDataURL('image/png'), {
+      candidate_id: 'RAC-TEST-FROZEN',
+      sha256: 'a'.repeat(64),
+      reference_fidelity_score: 88.4
+    });
+  });
+  expect(result.candidate_id).toBe('RAC-TEST-FROZEN');
+  await expect(page.locator('#mockupCanvas')).toHaveAttribute('data-frozen-tile', 'true');
+  const after = await canvasSignature(page);
+  expect(after).not.toBe(before);
+
+  const meta = await page.evaluate(() => RACStudio.getFrozenTileMetadata());
+  expect(meta.candidate_id).toBe('RAC-TEST-FROZEN');
+  expect(meta.sha256).toHaveLength(64);
+});
