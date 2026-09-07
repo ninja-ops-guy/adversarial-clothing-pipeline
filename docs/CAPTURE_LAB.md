@@ -1,6 +1,6 @@
 # RAC Capture Lab
 
-**Version:** 1.2.0  
+**Version:** 1.3.0  
 **Surface:** `capture-lab.html`
 
 Capture Lab turns the P1/printed-prototype SOP into a sequential browser workflow.
@@ -106,3 +106,52 @@ Install the benchmark detector dependencies before first use. Model downloads/ca
 ### Motion analysis
 
 Implemented in `scripts/analyze_capture_motion.py` and integrated behind `--include-motion` in the main runner. Motion analysis requires `ffmpeg` and `ffprobe` on the local workstation. The session freezes a `motion_sampling` contract before analysis; current Capture Lab presets use 2 fps, at most 120 frames per video, and `sequence_fraction` aggregation.\n\nThe runner deterministically extracts frames, executes the same frozen person-detection ensemble, and records per sequence/model:\n\n- frame count;\n- detection fraction;\n- mean/max target confidence;\n- longest continuous detected run;\n- longest detection gap;\n- frozen aggregation rule.\n\nFrames remain nested within a video sequence. Sequence summaries, not raw frame count, are the appropriate inputs to later physical inference.\n\nRun both still and motion analysis with:\n\n```bash\npython scripts/analyze_capture_session.py RAC-CAP-...-session.json --include-motion --output inference.json\n```\n\nThe runner still refuses identity matching. Motion support is for person-detection research under the frozen authorized ensemble.
+
+
+## Research OS ingestion
+
+`scripts/ingest_capture_inference.py` closes the camera → model → statistics → lineage path.
+
+For each sealed matched session it:
+
+1. verifies that the session and inference share the same `session_id` and `experiment_id`;
+2. requires capture integrity PASS;
+3. enforces the calibration gate for `physical_garment_p1`;
+4. applies the conservative P1 decision rule: **all frozen models must detect the control; any frozen model detecting the candidate counts as candidate detection**;
+5. converts the result to `PhysicalTrial`;
+6. runs `paired_trial_statistics`, invalid-condition accounting and the preregistered stopping rule;
+7. optionally appends the matched trial to a cumulative trial store;
+8. optionally registers the physical-session lineage in `ExperimentRegistry` when frozen candidate/generation hashes are supplied.
+
+### Recommended repeated-session workflow
+
+Use one cumulative trial store across the preregistered P1 experiment. Do not count video frames as trials.
+
+```bash
+python scripts/analyze_capture_session.py session-001.json \
+  --include-motion --output inference-001.json
+
+python scripts/ingest_capture_inference.py \
+  session-001.json inference-001.json \
+  --source motion \
+  --trial-store research/p1/trials.json \
+  --output-dir research/p1/session-001
+```
+
+Repeat for each preregistered garment × actor × session condition. The cumulative store is re-analyzed after every append against the same frozen stopping rule.
+
+For final Research OS registration, Capture Lab now freezes:
+
+- `experiment_id` in `RAC-EXP-YYYY-NNN` form;
+- `hypothesis_id`;
+- generation artifact ID + SHA-256;
+- candidate artifact ID + SHA-256;
+- session/camera/lighting/geometry metadata;
+- capture hashes;
+- analysis contract and motion-sampling contract.
+
+Registration should only be performed when the referenced candidate and generation hashes are real frozen artifacts. Prototype/paper sessions remain non-P1 evidence even though they can exercise the identical pipeline.
+
+### Current boundary
+
+This closes **local acquisition, frozen person-detection inference, temporal aggregation, P1 trial conversion, statistics and Research OS lineage registration**. It does not manufacture physical evidence. RAC-P1 still requires the real garment, accepted calibration, preregistered conditions and completed matched sessions.
