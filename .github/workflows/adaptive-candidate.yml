@@ -1,0 +1,135 @@
+name: Surrogate Adaptive Candidate Search
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'studio-style-profiles.js'
+      - 'studio-patterns.js'
+      - 'reference-fidelity.js'
+      - 'product-studio.js'
+      - 'scripts/export_candidate_pool.js'
+      - 'scripts/select_surrogate_candidate.py'
+      - 'scripts/adapt_surrogate_shortlist.py'
+      - 'ruthless_pipeline/capgen.py'
+      - 'ruthless_pipeline/candidate_optimizer.py'
+      - 'design_profiles/**'
+      - 'benchmarks/model_manifest.json'
+      - '.github/workflows/adaptive-candidate.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rac-adaptive-surrogate-search
+  cancel-in-progress: true
+
+jobs:
+  adaptive-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      HF_HOME: ${{ github.workspace }}/.model-cache/huggingface
+      TORCH_HOME: ${{ github.workspace }}/.model-cache/torch
+      ULTRALYTICS_SETTINGS_DIR: ${{ github.workspace }}/.model-cache/ultralytics
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Cache surrogate weights
+        uses: actions/cache@v4
+        with:
+          path: |
+            .model-cache
+            yolov8n.pt
+          key: rac-adaptive-surrogates-${{ runner.os }}
+
+      - name: Install runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+          python -m pip install -e . --no-deps
+          python -m pip install -r benchmarks/requirements.txt
+          npm install
+          npx playwright install --with-deps chromium
+
+      - name: Validate no held-out execution path
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('scripts/adapt_surrogate_shortlist.py').read_text()
+          assert 'roles={"surrogate"}' in text
+          assert 'build_evaluators(manifest)' not in text
+          assert '"heldout_models_loaded": []' in text
+          assert '"heldout_feedback_used": False' in text
+          PY
+
+      - name: Export reference-ranked candidate pool
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/rac-http.log 2>&1 &
+          for i in {1..20}; do
+            curl -fsS http://127.0.0.1:4173/product-studio.html >/dev/null && break
+            sleep 1
+          done
+          node scripts/export_candidate_pool.js benchmarks/runtime/pool design_profiles/ruthless_reference_v1.json
+
+      - name: Run two-stage surrogate screening
+        run: python scripts/select_surrogate_candidate.py --final-id RAC-ADAPT-SOURCE --top-k 6
+
+      - name: Run environment-adaptive surrogate search
+        run: python scripts/adapt_surrogate_shortlist.py --top-k 3
+
+      - name: Validate adaptive boundary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('benchmarks/runtime/adaptive/adaptive-selection.json').read_text())
+          assert r['stage'] == 'environment_adaptive_surrogate_only'
+          assert r['heldout_models_loaded'] == []
+          assert r['heldout_feedback_used'] is False
+          assert r['variant_count'] > 0
+          assert len(r['winner']['png_sha256']) == 64
+          assert 'fresh held-out generation' in r['next_boundary']
+          print(json.dumps(r['winner'], indent=2))
+          PY
+
+      - name: Publish adaptive summary
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          r=json.loads(Path('benchmarks/runtime/adaptive/adaptive-selection.json').read_text())
+          w=r['winner']
+          print('# RAC environment-adaptive surrogate search')
+          print()
+          print(f"- Winner: `{w['candidate_id']}`")
+          print(f"- Source candidate: `{w['source_candidate_id']}`")
+          print(f"- Family / product: `{w['family']} / {w['product']}`")
+          print(f"- Surrogate detection rate: **{w['candidate_detection_rate']}**")
+          print(f"- Surrogate mean confidence: **{w['candidate_mean']}**")
+          print(f"- Reference fidelity: **{w.get('reference_fidelity_score')}**")
+          print(f"- Environment colors: {w['environment_colors']}")
+          print(f"- Temperature / blend: {w['temperature']} / {w['blend']}")
+          print()
+          print('**Boundary:** no held-out models were loaded. A fresh preregistered held-out generation is required before D2.')
+          PY
+
+      - name: Upload adaptive candidate artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: rac-adaptive-surrogate-${{ github.run_id }}
+          path: |
+            benchmarks/runtime/pool/pool.json
+            benchmarks/runtime/surrogate-selection.json
+            benchmarks/runtime/adaptive/adaptive-selection.json
+            benchmarks/runtime/adaptive/*.png
+          retention-days: 30
