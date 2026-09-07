@@ -27,21 +27,23 @@ def test_v2_manifest_protocol_and_sets_are_identical_contracts():
     assert set(manifest_surrogate).isdisjoint(manifest_heldout)
 
 
-def test_v2_workflow_targets_current_generation_and_six_models():
+def test_v3_product_workflow_targets_current_generation_and_six_models():
     workflow = (ROOT / ".github/workflows/measured-benchmark.yml").read_text()
     required = {
         "RAC-PERSON-DETECT-1.1.json",
-        "RAC-PER-D2-0002",
+        "RAC-PER-D2-0003",
         "PERSON-SUR-v2",
         "PERSON-HO-v2",
         "retinanet_resnet50_fpn_v2",
         "fcos_resnet50_fpn",
         "lock_inference_performed",
+        "Product Studio",
         "Build D2 evidence bundle",
-        "Validate D2 generation status",
+        "Build high-resolution print-test assets",
+        "Validate print-test kit boundary",
     }
     missing = sorted(item for item in required if item not in workflow)
-    assert not missing, f"v2 workflow contract missing: {missing}"
+    assert not missing, f"v3 Product Studio workflow contract missing: {missing}"
 
 
 def test_frontend_workflow_references_existing_specs():
@@ -55,7 +57,7 @@ def test_frontend_workflow_references_existing_specs():
             assert (ROOT / spec).exists(), f"frontend workflow references missing spec: {spec}"
 
 
-def test_current_published_result_is_never_mislabeled_as_v2():
+def test_current_published_result_matches_current_generation_when_v2_models_are_used():
     result_path = ROOT / "benchmark-results.json"
     status_path = ROOT / "d2-latest-status.json"
     if not result_path.exists() or not status_path.exists():
@@ -65,17 +67,16 @@ def test_current_published_result_is_never_mislabeled_as_v2():
     status = json.loads(status_path.read_text())
     heldout = result.get("benchmark", {}).get("heldout_models", [])
 
-    is_v2 = heldout == ["retinanet_resnet50_fpn_v2", "fcos_resnet50_fpn"]
-    if is_v2:
+    is_current_model_generation = heldout == ["retinanet_resnet50_fpn_v2", "fcos_resnet50_fpn"]
+    if is_current_model_generation:
         assert status.get("protocol_version") == "1.1"
-        assert status.get("candidate_id") == "RAC-PER-D2-0002"
+        assert status.get("candidate_id") == "RAC-PER-D2-0003"
         assert status.get("surrogate_model_set") == "PERSON-SUR-v2"
         assert status.get("heldout_model_set") == "PERSON-HO-v2"
     else:
-        # Old evidence may remain published while a new run is pending, but it must not
-        # claim to be the v2 generation.
-        assert status.get("protocol_version") != "1.1"
-        assert status.get("candidate_id") != "RAC-PER-D2-0002"
+        # Older evidence may remain published while the Product Studio generation
+        # is running, but it must not claim to be RAC-PER-D2-0003.
+        assert status.get("candidate_id") != "RAC-PER-D2-0003"
 
 
 def test_all_current_model_manifests_match_benchmark_hash_contract():
