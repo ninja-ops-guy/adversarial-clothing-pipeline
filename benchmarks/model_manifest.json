@@ -1,9 +1,9 @@
 {
-  "schema_version": "3.0",
+  "schema_version": "3.1",
   "task": "person_detection",
   "threshold": 0.5,
   "lock_status": "PREREGISTERED",
-  "generation": "v2 rotate previously observed held-out models into surrogate ensemble; new held-out models receive no candidate inference until hashes are preregistered",
+  "generation": "v2 detector lock with Product Studio v3 candidate selection preregistered before held-out evaluation",
   "models": [
     {
       "id": "yolov8n",
@@ -74,51 +74,32 @@
     "note": "Convenience digital fixture for repeatable CI measurement only; not a physical-garment or population-level benchmark."
   },
   "transform_sweep": {
-    "brightness": [
-      0.7,
-      1,
-      1.3
-    ],
-    "scale": [
-      1
-    ],
-    "blur_sigma": [
-      0,
-      0.8
-    ],
-    "rotation_deg": [
-      -20,
-      0,
-      20
-    ]
+    "brightness": [0.7, 1, 1.3],
+    "scale": [1],
+    "blur_sigma": [0, 0.8],
+    "rotation_deg": [-20, 0, 20]
   },
   "selection_sweep": {
-    "brightness": [
-      0.8,
-      1,
-      1.2
-    ],
-    "scale": [
-      1
-    ],
-    "blur_sigma": [
-      0,
-      0.8
-    ],
-    "rotation_deg": [
-      0
-    ]
+    "brightness": [0.8, 1, 1.2],
+    "scale": [1],
+    "blur_sigma": [0, 0.8],
+    "rotation_deg": [0]
   },
   "selection_policy": {
     "pool": "scripts/export_candidate_pool.js",
+    "design_profile": "design_profiles/ruthless_reference_v1.json",
+    "candidate_count": 60,
     "objective": [
       "candidate_detection_rate:min",
       "candidate_mean:min",
+      "printability_proxy:max",
+      "art_direction_proxy:max",
       "candidate_id:lexical"
     ],
     "boundary": "surrogate_only",
-    "version": "2.0",
-    "candidate_pool": "core+reference-inspired"
+    "heldout_feedback_allowed": false,
+    "version": "3.0",
+    "candidate_pool": "product-studio-reference-inspired-only"
   },
   "min_baseline_score": 0.5,
   "lock_source_commit": "77db0ee53faafe935939de7e11476ebd0bf9b0d4",
