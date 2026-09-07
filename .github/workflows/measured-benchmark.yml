@@ -6,8 +6,6 @@ on:
     branches: [main]
     paths:
       - 'generations/RAC-PER-D2-0004.json'
-  schedule:
-    - cron: '17 5 * * 1'
   # D2-0004 is the current preregistered fresh generation. Trigger manually only
   # after its no-inference detector lock has been frozen by model-lock-bootstrap.
 
@@ -41,6 +39,11 @@ jobs:
               raise SystemExit('D2 execution blocked: expected preregistered generation RAC-PER-D2-0004.')
           if m.get('lock_status') != 'PREREGISTERED':
               raise SystemExit('D2 execution blocked: D2-0004 detector lock has not been frozen yet.')
+          result=Path('benchmark-results.json')
+          if result.exists():
+              published=json.loads(result.read_text())
+              if published.get('candidate',{}).get('config',{}).get('candidate_id') == m.get('generation_id'):
+                  raise SystemExit('D2 execution blocked: this generation already has published held-out evidence; preregister a fresh generation instead.')
           PY
 
       - name: Require preregistered detector lock and design policy
