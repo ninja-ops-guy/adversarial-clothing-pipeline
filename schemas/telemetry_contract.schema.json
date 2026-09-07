@@ -1,0 +1,275 @@
+{
+  "$defs": {
+    "calibrationProfileRef": {
+      "additionalProperties": false,
+      "properties": {
+        "profile_id": {
+          "pattern": "^RAC-PCP-[A-Za-z0-9._-]+-[0-9]+$",
+          "type": "string"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256hex"
+        }
+      },
+      "required": [
+        "profile_id",
+        "sha256"
+      ],
+      "type": "object"
+    },
+    "heldOutOutcome": {
+      "additionalProperties": false,
+      "properties": {
+        "benchmark_run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "candidate_sha256": {
+          "$ref": "#/$defs/sha256hex"
+        },
+        "heldout_detection_rates": {
+          "$ref": "#/$defs/rateMap"
+        },
+        "recorded_utc": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "PASS",
+            "FAIL"
+          ]
+        }
+      },
+      "required": [
+        "candidate_sha256",
+        "heldout_detection_rates",
+        "verdict",
+        "recorded_utc",
+        "benchmark_run_id"
+      ],
+      "type": "object"
+    },
+    "optimizerConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "hyperparameters": {
+          "type": "object"
+        },
+        "max_evaluations": {
+          "minimum": 1,
+          "type": "integer"
+        },
+        "optimizer_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "optimizer_id",
+        "seed",
+        "max_evaluations",
+        "hyperparameters"
+      ],
+      "type": "object"
+    },
+    "preHeldOutTelemetry": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/calibrationProfileRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_sha256": {
+          "$ref": "#/$defs/sha256hex"
+        },
+        "contract_version": {
+          "const": "1.0"
+        },
+        "coverage_metrics": {
+          "additionalProperties": true,
+          "properties": {
+            "coverage_entropy": {
+              "minimum": 0.0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "coverage_entropy"
+          ],
+          "type": "object"
+        },
+        "cross_model_disagreement": {
+          "additionalProperties": false,
+          "properties": {
+            "max_pairwise_delta": {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            "mean": {
+              "$ref": "#/$defs/rate"
+            },
+            "model_count": {
+              "minimum": 2,
+              "type": "number"
+            },
+            "spread": {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            "variance": {
+              "minimum": 0.0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "model_count",
+            "mean",
+            "variance",
+            "spread",
+            "max_pairwise_delta"
+          ],
+          "type": "object"
+        },
+        "generation_id": {
+          "pattern": "^RAC-PER-D2-\\d{4}$",
+          "type": "string"
+        },
+        "objective_trajectory": {
+          "additionalProperties": true,
+          "properties": {
+            "best": {
+              "type": "number"
+            },
+            "evaluations": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "final": {
+              "type": "number"
+            },
+            "initial": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "initial",
+            "final",
+            "best",
+            "evaluations"
+          ],
+          "type": "object"
+        },
+        "optimizer_config": {
+          "$ref": "#/$defs/optimizerConfig"
+        },
+        "pattern_fidelity": {
+          "$ref": "#/$defs/rate"
+        },
+        "per_surrogate_detection_rates": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/rateMap"
+            },
+            {
+              "minProperties": 2
+            }
+          ]
+        },
+        "printability": {
+          "$ref": "#/$defs/rate"
+        },
+        "recorded_utc": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "spectral_band_energy": {
+          "additionalProperties": {
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "minProperties": 1,
+          "type": "object"
+        },
+        "surrogate_mean_detection_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "surrogate_worst_case_detection_rate": {
+          "$ref": "#/$defs/rate"
+        },
+        "transformation_sweep_variance": {
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "contract_version",
+        "candidate_sha256",
+        "generation_id",
+        "recorded_utc",
+        "surrogate_mean_detection_rate",
+        "surrogate_worst_case_detection_rate",
+        "per_surrogate_detection_rates",
+        "cross_model_disagreement",
+        "transformation_sweep_variance",
+        "spectral_band_energy",
+        "pattern_fidelity",
+        "printability",
+        "objective_trajectory",
+        "coverage_metrics",
+        "optimizer_config",
+        "calibration_profile"
+      ],
+      "type": "object"
+    },
+    "rate": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "type": "number"
+    },
+    "rateMap": {
+      "additionalProperties": {
+        "$ref": "#/$defs/rate"
+      },
+      "minProperties": 1,
+      "type": "object"
+    },
+    "sha256hex": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    }
+  },
+  "$id": "https://rac.example/schemas/telemetry_contract.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "outcome": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/heldOutOutcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pre": {
+      "$ref": "#/$defs/preHeldOutTelemetry"
+    }
+  },
+  "required": [
+    "pre",
+    "outcome"
+  ],
+  "title": "D2-0005 Optimization Telemetry Contract",
+  "type": "object"
+}
