@@ -3,6 +3,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
+from scripts.build_d2_bundle import _weight_reference_compatible, verify_frozen_model_contract
+
 
 def test_d2_bundle_rejects_stale_or_unlocked_result(tmp_path: Path):
     result = {
@@ -66,3 +70,44 @@ def test_all_v2_model_manifests_pin_runtime_and_weight_hash():
         assert payload["framework"]
         assert payload["framework_version"]
         assert 0 <= float(payload["decision_threshold"]) <= 1
+
+
+def test_torchvision_default_alias_accepts_resolved_concrete_enum():
+    assert _weight_reference_compatible(
+        framework="torchvision",
+        frozen_ref="RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
+        measured_ref="RetinaNet_ResNet50_FPN_V2_Weights.COCO_V1",
+    )
+    assert _weight_reference_compatible(
+        framework="torchvision",
+        frozen_ref="FCOS_ResNet50_FPN_Weights.DEFAULT",
+        measured_ref="FCOS_ResNet50_FPN_Weights.COCO_V1",
+    )
+    assert not _weight_reference_compatible(
+        framework="torchvision",
+        frozen_ref="RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
+        measured_ref="FCOS_ResNet50_FPN_Weights.COCO_V1",
+    )
+
+
+def test_model_contract_keeps_state_hash_authoritative():
+    frozen = {
+        "weights_sha256": "a" * 64,
+        "decision_threshold": 0.5,
+        "framework": "torchvision",
+        "framework_version": "0.29.0+cpu",
+        "weights_id": "RetinaNet_ResNet50_FPN_V2_Weights.DEFAULT",
+        "preprocessing": {"input": "float32 RGB tensors [0,1]"},
+    }
+    measured = {
+        "state_dict_sha256": "a" * 64,
+        "decision_threshold": 0.5,
+        "framework": "torchvision",
+        "framework_version": "0.29.0+cpu",
+        "model_ref": "RetinaNet_ResNet50_FPN_V2_Weights.COCO_V1",
+    }
+    verify_frozen_model_contract("retinanet_resnet50_fpn_v2", frozen, measured)
+
+    measured["state_dict_sha256"] = "b" * 64
+    with pytest.raises(ValueError, match="hash mismatch"):
+        verify_frozen_model_contract("retinanet_resnet50_fpn_v2", frozen, measured)
