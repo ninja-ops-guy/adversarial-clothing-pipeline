@@ -6,7 +6,37 @@ Production-oriented research software for **machine-optimized fashion engineered
 **Python package version:** `3.1.0`  
 **Documentation baseline:** current `main` (RAC v2 D2 pipeline present)
 
-## RAC certification layer\n\nVersion 3.1 adds an internal fail-closed evidence certification layer under `ruthless_pipeline/certification/`, frozen protocol/model-set contracts, baseline qualification, sealed artifact bundles, physical/manufacturing conformity schemas, and a measured-result import boundary in Pattern Lab. See `docs/CERTIFICATION_SYSTEM.md`. Real detector weights, calibrated print data, physical trials, and production measurements remain required external evidence; the software does not manufacture them.\n\n## Current repository state
+## RAC certification layer\n\nVersion 3.1 adds an internal fail-closed evidence certification layer under `ruthless_pipeline/certification/`, frozen protocol/model-set contracts, baseline qualification, sealed artifact bundles, physical/manufacturing conformity schemas, and a measured-result import boundary in Pattern Lab. See `docs/CERTIFICATION_SYSTEM.md`. Real detector weights, calibrated print data, physical trials, and production measurements remain required external evidence; the software does not manufacture them.\n\n## Environment-adaptive candidate generation
+
+RAC now includes an original environment-adaptive optimizer inspired by CAPGen (arXiv:2412.07253) and informed by the architecture of the external YOLOv5 adversarial-patch repository. No AGPL implementation code is vendored.
+
+The new research path is:
+
+```text
+Textile Generator / NAP seed
+        ↓
+Environment palette extraction
+        ↓
+Pattern/color decomposition
+        ↓
+Palette-constrained allocation optimization
+        ↓
+EOT brightness/rotation/scale
+        ↓
+Surrogate-only scoring
+        ↓
+CandidateArtifact
+        ↓
+existing deformation / scene / benchmark stack
+        ↓
+freeze
+        ↓
+RAC-D2 held-out boundary
+```
+
+The optimizer can also rapidly recolor a learned structural allocation for a new environment without retraining the pattern. Generated artifacts explicitly record surrogate membership and `heldout_models_used: []`; they are candidate-generation outputs, not certification evidence. See `docs/CAPGEN_INTEGRATION.md`.
+
+## Current repository state
 
 | Area | Current state | Evidence boundary |
 |---|---|---|
