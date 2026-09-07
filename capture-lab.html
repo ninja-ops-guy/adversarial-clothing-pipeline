@@ -41,14 +41,23 @@
 <div class="divider"></div>
 <h3>Frozen ensemble</h3>
 <p class="note">Capture is blinded to outcomes. Analysis happens only after capture. Person/object inference is performed by the authorized local analyzer; browser heuristics are never evidence.</p>
-<textarea id="modelManifest" rows="7" spellcheck="false">{
-  "models": [],
-  "thresholds": {},
-  "preprocessing": {},
+<label>Frozen ensemble preset<select id="ensemblePreset"><option value="surrogate">SUR-v3 · 6-model authorized research ensemble</option><option value="heldout">HO-v3 · fresh held-out (do not use for optimization)</option><option value="custom">Custom manifest</option></select></label>
+<textarea id="modelManifest" rows="12" spellcheck="false">{
+  "models": ["yolov8n", "fasterrcnn_mobilenet_v3_320", "detr_resnet50", "ssdlite320_mobilenet_v3", "retinanet_resnet50_fpn_v2", "fcos_resnet50_fpn"],
+  "thresholds": {
+    "yolov8n": 0.5,
+    "fasterrcnn_mobilenet_v3_320": 0.5,
+    "detr_resnet50": 0.5,
+    "ssdlite320_mobilenet_v3": 0.5,
+    "retinanet_resnet50_fpn_v2": 0.5,
+    "fcos_resnet50_fpn": 0.5
+  },
+  "preprocessing": {"source": "frozen model manifests"},
   "identity_mode": "disabled"
 }</textarea>
 <button id="reviewBtn">Validate Capture Pair</button>
-<button id="analyzeBtn" disabled>Prepare Frozen Ensemble Analysis</button>
+<button id="analyzeBtn" disabled>Freeze Ensemble Analysis Contract</button>
+<div class="note">After export, run: <code>python scripts/analyze_capture_session.py &lt;session.json&gt; --output inference.json</code></div>
 <div id="analysisStatus" class="analysis">No analysis run.</div>
 <div class="divider"></div>
 <button id="exportBtn" disabled>Export Session Bundle</button>
