@@ -1,4 +1,7 @@
 # Perpetual Improvement Master Document
+
+> **Stale notice (2026-09-08):** This document's roadmap table (Part on self-improvement backlog, item 9) still describes statistical certification as "**Open** — D2 certification is threshold-based only". That statement is superseded: Wave E landed `ruthless_pipeline/certification/paired_arm_statistics.py` (paired-arm Δ, Wilson intervals, deterministic hash-seeded bootstrap, preregistered decision regions) and D2-0005 amendments A1–A4 made paired-arm statistics the preregistered analysis path — see `docs/PREREGISTRATION_D2-0005.md` (§9 amendment log) and `docs/PROJECT_PROGRESS.md` (2026-09-08 entries). The historical body below is retained unchanged; this banner is the correction.
+
 ## Open Research Questions & Cutting-Edge Development Framework
 
 **Document ID:** PIM-2026-09-06-001  
