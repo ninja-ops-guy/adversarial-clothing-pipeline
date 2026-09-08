@@ -79,6 +79,7 @@ from ruthless_pipeline.certification.release_format import (
     verify_release,
 )
 from ruthless_pipeline.certification.report_compiler import compile_report
+from ruthless_pipeline.certification.schema_version import require_schema_version
 from ruthless_pipeline.certification.trial_statistics import (
     evaluate_stopping_rule,
     invalid_condition_report,
@@ -347,6 +348,7 @@ def append_to_trial_store(store_path: Path, records: list[dict]) -> dict:
     """Append session trial records to the cumulative store; return the store."""
     if store_path.exists():
         store = json.loads(store_path.read_text())
+        require_schema_version(store, "1.0", label=f"cumulative trial store {store_path}")
     else:
         store = _label({
             "store_id": "SYNTHETIC-P1-CUMULATIVE-TRIAL-STORE",
