@@ -88,13 +88,23 @@ jobs:
             yolov8n.pt
           key: measured-detectors-v2-six-model-${{ runner.os }}
 
-      - name: Install CPU PyTorch
-        run: python -m pip install --upgrade pip && python -m pip install --index-url https://download.pytorch.org/whl/cpu torch torchvision
+      - name: Install pinned CPU PyTorch from runtime lock
+        run: |
+          python -m pip install --upgrade pip
+          TORCH=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['torch'])")
+          TORCHVISION=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['torchvision'])")
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==${TORCH}" "torchvision==${TORCHVISION}"
 
-      - name: Install pipeline and detector adapters
+      - name: Install pipeline and pinned detector adapters from runtime lock
         run: |
           python -m pip install -e . --no-deps
           python -m pip install -r benchmarks/requirements.txt
+          ULTRALYTICS=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['ultralytics'])")
+          TRANSFORMERS=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['transformers'])")
+          python -m pip install "ultralytics==${ULTRALYTICS}" "transformers==${TRANSFORMERS}"
+
+      - name: Verify runtime lock before any model download or inference
+        run: python scripts/verify_runtime_lock.py
 
       - name: Install browser runtime
         run: |
