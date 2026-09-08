@@ -104,6 +104,7 @@ def _write_inputs(tmp_path: Path) -> tuple[Path, Path]:
         (pool_dir / f"{cand_id}.png").write_bytes(f"fake-png-{cand_id}".encode())
         candidates.append({"candidate_id": cand_id, "png": f"{cand_id}.png"})
     pool = {
+        "schema_version": "3.0",
         "heldout_feedback_allowed": False,
         "candidate_count": len(candidates),
         "candidates": candidates,
@@ -273,7 +274,8 @@ def test_mean_arm_byte_identical_to_pristine_checkout(monkeypatch, tmp_path):
         out_dir = tmp_path / "out-pristine"
         _install_fakes(pristine, monkeypatch)
         monkeypatch.setattr(
-            sys, "argv",
+            sys,
+            "argv",
             ["select_surrogate_candidate.py", "--manifest", str(manifest_path),
              "--pool", str(pool_path), "--output-dir", str(out_dir)],
         )
