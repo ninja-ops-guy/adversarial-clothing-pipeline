@@ -486,3 +486,222 @@ def test_scaffold_field_paths_match_real_producers():
         generation_id="RAC-PER-D2-0005",
     )
     assert record_f4.category is FailureCategory.TRANSFORMATION_FRAGILITY
+
+
+# ---------------------------------------------------------------------------
+# Overnight stream MS: committed-evidence exports, population, traceability.
+# ---------------------------------------------------------------------------
+
+import hashlib
+
+from ruthless_pipeline.certification.manuscript_export import (
+    GENERATION_FIELDS,
+    PAPER1_GENERATION_HEADER,
+    GenerationRecord,
+    SourcedValue,
+    figure_scaffolds_populated,
+    load_committed_generation_records,
+    paper1_generation_csv,
+    paper1_generation_rows,
+    paper5_comparison_scaffold,
+    write_manuscript_exports,
+)
+
+COMMITTED_FIGURES = ROOT / "manuscript" / "figures"
+COMMITTED_EXPORTS = ROOT / "manuscript" / "exports"
+
+
+def _file_sha(rel_path: str) -> str:
+    return hashlib.sha256((ROOT / rel_path).read_bytes()).hexdigest()
+
+
+def test_committed_generation_records_values():
+    records = load_committed_generation_records(ROOT)
+    assert [r.generation_id for r in records] == ["RAC-PER-D2-0003", "RAC-PER-D2-0004"]
+    d3, d4 = records
+    assert d3.status == "closed"
+    status = json.loads((ROOT / "d2-latest-status.json").read_text())
+    benchmark = json.loads((ROOT / "benchmark-results.json").read_text())
+    f = d3.fields
+    # Values are exactly the committed evidence, not restated numbers.
+    assert f["decision"].value == status["decision"] == "FAIL"
+    assert f["heldout_detection_rate"].value == repr(
+        float(status["heldout"]["candidate_detection_rate"])
+    )
+    assert f["heldout_n"].value == str(status["heldout"]["n"]) == "36"
+    assert f["surrogate_detection_rate"].value == repr(
+        float(
+            benchmark["benchmark"]["comparative_summary"]["surrogate"][
+                "candidate_detection_rate"
+            ]
+        )
+    )
+    assert f["candidate_sha256"].value == benchmark["candidate"]["sha256"]
+    assert f["recorded_utc"].value == benchmark["generated_at"]
+    assert f["evidence_state"].value == "RAC-D0"
+    # D2-0004: running, all evidence fields blank.
+    assert d4.status == "running"
+    assert all(not sv.populated for sv in d4.fields.values())
+
+
+def test_paper1_generation_csv_rows_and_determinism():
+    records = load_committed_generation_records(ROOT)
+    text = paper1_generation_csv(records)
+    assert text == paper1_generation_csv(records)  # deterministic
+    parsed = list(csv.DictReader(io.StringIO(text)))
+    assert list(parsed[0].keys()) == list(PAPER1_GENERATION_HEADER)
+    assert [r["generation_id"] for r in parsed] == ["RAC-PER-D2-0003", "RAC-PER-D2-0004"]
+    d3, d4 = parsed
+    assert d3["status"] == "closed"
+    assert d4["status"] == "running"
+    for field_name in GENERATION_FIELDS:
+        # D2-0003: every populated field carries adjacent source + sha256.
+        assert d3[field_name] != ""
+        assert d3[f"{field_name}_source"]
+        assert d3[f"{field_name}_sha256"] == _file_sha(d3[f"{field_name}_source"])
+        # D2-0004: all evidence fields blank (no invented results).
+        assert d4[field_name] == ""
+        assert d4[f"{field_name}_source"] == ""
+        assert d4[f"{field_name}_sha256"] == ""
+    # Committed export matches regeneration byte-for-byte.
+    assert (COMMITTED_EXPORTS / "paper1_longitudinal.csv").read_text() == text
+
+
+def test_paper5_awaiting_scaffolds():
+    # Arms CSV: schema only, zero data rows.
+    arms_text = (COMMITTED_EXPORTS / "paper5_arms.csv").read_text()
+    assert arms_text.splitlines() == [",".join(PAPER5_ARMS_HEADER)]
+    # Comparison JSON: all data fields null, status set.
+    payload = json.loads((COMMITTED_EXPORTS / "paper5_comparison.json").read_text())
+    assert payload["status"] == "awaiting_d2-0005_closure"
+    assert payload == paper5_comparison_scaffold()
+    stats = payload["statistics"]
+    for key, value in stats.items():
+        if isinstance(value, dict):
+            assert all(v is None or v == [None, None] for v in value.values()), key
+        elif isinstance(value, list):
+            assert value == [None, None], key
+        else:
+            assert value is None, key
+    assert payload["preregistration_sha256"] is None
+    assert payload["decision_region"]["decision"] is None
+    # Canonical bytes round-trip.
+    text = (COMMITTED_EXPORTS / "paper5_comparison.json").read_text()
+    assert text.endswith("\n")
+    assert text == (
+        json.dumps(payload, sort_keys=True, separators=(",", ":")) + "\n"
+    )
+
+
+def test_generation_record_validation():
+    with pytest.raises(ValueError):
+        # running generation must not carry populated evidence.
+        GenerationRecord(
+            generation_id="RAC-PER-D2-9999",
+            status="running",
+            fields={"decision": SourcedValue("FAIL", "x.json", "a" * 64)},
+        ).validate()
+    with pytest.raises(ValueError):
+        # populated value without a sha256 is rejected.
+        SourcedValue("FAIL", "x.json", "").validate()
+    with pytest.raises(ValueError):
+        # blank value must not carry provenance.
+        SourcedValue("", "x.json", "a" * 64).validate()
+
+
+def test_figure_population_and_byte_identical_regeneration(tmp_path):
+    records = load_committed_generation_records(ROOT)
+    scaffolds = figure_scaffolds_populated(records)
+    by_id = {s["figure_id"]: s for s in scaffolds}
+    # F1/F2 populated from D2-0003 evidence.
+    f1 = by_id["F1"]
+    assert f1["status"] == "populated"
+    assert len(f1["data"]) == 1
+    point = f1["data"][0]
+    status = json.loads((ROOT / "d2-latest-status.json").read_text())
+    benchmark = json.loads((ROOT / "benchmark-results.json").read_text())
+    assert point["generation_id"] == "RAC-PER-D2-0003"
+    assert point["y"] == status["heldout"]["candidate_detection_rate"]
+    assert point["x"] == benchmark["benchmark"]["comparative_summary"]["surrogate"][
+        "candidate_detection_rate"
+    ]
+    assert point["color"] == "fail"
+    f2_point = by_id["F2"]["data"][0]
+    assert f2_point["x"] == benchmark["generated_at"]
+    assert f2_point["y"] == point["y"]
+    # F3-F8 remain empty awaiting_data scaffolds with no numbers.
+    for fid in ("F3", "F4", "F5", "F6", "F7", "F8"):
+        assert by_id[fid]["status"] == "awaiting_data"
+        assert by_id[fid]["data"] == []
+    # Every scaffold source declares its exact producer function + artifact ids.
+    for scaffold in scaffolds:
+        for source in scaffold["sources"]:
+            assert source["producer_function"].startswith(
+                "ruthless_pipeline.certification.manuscript_export."
+            )
+            assert "artifact_ids" in source
+    # Committed files are byte-identical to deterministic regeneration.
+    import ruthless_pipeline.certification.manuscript_export as mex
+
+    written = mex.write_figure_scaffolds_populated(
+        tmp_path / "figures", repo_root=ROOT
+    )
+    for path in written:
+        committed = COMMITTED_FIGURES / path.name
+        assert committed.read_bytes() == path.read_bytes(), path.name
+
+
+def _walk_numbers(node):
+    if isinstance(node, bool):
+        yield node
+    elif isinstance(node, (int, float)):
+        yield node
+    elif isinstance(node, dict):
+        for value in node.values():
+            yield from _walk_numbers(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _walk_numbers(item)
+
+
+def test_traceability_committed_artifacts():
+    """Every populated datum references an existing artifact + its real sha256;
+    awaiting_data entries contain no numbers."""
+    # paper1_longitudinal.csv provenance columns.
+    parsed = list(
+        csv.DictReader((COMMITTED_EXPORTS / "paper1_longitudinal.csv").open())
+    )
+    for row in parsed:
+        for field_name in GENERATION_FIELDS:
+            value = row[field_name]
+            source = row[f"{field_name}_source"]
+            sha = row[f"{field_name}_sha256"]
+            if value == "":
+                assert source == "" and sha == ""
+                continue
+            assert source, field_name
+            artifact = ROOT / source
+            assert artifact.is_file(), f"{field_name}: {source} not in repo"
+            assert sha == _file_sha(source), f"{field_name}: sha mismatch"
+            assert len(sha) == 64
+        # status provenance always present (closed or running).
+        assert row["status_source"] and row["status_sha256"] == _file_sha(
+            row["status_source"]
+        )
+    # Populated figure data: every source_artifacts entry exists and hashes.
+    for path in sorted(COMMITTED_FIGURES.glob("*.json")):
+        scaffold = json.loads(path.read_text())
+        if scaffold["status"] == "awaiting_data":
+            assert scaffold["data"] == []
+            assert list(_walk_numbers(scaffold["data"])) == []
+            continue
+        assert scaffold["status"] == "populated"
+        assert scaffold["data"], path.name
+        for datum in scaffold["data"]:
+            artifacts = datum["source_artifacts"]
+            assert artifacts, path.name
+            for source, sha in artifacts.items():
+                artifact = ROOT / source
+                assert artifact.is_file(), f"{path.name}: {source} missing"
+                assert sha == _file_sha(source), f"{path.name}: {source} sha"
+                assert len(sha) == 64
