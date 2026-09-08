@@ -9,6 +9,14 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ruthless_pipeline.certification.experiment_status import (
+    PACKAGING_COMPLETE,
+    PACKAGING_FAILED,
+    read_d2_status,
+    with_packaging,
+    write_d2_status,
+)
+
 
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -51,17 +59,29 @@ def capture_rows() -> list[dict]:
     return rows
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Seal a selected digital candidate into a print-and-test kit.")
-    parser.add_argument("--kit-dir", default="print-test-kit")
-    parser.add_argument("--benchmark", default="benchmark-results.json")
-    parser.add_argument("--d2-status", default="d2-latest-status.json")
-    parser.add_argument("--selection", default="benchmarks/runtime/surrogate-selection.json")
-    parser.add_argument("--model-manifest", default="benchmarks/model_manifest.json")
-    parser.add_argument("--protocol", default="protocols/RAC-PHYSICAL-PRINT-TEST-1.0.md")
-    parser.add_argument("--zip", default="print-test-kit.zip")
-    args = parser.parse_args()
+def record_packaging_outcome(
+    d2_status_path: Path, packaging_status: str, failure_detail: str | None = None
+) -> None:
+    """Record a packaging outcome in the d2 status file's packaging block.
 
+    Packaging is downstream of the sealed scientific record: only the
+    ``packaging`` block is updated; decision/evidence_state and every other
+    scientific field are carried through verbatim. Legacy (unversioned)
+    status files are upgraded to schema_version 1.0 on write.
+    """
+    status = read_d2_status(d2_status_path)
+    write_d2_status(d2_status_path, with_packaging(status, packaging_status, failure_detail))
+
+
+def _record_packaging_failure_best_effort(args: argparse.Namespace, detail: str) -> None:
+    try:
+        record_packaging_outcome(Path(args.d2_status), PACKAGING_FAILED, detail)
+    except Exception:
+        # Never mask the original packaging failure with a status-write error.
+        pass
+
+
+def run(args: argparse.Namespace) -> int:
     root = Path(args.kit_dir)
     verification_path = root / "export-verification.json"
     candidate_config_path = root / "design" / "candidate-config.json"
@@ -176,6 +196,36 @@ Current digital D2 decision: **{d2.get('decision', 'UNKNOWN')}**. This does not 
     Path("print-test-kit-status.json").write_text(json.dumps(status, indent=2, sort_keys=True) + "\n")
     print(json.dumps(status, indent=2, sort_keys=True))
     return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Seal a selected digital candidate into a print-and-test kit.")
+    parser.add_argument("--kit-dir", default="print-test-kit")
+    parser.add_argument("--benchmark", default="benchmark-results.json")
+    parser.add_argument("--d2-status", default="d2-latest-status.json")
+    parser.add_argument("--selection", default="benchmarks/runtime/surrogate-selection.json")
+    parser.add_argument("--model-manifest", default="benchmarks/model_manifest.json")
+    parser.add_argument("--protocol", default="protocols/RAC-PHYSICAL-PRINT-TEST-1.0.md")
+    parser.add_argument("--zip", default="print-test-kit.zip")
+    args = parser.parse_args()
+
+    # Packaging is downstream of the sealed scientific record: failures here
+    # are recorded in the d2 status packaging block (FAILED) and must never
+    # overwrite the scientific decision/evidence fields.
+    try:
+        rc = run(args)
+    except SystemExit:
+        _record_packaging_failure_best_effort(args, "packaging aborted (see stderr)")
+        raise
+    except Exception as exc:
+        _record_packaging_failure_best_effort(args, f"{type(exc).__name__}: {exc}")
+        raise
+    try:
+        record_packaging_outcome(Path(args.d2_status), PACKAGING_COMPLETE)
+    except Exception:
+        # The kit is sealed; a status-record glitch must not fail packaging.
+        pass
+    return rc
 
 
 if __name__ == "__main__":

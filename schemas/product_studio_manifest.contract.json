@@ -1,0 +1,12 @@
+{
+  "contract_id": "product_studio_manifest",
+  "accepted_schema_version": "1.4",
+  "compatibility_rule": "exact_match",
+  "compatibility_note": "Consumers MUST fail closed unless the manifest's top-level schema_version string exactly equals accepted_schema_version. Producers emitting any other version are rejected intentionally; never parse an unversioned or mismatched manifest silently.",
+  "producer": "product-studio.js (Product Studio 'Export Production Manifest')",
+  "consumers": [
+    "scripts/build_print_test_kit.js"
+  ],
+  "governance": "Single source of truth for the Product Studio manifest schema_version contract. Both the JS consumer and Python-side schema governance read this file; change it only via a reviewed commit that updates producer and consumers together.",
+  "evidence_scope": "synthetic_pipeline_validation_only"
+}

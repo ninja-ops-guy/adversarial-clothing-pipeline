@@ -14,6 +14,11 @@ from ruthless_pipeline.certification import (
     load_protocol,
     verify_certificate_bundle,
 )
+from ruthless_pipeline.certification.experiment_status import (
+    D2_STATUS_SCHEMA_VERSION,
+    make_packaging_block,
+    write_d2_status,
+)
 
 
 def _weight_reference_compatible(*, framework: str, frozen_ref: str, measured_ref: str) -> bool:
@@ -23,8 +28,8 @@ def _weight_reference_compatible(*, framework: str, frozen_ref: str, measured_re
     as ``Weights.COCO_V1``. ``str(Weights.DEFAULT)`` therefore resolves to the
     concrete member at runtime even though the preregistered manifest correctly
     records ``DEFAULT``. The loaded state-dict SHA-256 remains the authoritative
-    identity gate; this helper only prevents that documented alias from causing a
-    false metadata mismatch.
+    identity gate; this helper only prevents that documented alias from causing
+    a false metadata mismatch.
     """
     frozen_ref = frozen_ref.strip()
     measured_ref = measured_ref.strip()
@@ -170,7 +175,13 @@ def main() -> int:
         requested_state=EvidenceState.DIGITAL_HELDOUT,
     )
     ok, failures = verify_certificate_bundle(bundle.root)
+    # Scientific fields are sealed from the verified evidence FIRST. Packaging
+    # is a downstream, non-scientific concern recorded in a separate block
+    # (status format 1.0); a packaging failure can never overwrite the
+    # decision/evidence_state below.
     status = {
+        "schema_version": D2_STATUS_SCHEMA_VERSION,
+        "packaging": make_packaging_block(),
         "candidate_id": candidate_id,
         "protocol_id": protocol.protocol_id,
         "protocol_version": protocol.version,
@@ -185,7 +196,7 @@ def main() -> int:
         "heldout": result["benchmark"]["comparative_summary"].get("heldout", {}),
         "invalid_condition_fraction": result["benchmark"]["comparative_summary"].get("invalid_condition_fraction"),
     }
-    Path("d2-latest-status.json").write_text(json.dumps(status, indent=2, sort_keys=True) + "\n")
+    write_d2_status("d2-latest-status.json", status)
     print(json.dumps(status, indent=2, sort_keys=True))
     if not ok:
         return 3

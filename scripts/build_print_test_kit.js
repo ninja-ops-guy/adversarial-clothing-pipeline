@@ -1,7 +1,34 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { chromium } = require('@playwright/test');
+
+// The accepted Product Studio manifest schema_version is governed by a single
+// machine-readable contract registry (schemas/product_studio_manifest.contract.json)
+// shared with Python-side schema governance. It is loaded at runtime; the
+// schema version is never hardcoded here so JS<->producer drift cannot recur
+// silently. Loading fails closed: a missing/invalid registry is a hard error.
+const MANIFEST_CONTRACT_PATH = path.resolve(__dirname, '..', 'schemas', 'product_studio_manifest.contract.json');
+
+function loadAcceptedManifestSchemaVersion() {
+  let contract;
+  try {
+    contract = JSON.parse(fs.readFileSync(MANIFEST_CONTRACT_PATH, 'utf8'));
+  } catch (err) {
+    throw new Error(`Product Studio manifest contract registry unreadable: ${MANIFEST_CONTRACT_PATH}: ${err.message}`);
+  }
+  if (contract.contract_id !== 'product_studio_manifest') {
+    throw new Error(`Unexpected contract registry id: ${contract.contract_id} (expected 'product_studio_manifest')`);
+  }
+  if (contract.compatibility_rule !== 'exact_match') {
+    throw new Error(`Unsupported manifest compatibility rule: ${contract.compatibility_rule} (expected 'exact_match')`);
+  }
+  if (typeof contract.accepted_schema_version !== 'string' || !contract.accepted_schema_version) {
+    throw new Error('Manifest contract registry must declare a non-empty string accepted_schema_version');
+  }
+  return contract.accepted_schema_version;
+}
+
+const ACCEPTED_MANIFEST_SCHEMA_VERSION = loadAcceptedManifestSchemaVersion();
 
 const PRODUCTS = ['hoodie', 'hat', 'beanie', 'cargo', 'mask', 'shirt'];
 const PRIMARY_BY_FAMILY = {
@@ -46,7 +73,7 @@ function validateStudioManifest(file, cfg, primaryProduct, family) {
   }
 
   const required = {
-    schema_version: '1.4',
+    schema_version: ACCEPTED_MANIFEST_SCHEMA_VERSION,
     product: primaryProduct,
     production_status: 'digital_design_ready'
   };
@@ -114,6 +141,7 @@ async function main() {
   const family = cfg.family || cfg.patternType;
   if (!PRIMARY_BY_FAMILY[family]) throw new Error(`Unsupported Product Studio family: ${family}`);
 
+  const { chromium } = require('@playwright/test');
   fs.rmSync(outputDir, { recursive: true, force: true });
   fs.mkdirSync(path.join(outputDir, 'mockups'), { recursive: true });
   fs.mkdirSync(path.join(outputDir, 'design'), { recursive: true });
@@ -211,4 +239,8 @@ async function main() {
   }
 }
 
-main().catch(err => { console.error(err); process.exit(1); });
+if (require.main === module) {
+  main().catch(err => { console.error(err); process.exit(1); });
+}
+
+module.exports = { validateStudioManifest, loadAcceptedManifestSchemaVersion, ACCEPTED_MANIFEST_SCHEMA_VERSION, MANIFEST_CONTRACT_PATH };
