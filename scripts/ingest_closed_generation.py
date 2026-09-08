@@ -52,6 +52,7 @@ from ruthless_pipeline.certification.experiment import (
     StageRef,
 )
 from ruthless_pipeline.certification.failure_taxonomy import classify_failure
+from ruthless_pipeline.certification.schema_version import require_schema_version
 from ruthless_pipeline.certification.release_format import (
     ReleaseManifest,
     ReleaseRevisionLog,
@@ -133,6 +134,7 @@ def _require_file(path: Path, label: str) -> Path:
 
 
 def _check_generation_closed(generation: dict[str, Any], path: Path) -> str:
+    require_schema_version(generation, "1.0", label=f"generation record {path}")
     if not generation.get("lock_inference_performed", False):
         raise IngestError(
             f"generation {path} has lock_inference_performed=false; "
