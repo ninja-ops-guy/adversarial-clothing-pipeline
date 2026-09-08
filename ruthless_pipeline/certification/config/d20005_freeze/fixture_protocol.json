@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "schema_id": "d2-0005-fixture-protocol",
+  "generation_id": "RAC-PER-D2-0005",
+  "status": "FREEZE_CANDIDATE_NOT_ARMED",
+  "cluster_definition": {
+    "inferential_unit": "base_image",
+    "members_per_cluster": 36,
+    "member_geometry": "18 transformation views (brightness 0.7/1/1.3 x blur 0/0.8 x rotation -20/0/20) x 2 fixed fixture crops (prepare_fixture in scripts/run_measured_benchmark.py)",
+    "pairing": "within-member: both arms (M and C) scored on the SAME rendered view"
+  },
+  "base_image_requirements": {
+    "min_clusters": 72,
+    "fail_closed_floor": 8,
+    "fail_closed_floor_source": "ruthless_pipeline/certification/cluster_paired_arm_statistics.py DEFAULT_MIN_CLUSTERS = ABSOLUTE_MIN_CLUSTERS = 8",
+    "total_paired_members_at_min": 2592
+  },
+  "pinning_procedure": {
+    "content_pin": "SHA-256 of the exact image bytes, recorded in the frozen fixture manifest (schema d2-0005-fixture-manifest 1.0) BEFORE arming, exactly as source-zidane.jpg is pinned today",
+    "manifest_path_planned": "fixtures/d20005_base_images/manifest.json",
+    "frozen_before": "arming; any change after freeze requires a new pre-arming amendment under the section 7 deviations policy"
+  },
+  "independence_criteria": [
+    "images are sourced independently of the candidate pipeline and of every model in PERSON-SUR-v3 and PERSON-HO-v3",
+    "no image may be selected, rejected, or weighted on the basis of any measured outcome (selection is outcome-blind)",
+    "no two base images may be near-duplicates, crops, or transformed variants of one another (distinct photographic sources)",
+    "no base image may overlap the surrogate optimization or any prior-generation evaluation fixture"
+  ],
+  "rehearsal_gate": {
+    "metric": "realized ICC via the ANOVA rho-hat diagnostic of cluster_paired_arm_statistics.intracluster_diagnostics",
+    "measured_on": "outcome-free rehearsal data only",
+    "gate": "ICC <= 0.25 confirmed BEFORE arming; if realized ICC materially exceeds 0.25, K must be raised by a further pre-arming amendment (ICC ~ 0.5 requires K ~ 144, disclosed design-effect extrapolation) BEFORE arming",
+    "zero_variance_behavior": "rho-hat reported NA (null) at zero total variance, never 0 (red-team finding F7)"
+  },
+  "unmodeled_dependence_disclosure": "cross-model same-image correlation and view-level ICC heterogeneity are NOT modeled in the sizing study; they are absorbed into the within-cluster member structure at analysis time and bounded by the mandatory rehearsal ICC measurement gate",
+  "provenance_disclosure": "K = 72 is a disclosed grid pick from K in {8, 12, 18, 24, 36, 72} of the pre-arming cluster OC study (artifacts/design_analysis_d20005_cluster/results.json, schema 2.0), the smallest simulated cluster count achieving P(SUCCESS) >= 0.8 at delta_true = +0.2 under ICC = 0.25; the choice is conditioned on the ICC <= 0.25 assumption enforced by the rehearsal gate"
+}

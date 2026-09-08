@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0",
+  "schema_id": "d2-0005-freeze-candidate",
+  "generation_id": "RAC-PER-D2-0005",
+  "status": "FREEZE_CANDIDATE_NOT_ARMED_PENDING_REHEARSAL_AND_AUDIT",
+  "arming": {
+    "armed": false,
+    "statement": "This manifest is a freeze CANDIDATE. D2-0005 is NOT armed. Effectiveness requires governance-lead approval, independent verification, outcome-free rehearsal (ICC <= 0.25 gate), boundary audit, and user signature on the ARMING PACKET.",
+    "required_gates": [
+      "governance_lead_approval",
+      "independent_verification",
+      "rehearsal_icc_gate",
+      "boundary_audit",
+      "arming_packet_user_signoff"
+    ]
+  },
+  "keyed_to_commit": "67dd53fee37279ffb032e480053e165ebf6217fb",
+  "governing_documents": {
+    "frozen_preregistration": {
+      "path": "docs/PREREGISTRATION_D2-0005.md",
+      "sha256": "5a26c0839f49d5bb8feedaa77027e9d778ac5ed40edd96651266f83b24e3a0a3",
+      "note": "FROZEN (A1-A4); NOT edited by this package"
+    },
+    "amendment_a5_candidate": {
+      "path": "docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md",
+      "sha256": "f2647f35b6475c2896408014a1760b4462e4ce4b0ac87803a6de92aaf3ceb51b"
+    },
+    "go_nogo_memo": {
+      "path": "docs/D2-0005_GO_NOGO_MEMO.md",
+      "sha256": "f05e2d05029c7fe7c7303bf49534d58cddd1299a6351d0f498ed2045cad3ffbc"
+    },
+    "design_amendment_proposal_v2": {
+      "path": "docs/DESIGN_AMENDMENT_D2-0005_PROPOSAL.md",
+      "sha256": "aad8b8128757f27d4b2bbf2e1fff0ecbc17532eec0d00cd9f327b6260737334c"
+    }
+  },
+  "analysis_implementation": {
+    "module": {
+      "path": "ruthless_pipeline/certification/cluster_paired_arm_statistics.py",
+      "sha256": "bad02b22a9061dd3baf273d92facff42c847f4da2c2e08ed891ac118f6094674"
+    },
+    "design_script": {
+      "path": "scripts/design_analysis_d20005_cluster.py",
+      "sha256": "ddaab35f4afe382ce096808b3b083a46420c01480397c82c13f99878a91b6737"
+    },
+    "frozen_unit_level_module_untouched": {
+      "path": "ruthless_pipeline/certification/paired_arm_statistics.py",
+      "sha256": "afce3df27ef03668400779f47510719c39c3bf7ec38a6fe66aaa402ab90a3132"
+    },
+    "parameters": {
+      "z": 1.959963984540054,
+      "bootstrap_seed": 20260907,
+      "bootstrap_resamples": 10000,
+      "width_gate": 0.2,
+      "min_clusters": 8,
+      "cvar_alpha": 0.5,
+      "candidate_pool_seed": 1337
+    }
+  },
+  "frozen_inputs": [
+    {
+      "name": "freeze seeds pin",
+      "path": "ruthless_pipeline/certification/config/d20005_freeze/seeds.json",
+      "schema_id": "d2-0005-freeze-seeds",
+      "schema_version": "1.0",
+      "sha256": "6dff892080af5c88ac5d2f7b1e09e79a9bd2bb209f5512d643abb434b2b01eb6"
+    },
+    {
+      "name": "freeze model-set pin",
+      "path": "ruthless_pipeline/certification/config/d20005_freeze/model_sets.json",
+      "schema_id": "d2-0005-freeze-model-sets",
+      "schema_version": "1.0",
+      "sha256": "8d04ef8e2f2218a0bc6793ea5191e42634f6bd2d60d4bfb6f240a48e6d7cfbc6"
+    },
+    {
+      "name": "fixture protocol pin",
+      "path": "ruthless_pipeline/certification/config/d20005_freeze/fixture_protocol.json",
+      "schema_id": "d2-0005-fixture-protocol",
+      "schema_version": "1.0",
+      "sha256": "604fa9d861e2d29d12ee28381da9bc361837e7aa87e9b6baefa34d03bfdce457"
+    },
+    {
+      "name": "surrogate model set",
+      "path": "model_sets/PERSON-SUR-v3.json",
+      "schema_id": "model-set",
+      "schema_version": null,
+      "sha256": "2f06c19e9e51f3f607b04b499760ab7f470f4b6e18f9c834013fb0a06a5d8876",
+      "note": "legacy unversioned JSON; identity pinned by hash"
+    },
+    {
+      "name": "held-out model set",
+      "path": "model_sets/PERSON-HO-v3.json",
+      "schema_id": "model-set",
+      "schema_version": null,
+      "sha256": "ad1127659a5615871ff320056415dd3c8e8b6a27acef7c6a3bcc4a96e713495e",
+      "note": "legacy unversioned JSON; identity pinned by hash; no held-out access"
+    },
+    {
+      "name": "runtime lock",
+      "path": "benchmarks/runtime_lock.json",
+      "schema_id": "runtime-lock",
+      "schema_version": "1.0",
+      "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+    },
+    {
+      "name": "OC study evidence base",
+      "path": "artifacts/design_analysis_d20005_cluster/results.json",
+      "schema_id": "design-analysis-d20005-cluster",
+      "schema_version": "2.0",
+      "sha256": "5e8c78b1af395a67258960ac4d4f35e3e7cf20bfef381fd39f8d70c43a67d7d1"
+    }
+  ],
+  "planned_outputs": [
+    {
+      "name": "fixture image manifest",
+      "path": "fixtures/d20005_base_images/manifest.json",
+      "schema_id": "d2-0005-fixture-manifest",
+      "schema_version": "1.0",
+      "sha256": null,
+      "produced_at": "fixture freeze, before arming"
+    },
+    {
+      "name": "rehearsal ICC report",
+      "path": "artifacts/d20005_rehearsal_icc/results.json",
+      "schema_id": "d2-0005-rehearsal-icc",
+      "schema_version": "1.0",
+      "sha256": null,
+      "produced_at": "outcome-free rehearsal; arms only if ICC <= 0.25"
+    },
+    {
+      "name": "primary comparison result",
+      "path": "artifacts/d20005_primary_comparison/results.json",
+      "schema_id": "d2-0005-cluster-paired-arm-statistics",
+      "schema_version": "1.0",
+      "sha256": null,
+      "produced_at": "post-execution; canonical JSON of cluster_paired_arm_statistics.to_canonical_json"
+    },
+    {
+      "name": "per-candidate telemetry records",
+      "path": null,
+      "schema_id": "telemetry-contract",
+      "schema_version": "1.0",
+      "sha256": null,
+      "produced_at": "per arm; frozen and hashed before held-out inference (frozen_sha256), outcome appended append-only"
+    }
+  ],
+  "design_point": {
+    "min_clusters_K": 72,
+    "members_per_cluster": 36,
+    "paired_observations_at_K72": 2592,
+    "icc_gate": 0.25,
+    "confirmatory_floor_delta": 0.2,
+    "calibrated_coverage_claim": [
+      0.9,
+      0.95
+    ],
+    "nominal_coverage_claimed": false,
+    "false_success_at_design_point_max": 0.035,
+    "k_grid_provenance": [
+      8,
+      12,
+      18,
+      24,
+      36,
+      72
+    ],
+    "cross_model_same_image_correlation": "unmodeled; measured at rehearsal and disclosed"
+  }
+}

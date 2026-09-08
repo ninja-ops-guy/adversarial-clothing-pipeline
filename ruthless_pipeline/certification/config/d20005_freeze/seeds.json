@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "schema_id": "d2-0005-freeze-seeds",
+  "generation_id": "RAC-PER-D2-0005",
+  "status": "FREEZE_CANDIDATE_NOT_ARMED",
+  "seeds": {
+    "candidate_pool_seed": 1337,
+    "bootstrap_seed": 20260907,
+    "design_simulation_seed": 20261209
+  },
+  "notes": "candidate_pool_seed and bootstrap_seed are the frozen preregistered seeds of docs/PREREGISTRATION_D2-0005.md (A1-A4) and are UNCHANGED by amendment A5; design_simulation_seed is the disclosed seed of the pre-arming cluster OC study (scripts/design_analysis_d20005_cluster.py), recorded for provenance only."
+}
