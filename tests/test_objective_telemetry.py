@@ -274,8 +274,7 @@ def test_mean_arm_byte_identical_to_pristine_checkout(monkeypatch, tmp_path):
         out_dir = tmp_path / "out-pristine"
         _install_fakes(pristine, monkeypatch)
         monkeypatch.setattr(
-            sys,
-            "argv",
+            sys, "argv",
             ["select_surrogate_candidate.py", "--manifest", str(manifest_path),
              "--pool", str(pool_path), "--output-dir", str(out_dir)],
         )
