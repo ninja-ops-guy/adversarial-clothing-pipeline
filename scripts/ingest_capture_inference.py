@@ -18,6 +18,100 @@ from ruthless_pipeline.certification.trial_statistics import (
 )
 
 
+#: Only this evidence class may enter the cumulative P1 physical trial store.
+P1_EVIDENCE_CLASS = "physical_garment_p1"
+
+
+def enforce_promotion_gate(session: dict[str, Any]) -> None:
+    """Hard gate: only physical P1 garment sessions with passing calibration
+    may enter the cumulative P1 trial store. Synthetic pipeline validation
+    runs and paper/flat-print prototypes are rejected.
+    """
+    evidence_class = session.get("evidence_class")
+    if evidence_class != P1_EVIDENCE_CLASS:
+        raise ValueError(
+            "trial store promotion gate: evidence_class "
+            f"{evidence_class!r} may not enter the P1 trial store; "
+            f"only {P1_EVIDENCE_CLASS!r} sessions are eligible"
+        )
+    if session.get("calibration_pass") is not True:
+        raise ValueError(
+            "trial store promotion gate: calibration_pass must be true for "
+            "a session to enter the P1 trial store"
+        )
+
+
+def trial_store_record(
+    trial: PhysicalTrial,
+    session: dict[str, Any],
+    inference: dict[str, Any],
+    detail: dict[str, Any],
+    prev_record_sha256: str | None,
+) -> dict[str, Any]:
+    """One cumulative trial-store line: the trial itself, its human-readable
+    record, lineage needed for release export, and a hash-chain link to the
+    previous stored record (SHA-256 over the previous canonical line)."""
+    record = {
+        "schema_version": "1.0",
+        "trial": asdict(trial),
+        "trial_record": trial_payload(trial, session, inference, detail),
+        "evidence_class": str(session["evidence_class"]),
+        "calibration_pass": bool(session.get("calibration_pass")),
+        "lineage": {
+            "experiment_id": str(session["experiment_id"]),
+            "hypothesis_id": str(session.get("hypothesis_id", "UNSPECIFIED")),
+            "calibration_profile_id": str(session.get("calibration_profile_id", "CAPTURE-CALIBRATION")),
+            "candidate": session.get("candidate", {}),
+            "generation": session.get("generation", {}),
+        },
+        "prev_record_sha256": prev_record_sha256,
+    }
+    return record
+
+
+def trial_from_store_record(record: dict[str, Any]) -> PhysicalTrial:
+    raw = record.get("trial")
+    if not isinstance(raw, dict):
+        raise ValueError("trial store record is missing the 'trial' payload")
+    return PhysicalTrial(**raw)
+
+
+def load_trial_store(path: Path) -> list[dict[str, Any]]:
+    """Load a cumulative trial store (canonical JSONL), enforcing the
+    promotion gate on every stored record and verifying the hash chain."""
+    if not path.exists():
+        return []
+    records: list[dict[str, Any]] = []
+    prev_sha: str | None = None
+    for line_number, line in enumerate(path.read_text().splitlines(), start=1):
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        if record.get("schema_version") != "1.0":
+            raise ValueError(f"trial store line {line_number}: unsupported schema_version")
+        if record.get("prev_record_sha256") != prev_sha:
+            raise ValueError(
+                f"trial store line {line_number}: hash-chain break "
+                "(prev_record_sha256 does not match the previous record)"
+            )
+        enforce_promotion_gate(
+            {"evidence_class": record.get("evidence_class"), "calibration_pass": record.get("calibration_pass")}
+        )
+        trial = trial_from_store_record(record)
+        if any(trial_from_store_record(r).trial_id == trial.trial_id for r in records):
+            raise ValueError(f"trial store line {line_number}: duplicate trial_id {trial.trial_id!r}")
+        records.append(record)
+        prev_sha = hashlib.sha256(line.encode()).hexdigest()
+    return records
+
+
+def append_trial_store(path: Path, record: dict[str, Any]) -> None:
+    """Append one canonical-JSON record line to the cumulative store."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(canonical(record).decode() + "\n")
+
+
 def canonical(payload: dict[str, Any]) -> bytes:
     return json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
 
@@ -206,10 +300,32 @@ def main() -> int:
         raise SystemExit("ingestion blocked: P1 calibration gate did not pass")
 
     trial, detail = build_trial(session, inference, args.source)
-    # NOTE: --trial-store accumulation is not yet implemented; analysis covers this session only.
-    analysis_trials = [trial]
-    stats = paired_trial_statistics([trial], bootstrap_resamples=1000) if trial.control_detected else None
-    invalid = invalid_condition_report([trial])
+    store_records: list[dict[str, Any]] | None = None
+    if args.trial_store:
+        try:
+            enforce_promotion_gate(session)
+        except ValueError as exc:
+            raise SystemExit(f"ingestion blocked: {exc}")
+        store_path = Path(args.trial_store)
+        try:
+            store_records = load_trial_store(store_path)
+        except ValueError as exc:
+            raise SystemExit(f"ingestion blocked: {exc}")
+        if any(trial_from_store_record(r).trial_id == trial.trial_id for r in store_records):
+            raise SystemExit(f"ingestion blocked: duplicate trial_id {trial.trial_id!r} already in trial store")
+        prev_sha = hashlib.sha256(canonical(store_records[-1])).hexdigest() if store_records else None
+        record = trial_store_record(trial, session, inference, detail, prev_sha)
+        append_trial_store(store_path, record)
+        store_records.append(record)
+        analysis_trials = [trial_from_store_record(r) for r in store_records]
+    else:
+        analysis_trials = [trial]
+    stats = (
+        paired_trial_statistics(analysis_trials, bootstrap_resamples=1000)
+        if any(t.control_detected for t in analysis_trials)
+        else None
+    )
+    invalid = invalid_condition_report(analysis_trials)
     rule = load_rule(Path(args.stopping_rule))
     stopping = evaluate_stopping_rule(rule, stats) if stats else None
 
@@ -234,6 +350,10 @@ def main() -> int:
         "warning": "Each Capture Lab session/source is one matched trial; frames remain nested. Continue collection until the preregistered stopping rule is satisfied.",
         "cumulative_trial_count": len(analysis_trials),
     }
+    if args.trial_store:
+        statistics_payload["trial_store"] = str(args.trial_store)
+        statistics_payload["stored_trial_count"] = len(analysis_trials)
+        statistics_payload["valid_trial_count"] = sum(1 for t in analysis_trials if t.control_detected)
     stats_path = out / "statistics.json"
     stats_path.write_text(json.dumps(statistics_payload, indent=2, sort_keys=True) + "\n")
 
@@ -252,6 +372,8 @@ def main() -> int:
         "cumulative_trial_count": len(analysis_trials),
         "experiment_registered": experiment.experiment_id if experiment else None,
     }
+    if args.trial_store:
+        summary["trial_store"] = str(args.trial_store)
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
 

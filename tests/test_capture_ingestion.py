@@ -59,3 +59,16 @@ def test_build_trial_marks_flat_print_as_non_p1_metadata():
     }
     trial, _ = build_trial(session, inference, "still")
     assert trial.metadata["evidence_class"] == "printed_flat_prototype"
+
+
+def test_promotion_gate_rejects_non_p1_classes():
+    import pytest
+
+    from scripts.ingest_capture_inference import enforce_promotion_gate
+
+    for cls in ("synthetic_pipeline_validation_only", "printed_flat_prototype", "paper_prototype"):
+        with pytest.raises(ValueError, match="promotion gate"):
+            enforce_promotion_gate({"evidence_class": cls, "calibration_pass": True})
+    with pytest.raises(ValueError, match="calibration_pass"):
+        enforce_promotion_gate({"evidence_class": "physical_garment_p1", "calibration_pass": False})
+    enforce_promotion_gate({"evidence_class": "physical_garment_p1", "calibration_pass": True})
