@@ -162,7 +162,7 @@ def main() -> int:
             raise SystemExit(f"missing model set: {set_path}")
         set_payload = json.loads(set_path.read_text())
         if set_payload.get("status") != "PREREGISTERED":
-            raise SystemExit(f"model set not preregistered: {set_path}")
+            raise SystemExit(f"model set not preregistered: {set_name}")
         if list(set_payload.get("models", [])) != measured_members:
             raise SystemExit(f"model-set membership mismatch for {set_name}")
         bundle.write_json(f"manifests/model_sets/{set_name}.json", set_payload)
