@@ -1,6 +1,8 @@
 # RAC Studio UX Specification — Unified Design / Research / Capture / Evidence
 
-**Status:** SPECIFICATION ONLY. This document defines work to be performed **after the current experiment wave** (D2-0004 re-run, D2-0005 arming). Nothing here is implemented; nothing here changes any frozen contract, protocol, model manifest, generation, benchmark, or workflow.
+**Status:** SPECIFICATION ONLY. This document defines work to be performed **after the current experiment wave** (D2-0005 arming/execution). Nothing here is implemented; nothing here changes any frozen contract, protocol, model manifest, generation, benchmark, or workflow.
+
+> **Dated note (2026-09-08):** the D2-0004 re-run referenced above has completed — D2-0004 closed FAIL / RAC-D0 (log-attested); see `docs/D2-0004_CLOSURE_NOTE.md`. The re-run-allowance counter examples below (e.g., G6 "CONSUMED: 0") describe the pre-closure moment at which this spec was written; the D2-0004-INFRA-001 authorization is now consumed (1 of 1).
 **Grounded at:** commit `b4fe0e5` ("ci: land Wave G runtime lock workflow fixes").
 **Audience:** the single operator of this pipeline, and any future collaborator.
 
