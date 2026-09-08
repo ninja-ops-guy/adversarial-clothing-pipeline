@@ -10,6 +10,7 @@ from typing import Any
 
 from ruthless_pipeline.certification.experiment import ExperimentArtifact, ExperimentRegistry, StageRef
 from ruthless_pipeline.certification.physical import PhysicalTrial
+from ruthless_pipeline.certification.schema_version import require_schema_version
 from ruthless_pipeline.certification.trial_statistics import (
     PreregisteredStoppingRule,
     evaluate_stopping_rule,
@@ -87,8 +88,7 @@ def load_trial_store(path: Path) -> list[dict[str, Any]]:
         if not line.strip():
             continue
         record = json.loads(line)
-        if record.get("schema_version") != "1.0":
-            raise ValueError(f"trial store line {line_number}: unsupported schema_version")
+        require_schema_version(record, "1.0", label=f"trial store line {line_number}")
         if record.get("prev_record_sha256") != prev_sha:
             raise ValueError(
                 f"trial store line {line_number}: hash-chain break "
