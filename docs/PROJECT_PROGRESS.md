@@ -1,8 +1,8 @@
 # RAC Project Progress Ledger
 
 **Version:** 1.0.0  
-**Last updated:** 2026-09-08  
-**Tracking baseline:** `main` at `81cc794` plus the active D2-0004 generation marker.  
+**Last updated:** 2026-09-08 (update 3 — D2-0004 closed)  
+**Tracking baseline:** `main` at `8851e01` (D2-0004 closed FAIL / RAC-D0, log-attested).  
 **Purpose:** Single source of truth for what has been completed, what is in progress, what is externally blocked, and what constitutes the next production/research gates.
 
 > This ledger tracks engineering and research progress. A software-complete capability is not automatically physical evidence, manufacturing evidence, or a product-efficacy claim.
@@ -25,7 +25,7 @@ RAC has moved from a browser pattern prototype into a multi-layer research and p
 | Core software / research infrastructure | **Advanced / substantially complete** | Major research-OS and evidence primitives exist; continued work should be experiment-driven |
 | Product Studio / reference-fidelity system | **Implemented** | Five canonical families, product mapping, reference scoring/search and production exports exist |
 | Digital certification architecture | **Implemented** | Frozen manifests, generation isolation, held-out model rotation and bundle verification exist |
-| D2-0004 | **IN PROGRESS** | Fresh held-out generation is running; published status must remain D2-0003 until completion |
+| D2-0004 | **CLOSED — retained negative (log-attested)** | FAIL / RAC-D0 from authorized re-run 34175028944 (2026-09-08); closure rests on log-attested evidence per `docs/D2-0004_CLOSURE_NOTE.md`; sealed release `releases/RAC-EXP-2026-001/`; root `d2-latest-status.json` now carries this outcome |
 | Production Alpha preparation | **IN PROGRESS** | First SKU decision/spec exists; exact provider IDs/template/order remain external |
 | Statistical P1 infrastructure | **Implemented** | Paired statistics, uncertainty, stopping rules and invalid-condition accounting are in code |
 | Calibration infrastructure | **Implemented as software/spec** | Calibration ingestion + target spec exist; real printed calibration measurements do not |
@@ -106,7 +106,7 @@ RAC has moved from a browser pattern prototype into a multi-layer research and p
 - [x] D2-0003 negative result retained as FAIL / RAC-D0.
 - [x] D2-0004 fresh held-out generation preregistered.
 - [x] D2-0004 fixture source hash-pinned, cached once per workspace and given verified fallbacks.
-- [ ] D2-0004 closed and published.
+- [x] D2-0004 closed and published. *(Closed 2026-09-08: FAIL / RAC-D0, log-attested; root `d2-latest-status.json` updated; `releases/RAC-EXP-2026-001/`.)*
 - [ ] P1 physical evidence.
 - [ ] P2 durability evidence.
 - [ ] M1 golden-sample evidence.
@@ -165,9 +165,9 @@ RAC has moved from a browser pattern prototype into a multi-layer research and p
 
 ## Active work
 
-### D2-0004 — do not mutate
+### D2-0004 — CLOSED 2026-09-08 (do not mutate; retained negative)
 
-Current marker:
+Closed marker (immutable):
 
 - generation: `RAC-PER-D2-0004`
 - protocol: `RAC-PERSON-DETECT-1.2`
@@ -177,21 +177,22 @@ Current marker:
 - selection boundary: `SURROGATE_ONLY`
 - held-out feedback: forbidden
 - pool: 100 candidates
-- status: running / awaiting publication
+- outcome: **FAIL / RAC-D0** (held-out detection 1.00 → 1.00, mean 0.99473 → 0.89599, n=36, PERSON-HO-v3), authorized re-run 34175028944, source commit `b4fe0e5`; closure is **log-attested** (validated bundle never archived — step-22 packaging failure, infra fix `5cdce1b`); see `docs/D2-0004_CLOSURE_NOTE.md` and `manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json`
+- sealed release: `releases/RAC-EXP-2026-001/`
 
-The published `d2-latest-status.json` still names D2-0003. This is correct until D2-0004 closes. Do not interpret the old published status as the new generation.
+The published `d2-latest-status.json` now carries the D2-0004 outcome (FAIL / RAC-D0). D2-0003's status file is preserved byte-identical at `manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json`.
 
 ## Immediate next tasks
 
 ### Can execute in software now
 
-- [ ] Close D2-0004 and ingest the immutable result into the research release/telemetry system.
-- [ ] Instantiate the first canonical `RAC-EXP-YYYY-NNN` release from a closed generation.
+- [x] Close D2-0004 and ingest the immutable result into the research release/telemetry system. *(Closed 2026-09-08: FAIL / RAC-D0, log-attested; evidence at `manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json`.)*
+- [x] Instantiate the first canonical `RAC-EXP-YYYY-NNN` release from a closed generation. *(Done: `releases/RAC-EXP-2026-001/`.)*
 - [ ] Wire automatic failure-taxonomy classification into generation closure.
-- [ ] Generate manuscript-ready tables/figures automatically from the first canonical release.
-- [ ] Preregister D2-0005 around a research hypothesis rather than generic candidate improvement.
-- [ ] Recommended D2-0005 study: equal-budget mean vs worst-case/CVaR optimization.
-- [ ] Begin longitudinal transfer-predictor dataset with D2-0003, D2-0004 and later generations.
+- [ ] Generate manuscript-ready tables/figures automatically from the first canonical release. *(Partial: `manuscript/exports/paper1_longitudinal.csv` and figures F1/F2 are populated for D2-0003 and D2-0004 with declared per-field provenance.)*
+- [x] Preregister D2-0005 around a research hypothesis rather than generic candidate improvement. *(Done: `docs/PREREGISTRATION_D2-0005.md`, frozen, NOT armed.)*
+- [x] Recommended D2-0005 study: equal-budget mean vs worst-case/CVaR optimization. *(Preregistered as the two-arm mean vs CVaR_0.5 ablation.)*
+- [x] Begin longitudinal transfer-predictor dataset with D2-0003, D2-0004 and later generations. *(Begun: `manuscript/exports/paper1_longitudinal.csv` rows for D2-0003 and D2-0004.)*
 
 ### External / physical critical path
 
@@ -247,7 +248,7 @@ Complete when:
 
 - [x] Methodology and telemetry infrastructure.
 - [x] Closed-generation discipline.
-- [ ] D2-0004 closed.
+- [x] D2-0004 closed. *(2026-09-08, FAIL / RAC-D0, log-attested.)*
 - [ ] At least three comparable closed generations for first serious predictor analysis.
 - [ ] Results/discussion populated without post-hoc contamination.
 
@@ -338,4 +339,14 @@ The project should now be measured by **closed evidence loops**, not feature cou
 - **F0 design-analysis finding (D2-0005):** `docs/DESIGN_ANALYSIS_D2-0005.md` shows the frozen D2-0005 analysis is **INCONCLUSIVE-dominated at the planned n = 72** for symmetric/sparse discordance structures (P(INCONCLUSIVE) ≈ 1.000 across |Δ_true| ≤ 0.3 under independent pairing; mean CI width ≈ 0.27–0.32 vs the 0.20 width gate), with decisive power only under maximum-concordance (`m_dominated`) pairing or at n = 144. **Pending user design decision:** either (a) amend the D2-0005 DESIGN pre-arming per its §7 deviations policy / §9 amendment log, or (b) declare D2-0005 an exploratory/pilot-sized prospective experiment. No threshold change has been proposed or made; D2-0005 remains frozen and NOT armed, gated on D2-0004 closing first.
 - **Open user actions:** (1) Printful private API token (`PF_TOKEN`) — printfile/template archive and v2 catalog mapping are auth-gated (`production_alpha/ORDER_CHECKLIST.md` Step 0); (2) download + hash the exact product-388 template/printfile archive and fill `SKU_MANIFEST_DRAFT.json` UNKNOWNs; (3) place the matched control/candidate garment order (user-executed; the agent never orders/pays); (4) monitor re-run 34175028944 and, on closure, ingest the immutable result via `scripts/ingest_closed_generation.py` and publish status.
 
+### 2026-09-08 (update 3 — D2-0004 CLOSED FAIL / RAC-D0, log-attested; release RAC-EXP-2026-001 sealed)
+
+> **Status update (2026-09-08):** the update-2 entry's statements that run 34175028944 was "IN PROGRESS", that the published `d2-latest-status.json` "correctly remains D2-0003", and that D2-0004 closure/ingestion was an open task are superseded by this entry. The historical entries are retained unchanged for provenance.
+
+- **D2-0004 CLOSED — FAIL / RAC-D0 (log-attested):** authorized re-run 34175028944 completed all science steps (18 measured held-out + full-benchmark inference; 19 bundle build+verify; 20 validation `measured_locked`; 21 status write). Step 22 (build print-test kit) failed on a Product Studio manifest schema guard (consumer required 1.3, manifest is 1.4; infrastructure-only fix `5cdce1b`), so steps 23–28 were skipped and the validated bundle was never archived. Closure therefore rests on maintainer-uploaded run logs transcribed into `manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json`; canonical narrative: `docs/D2-0004_CLOSURE_NOTE.md`. Outcome: held-out detection 1.00 → 1.00 (mean 0.99473 → 0.89599, n=36, PERSON-HO-v3); certificate `RAC-PER-D2-0004-1.0.0-1.2`; candidate sha256 `9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803`; source commit `b4fe0e5`. Root `d2-latest-status.json` now carries this outcome; D2-0003's status file is preserved byte-identical at `manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json`.
+- **Sealed release:** `releases/RAC-EXP-2026-001/` — the first canonical RAC-EXP release, from this closed generation.
+- **Manuscript provenance:** `manuscript/exports/paper1_longitudinal.csv` and figures F1/F2 are populated for D2-0003 and D2-0004; D2-0004's `surrogate_detection_rate` remains blank because it is genuinely not log-attested (see `not_log_attested_gaps`).
+- **SEC-F supply-chain fixes landed:** `package-lock.json`, `benchmarks/frozen_surface_sha256.json` enforcement, and exact pins `timm==1.0.29` / `safetensors==0.8.0` in `benchmarks/requirements.txt`.
+- **Validation:** full suite 343 passed.
+- **Open user actions (unchanged except item 4 resolved):** (1) Printful private API token (`PF_TOKEN`); (2) download + hash the product-388 template/printfile archive and fill `SKU_MANIFEST_DRAFT.json` UNKNOWNs; (3) place the matched control/candidate garment order (user-executed); (5) fabricate and capture the physical calibration target RAC-CALT-P1-0001. D2-0005 remains frozen and NOT armed; the F0 design decision from update 2 is still pending.
 Update this ledger whenever a hard gate closes, an evidence state changes, a production artifact is frozen, or a new research generation is opened/closed.
