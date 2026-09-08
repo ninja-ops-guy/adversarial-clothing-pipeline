@@ -903,10 +903,17 @@ PAPER1_GENERATION_HEADER: tuple[str, ...] = (
 )
 
 #: Committed evidence files backing the D2-0003 closed-generation row.
-D2_0003_STATUS_JSON = "d2-latest-status.json"
+#: D2-0003's status JSON was archived byte-identical when D2-0004 closed and
+#: claimed the root d2-latest-status.json; the root benchmark-results.json
+#: remains D2-0003's (its candidate_id is RAC-PER-D2-0003).
+D2_0003_STATUS_JSON = "manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json"
 D2_0003_BENCHMARK_JSON = "benchmark-results.json"
-#: Generation JSON backing the D2-0004 "running" row (read-only).
-D2_0004_GENERATION_JSON = "generations/RAC-PER-D2-0004.json"
+#: Log-attested closure evidence backing the D2-0004 closed-generation row.
+#: The CI-validated bundle was never archived (packaging step 22 schema-guard
+#: failure, infra fix 5cdce1b); closure rests on maintainer-uploaded run logs.
+D2_0004_LOG_ATTESTED_JSON = (
+    "manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json"
+)
 
 _PAPER5_COMPARISON_STATUS = "awaiting_d2-0005_closure"
 
@@ -981,8 +988,11 @@ def load_committed_generation_records(
     """Build generation rows from the repo's committed evidence files.
 
     D2-0003 (closed, retained negative): populated from d2-latest-status.json
-    and benchmark-results.json. D2-0004: status "running" (provenance: its
-    generation JSON), all evidence fields blank until its release exists.
+    and benchmark-results.json. D2-0004 (closed, retained negative): populated
+    from the log-attested closure evidence (CI run 34175028944 validated the
+    bundle in steps 19-21 but never archived it; see
+    docs/AMENDMENT_D2-0004_INFRA-001.md and the release RAC-EXP-2026-001).
+    Fields the logs do not attest stay blank — never reconstructed.
     """
     repo_root = Path(repo_root)
     status_path = repo_root / D2_0003_STATUS_JSON
@@ -1044,17 +1054,66 @@ def load_committed_generation_records(
         },
     )
 
-    generation_path = repo_root / D2_0004_GENERATION_JSON
-    if not generation_path.is_file():
-        raise ValueError("D2-0004 generation JSON is missing")
-    generation = json.loads(generation_path.read_text())
+    evidence_path = repo_root / D2_0004_LOG_ATTESTED_JSON
+    if not evidence_path.is_file():
+        raise ValueError("D2-0004 log-attested closure evidence is missing")
+    evidence = json.loads(evidence_path.read_text())
+    bundle = evidence["step19_d2_evidence_bundle_stdout"]
+    heldout4 = bundle["heldout"]
     d2_0004 = GenerationRecord(
-        generation_id=str(generation["generation_id"]),
-        status="running",
+        generation_id=str(bundle["candidate_id"]),
+        status="closed",
         status_source=_file_sourced(
-            repo_root, D2_0004_GENERATION_JSON, generation["status"]
+            repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["evidence_state"]
         ),
-        fields={},
+        fields={
+            "protocol": _file_sourced(
+                repo_root,
+                D2_0004_LOG_ATTESTED_JSON,
+                f"{bundle['protocol_id']} {bundle['protocol_version']}",
+            ),
+            "surrogate_model_set": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["surrogate_model_set"]
+            ),
+            "heldout_model_set": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["heldout_model_set"]
+            ),
+            "candidate_sha256": _file_sourced(
+                repo_root,
+                D2_0004_LOG_ATTESTED_JSON,
+                evidence["step18_measured_benchmark_stdout"]["candidate_sha256"],
+            ),
+            # surrogate_detection_rate intentionally blank: the logs attest
+            # only the full-benchmark aggregate over 144 rows, never the
+            # surrogate-only split (see not_log_attested_gaps).
+            "heldout_detection_rate": _file_sourced(
+                repo_root,
+                D2_0004_LOG_ATTESTED_JSON,
+                repr(float(heldout4["candidate_detection_rate"])),
+            ),
+            "heldout_n": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, heldout4["n"]
+            ),
+            "decision": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["decision"]
+            ),
+            "evidence_state": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["evidence_state"]
+            ),
+            "certificate_id": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["certificate_id"]
+            ),
+            "source_commit": _file_sourced(
+                repo_root, D2_0004_LOG_ATTESTED_JSON, bundle["source_commit"]
+            ),
+            # Only the run date is attested; the generated_at timestamp of
+            # benchmark-results.json was never printed to the logs.
+            "recorded_utc": _file_sourced(
+                repo_root,
+                D2_0004_LOG_ATTESTED_JSON,
+                evidence["benchmark_run"]["run_date"],
+            ),
+        },
     )
     records = (d2_0003, d2_0004)
     for record in records:
@@ -1193,9 +1252,12 @@ def _closed_figure_point(record: GenerationRecord) -> dict[str, Any]:
         {sv.source for sv in fields.values() if sv.populated}
         | ({record.status_source.source} if record.status_source.populated else set())
     )
+    surrogate_rate = fields.get("surrogate_detection_rate", SourcedValue()).value
     return {
         "generation_id": record.generation_id,
-        "surrogate_detection_rate": float(fields["surrogate_detection_rate"].value),
+        "surrogate_detection_rate": (
+            float(surrogate_rate) if surrogate_rate != "" else None
+        ),
         "heldout_detection_rate": float(fields["heldout_detection_rate"].value),
         "decision": fields["decision"].value,
         "recorded_utc": fields["recorded_utc"].value,
@@ -1216,17 +1278,27 @@ def figure_scaffolds_populated(
     """Figure scaffolds with closed-generation data populated deterministically.
 
     F1 (transfer scatter) and F2 (generation timeline) gain one data point per
-    closed generation record; each point carries ``source_artifacts`` mapping
-    the committed evidence path to its SHA-256. All other figures keep
-    ``status: "awaiting_data"`` with an empty ``data`` array.
+    closed generation record whose required fields are attested (F1 needs the
+    surrogate-only detection rate; F2 needs recorded_utc). Records lacking an
+    attested value are excluded from that figure rather than reconstructed —
+    nothing here invents results. Each point carries ``source_artifacts``
+    mapping the committed evidence path to its SHA-256. All other figures
+    keep ``status: "awaiting_data"`` with an empty ``data`` array.
     """
     closed = [r for r in records if r.status == "closed"]
     closed.sort(key=lambda r: r.generation_id)
     points = [_closed_figure_point(record) for record in closed]
+    # F1 plots the surrogate-only detection rate on x. D2-0004's logs never
+    # attested the surrogate-only split (full-benchmark aggregate only), so
+    # its point is excluded from F1 rather than reconstructed. F2's timeline
+    # needs only recorded_utc + heldout rate, both attested, so D2-0004 is
+    # included there.
+    f1_points = [p for p in points if p["surrogate_detection_rate"] is not None]
+    f2_points = [p for p in points if p["recorded_utc"]]
     scaffolds = []
     for scaffold in figure_scaffolds():
         scaffold = dict(scaffold)
-        if scaffold["figure_id"] == "F1" and points:
+        if scaffold["figure_id"] == "F1" and f1_points:
             scaffold["status"] = "populated"
             scaffold["data"] = [
                 {
@@ -1236,9 +1308,9 @@ def figure_scaffolds_populated(
                     "color": p["decision"].lower(),
                     "source_artifacts": p["source_artifacts"],
                 }
-                for p in points
+                for p in f1_points
             ]
-        elif scaffold["figure_id"] == "F2" and points:
+        elif scaffold["figure_id"] == "F2" and f2_points:
             scaffold["status"] = "populated"
             scaffold["data"] = [
                 {
@@ -1248,7 +1320,7 @@ def figure_scaffolds_populated(
                     "series": p["generation_id"],
                     "source_artifacts": p["source_artifacts"],
                 }
-                for p in points
+                for p in f2_points
             ]
         scaffolds.append(scaffold)
     return scaffolds
