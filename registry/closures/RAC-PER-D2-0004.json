@@ -90,7 +90,7 @@
     "candidate.png bytes (only its SHA-256 is attested)",
     "per-model held-out detection rates (only the PERSON-HO-v3 aggregate 1.0 over n=36 is attested)",
     "surrogate-only split of the step-18 aggregate (the 0.7777777777777778 candidate_detection_rate is the full-benchmark aggregate over 144 rows)",
-    "surrogate-phase optimization telemetry (spectral_band_energy, objective_trajectory, coverage_metrics, optimizer_config) — same D2-0004 gap documented for --legacy-d20004",
+    "surrogate-phase optimization telemetry (spectral_band_energy, objective_trajectory, coverage_metrics, optimizer_config) \u2014 same D2-0004 gap documented for --legacy-d20004",
     "benchmark-results.json generated_at timestamp (only the run date 2026-09-08 is attested)"
   ],
   "protocol_id": "RAC-PERSON-DETECT",
