@@ -39,7 +39,7 @@ Subliminator is retained as runner-up solely on template quality; its lack of a 
 API for stable manifest IDs is disqualifying under evidence governance.
 
 Garment rationale: tee over hoodie — fewer panels/seams, flatter under the camera capture
-rig, cheaper per iteration. Polyester sublimation over cotton DTY — dye-in-fiber, matte
+rig, cheaper per iteration. Polyester sublimation over cotton DTG — dye-in-fiber, matte
 finish, holds high-frequency pattern detail.
 
 ## 3. The golden digital SKU manifest
