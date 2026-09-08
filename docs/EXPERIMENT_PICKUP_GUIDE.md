@@ -3,13 +3,15 @@
 **Version:** 1.0.0  
 **Purpose:** A short operational checklist for resuming the project after time away.
 
-## If D2-0004 is still running
+> **Current state (2026-09-08):** D2-0004 has **CLOSED — FAIL / RAC-D0, log-attested** (see `docs/D2-0004_CLOSURE_NOTE.md`); release `releases/RAC-EXP-2026-001/` is sealed and the Paper 1 longitudinal export includes D2-0004. The "If D2-0004 has closed" checklist below is therefore **complete** for D2-0004; the generation is immutable. D2-0005 remains preregistered but **NOT armed**; do not open/arm it without explicit user governance.
+
+## If a D2 generation is running
 
 - Do not touch candidate/generation artifacts.
 - Check workflow only.
-- Continue Production Alpha, calibration, P1 dry-run, papers, and D2-0005 preregistration independently.
+- Continue Production Alpha, calibration, P1 dry-run, papers, and preregistration work independently.
 
-## If D2-0004 has closed
+## When a D2 generation has closed (completed for D2-0004 on 2026-09-08)
 
 - Verify candidate/protocol/model hashes.
 - Verify no held-out feedback.

@@ -30,10 +30,11 @@ This page is the navigation layer for the RAC documentation stack. Use the docum
 
 ## Preregistrations, amendments and analyses
 
-- [Preregistration D2-0005](PREREGISTRATION_D2-0005.md) — frozen mean-vs-CVaR two-arm ablation preregistration with amendments A1–A4 (§9 log); frozen, NOT armed, gated on D2-0004. **Status: current (preregistered, unarmed).**
+- [Preregistration D2-0005](PREREGISTRATION_D2-0005.md) — frozen mean-vs-CVaR two-arm ablation preregistration with amendments A1–A4 (§9 log); frozen, NOT armed; its D2-0004 gate is now satisfied (D2-0004 closed 2026-09-08) but arming still awaits the pending F0 user design decision. **Status: current (preregistered, unarmed).**
 - [Design Analysis D2-0005](DESIGN_ANALYSIS_D2-0005.md) — pre-arming operating-characteristics simulation; F0 finding: INCONCLUSIVE-dominated at n=72; pending user design decision. **Status: current (analysis; no outcome data).**
 - [Preregistration D2-0006 DRAFT](PREREGISTRATION_D2-0006_DRAFT.md) — predeclared interpretation-policy decision tree for the prospective replication generation. **Status: draft — not a preregistration; arms nothing.**
-- [Amendment D2-0004-INFRA-001](AMENDMENT_D2-0004_INFRA-001.md) — infrastructure-only amendment: step-18 loader root cause (fix 7148202d), runtime lock, exactly-one-rerun authorization for RAC-PER-D2-0004. **Status: current (active).**
+- [Amendment D2-0004-INFRA-001](AMENDMENT_D2-0004_INFRA-001.md) — infrastructure-only amendment: step-18 loader root cause (fix 7148202d), runtime lock, exactly-one-rerun authorization for RAC-PER-D2-0004. **Status: consumed — the single authorized re-run (34175028944) executed and D2-0004 closed FAIL / RAC-D0 (log-attested) on 2026-09-08; see [D2-0004 Closure Note](D2-0004_CLOSURE_NOTE.md).**
+- [D2-0004 Closure Note](D2-0004_CLOSURE_NOTE.md) — canonical narrative of the log-attested D2-0004 closure (FAIL / RAC-D0, re-run 34175028944, step-22 packaging failure, evidence limits). **Status: current.**
 - [Ingest Notes](INGEST_NOTES.md) — `ingest_closed_generation.py` field-mapping notes for converting a closed D2 generation into a RAC-EXP release. **Status: current.**
 
 ## Design / production
@@ -47,7 +48,7 @@ This page is the navigation layer for the RAC documentation stack. Use the docum
 
 - [End-to-End Research SOP](END_TO_END_RESEARCH_SOP.md) — full design → D2 → Printful → calibration → P1 → durability → manufacturing → paper workflow. **Status: current.**
 - [Printful Production Alpha SOP](PRINTFUL_PRODUCTION_SOP.md) — exact matched control/candidate ordering and provenance procedure. **Status: current.**
-- [Experiment Pickup Guide](EXPERIMENT_PICKUP_GUIDE.md) — short resume-from-here checklist for each project state. **Status: current (predates the D2-0004 step-18 failure; see AMENDMENT_D2-0004_INFRA-001 for the re-run path).**
+- [Experiment Pickup Guide](EXPERIMENT_PICKUP_GUIDE.md) — short resume-from-here checklist for each project state. **Status: current (updated 2026-09-08 for the D2-0004 closure; see D2-0004_CLOSURE_NOTE.md).**
 
 ## Physical program
 

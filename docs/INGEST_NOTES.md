@@ -4,6 +4,8 @@ Converts a CLOSED measured-benchmark generation (e.g. RAC-PER-D2-0004) into the
 first canonical RAC-EXP release. Stdlib + `ruthless_pipeline.certification` only.
 Run only after the benchmark closes; never against an open generation JSON.
 
+> **Dated note (2026-09-08):** D2-0004 closed FAIL / RAC-D0 (log-attested; `docs/D2-0004_CLOSURE_NOTE.md`). The actual minted release is `releases/RAC-EXP-2026-001/`; the `RAC-EXP-2025-001` id in the CLI example below is illustrative only.
+
 ## CLI (typical)
 
 ```

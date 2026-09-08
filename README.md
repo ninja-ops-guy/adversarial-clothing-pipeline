@@ -2,7 +2,7 @@
 
 Production-oriented research software for **machine-optimized fashion engineered to reduce reliable visual classification across diverse computer-vision systems** in owned or explicitly authorized lab environments.
 
-**Repository state reviewed:** 2026-09-07  
+**Repository state reviewed:** 2026-09-08  
 **Python package version:** `3.1.0`  
 **Documentation baseline:** current `main` — see `docs/PROJECT_PROGRESS.md` for the authoritative live progress ledger
 
@@ -11,11 +11,11 @@ Production-oriented research software for **machine-optimized fashion engineered
 
 Start with **`docs/README.md`** for the documentation map and **`docs/PROJECT_PROGRESS.md`** for the authoritative project ledger. The ledger tracks completed engineering, active D2 generations, Production Alpha/Beta/v1 gates, physical blockers, research-paper gates, and the distinction between software-complete capability and real evidence.
 
-Current headline status as of 2026-09-07:
+Current headline status as of 2026-09-08:
 
 - the design factory, certification architecture, statistics layer, and Research OS are substantially implemented;
 - D2-0003 remains a retained FAIL / RAC-D0 negative result;
-- D2-0004 is the active fresh held-out generation and must remain untouched until closure;
+- D2-0004 has closed as a retained FAIL / RAC-D0 negative result (log-attested closure, 2026-09-08; see `docs/D2-0004_CLOSURE_NOTE.md`), with sealed release `releases/RAC-EXP-2026-001/`; the generation remains immutable;
 - Production Alpha is blocked on exact provider IDs/template and placing the matched control/candidate order;
 - RAC-P and RAC-M remain open because real physical/manufacturing evidence has not yet been collected.
 

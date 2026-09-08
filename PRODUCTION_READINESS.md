@@ -61,4 +61,6 @@ Do not label this research system or any garment **product validated** until the
 
 ## Latest locked digital result
 
+> **Dated note (2026-09-08):** D2-0004 has since closed — FAIL / RAC-D0, log-attested (authorized re-run 34175028944; see `docs/D2-0004_CLOSURE_NOTE.md`) — and root `d2-latest-status.json` now carries the D2-0004 outcome. Sealed release: `releases/RAC-EXP-2026-001/`. The D2-0003 paragraph below is retained as the historical record of the first locked run.
+
 Published run **RAC-PER-D2-0003** is locked and reproducible, but it **failed** the preregistered D2 pass criteria. Held-out detection rate remained 1.00 (baseline 1.00) over 36 valid conditions, although mean confidence decreased. Bundle verification passed and the evidence state correctly remained RAC-D0. This negative result is retained as evidence and must not be promoted to a D2 or physical claim.
