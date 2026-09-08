@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ruthless_pipeline.certification.physical import PhysicalTrial, summarize_physical_trials
+from ruthless_pipeline.certification.schema_version import require_schema_version
 from scripts.run_measured_benchmark import build_evaluators, image_tensor
 
 
@@ -89,6 +90,7 @@ def main() -> int:
     model_manifest_path = Path(args.model_manifest)
     protocol_path = Path(args.cert_protocol)
     trial_manifest = json.loads(trial_manifest_path.read_text())
+    require_schema_version(trial_manifest, "1.0", label=f"physical trial manifest {trial_manifest_path}")
     model_manifest = json.loads(model_manifest_path.read_text())
     protocol = json.loads(protocol_path.read_text())
 
