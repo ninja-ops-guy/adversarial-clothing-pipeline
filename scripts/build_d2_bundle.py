@@ -28,8 +28,8 @@ def _weight_reference_compatible(*, framework: str, frozen_ref: str, measured_re
     as ``Weights.COCO_V1``. ``str(Weights.DEFAULT)`` therefore resolves to the
     concrete member at runtime even though the preregistered manifest correctly
     records ``DEFAULT``. The loaded state-dict SHA-256 remains the authoritative
-    identity gate; this helper only prevents that documented alias from causing
-    a false metadata mismatch.
+    identity gate; this helper only prevents that documented alias from causing a
+    false metadata mismatch.
     """
     frozen_ref = frozen_ref.strip()
     measured_ref = measured_ref.strip()
@@ -162,7 +162,7 @@ def main() -> int:
             raise SystemExit(f"missing model set: {set_path}")
         set_payload = json.loads(set_path.read_text())
         if set_payload.get("status") != "PREREGISTERED":
-            raise SystemExit(f"model set not preregistered: {set_name}")
+            raise SystemExit(f"model set not preregistered: {set_path}")
         if list(set_payload.get("models", [])) != measured_members:
             raise SystemExit(f"model-set membership mismatch for {set_name}")
         bundle.write_json(f"manifests/model_sets/{set_name}.json", set_payload)
