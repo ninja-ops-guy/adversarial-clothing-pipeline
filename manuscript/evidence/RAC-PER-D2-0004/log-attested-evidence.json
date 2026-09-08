@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "generation_id": "RAC-PER-D2-0004",
+  "evidence_kind": "log_attested_closure_evidence",
+  "provenance": "log_attested: true; bundle validated in CI steps 19-21 but never archived (packaging step 22 failed on schema guard; infra fix 5cdce1b; no re-run authorized); evidence extracted from run logs uploaded by maintainer",
+  "benchmark_run": {
+    "run_id": "34175028944",
+    "workflow": "measured-benchmark.yml (workflow_dispatch on main)",
+    "run_date": "2026-09-08",
+    "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59"
+  },
+  "step18_measured_benchmark_stdout": {
+    "output": "benchmark-results.json",
+    "candidate_sha256": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+    "raw_rows": 144,
+    "aggregate": {
+      "n": 144,
+      "baseline_mean_confidence": 0.9319073851737711,
+      "candidate_mean_confidence": 0.6855992215892507,
+      "baseline_detection_rate": 1.0,
+      "candidate_detection_rate": 0.7777777777777778,
+      "absolute_detection_reduction": 0.2222222222222222,
+      "relative_detection_suppression": 0.2222222222222222,
+      "relative_confidence_reduction": 0.26430541006882546
+    }
+  },
+  "step19_d2_evidence_bundle_stdout": {
+    "bundle_verified": true,
+    "candidate_id": "RAC-PER-D2-0004",
+    "certificate_id": "RAC-PER-D2-0004-1.0.0-1.2",
+    "decision": "FAIL",
+    "evidence_state": "RAC-D0",
+    "heldout": {
+      "baseline_detection_rate": 1.0,
+      "baseline_mean": 0.9947303864690993,
+      "candidate_detection_rate": 1.0,
+      "candidate_mean": 0.8959943834278319,
+      "mean_delta": -0.0987360030412674,
+      "n": 36,
+      "valid_n": 36
+    },
+    "heldout_model_set": "PERSON-HO-v3",
+    "invalid_condition_fraction": 0.0,
+    "protocol_id": "RAC-PERSON-DETECT",
+    "protocol_version": "1.2",
+    "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59",
+    "surrogate_model_set": "PERSON-SUR-v3",
+    "verification_failures": []
+  },
+  "step20_validation_stdout": {
+    "status": "measured_locked",
+    "candidate": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+    "aggregate": {
+      "n": 144,
+      "baseline_mean_confidence": 0.9319073851737711,
+      "candidate_mean_confidence": 0.6855992215892507,
+      "baseline_detection_rate": 1.0,
+      "candidate_detection_rate": 0.7777777777777778,
+      "absolute_detection_reduction": 0.2222222222222222,
+      "relative_detection_suppression": 0.2222222222222222,
+      "relative_confidence_reduction": 0.26430541006882546
+    }
+  },
+  "step21_status_write": "d2-latest-status.json written with decision FAIL / evidence_state RAC-D0",
+  "step22_packaging_failure": {
+    "step": 22,
+    "outcome": "FAILED",
+    "root_cause": "Product Studio manifest schema guard: consumer required schema 1.3, production manifest is 1.4",
+    "fix_commit": "5cdce1b",
+    "fix_scope": "infrastructure only; no scientific parameter changed",
+    "consequence": "steps 23-28 (artifact upload, publish) SKIPPED; the validated evidence bundle was never archived"
+  },
+  "not_log_attested_gaps": [
+    "candidate.png bytes (only its SHA-256 is attested)",
+    "per-model held-out detection rates (only the PERSON-HO-v3 aggregate 1.0 over n=36 is attested)",
+    "surrogate-only split of the step-18 aggregate (the 0.7777777777777778 candidate_detection_rate is the full-benchmark aggregate over 144 rows)",
+    "surrogate-phase optimization telemetry (spectral_band_energy, objective_trajectory, coverage_metrics, optimizer_config) — same D2-0004 gap documented for --legacy-d20004",
+    "benchmark-results.json generated_at timestamp (only the run date 2026-09-08 is attested)"
+  ]
+}

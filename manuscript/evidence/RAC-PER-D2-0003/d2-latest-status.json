@@ -1,0 +1,23 @@
+{
+  "bundle_verified": true,
+  "candidate_id": "RAC-PER-D2-0003",
+  "certificate_id": "RAC-PER-D2-0003-1.0.0-1.1",
+  "decision": "FAIL",
+  "evidence_state": "RAC-D0",
+  "heldout": {
+    "baseline_detection_rate": 1.0,
+    "baseline_mean": 0.8689593970775604,
+    "candidate_detection_rate": 1.0,
+    "candidate_mean": 0.6746361007293066,
+    "mean_delta": -0.19432329634825388,
+    "n": 36,
+    "valid_n": 36
+  },
+  "heldout_model_set": "PERSON-HO-v2",
+  "invalid_condition_fraction": 0.0,
+  "protocol_id": "RAC-PERSON-DETECT",
+  "protocol_version": "1.1",
+  "source_commit": "65646777151966729ab6c06cdbdfe71671e5266d",
+  "surrogate_model_set": "PERSON-SUR-v2",
+  "verification_failures": []
+}
