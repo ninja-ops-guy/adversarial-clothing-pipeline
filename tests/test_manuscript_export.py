@@ -520,7 +520,11 @@ def test_committed_generation_records_values():
     assert [r.generation_id for r in records] == ["RAC-PER-D2-0003", "RAC-PER-D2-0004"]
     d3, d4 = records
     assert d3.status == "closed"
-    status = json.loads((ROOT / "d2-latest-status.json").read_text())
+    # D2-0003's status JSON is the byte-identical archive (the root
+    # d2-latest-status.json now carries the closed D2-0004 outcome).
+    status = json.loads(
+        (ROOT / "manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json").read_text()
+    )
     benchmark = json.loads((ROOT / "benchmark-results.json").read_text())
     f = d3.fields
     # Values are exactly the committed evidence, not restated numbers.
@@ -539,9 +543,31 @@ def test_committed_generation_records_values():
     assert f["candidate_sha256"].value == benchmark["candidate"]["sha256"]
     assert f["recorded_utc"].value == benchmark["generated_at"]
     assert f["evidence_state"].value == "RAC-D0"
-    # D2-0004: running, all evidence fields blank.
-    assert d4.status == "running"
-    assert all(not sv.populated for sv in d4.fields.values())
+    # D2-0004: closed via log-attested evidence (FAIL / RAC-D0 retained).
+    evidence = json.loads(
+        (
+            ROOT / "manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json"
+        ).read_text()
+    )
+    bundle = evidence["step19_d2_evidence_bundle_stdout"]
+    assert d4.status == "closed"
+    f4 = d4.fields
+    assert f4["decision"].value == bundle["decision"] == "FAIL"
+    assert f4["evidence_state"].value == bundle["evidence_state"] == "RAC-D0"
+    assert f4["heldout_detection_rate"].value == repr(
+        float(bundle["heldout"]["candidate_detection_rate"])
+    )
+    assert f4["heldout_n"].value == str(bundle["heldout"]["n"]) == "36"
+    assert f4["candidate_sha256"].value == (
+        evidence["step18_measured_benchmark_stdout"]["candidate_sha256"]
+    )
+    assert f4["certificate_id"].value == bundle["certificate_id"]
+    assert f4["source_commit"].value == bundle["source_commit"]
+    # Only the run date is attested, never the benchmark generated_at timestamp.
+    assert f4["recorded_utc"].value == evidence["benchmark_run"]["run_date"]
+    # The surrogate-only split was never printed to the logs: the field must
+    # stay blank rather than be reconstructed from the full-benchmark aggregate.
+    assert "surrogate_detection_rate" not in f4
 
 
 def test_paper1_generation_csv_rows_and_determinism():
@@ -553,16 +579,25 @@ def test_paper1_generation_csv_rows_and_determinism():
     assert [r["generation_id"] for r in parsed] == ["RAC-PER-D2-0003", "RAC-PER-D2-0004"]
     d3, d4 = parsed
     assert d3["status"] == "closed"
-    assert d4["status"] == "running"
+    assert d4["status"] == "closed"
     for field_name in GENERATION_FIELDS:
         # D2-0003: every populated field carries adjacent source + sha256.
         assert d3[field_name] != ""
         assert d3[f"{field_name}_source"]
         assert d3[f"{field_name}_sha256"] == _file_sha(d3[f"{field_name}_source"])
-        # D2-0004: all evidence fields blank (no invented results).
-        assert d4[field_name] == ""
-        assert d4[f"{field_name}_source"] == ""
-        assert d4[f"{field_name}_sha256"] == ""
+        # D2-0004: every attested field carries adjacent source + sha256; the
+        # one unattested field (surrogate-only split never printed to the CI
+        # logs) stays blank with empty provenance — no reconstructed numbers.
+        if field_name == "surrogate_detection_rate":
+            assert d4[field_name] == ""
+            assert d4[f"{field_name}_source"] == ""
+            assert d4[f"{field_name}_sha256"] == ""
+        else:
+            assert d4[field_name] != "", field_name
+            assert d4[f"{field_name}_source"] == (
+                "manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json"
+            )
+            assert d4[f"{field_name}_sha256"] == _file_sha(d4[f"{field_name}_source"])
     # Committed export matches regeneration byte-for-byte.
     assert (COMMITTED_EXPORTS / "paper1_longitudinal.csv").read_text() == text
 
@@ -613,12 +648,16 @@ def test_figure_population_and_byte_identical_regeneration(tmp_path):
     records = load_committed_generation_records(ROOT)
     scaffolds = figure_scaffolds_populated(records)
     by_id = {s["figure_id"]: s for s in scaffolds}
-    # F1/F2 populated from D2-0003 evidence.
+    # F1 populated from D2-0003 evidence only: D2-0004's surrogate-only split
+    # was never attested in the CI logs, so its point is excluded from the
+    # transfer scatter rather than reconstructed.
     f1 = by_id["F1"]
     assert f1["status"] == "populated"
     assert len(f1["data"]) == 1
     point = f1["data"][0]
-    status = json.loads((ROOT / "d2-latest-status.json").read_text())
+    status = json.loads(
+        (ROOT / "manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json").read_text()
+    )
     benchmark = json.loads((ROOT / "benchmark-results.json").read_text())
     assert point["generation_id"] == "RAC-PER-D2-0003"
     assert point["y"] == status["heldout"]["candidate_detection_rate"]
@@ -626,9 +665,24 @@ def test_figure_population_and_byte_identical_regeneration(tmp_path):
         "candidate_detection_rate"
     ]
     assert point["color"] == "fail"
-    f2_point = by_id["F2"]["data"][0]
+    # F2 timeline carries both closed generations (D2-0004's x is the attested
+    # run date; the unattested timestamp is never invented).
+    f2 = by_id["F2"]
+    assert [p["generation_id"] for p in f2["data"]] == [
+        "RAC-PER-D2-0003",
+        "RAC-PER-D2-0004",
+    ]
+    f2_point = f2["data"][0]
     assert f2_point["x"] == benchmark["generated_at"]
     assert f2_point["y"] == point["y"]
+    f2_d4 = f2["data"][1]
+    assert f2_d4["x"] == "2026-09-08"
+    assert f2_d4["y"] == 1.0
+    assert f2_d4["source_artifacts"] == {
+        "manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json": _file_sha(
+            "manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json"
+        )
+    }
     # F3-F8 remain empty awaiting_data scaffolds with no numbers.
     for fid in ("F3", "F4", "F5", "F6", "F7", "F8"):
         assert by_id[fid]["status"] == "awaiting_data"
