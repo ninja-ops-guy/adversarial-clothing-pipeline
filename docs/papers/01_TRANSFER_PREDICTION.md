@@ -88,7 +88,7 @@ A first serious predictor analysis requires at least three comparable closed gen
 
 **RESULTS PENDING.**
 
-D2-0003 is retained as a negative historical generation. D2-0004 must not be incorporated until its generation closes and its immutable release is minted.
+D2-0003 is retained as a negative historical generation. D2-0004 closed on 2026-09-08 (FAIL / RAC-D0, log-attested) with its immutable release minted at `releases/RAC-EXP-2026-001/`; it may now be incorporated into the longitudinal dataset subject to its attestation gaps (`manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json` → `not_log_attested_gaps`).
 
 ## 8. Discussion
 

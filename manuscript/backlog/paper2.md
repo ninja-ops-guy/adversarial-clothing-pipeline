@@ -24,7 +24,7 @@ control-undetected conditions are invalid measurement conditions, never candidat
 ## 2. Methods skeleton
 
 ### 2.1 Candidate garment and provenance
-- Candidate identity and hash ← sealed candidate artifact from the D2 generation release [AWAITING: D2-0004 release id].
+- Candidate identity and hash ← sealed candidate artifact from the D2 generation release (D2-0004 closed 2026-09-08: release `releases/RAC-EXP-2026-001/`, candidate sha256 `9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803`; note the operative Production Alpha manifest currently uses the sealed RAC-PER-D2-0003 print-kit candidate — see `production_alpha/SKU_MANIFEST.json`).
 - Physical production SOP and golden-sample QA ← `docs/PRINTFUL_PRODUCTION_SOP.md`, `docs/PRODUCTION_ALPHA_SKU.md` (certificate stage artifact [AWAITING: sku/certificate stage refs]).
 
 ### 2.2 Preregistered stopping rule
