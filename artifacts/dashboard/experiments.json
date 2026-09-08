@@ -1,0 +1,185 @@
+{
+  "records": [
+    {
+      "armed": false,
+      "blockers": [],
+      "decision": "FAIL",
+      "evidence_class": "archived_in_repo",
+      "experiment_id": "RAC-PER-D2-0003",
+      "key_hashes": {
+        "benchmark_results_sha256": "d21b2ef6e4619d7eaf67cb213a65fcb40560a2c8aeca2c670c9b0e100bc1f112",
+        "candidate_sha256": "8f4f79a333cc8b5f61fe5e78c40fe175de41569ac6eddd68ee072d88ee7d51e8",
+        "status_file_sha256": "f55732d666ce0227747e0416485364cf2d0d871ac395e2b7ff29d54291f1b5d1"
+      },
+      "kind": "generation",
+      "measured": {
+        "bundle_verified": true,
+        "candidate_id": "RAC-PER-D2-0003",
+        "certificate_id": "RAC-PER-D2-0003-1.0.0-1.1",
+        "decision": "FAIL",
+        "evidence_state": "RAC-D0",
+        "heldout": {
+          "baseline_detection_rate": 1.0,
+          "baseline_mean": 0.8689593970775604,
+          "candidate_detection_rate": 1.0,
+          "candidate_mean": 0.6746361007293066,
+          "mean_delta": -0.19432329634825388,
+          "n": 36,
+          "valid_n": 36
+        },
+        "heldout_model_set": "PERSON-HO-v2",
+        "invalid_condition_fraction": 0.0,
+        "protocol_id": "RAC-PERSON-DETECT",
+        "protocol_version": "1.1",
+        "source_commit": "65646777151966729ab6c06cdbdfe71671e5266d",
+        "surrogate_model_set": "PERSON-SUR-v2",
+        "verification_failures": []
+      },
+      "physical_state": "not_applicable_digital_only",
+      "publication_state": "exported_in_manuscript/paper1_longitudinal.csv",
+      "runtime_lock": {
+        "path": "benchmarks/runtime_lock.json",
+        "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+      },
+      "source_commit": "65646777151966729ab6c06cdbdfe71671e5266d",
+      "state": "closed",
+      "user_actions_required": []
+    },
+    {
+      "armed": false,
+      "blockers": [],
+      "decision": "FAIL",
+      "evidence_class": "log_attested",
+      "experiment_id": "RAC-PER-D2-0004",
+      "key_hashes": {
+        "candidate_sha256": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+        "log_attested_evidence_sha256": "8c5cf8617ef935cae8c662f60d11de96d4a5cb852afff512380e3e317a073ba3",
+        "status_file_sha256": "d761fd947342cca722e6820e9beed0f78b925638e02389c4487e4061f59db4b9"
+      },
+      "kind": "generation",
+      "measured": {
+        "bundle_verified": true,
+        "candidate_id": "RAC-PER-D2-0004",
+        "certificate_id": "RAC-PER-D2-0004-1.0.0-1.2",
+        "decision": "FAIL",
+        "evidence_state": "RAC-D0",
+        "heldout": {
+          "baseline_detection_rate": 1.0,
+          "baseline_mean": 0.9947303864690993,
+          "candidate_detection_rate": 1.0,
+          "candidate_mean": 0.8959943834278319,
+          "mean_delta": -0.0987360030412674,
+          "n": 36,
+          "valid_n": 36
+        },
+        "heldout_model_set": "PERSON-HO-v3",
+        "invalid_condition_fraction": 0.0,
+        "protocol_id": "RAC-PERSON-DETECT",
+        "protocol_version": "1.2",
+        "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59",
+        "surrogate_model_set": "PERSON-SUR-v3",
+        "verification_failures": []
+      },
+      "physical_state": "not_applicable_digital_only",
+      "publication_state": "exported_in_manuscript/paper1_longitudinal.csv",
+      "runtime_lock": {
+        "path": "benchmarks/runtime_lock.json",
+        "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+      },
+      "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59",
+      "state": "closed",
+      "user_actions_required": []
+    },
+    {
+      "armed": false,
+      "blockers": [
+        "arming packet awaiting user decision (docs/D2-0005_ARMING_PACKET.md: AWAITING_USER_DECISION)"
+      ],
+      "decision": null,
+      "evidence_class": "preregistered_not_executed",
+      "experiment_id": "RAC-PER-D2-0005",
+      "key_hashes": {
+        "freeze_candidate_sha256": "ae505bb0d57db1c98a04f7b7ef1259877040ce0e0c7968f6cdfe619864ab411c",
+        "generation_file_sha256": "d54e1d7d49acef53d1ce20c2b09a4592af83b5a8e70d7e7ad7ca4754d03d0e8d"
+      },
+      "kind": "generation",
+      "measured": null,
+      "physical_state": "not_applicable_digital_only",
+      "publication_state": "unpublished",
+      "runtime_lock": {
+        "path": "benchmarks/runtime_lock.json",
+        "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+      },
+      "source_commit": null,
+      "state": "PREREGISTERED",
+      "user_actions_required": [
+        "Fixture image manifest missing.",
+        "Memo precondition §5.2 — rehearsal ICC gate on the REAL fixture.",
+        "Memo precondition §5.5 — run-B re-confirmation pre-execution.",
+        "Governance sequence (precondition §5.6) incomplete:",
+        "User sign-off:",
+        "Ordered remaining actions: (a) freeze fixture manifest → (b) real-fixture"
+      ]
+    },
+    {
+      "armed": false,
+      "blockers": [
+        "directional hypothesis BLOCKED until D2-0005 closes (docs/PREREGISTRATION_D2-0006_DRAFT.md)"
+      ],
+      "decision": null,
+      "evidence_class": "draft",
+      "experiment_id": "RAC-PER-D2-0006",
+      "key_hashes": {
+        "draft_policy_sha256": "739fd0368e50ab011f53b6388aabde989d63e42d491d3d2eaa8808a6ef292a98"
+      },
+      "kind": "generation",
+      "measured": null,
+      "physical_state": "not_applicable_digital_only",
+      "publication_state": "unpublished",
+      "runtime_lock": {
+        "path": "benchmarks/runtime_lock.json",
+        "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+      },
+      "source_commit": null,
+      "state": "draft_policy_only",
+      "user_actions_required": []
+    },
+    {
+      "armed": false,
+      "blockers": [
+        "real POD production template not yet acquired (checklist item 3; single biggest external blocker)",
+        "physical control/candidate pair not yet ordered (checklist item 7)"
+      ],
+      "decision": null,
+      "evidence_class": "planned",
+      "experiment_id": "PRODUCTION-ALPHA-P1",
+      "key_hashes": {
+        "sku_manifest_sha256": "8f6d7614a5c070f68e1afd79b357b868824a54fc50ed693795a5b7216e614f8d"
+      },
+      "kind": "production",
+      "measured": null,
+      "physical_state": "no_physical_sample_received",
+      "publication_state": "internal_only",
+      "runtime_lock": {
+        "path": "benchmarks/runtime_lock.json",
+        "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+      },
+      "source_commit": null,
+      "state": "open_external_blockers",
+      "user_actions_required": [
+        "Next single action: Pick one POD provider and one exact garment SKU, obtain its real production template, map one frozen design, and order the control/candidate pair. **Further software work after that should be driven by what comes back in the mail.",
+        "Printful account creation + API key provisioning.",
+        "Template ZIP download for the AOP tee; record URL + download date + SHA-256.",
+        "Live fetch of integer `product_id` / `variant_id` via `GET /products` (PENDING-API-FETCH).",
+        "Vendor questions outstanding:",
+        "Shipping address and budget approval."
+      ]
+    }
+  ],
+  "runtime_lock": {
+    "path": "benchmarks/runtime_lock.json",
+    "sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186"
+  },
+  "schema_id": "research-os-dashboard",
+  "schema_version": "1.0"
+}
