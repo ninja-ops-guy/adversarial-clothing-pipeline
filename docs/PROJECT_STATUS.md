@@ -1,8 +1,43 @@
 # Adversarial Clothing Pipeline — Project Status
 
-**Date:** 2026-09-07  
+**Date:** 2026-09-08  
 **Repository:** `ninja-ops-guy/adversarial-clothing-pipeline`  
-**Status basis:** current `main`. For authoritative live completion tracking, use `docs/PROJECT_PROGRESS.md`; this document is the architecture/readiness narrative.
+**Status basis:** current `main` (head ≥ `b4fe0e5`). For authoritative live completion tracking, use `docs/PROJECT_PROGRESS.md`; this document is the architecture/readiness narrative.
+
+## Current-State Snapshot (2026-09-08)
+
+Machine-readable-ish summary of every experiment, blocker, and user action. Narrative sections below remain the historical record; where they conflict, this table and `docs/PROJECT_PROGRESS.md` win.
+
+### Experiments / generations
+
+| ID | State | Detail |
+| --- | --- | --- |
+| RAC-PER-D2-0003 | **CLOSED — retained negative** | FAIL / RAC-D0; held-out 1.00 → 1.00 (n=36, PERSON-HO-v2); bundle verified; remains the published `d2-latest-status.json` |
+| RAC-PER-D2-0004 | **RUNNING (authorized re-run 34175028944 in progress)** | First run 34147902820 failed at step 18 (protocol-loader crash, fixed by 7148202d); `docs/AMENDMENT_D2-0004_INFRA-001.md` authorizes exactly ONE re-run under `benchmarks/runtime_lock.json`; one-shot boundary intact (outcome never observed); generation remains do-not-mutate |
+| RAC-PER-D2-0005 | **PREREGISTERED — frozen, NOT armed, pending design decision** | Skeleton frozen (`lock_status: PREREGISTERED`, triggers not armed); gated on D2-0004 closing; F0 design analysis shows INCONCLUSIVE-dominated at n=72 → user must choose pre-arming design amendment vs exploratory/pilot declaration |
+| RAC-PER-D2-0006 | **DRAFT — interpretation policy only** | `docs/PREREGISTRATION_D2-0006_DRAFT.md`; no generation file, no directional hypothesis, not a preregistration |
+| P1 physical program | **Tooling READY — awaiting hardware/garments** | Calibration-target generator, rig spec/checklists, session/ingestion templates, frozen stopping rule RAC-P1-STOP-2026-001 (min 93 / max 144 valid trials) on main; synthetic dry-run only (non-evidence) |
+| Production Alpha | **IN PROGRESS — externally blocked** | Printful product_id 388 resolved (fallback 257); template archive + v2 mapping auth-gated; `SKU_MANIFEST_DRAFT.json` has UNKNOWN fields; ordering is a user action |
+
+### Open blockers
+
+| Blocker | Blocking | Owner |
+| --- | --- | --- |
+| D2-0004 re-run not yet closed | D2-0005 opening, first RAC-EXP release, Paper 1 dataset | CI (run 34175028944) |
+| D2-0005 power/design decision (F0 finding) | D2-0005 arming | USER |
+| Printful API token (`PF_TOKEN`) | template/printfile archive download, v2 catalog mapping | USER |
+| Exact vendor template + panel geometry | SKU freeze, panel-pack validation | USER |
+| Matched control/candidate garment order | calibration, P1, all physical evidence | USER |
+| P1 rig hardware + calibration target print | W0 sessions, measured EOT | USER |
+| RAC-P / RAC-M evidence | any physical/manufacturing claim | EXTERNAL |
+
+### USER ACTION REQUIRED
+
+1. Create Printful private API token and export `PF_TOKEN` (`production_alpha/ORDER_CHECKLIST.md` Step 0).
+2. Download + SHA-256 the product-388 printfile/template archive; fill `SKU_MANIFEST_DRAFT.json` UNKNOWNs.
+3. Place the matched control/candidate garment order (same variant/size for both arms).
+4. Monitor re-run **34175028944**; on closure, run the closed-generation ingester and publish status.
+5. Decide the D2-0005 pre-arming route: design amendment (§7/§9 of its preregistration) or exploratory/pilot declaration.
 
 ## Executive Summary
 
