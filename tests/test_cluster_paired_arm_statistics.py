@@ -151,7 +151,11 @@ def test_draw_row_matches_paired_arm_hash_draw():
 
 
 def test_singleton_clusters_reproduce_unit_level_path():
-    """Cluster size 1 must equal the frozen unit-level path bit-for-bit."""
+    """Cluster size 1 reproduces the frozen unit-level path in every value
+    EXCEPT the documented F8 divergence: the frozen path's percentile
+    lower-index off-by-one is corrected here, so the interval lower bound may
+    sit one order statistic lower. Upper bound, point estimate, width
+    ordering, and decision semantics are otherwise identical."""
     outcomes = {f"u{i:03d}": (i % 3 != 0, i % 7 in (0, 3)) for i in range(41)}
     resamples = 500
     unit = paired_arm_statistics(outcomes, bootstrap_resamples=resamples)
@@ -159,19 +163,46 @@ def test_singleton_clusters_reproduce_unit_level_path():
         {unit_key: {"m0": pair} for unit_key, pair in outcomes.items()},
         bootstrap_resamples=resamples,
     )
-    assert cluster.risk_difference_interval == unit.risk_difference_interval
+    cluster_lo, cluster_hi = cluster.risk_difference_interval
+    unit_lo, unit_hi = unit.risk_difference_interval
+    assert cluster_hi == unit_hi
+    assert cluster_lo <= unit_lo  # F8 correction: never a higher lower bound
     assert cluster.risk_difference == pytest.approx(unit.risk_difference)
     assert cluster.decision == unit.decision
-    assert cluster.interval_width == pytest.approx(unit.interval_width)
     assert cluster.observation_units == unit.observation_units
-    # Also at the raw bootstrap-function level.
+
+
+def test_percentile_lower_index_off_by_one_fixed():
+    """Finding F8: at R resamples and z = DEFAULT_Z (alpha/2 = 0.025), the
+    interval bounds must be exactly the ceil(0.025*R)-th and
+    ceil(0.975*R)-th order statistics of the sorted bootstrap estimates.
+    Reconstruct the deterministic resample estimates independently via
+    paired_arm_statistics._hash_draw and compare."""
+    from ruthless_pipeline.certification.paired_arm_statistics import _hash_draw
+
+    outcomes = {f"u{i:03d}": (i % 3 != 0, i % 7 in (0, 3)) for i in range(41)}
     deltas = tuple(
-        (1 if m else 0) - (1 if c else 0)
-        for _, (m, c) in sorted(outcomes.items())
+        (1 if m else 0) - (1 if c else 0) for _, (m, c) in sorted(outcomes.items())
     )
-    assert bootstrap_cluster_difference_interval(
+    resamples = 1000
+    n = len(deltas)
+    estimates = sorted(
+        sum(deltas[_hash_draw(DEFAULT_BOOTSTRAP_SEED, r, j, n)] for j in range(n)) / n
+        for r in range(resamples)
+    )
+    expected = (estimates[math.ceil(0.025 * resamples) - 1],
+                estimates[math.ceil(0.975 * resamples) - 1])
+    got = bootstrap_cluster_difference_interval(
         tuple((delta, 1) for delta in deltas), resamples=resamples
-    ) == bootstrap_paired_difference_interval(deltas, resamples=resamples)
+    )
+    assert got == expected
+    # The frozen path's off-by-one used floor(0.025*R) = one index higher;
+    # the corrected bound is therefore <= the frozen bound, and strictly
+    # lower whenever the adjacent order statistics differ.
+    frozen_style = (estimates[int(math.floor(0.025 * resamples))], expected[1])
+    assert got[0] <= frozen_style[0]
+    unit_lo, _ = bootstrap_paired_difference_interval(deltas, resamples=resamples)
+    assert got[0] <= unit_lo
 
 
 def test_decision_semantics_match_unit_path():
@@ -222,6 +253,35 @@ def test_single_cluster_rho_not_identifiable():
     clusters = {"only": {"m0": (True, False), "m1": (False, True)}}
     rho, design_effect, n_eff = intracluster_diagnostics(_validated_clusters(clusters))
     assert (rho, design_effect, n_eff) == (0.0, 1.0, 2.0)
+
+
+def test_zero_variance_diagnostics_report_na():
+    """Finding F7: when every member delta in every cluster is identical
+    (zero total variance — e.g. perfect agreement at a boundary rate), rho is
+    0/0 undefined and must be reported as NA (None), NOT as rho = 0 with
+    n_eff = N (which would falsely signal 'no clustering')."""
+    clusters = {
+        f"c{k:02d}": {f"m{j}": (True, False) for j in range(4)} for k in range(10)
+    }
+    rho, design_effect, n_eff = intracluster_diagnostics(_validated_clusters(clusters))
+    assert (rho, design_effect, n_eff) == (None, None, None)
+    stats = cluster_paired_arm_statistics(clusters, bootstrap_resamples=200)
+    assert stats.intracluster_rho is None
+    assert stats.design_effect is None
+    assert stats.effective_sample_size is None
+    payload = json.loads(to_canonical_json(stats))
+    assert payload["intracluster_rho"] is None  # serialized as null ("NA")
+    # Sanity: the same all-+1 dataset still yields a decisive SUCCESS with a
+    # degenerate zero-width interval — only the DIAGNOSTIC is NA.
+    assert stats.decision == "success"
+    # Contrast: zero WITHIN-cluster variance but nonzero between-cluster
+    # variance is rho = 1 (identifiable), not NA.
+    mixed = {}
+    for k in range(10):
+        value = k % 2 == 0
+        mixed[f"c{k:02d}"] = {f"m{j}": (value, False) for j in range(4)}
+    rho_mixed, _, _ = intracluster_diagnostics(_validated_clusters(mixed))
+    assert rho_mixed == pytest.approx(1.0)
 
 
 def test_cluster_bootstrap_widens_under_correlation():
