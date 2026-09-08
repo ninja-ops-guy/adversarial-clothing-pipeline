@@ -7,6 +7,7 @@ from scripts.validate_capture_session import build_trial, load_session
 def test_synthetic_session_is_never_physical_eligible(tmp_path: Path):
     p = tmp_path / "session.json"
     p.write_text(json.dumps({
+        "schema_version": "1.0",
         "session_id": "S1", "experiment_id": "E1",
         "evidence_class": "synthetic_pipeline_validation_only",
         "actor_id": "A1", "camera_id": "C1",

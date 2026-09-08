@@ -18,6 +18,12 @@ import json
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from ruthless_pipeline.certification.schema_version import require_schema_version
+
 DEFAULT_LOCK_PATH = Path(__file__).resolve().parents[1] / "benchmarks" / "runtime_lock.json"
 
 REQUIRED_FIELDS = ("python", "torch", "torchvision", "ultralytics", "transformers")
@@ -27,8 +33,7 @@ FRAMEWORK_MODULES = ("torch", "torchvision", "ultralytics", "transformers")
 
 def load_lock(path: Path) -> dict:
     lock = json.loads(Path(path).read_text())
-    if str(lock.get("schema_version")) != "1.0":
-        raise ValueError(f"unsupported runtime lock schema_version: {lock.get('schema_version')}")
+    require_schema_version(lock, "1.0", label="runtime lock")
     for field in REQUIRED_FIELDS:
         value = lock.get(field)
         if not isinstance(value, str) or not value:

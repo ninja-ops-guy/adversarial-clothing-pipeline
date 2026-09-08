@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from ruthless_pipeline.certification.physical import PhysicalTrial
+from ruthless_pipeline.certification.schema_version import require_schema_version
 
 
 def sha256_file(path: Path) -> str:
@@ -19,6 +20,7 @@ def sha256_file(path: Path) -> str:
 
 def load_session(path: Path) -> dict[str, Any]:
     payload = json.loads(path.read_text())
+    require_schema_version(payload, "1.0", label=f"capture session {path}")
     required = {"session_id", "experiment_id", "evidence_class", "actor_id", "camera_id", "captures"}
     missing = sorted(required - set(payload))
     if missing:
