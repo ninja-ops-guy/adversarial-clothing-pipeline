@@ -39,7 +39,7 @@ Subliminator is retained as runner-up solely on template quality; its lack of a 
 API for stable manifest IDs is disqualifying under evidence governance.
 
 Garment rationale: tee over hoodie — fewer panels/seams, flatter under the camera capture
-rig, cheaper per iteration. Polyester sublimation over cotton DTG — dye-in-fiber, matte
+rig, cheaper per iteration. Polyester sublimation over cotton DTY — dye-in-fiber, matte
 finish, holds high-frequency pattern detail.
 
 ## 3. The golden digital SKU manifest
@@ -103,7 +103,7 @@ Field definitions:
 | Field | Meaning |
 |---|---|
 | manifest_version | Schema version of this manifest (semver). |
-| generation_id | Pattern generation lineage ID; `RAC-PER-D2-0004` pending that generation's outcome. |
+| generation_id | Pattern generation lineage ID. D2-0004 closed FAIL / RAC-D0 on 2026-09-08 (log-attested; `docs/D2-0004_CLOSURE_NOTE.md`); the operative Production Alpha manifest (`production_alpha/SKU_MANIFEST.json`) uses the sealed RAC-PER-D2-0003 print-kit candidate. |
 | provider.name | Vendor legal/display name. |
 | provider.product_id | Printful integer product ID. PENDING-API-FETCH; fetch live via `GET /products`. Do not invent. |
 | provider.variant_id | Printful integer variant ID for the size-M white-base tee. PENDING-API-FETCH. |
