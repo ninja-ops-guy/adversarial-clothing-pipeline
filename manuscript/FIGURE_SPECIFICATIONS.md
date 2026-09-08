@@ -1,20 +1,27 @@
 # Manuscript Figure Specifications (Papers 1 and 5)
 
-**Status:** scaffolds only — every figure input in `manuscript/figures/` is an
-explicit empty scaffold (`status: "awaiting_data"`, `data: []`). No figure
-contains numbers yet, and none may until a renderer populates it from the
-sealed artifacts named in its `sources` block, exactly per its `fill_rule`.
+**Status:** F1 and F2 are **populated** from the committed D2-0003 closed-
+generation evidence (`d2-latest-status.json`, `benchmark-results.json`);
+every populated datum carries its source artifact path plus that file's
+SHA-256 under `source_artifacts`. F3–F8 remain explicit empty scaffolds
+(`status: "awaiting_data"`, `data: []`) until their closed releases exist.
 Invented results are forbidden; empty scaffolds are the only legal pre-data
-state.
+state, and a "running" generation (D2-0004) contributes rows with all
+evidence fields blank.
 
 **Producer module:** `ruthless_pipeline/certification/manuscript_export.py`
-(`figure_scaffolds()`, `write_figure_scaffolds()`). The scaffolds on disk are
-canonical JSON (sorted keys, compact separators, trailing newline) and are
-byte-identical to what the module emits.
+(`figure_scaffolds_populated()`, `write_figure_scaffolds_populated()`,
+`write_manuscript_exports()`). Every scaffold source declares its exact
+`producer_function` and `artifact_ids`. All files on disk are canonical JSON
+(sorted keys, compact separators, trailing newline) and regeneration is
+byte-identical.
 
-**Table exports** (same governance): `paper1_longitudinal.csv`,
-`paper5_arms.csv`, `paper5_comparison.json` — see the module docstring. All
-three are header/scaffold-only until closed experiments exist.
+**Table exports** (same governance, committed under `manuscript/exports/`):
+`paper1_longitudinal.csv` (one row per generation; D2-0003 populated with
+per-field `*_source`/`*_sha256` provenance columns, D2-0004 `running` with
+all evidence fields blank), `paper5_arms.csv` (header only — zero data rows
+until D2-0005 closes), `paper5_comparison.json` (schema with all data fields
+null, `status: "awaiting_d2-0005_closure"`).
 
 ---
 
@@ -29,8 +36,11 @@ three are header/scaffold-only until closed experiments exist.
   `frozen_sha256()`): `pre.surrogate_mean_detection_rate`,
   `outcome.heldout_detection_rates`, `outcome.verdict`,
   `pre.candidate_sha256`.
-- **Empty state:** `data: []`, `status: awaiting_data`. Records without an
-  attached outcome are skipped — never plotted as estimates.
+- **Current state:** `status: "populated"` with the single D2-0003 point
+  (surrogate 0.7222… from `benchmark-results.json`, held-out 1.0 / FAIL from
+  `d2-latest-status.json`), each byte-traceable via `source_artifacts`.
+  Records without an attached outcome are skipped — never plotted as
+  estimates.
 
 ## F2 — Generation timeline (`F2_generation_timeline.json`, Paper 1)
 
@@ -41,7 +51,9 @@ three are header/scaffold-only until closed experiments exist.
   `generation_id`, `created_utc`, `evidence_label`) plus the sealed
   `TelemetryRecord` outcome fields `outcome.recorded_utc` and
   `outcome.heldout_detection_rates`.
-- **Empty state:** `data: []`; no markers before the first generation closes.
+- **Current state:** `status: "populated"` with the single D2-0003 marker
+  (`generated_at` from `benchmark-results.json`, held-out rate from
+  `d2-latest-status.json`); D2-0004 contributes nothing while running.
 
 ## F3 — Architecture disagreement (`F3_architecture_disagreement.json`, Paper 1)
 
