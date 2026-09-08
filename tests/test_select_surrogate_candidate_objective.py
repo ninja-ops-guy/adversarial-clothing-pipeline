@@ -94,6 +94,7 @@ def _write_inputs(tmp_path: Path) -> tuple[Path, Path]:
         (pool_dir / f"{cand_id}.png").write_bytes(f"fake-png-{cand_id}".encode())
         candidates.append({"candidate_id": cand_id, "png": f"{cand_id}.png"})
     pool = {
+        "schema_version": "3.0",
         "heldout_feedback_allowed": False,
         "candidate_count": len(candidates),
         "candidates": candidates,

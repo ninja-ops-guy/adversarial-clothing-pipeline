@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ruthless_pipeline.benchmark import BenchmarkConfig, ComparativeBenchmark
+from ruthless_pipeline.certification.schema_version import require_schema_version
 from ruthless_pipeline.capgen import extract_base_colors, initialize_pattern_logits, render_palette_patch
 from scripts.run_measured_benchmark import build_evaluators, prepare_fixture
 
@@ -84,8 +85,10 @@ def main() -> int:
 
     manifest = json.loads(Path(args.manifest).read_text())
     selection = json.loads(Path(args.selection).read_text())
+    require_schema_version(selection, "3.0", label=f"selection report {args.selection}")
     pool_path = Path(args.pool)
     pool = json.loads(pool_path.read_text())
+    require_schema_version(pool, "3.0", label=f"candidate pool {pool_path}")
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
