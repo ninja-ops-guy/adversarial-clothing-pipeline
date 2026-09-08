@@ -29,10 +29,11 @@ newline), CSV via the csv module with deterministic row ordering.
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -62,6 +63,19 @@ __all__ = [
     "write_paper5_comparison_json",
     "figure_scaffolds",
     "write_figure_scaffolds",
+    "GENERATION_FIELDS",
+    "GENERATION_STATUSES",
+    "PAPER1_GENERATION_HEADER",
+    "SourcedValue",
+    "GenerationRecord",
+    "load_committed_generation_records",
+    "paper1_generation_rows",
+    "paper1_generation_csv",
+    "paper5_comparison_scaffold",
+    "paper5_comparison_scaffold_json",
+    "write_manuscript_exports",
+    "figure_scaffolds_populated",
+    "write_figure_scaffolds_populated",
 ]
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -434,6 +448,21 @@ _PAIRED_STATS_PRODUCER = "ruthless_pipeline.certification.paired_arm_statistics.
 _FAILURE_TAXONOMY_PRODUCER = "ruthless_pipeline.certification.failure_taxonomy.classify_failure (metrics input)"
 _EXPERIMENT_PRODUCER = "ruthless_pipeline.certification.experiment.ExperimentArtifact"
 
+#: Exact fill/population entry point declared by every scaffold source.
+_FILL_FUNCTION = "ruthless_pipeline.certification.manuscript_export.write_figure_scaffolds_populated"
+
+
+def _source(producer: str, artifact: str, fields: list[str], artifact_ids: list[str]) -> dict[str, Any]:
+    """One scaffold source declaration: producer, exact artifact ids, fields."""
+    return {
+        "producer": producer,
+        "producer_function": _FILL_FUNCTION,
+        "artifact": artifact,
+        "artifact_ids": artifact_ids,
+        "fields": fields,
+    }
+
+
 
 def figure_scaffolds() -> list[dict[str, Any]]:
     """The eight predefined manuscript figure-input scaffolds.
@@ -470,16 +499,17 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 "color": {"label": "outcome", "field": "outcome.verdict"},
             },
             sources=[
-                {
-                    "producer": _TELEMETRY_PRODUCER,
-                    "artifact": _TELEMETRY_ARTIFACT,
-                    "fields": [
+                _source(
+                    _TELEMETRY_PRODUCER,
+                    _TELEMETRY_ARTIFACT,
+                    [
                         "pre.candidate_sha256",
                         "pre.surrogate_mean_detection_rate",
                         "outcome.heldout_detection_rates",
                         "outcome.verdict",
                     ],
-                }
+                    [D2_0003_STATUS_JSON, D2_0003_BENCHMARK_JSON],
+                )
             ],
             fill_rule=(
                 "For every closed experiment in the ExperimentRegistry, load the "
@@ -512,16 +542,18 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 "series": {"label": "generation", "field": "generation_id"},
             },
             sources=[
-                {
-                    "producer": _EXPERIMENT_PRODUCER,
-                    "artifact": "experiment.json (release dir root)",
-                    "fields": ["experiment_id", "generation_id", "created_utc", "evidence_label"],
-                },
-                {
-                    "producer": _TELEMETRY_PRODUCER,
-                    "artifact": _TELEMETRY_ARTIFACT,
-                    "fields": ["outcome.heldout_detection_rates", "outcome.recorded_utc"],
-                },
+                _source(
+                    _EXPERIMENT_PRODUCER,
+                    "experiment.json (release dir root)",
+                    ["experiment_id", "generation_id", "created_utc", "evidence_label"],
+                    [D2_0003_STATUS_JSON],
+                ),
+                _source(
+                    _TELEMETRY_PRODUCER,
+                    _TELEMETRY_ARTIFACT,
+                    ["outcome.heldout_detection_rates", "outcome.recorded_utc"],
+                    [D2_0003_STATUS_JSON, D2_0003_BENCHMARK_JSON],
+                ),
             ],
             fill_rule=(
                 "For every closed experiment, emit one marker at "
@@ -550,16 +582,17 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 },
             },
             sources=[
-                {
-                    "producer": _TELEMETRY_PRODUCER,
-                    "artifact": _TELEMETRY_ARTIFACT,
-                    "fields": [
+                _source(
+                    _TELEMETRY_PRODUCER,
+                    _TELEMETRY_ARTIFACT,
+                    [
                         "pre.candidate_sha256",
                         "pre.cross_model_disagreement.variance",
                         "pre.cross_model_disagreement.spread",
                         "pre.cross_model_disagreement.max_pairwise_delta",
                     ],
-                }
+                    [],
+                )
             ],
             fill_rule=(
                 "For every frozen pre-held-out telemetry record (outcome not "
@@ -594,16 +627,18 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 },
             },
             sources=[
-                {
-                    "producer": _FAILURE_TAXONOMY_PRODUCER,
-                    "artifact": "failure-classification metrics bundle per closed experiment",
-                    "fields": ["transformation_rates"],
-                },
-                {
-                    "producer": _TELEMETRY_PRODUCER,
-                    "artifact": _TELEMETRY_ARTIFACT,
-                    "fields": ["pre.transformation_sweep_variance"],
-                },
+                _source(
+                    _FAILURE_TAXONOMY_PRODUCER,
+                    "failure-classification metrics bundle per closed experiment",
+                    ["transformation_rates"],
+                    [],
+                ),
+                _source(
+                    _TELEMETRY_PRODUCER,
+                    _TELEMETRY_ARTIFACT,
+                    ["pre.transformation_sweep_variance"],
+                    [],
+                ),
             ],
             fill_rule=(
                 "For every closed experiment, take the sealed transformation-sweep "
@@ -637,10 +672,10 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 },
             },
             sources=[
-                {
-                    "producer": _OBJECTIVE_TELEMETRY_PRODUCER,
-                    "artifact": _OBJECTIVE_TELEMETRY_ARTIFACT,
-                    "fields": [
+                _source(
+                    _OBJECTIVE_TELEMETRY_PRODUCER,
+                    _OBJECTIVE_TELEMETRY_ARTIFACT,
+                    [
                         "objective.name",
                         "objective.alpha",
                         "checkpoints[].checkpoint",
@@ -649,7 +684,8 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                         "checkpoints[].losses.cvar",
                         "checkpoints[].losses.worst_model",
                     ],
-                }
+                    [],
+                )
             ],
             fill_rule=(
                 "Load the sealed objective-telemetry JSON for the arm. Emit three "
@@ -678,10 +714,10 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 },
             },
             sources=[
-                {
-                    "producer": _OBJECTIVE_TELEMETRY_PRODUCER,
-                    "artifact": _OBJECTIVE_TELEMETRY_ARTIFACT,
-                    "fields": [
+                _source(
+                    _OBJECTIVE_TELEMETRY_PRODUCER,
+                    _OBJECTIVE_TELEMETRY_ARTIFACT,
+                    [
                         "checkpoints[].checkpoint",
                         "checkpoints[].cvar_tail.alpha",
                         "checkpoints[].cvar_tail.k",
@@ -689,7 +725,8 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                         "checkpoints[].tail_turnover.entered",
                         "checkpoints[].tail_turnover.left",
                     ],
-                }
+                    [],
+                )
             ],
             fill_rule=(
                 "Load the sealed objective-telemetry JSON. For each checkpoint, "
@@ -718,17 +755,18 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 },
             },
             sources=[
-                {
-                    "producer": _OBJECTIVE_TELEMETRY_PRODUCER,
-                    "artifact": _OBJECTIVE_TELEMETRY_ARTIFACT,
-                    "fields": [
+                _source(
+                    _OBJECTIVE_TELEMETRY_PRODUCER,
+                    _OBJECTIVE_TELEMETRY_ARTIFACT,
+                    [
                         "checkpoints[].checkpoint",
                         "checkpoints[].candidate_id",
                         "checkpoints[].candidate_ranks.<candidate_id>.mean_rank",
                         "checkpoints[].candidate_ranks.<candidate_id>.cvar_rank",
                         "checkpoints[].candidate_ranks.<candidate_id>.rank_delta",
                     ],
-                }
+                    [],
+                )
             ],
             fill_rule=(
                 "Load the sealed objective-telemetry JSON and take its FINAL "
@@ -758,10 +796,10 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                 },
             },
             sources=[
-                {
-                    "producer": _PAIRED_STATS_PRODUCER,
-                    "artifact": "paper5_comparison.json (this module) / sealed paired-arm statistics JSON",
-                    "fields": [
+                _source(
+                    _PAIRED_STATS_PRODUCER,
+                    "paper5_comparison.json (this module) / sealed paired-arm statistics JSON",
+                    [
                         "observation_units",
                         "arm_m.rate",
                         "arm_m.interval",
@@ -773,7 +811,8 @@ def figure_scaffolds() -> list[dict[str, Any]]:
                         "decision",
                         "inconclusive_width",
                     ],
-                }
+                    [],
+                )
             ],
             fill_rule=(
                 "Load the sealed paired-arm statistics JSON produced by "
@@ -792,25 +831,442 @@ def figure_scaffolds() -> list[dict[str, Any]]:
     ]
 
 
+_FIGURE_SLUGS: dict[str, str] = {
+    "F1": "transfer_scatter",
+    "F2": "generation_timeline",
+    "F3": "architecture_disagreement",
+    "F4": "transformation_robustness",
+    "F5": "objective_trajectories",
+    "F6": "cvar_tail_turnover",
+    "F7": "mean_vs_cvar_rank_changes",
+    "F8": "paired_arm_outcome",
+}
+
+
+def _figure_slugs() -> dict[str, str]:
+    return dict(_FIGURE_SLUGS)
+
+
 def write_figure_scaffolds(directory: str | Path) -> list[Path]:
     """Write the eight scaffolds as canonical JSON into ``directory``.
 
     Filenames: ``<figure_id>_<slug>.json`` (e.g. ``F1_transfer_scatter.json``).
     """
-    slugs = {
-        "F1": "transfer_scatter",
-        "F2": "generation_timeline",
-        "F3": "architecture_disagreement",
-        "F4": "transformation_robustness",
-        "F5": "objective_trajectories",
-        "F6": "cvar_tail_turnover",
-        "F7": "mean_vs_cvar_rank_changes",
-        "F8": "paired_arm_outcome",
-    }
+    slugs = _figure_slugs()
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
     for scaffold in figure_scaffolds():
+        path = directory / f"{scaffold['figure_id']}_{slugs[scaffold['figure_id']]}.json"
+        path.write_text(_canonical_json(scaffold))
+        written.append(path)
+    return written
+
+
+# ---------------------------------------------------------------------------
+# Overnight stream MS: committed-evidence generation exports (D2-0003/D2-0004).
+#
+# Governance: every populated datum carries its source artifact (repo-relative
+# path) plus the artifact's SHA-256 in adjacent columns/keys. Fields with no
+# closed-release evidence stay blank; a "running" generation contributes a
+# row with all evidence fields blank. Nothing is invented.
+# ---------------------------------------------------------------------------
+
+#: Canonical evidence fields of one generation row, in frozen column order.
+GENERATION_FIELDS: tuple[str, ...] = (
+    "protocol",
+    "surrogate_model_set",
+    "heldout_model_set",
+    "candidate_sha256",
+    "surrogate_detection_rate",
+    "heldout_detection_rate",
+    "heldout_n",
+    "decision",
+    "evidence_state",
+    "certificate_id",
+    "source_commit",
+    "recorded_utc",
+)
+
+GENERATION_STATUSES: tuple[str, ...] = ("closed", "running")
+
+#: Frozen CSV header for the committed-evidence paper1_longitudinal.csv:
+#: id/status (with status provenance), then per field a triple of
+#: value/source/sha256 columns.
+PAPER1_GENERATION_HEADER: tuple[str, ...] = (
+    ("generation_id", "status", "status_source", "status_sha256")
+    + tuple(
+        column
+        for field in GENERATION_FIELDS
+        for column in (field, f"{field}_source", f"{field}_sha256")
+    )
+)
+
+#: Committed evidence files backing the D2-0003 closed-generation row.
+D2_0003_STATUS_JSON = "d2-latest-status.json"
+D2_0003_BENCHMARK_JSON = "benchmark-results.json"
+#: Generation JSON backing the D2-0004 "running" row (read-only).
+D2_0004_GENERATION_JSON = "generations/RAC-PER-D2-0004.json"
+
+_PAPER5_COMPARISON_STATUS = "awaiting_d2-0005_closure"
+
+
+@dataclass(frozen=True)
+class SourcedValue:
+    """One exported datum with provenance; blank when no evidence exists.
+
+    Invariants: a populated value requires a non-empty ``source`` (release id
+    or repo-relative artifact path) and a 64-hex ``sha256`` of that artifact;
+    a blank value requires empty source and sha256. There is no third state.
+    """
+
+    value: str = ""
+    source: str = ""
+    sha256: str = ""
+
+    @property
+    def populated(self) -> bool:
+        return self.value != ""
+
+    def validate(self) -> None:
+        if self.populated:
+            if not self.source:
+                raise ValueError("populated value requires a source artifact id")
+            if not _is_sha256(self.sha256):
+                raise ValueError("populated value requires the source artifact sha256")
+        elif self.source or self.sha256:
+            raise ValueError("blank value must have empty source and sha256")
+
+
+@dataclass(frozen=True)
+class GenerationRecord:
+    """Evidence for one generation row: status plus sourced fields."""
+
+    generation_id: str
+    status: str  # "closed" | "running"
+    status_source: SourcedValue = SourcedValue()
+    fields: Mapping[str, SourcedValue] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        if not self.generation_id:
+            raise ValueError("generation_id is required")
+        if self.status not in GENERATION_STATUSES:
+            raise ValueError(f"status must be one of {GENERATION_STATUSES}")
+        self.status_source.validate()
+        unknown = sorted(set(self.fields) - set(GENERATION_FIELDS))
+        if unknown:
+            raise ValueError(f"unknown generation fields: {unknown}")
+        populated = 0
+        for name, sourced in self.fields.items():
+            sourced.validate()
+            populated += 1 if sourced.populated else 0
+        if self.status == "running" and populated:
+            raise ValueError(
+                "a running generation must have all evidence fields blank "
+                "(no invented results)"
+            )
+        if self.status == "closed" and not populated:
+            raise ValueError("a closed generation must populate its evidence fields")
+
+
+def _file_sourced(repo_root: Path, rel_path: str, value: Any) -> SourcedValue:
+    """Build a SourcedValue pinned to a committed file's actual SHA-256."""
+    digest = hashlib.sha256((repo_root / rel_path).read_bytes()).hexdigest()
+    return SourcedValue(value=str(value), source=rel_path, sha256=digest)
+
+
+def load_committed_generation_records(
+    repo_root: str | Path,
+) -> tuple[GenerationRecord, ...]:
+    """Build generation rows from the repo's committed evidence files.
+
+    D2-0003 (closed, retained negative): populated from d2-latest-status.json
+    and benchmark-results.json. D2-0004: status "running" (provenance: its
+    generation JSON), all evidence fields blank until its release exists.
+    """
+    repo_root = Path(repo_root)
+    status_path = repo_root / D2_0003_STATUS_JSON
+    benchmark_path = repo_root / D2_0003_BENCHMARK_JSON
+    if not status_path.is_file() or not benchmark_path.is_file():
+        raise ValueError("D2-0003 committed evidence files are missing")
+    status = json.loads(status_path.read_text())
+    benchmark = json.loads(benchmark_path.read_text())
+
+    heldout = status["heldout"]
+    surrogate_rate = benchmark["benchmark"]["comparative_summary"]["surrogate"][
+        "candidate_detection_rate"
+    ]
+    d2_0003 = GenerationRecord(
+        generation_id=str(status["candidate_id"]),
+        status="closed",
+        status_source=_file_sourced(
+            repo_root, D2_0003_STATUS_JSON, status["evidence_state"]
+        ),
+        fields={
+            "protocol": _file_sourced(
+                repo_root,
+                D2_0003_STATUS_JSON,
+                f"{status['protocol_id']} {status['protocol_version']}",
+            ),
+            "surrogate_model_set": _file_sourced(
+                repo_root, D2_0003_STATUS_JSON, status["surrogate_model_set"]
+            ),
+            "heldout_model_set": _file_sourced(
+                repo_root, D2_0003_STATUS_JSON, status["heldout_model_set"]
+            ),
+            "candidate_sha256": _file_sourced(
+                repo_root, D2_0003_BENCHMARK_JSON, benchmark["candidate"]["sha256"]
+            ),
+            "surrogate_detection_rate": _file_sourced(
+                repo_root, D2_0003_BENCHMARK_JSON, repr(float(surrogate_rate))
+            ),
+            "heldout_detection_rate": _file_sourced(
+                repo_root,
+                D2_0003_STATUS_JSON,
+                repr(float(heldout["candidate_detection_rate"])),
+            ),
+            "heldout_n": _file_sourced(repo_root, D2_0003_STATUS_JSON, heldout["n"]),
+            "decision": _file_sourced(
+                repo_root, D2_0003_STATUS_JSON, status["decision"]
+            ),
+            "evidence_state": _file_sourced(
+                repo_root, D2_0003_STATUS_JSON, status["evidence_state"]
+            ),
+            "certificate_id": _file_sourced(
+                repo_root, D2_0003_STATUS_JSON, status["certificate_id"]
+            ),
+            "source_commit": _file_sourced(
+                repo_root, D2_0003_STATUS_JSON, status["source_commit"]
+            ),
+            "recorded_utc": _file_sourced(
+                repo_root, D2_0003_BENCHMARK_JSON, benchmark["generated_at"]
+            ),
+        },
+    )
+
+    generation_path = repo_root / D2_0004_GENERATION_JSON
+    if not generation_path.is_file():
+        raise ValueError("D2-0004 generation JSON is missing")
+    generation = json.loads(generation_path.read_text())
+    d2_0004 = GenerationRecord(
+        generation_id=str(generation["generation_id"]),
+        status="running",
+        status_source=_file_sourced(
+            repo_root, D2_0004_GENERATION_JSON, generation["status"]
+        ),
+        fields={},
+    )
+    records = (d2_0003, d2_0004)
+    for record in records:
+        record.validate()
+    return records
+
+
+def paper1_generation_rows(
+    records: Sequence[GenerationRecord],
+) -> list[dict[str, str]]:
+    """One CSV row dict per generation, sorted by generation_id.
+
+    Columns follow PAPER1_GENERATION_HEADER: each populated field carries its
+    source artifact id and sha256 in the adjacent ``*_source`` / ``*_sha256``
+    columns; blank fields leave all three columns empty.
+    """
+    rows: list[dict[str, str]] = []
+    for record in records:
+        record.validate()
+        row = {
+            "generation_id": record.generation_id,
+            "status": record.status,
+            "status_source": record.status_source.source,
+            "status_sha256": record.status_source.sha256,
+        }
+        for field_name in GENERATION_FIELDS:
+            sourced = record.fields.get(field_name, SourcedValue())
+            row[field_name] = sourced.value
+            row[f"{field_name}_source"] = sourced.source
+            row[f"{field_name}_sha256"] = sourced.sha256
+        rows.append(row)
+    rows.sort(key=lambda row: row["generation_id"])
+    return rows
+
+
+def paper1_generation_csv(records: Sequence[GenerationRecord]) -> str:
+    """Serialize generation rows to CSV (header always present)."""
+    buffer = io.StringIO()
+    writer = csv.DictWriter(
+        buffer, fieldnames=list(PAPER1_GENERATION_HEADER), lineterminator="\n"
+    )
+    writer.writeheader()
+    writer.writerows(paper1_generation_rows(records))
+    return buffer.getvalue()
+
+
+# -- Paper 5 awaiting-closure scaffolds -------------------------------------
+
+
+def paper5_comparison_scaffold() -> dict[str, Any]:
+    """paper5_comparison.json schema with every data field null.
+
+    D2-0005 has not closed; the only non-null entries are the status string
+    and the preregistered (constant) decision-region documentation. All
+    measured/statistical fields are JSON null — never placeholder numbers.
+    """
+    null_arm = {
+        "detected": None,
+        "total": None,
+        "rate": None,
+        "interval": [None, None],
+    }
+    return {
+        "comparison": "arm_m_minus_arm_c",
+        "status": _PAPER5_COMPARISON_STATUS,
+        "primary_endpoint": (
+            "held-out candidate detection rate; Delta = R_M - R_C; "
+            "H1: Delta > 0 (CVaR arm suppresses below the mean arm)"
+        ),
+        "preregistration_sha256": None,
+        "statistics": {
+            "observation_units": None,
+            "arm_m": dict(null_arm),
+            "arm_c": dict(null_arm),
+            "risk_difference": None,
+            "risk_difference_interval": [None, None],
+            "interval_width": None,
+            "discordant_m_only": None,
+            "discordant_c_only": None,
+            "decision": None,
+            "inconclusive_width": None,
+            "z": None,
+            "bootstrap_resamples": None,
+            "bootstrap_seed": None,
+        },
+        "decision_region": {
+            "decision": None,
+            "inconclusive_width_max": INCONCLUSIVE_WIDTH_MAX,
+            "rule": (
+                "success if risk_difference_interval lower bound > 0; "
+                "negative if upper bound < 0; null if the interval includes 0 "
+                "within the width budget; inconclusive if interval width "
+                "exceeds inconclusive_width_max"
+            ),
+        },
+    }
+
+
+def paper5_comparison_scaffold_json() -> str:
+    """Canonical JSON of the awaiting-closure comparison scaffold."""
+    return _canonical_json(paper5_comparison_scaffold())
+
+
+def write_manuscript_exports(
+    repo_root: str | Path,
+    out_dir: str | Path,
+) -> dict[str, Path]:
+    """Emit the deterministic committed-evidence exports into ``out_dir``.
+
+    Writes paper1_longitudinal.csv (committed-evidence generation rows),
+    paper5_arms.csv (header only — zero data rows until D2-0005 closes) and
+    paper5_comparison.json (all-null scaffold). Byte-identical across runs.
+    """
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    records = load_committed_generation_records(repo_root)
+    paths = {
+        "paper1_longitudinal.csv": out_dir / "paper1_longitudinal.csv",
+        "paper5_arms.csv": out_dir / "paper5_arms.csv",
+        "paper5_comparison.json": out_dir / "paper5_comparison.json",
+    }
+    paths["paper1_longitudinal.csv"].write_text(paper1_generation_csv(records))
+    paths["paper5_arms.csv"].write_text(paper5_arms_csv([]))
+    paths["paper5_comparison.json"].write_text(paper5_comparison_scaffold_json())
+    return paths
+
+
+# -- Figure population from closed-generation evidence ----------------------
+
+
+def _closed_figure_point(record: GenerationRecord) -> dict[str, Any]:
+    """One deterministic figure datum for a closed generation, with provenance."""
+    record.validate()
+    fields = record.fields
+    artifacts = sorted(
+        {sv.source for sv in fields.values() if sv.populated}
+        | ({record.status_source.source} if record.status_source.populated else set())
+    )
+    return {
+        "generation_id": record.generation_id,
+        "surrogate_detection_rate": float(fields["surrogate_detection_rate"].value),
+        "heldout_detection_rate": float(fields["heldout_detection_rate"].value),
+        "decision": fields["decision"].value,
+        "recorded_utc": fields["recorded_utc"].value,
+        "source_artifacts": {path: _artifact_sha(record, path) for path in artifacts},
+    }
+
+
+def _artifact_sha(record: GenerationRecord, path: str) -> str:
+    for sv in list(record.fields.values()) + [record.status_source]:
+        if sv.source == path:
+            return sv.sha256
+    raise ValueError(f"no provenance for artifact {path!r}")
+
+
+def figure_scaffolds_populated(
+    records: Sequence[GenerationRecord] = (),
+) -> list[dict[str, Any]]:
+    """Figure scaffolds with closed-generation data populated deterministically.
+
+    F1 (transfer scatter) and F2 (generation timeline) gain one data point per
+    closed generation record; each point carries ``source_artifacts`` mapping
+    the committed evidence path to its SHA-256. All other figures keep
+    ``status: "awaiting_data"`` with an empty ``data`` array.
+    """
+    closed = [r for r in records if r.status == "closed"]
+    closed.sort(key=lambda r: r.generation_id)
+    points = [_closed_figure_point(record) for record in closed]
+    scaffolds = []
+    for scaffold in figure_scaffolds():
+        scaffold = dict(scaffold)
+        if scaffold["figure_id"] == "F1" and points:
+            scaffold["status"] = "populated"
+            scaffold["data"] = [
+                {
+                    "generation_id": p["generation_id"],
+                    "x": p["surrogate_detection_rate"],
+                    "y": p["heldout_detection_rate"],
+                    "color": p["decision"].lower(),
+                    "source_artifacts": p["source_artifacts"],
+                }
+                for p in points
+            ]
+        elif scaffold["figure_id"] == "F2" and points:
+            scaffold["status"] = "populated"
+            scaffold["data"] = [
+                {
+                    "generation_id": p["generation_id"],
+                    "x": p["recorded_utc"],
+                    "y": p["heldout_detection_rate"],
+                    "series": p["generation_id"],
+                    "source_artifacts": p["source_artifacts"],
+                }
+                for p in points
+            ]
+        scaffolds.append(scaffold)
+    return scaffolds
+
+
+def write_figure_scaffolds_populated(
+    directory: str | Path,
+    *,
+    repo_root: str | Path,
+) -> list[Path]:
+    """Write populated figure scaffolds (byte-identical across runs)."""
+    records = load_committed_generation_records(repo_root)
+    scaffolds = figure_scaffolds_populated(records)
+    slugs = _figure_slugs()
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+    for scaffold in scaffolds:
         path = directory / f"{scaffold['figure_id']}_{slugs[scaffold['figure_id']]}.json"
         path.write_text(_canonical_json(scaffold))
         written.append(path)
