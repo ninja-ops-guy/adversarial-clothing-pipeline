@@ -29,9 +29,12 @@ null / inconclusive with the configurable width gate, default 0.20), so
 cluster-robust results remain directly comparable with the unit-level path.
 
 Degenerate case: when every cluster has exactly one member, the cluster
-bootstrap over N singleton clusters is EXACTLY the unit-level bootstrap of
+bootstrap over N singleton clusters reproduces the unit-level bootstrap of
 ``paired_arm_statistics.bootstrap_paired_difference_interval`` (same hash
-draws, same multiset of deltas), so the two paths agree bit-for-bit.
+draws, same multiset of deltas) up to ONE intentional divergence: the
+percentile interval lower-index off-by-one present in the frozen path is
+corrected here (see ``bootstrap_cluster_difference_interval``), so the lower
+bound may differ by one order statistic. All other fields agree bit-for-bit.
 """
 
 from __future__ import annotations
@@ -71,7 +74,9 @@ class ClusterPairedArmStatistics:
     with replacement, all members carried). ``intracluster_rho``,
     ``design_effect`` and ``effective_sample_size`` diagnose pseudoreplication:
     design_effect = 1 + (mean_cluster_size - 1) * max(rho, 0) and
-    effective_sample_size = observation_units / design_effect. ``decision``
+    effective_sample_size = observation_units / design_effect; all three are
+    ``None`` (NA) when the data have zero total variance, where rho is
+    undefined — never misleadingly reported as 0 (finding F7). ``decision``
     uses the SAME regions as the unit-level preregistered path via
     ``classify_decision``.
     """
@@ -87,9 +92,9 @@ class ClusterPairedArmStatistics:
     interval_width: float
     discordant_m_only: int
     discordant_c_only: int
-    intracluster_rho: float
-    design_effect: float
-    effective_sample_size: float
+    intracluster_rho: float | None
+    design_effect: float | None
+    effective_sample_size: float | None
     decision: str
     inconclusive_width: bool
     z: float
@@ -199,14 +204,28 @@ def bootstrap_cluster_difference_interval(
         estimates.append(total_delta / total_members)
     estimates.sort()
     alpha = 2 * (1 - (0.5 * (1 + math.erf(z / math.sqrt(2)))))
-    lo_idx = max(0, int(math.floor((alpha / 2) * resamples)))
-    hi_idx = min(resamples - 1, int(math.ceil((1 - alpha / 2) * resamples)) - 1)
+    # Percentile indices over the SORTED estimates (0-based). The alpha/2
+    # lower bound is the round((alpha/2)*R)-th order statistic, i.e. 0-based
+    # index round((alpha/2)*R) - 1 (round() rather than ceil() because the
+    # preregistered z gives alpha/2 * R = 25.000000000000004 in floating
+    # point — ceil() would round the float dust UP and reproduce the frozen
+    # path's off-by-one). INTENTIONAL DIVERGENCE from the frozen unit-level
+    # path (paired_arm_statistics.bootstrap_paired_difference_interval),
+    # which uses floor((alpha/2)*R) — one order statistic too high on the
+    # lower bound (e.g. the 26th instead of the 25th at R = 1000). The frozen
+    # path is NOT modified (it is preregistered); this module corrects the
+    # index and documents the divergence (red-team finding F8). The
+    # correction only ever moves the lower bound one order statistic
+    # downward (slightly wider interval); the upper index matches the frozen
+    # path exactly.
+    lo_idx = max(0, int(round((alpha / 2) * resamples)) - 1)
+    hi_idx = min(resamples - 1, int(round((1 - alpha / 2) * resamples)) - 1)
     return estimates[lo_idx], estimates[hi_idx]
 
 
 def intracluster_diagnostics(
     clusters: tuple[tuple[str, tuple[tuple[str, bool, bool], ...]], ...],
-) -> tuple[float, float, float]:
+) -> tuple[float | None, float | None, float | None]:
     """ANOVA estimator of the intracluster correlation of member deltas.
 
     Returns ``(rho, design_effect, effective_sample_size)`` where
@@ -215,6 +234,15 @@ def intracluster_diagnostics(
     effective_sample_size = observation_units / design_effect. With a single
     cluster (no between-cluster replication) rho is not identifiable and the
     function returns (0.0, 1.0, N) — conservative (no variance credit).
+
+    Degenerate zero-total-variance case (red-team finding F7): when BOTH the
+    between- and within-cluster mean squares are zero (every member delta in
+    every cluster identical — e.g. perfect within-cluster agreement at a
+    boundary rate), rho is undefined (0/0), NOT zero. Reporting rho = 0 there
+    would falsely signal "no clustering" exactly when outcomes are maximally
+    clustered but variance-free. In that case the function returns
+    ``(None, None, None)`` — serialized as ``null`` ("NA") — rather than
+    ``(0.0, 1.0, N)``.
     """
     sums = cluster_delta_sums(clusters)
     k = len(sums)
@@ -241,7 +269,10 @@ def intracluster_diagnostics(
     m_bar = (n - sum(member_count * member_count for _, member_count in sums) / n) / df_between
     sigma_b = (ms_between - ms_within) / m_bar
     denom = sigma_b + ms_within
-    rho = sigma_b / denom if denom > 0 else 0.0
+    if denom <= 0:
+        # Zero total variance: rho is 0/0 — undefined. Report NA, not 0.
+        return None, None, None
+    rho = sigma_b / denom
     design_effect = 1.0 + (m_bar - 1.0) * max(rho, 0.0)
     return rho, design_effect, n / design_effect
 
