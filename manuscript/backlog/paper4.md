@@ -59,7 +59,7 @@ accredited certification.
 
 ### 2.8 Runtime and contract locking
 - benchmarks/runtime_lock.json as single source of truth; `verify_runtime_lock.py` hard gate; the 19-minute version-drift incident as motivation ← `docs/AMENDMENT_D2-0004_INFRA-001.md` §§1, 6.
-- Manuscript automation exports (header-only CSVs / `awaiting_data` scaffolds until closed experiments exist) ← `ruthless_pipeline/certification/manuscript_export.py` docstring.
+- Manuscript automation exports (`paper1_longitudinal.csv` now populated for closed generations D2-0003 and D2-0004 with per-field source + sha256 provenance; figures F1/F2 populated; remaining scaffolds `awaiting_data`) ← `ruthless_pipeline/certification/manuscript_export.py` docstring.
 
 ### 2.9 Limitations
 - Verification proves integrity, not validity; a verifying release may describe a failed experiment (FAILURE.json) ← `docs/RESEARCH_RELEASE_FORMAT.md` §1.
@@ -74,11 +74,11 @@ figure placeholders:
   `docs/CERTIFICATION_SYSTEM.md` — no numeric data required.
 - **Fig P4-2 — Lineage contract of one experiment.** Stage chain with StageRef hashes and
   the computed lineage_hash; tamper-detection annotation. Example hashes:
-  [AWAITING: first closed release id (D2-0004)].
+  `releases/RAC-EXP-2026-001/` (first closed release, D2-0004).
 - **Fig P4-3 — Release bundle anatomy.** Directory tree of one frozen release with the
   MANIFEST.json/content_hash addressing overlay. Layout from
-  `docs/RESEARCH_RELEASE_FORMAT.md` §2; concrete digests [AWAITING: first frozen
-  RAC-EXP-YYYY-NNN release].
+  `docs/RESEARCH_RELEASE_FORMAT.md` §2; concrete digests in
+  `releases/RAC-EXP-2026-001/MANIFEST.json` (first frozen RAC-EXP release, sealed 2026-09-08).
 
 ## 4. Citation placeholder list
 

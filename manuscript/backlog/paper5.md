@@ -53,7 +53,7 @@ null and negative outcomes — are committed to publication as closed-generation
 - A1 evidence-label correction (internally_measured); A2 statistics-module correction; A3 objective-scope clarification; A4 mandatory objective telemetry ← `docs/PREREGISTRATION_D2-0005.md` §9.
 
 ### 2.7 Execution and results (NOT YET RUN)
-- Gating: D2-0004 must close first; generation skeleton frozen, triggers NOT armed ← `docs/PREREGISTRATION_D2-0005.md` header.
+- Gating: D2-0004 closed 2026-09-08 (FAIL / RAC-D0, log-attested), so the open-order gate is satisfied; generation skeleton frozen, triggers NOT armed; the F0 user design decision remains pending ← `docs/PREREGISTRATION_D2-0005.md` header, `docs/DESIGN_ANALYSIS_D2-0005.md`.
 - Arm-level rates, Δ, intervals, decision: [AWAITING: D2-0005 Arm M release id] / [AWAITING: D2-0005 Arm C release id].
 - Objective-telemetry checkpoint series: [AWAITING: sealed optimization_telemetry stage artifacts per arm].
 
