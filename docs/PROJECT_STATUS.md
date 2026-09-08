@@ -12,8 +12,8 @@ Machine-readable-ish summary of every experiment, blocker, and user action. Narr
 
 | ID | State | Detail |
 | --- | --- | --- |
-| RAC-PER-D2-0003 | **CLOSED — retained negative** | FAIL / RAC-D0; held-out 1.00 → 1.00 (n=36, PERSON-HO-v2); bundle verified; remains the published `d2-latest-status.json` |
-| RAC-PER-D2-0004 | **RUNNING (authorized re-run 34175028944 in progress)** | First run 34147902820 failed at step 18 (protocol-loader crash, fixed by 7148202d); `docs/AMENDMENT_D2-0004_INFRA-001.md` authorizes exactly ONE re-run under `benchmarks/runtime_lock.json`; one-shot boundary intact (outcome never observed); generation remains do-not-mutate |
+| RAC-PER-D2-0003 | **CLOSED — retained negative** | FAIL / RAC-D0; held-out 1.00 → 1.00 (n=36, PERSON-HO-v2); bundle verified; status archived byte-identical at `manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json` |
+| RAC-PER-D2-0004 | **CLOSED — retained negative (log-attested)** | FAIL / RAC-D0; held-out 1.00 → 1.00 mean 0.99473 → 0.89599 (n=36, PERSON-HO-v3); CI run 34175028944 validated the bundle (steps 19–21) but never archived it (packaging step 22 schema-guard failure, infra fix 5cdce1b); closure rests on maintainer-uploaded logs per `docs/D2-0004_CLOSURE_NOTE.md`; sealed release `releases/RAC-EXP-2026-001/`; root `d2-latest-status.json` now carries this outcome |
 | RAC-PER-D2-0005 | **PREREGISTERED — frozen, NOT armed, pending design decision** | Skeleton frozen (`lock_status: PREREGISTERED`, triggers not armed); gated on D2-0004 closing; F0 design analysis shows INCONCLUSIVE-dominated at n=72 → user must choose pre-arming design amendment vs exploratory/pilot declaration |
 | RAC-PER-D2-0006 | **DRAFT — interpretation policy only** | `docs/PREREGISTRATION_D2-0006_DRAFT.md`; no generation file, no directional hypothesis, not a preregistration |
 | P1 physical program | **Tooling READY — awaiting hardware/garments** | Calibration-target generator, rig spec/checklists, session/ingestion templates, frozen stopping rule RAC-P1-STOP-2026-001 (min 93 / max 144 valid trials) on main; synthetic dry-run only (non-evidence) |
@@ -23,7 +23,6 @@ Machine-readable-ish summary of every experiment, blocker, and user action. Narr
 
 | Blocker | Blocking | Owner |
 | --- | --- | --- |
-| D2-0004 re-run not yet closed | D2-0005 opening, first RAC-EXP release, Paper 1 dataset | CI (run 34175028944) |
 | D2-0005 power/design decision (F0 finding) | D2-0005 arming | USER |
 | Printful API token (`PF_TOKEN`) | template/printfile archive download, v2 catalog mapping | USER |
 | Exact vendor template + panel geometry | SKU freeze, panel-pack validation | USER |
@@ -36,8 +35,7 @@ Machine-readable-ish summary of every experiment, blocker, and user action. Narr
 1. Create Printful private API token and export `PF_TOKEN` (`production_alpha/ORDER_CHECKLIST.md` Step 0).
 2. Download + SHA-256 the product-388 printfile/template archive; fill `SKU_MANIFEST_DRAFT.json` UNKNOWNs.
 3. Place the matched control/candidate garment order (same variant/size for both arms).
-4. Monitor re-run **34175028944**; on closure, run the closed-generation ingester and publish status.
-5. Decide the D2-0005 pre-arming route: design amendment (§7/§9 of its preregistration) or exploratory/pilot declaration.
+4. Decide the D2-0005 pre-arming route: design amendment (§7/§9 of its preregistration) or exploratory/pilot declaration.
 
 ## Executive Summary
 
@@ -301,7 +299,7 @@ As of 2026-09-07, Research OS Waves A/B, P1 statistics, calibration ingestion, r
 
 ### Active execution
 
-D2-0004 is the active fresh held-out generation. The published `d2-latest-status.json` intentionally remains D2-0003 until D2-0004 closes. Do not mutate the frozen generation or interpret the old published status as the new outcome.
+D2-0004 is closed (FAIL / RAC-D0, log-attested; see `docs/D2-0004_CLOSURE_NOTE.md`). The published root `d2-latest-status.json` now carries the D2-0004 outcome; D2-0003's status is archived byte-identical under `manuscript/evidence/RAC-PER-D2-0003/`. The next gated decision is D2-0005 design (amendment vs pilot declaration) — it remains frozen and unarmed.
 
 ### CI / deployment rule
 
@@ -411,3 +409,11 @@ Latest published locked run: **RAC-PER-D2-0003** (`machine_static`) from source 
 - Bundle verification: **PASS**.
 
 This is useful negative evidence: the candidate reduced mean held-out confidence but did not cross the preregistered detection-rate criteria. It must not be described as D2-certified or as a physical garment result.
+
+Latest closed run: **RAC-PER-D2-0004** from source commit `b4fe0e5942b56b7fffb8de6f1cb3172744269f59` (CI run 34175028944, 2026-09-08, log-attested per `docs/D2-0004_CLOSURE_NOTE.md`).
+
+- Held-out set (`PERSON-HO-v3`): baseline detection rate 1.00 → candidate 1.00 across 36 valid conditions (mean confidence 0.99473 → 0.89599, mean_delta -0.09874).
+- D2 certificate decision: **FAIL**; evidence state remains **RAC-D0**; bundle_verified true in CI.
+- Sealed release: `releases/RAC-EXP-2026-001/`; root `d2-latest-status.json` carries this outcome.
+
+This is a second retained negative under the newer PERSON-SUR-v3/HO-v3 contract: detection was not suppressed. It likewise must not be described as D2-certified or as a physical garment result.
