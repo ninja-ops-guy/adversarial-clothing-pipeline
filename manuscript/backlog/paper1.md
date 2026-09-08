@@ -12,9 +12,10 @@ preregistered research program on whether surrogate-ensemble optimization of adv
 clothing patterns transfers to fresh, never-before-seen object-detector architectures.
 Across a generation-based design in which every generation is preregistered before execution
 and closed before the next is opened, we retain and publish a **negative result (D2-0003)**,
-a prospective closure generation with a canonical content-addressed release **(D2-0004,
-protocol RAC-PERSON-DETECT-1.2, one authorized infrastructure re-run under amendment
-D2-0004-INFRA-001)**, a preregistered two-arm mean-vs-CVaR objective ablation **(D2-0005)**,
+a second closed generation — also a retained negative (FAIL / RAC-D0) — with a canonical
+content-addressed release **(D2-0004, protocol RAC-PERSON-DETECT-1.2, one authorized
+infrastructure re-run under amendment D2-0004-INFRA-001; log-attested closure,
+`releases/RAC-EXP-2026-001/`)**, a preregistered two-arm mean-vs-CVaR objective ablation **(D2-0005)**,
 and a prospective **replication policy (D2-0006)** whose hypothesis form is selected
 mechanically by a frozen decision tree keyed to D2-0005's preregistered decision regions.
 The contribution is both empirical (per-generation sealed surrogate-vs-held-out evidence)
@@ -25,7 +26,7 @@ not open to post-hoc revision).
 ## 2. Methods skeleton
 
 ### 2.1 Program structure and generation-based design
-- Generation ladder D2-0003 (retained negative) → D2-0004 (prospective closure) → D2-0005 (controlled ablation) → D2-0006 (replication, policy draft only) ← `docs/PREREGISTRATION_D2-0006_DRAFT.md` §4 table.
+- Generation ladder D2-0003 (retained negative) → D2-0004 (closed 2026-09-08: FAIL / RAC-D0, log-attested; release `releases/RAC-EXP-2026-001/`) → D2-0005 (controlled ablation) → D2-0006 (replication, policy draft only) ← `docs/PREREGISTRATION_D2-0006_DRAFT.md` §4 table.
 - One-shot rule and "never re-run silently" semantics ← `docs/PREREGISTRATION_D2-0006_DRAFT.md` §3; `docs/PREREGISTRATION_D2-0005.md` §1 (one-shot rule; publication commitment).
 - Status per generation (closed / closing / PREREGISTERED / DRAFT) ← the four docs above, verbatim status lines.
 
@@ -47,10 +48,10 @@ not open to post-hoc revision).
 ### 2.5 D2-0003: the retained negative generation
 - Negative-result record and failure classification ← D2-0003 closed release artifacts [AWAITING: RAC-EXP release id for D2-0003]; failure taxonomy categories ← `ruthless_pipeline/certification/failure_taxonomy.py` (CROSS_ARCHITECTURE_TRANSFER_FAILURE, SURROGATE_OVERFIT).
 
-### 2.6 D2-0004: prospective closure and infrastructure amendment
+### 2.6 D2-0004: closure and infrastructure amendment
 - Preregistered candidate-selection policy (surrogate-only, heldout_feedback_allowed: false; 100-candidate Product Studio pool; top-k 8→4; frozen winner before held-out inference) ← `docs/AMENDMENT_D2-0004_INFRA-001.md` §4.
 - The single authorized infrastructure re-run (step-18 loader crash, root cause, 19-minute version-drift window, runtime_lock hard gate) ← `docs/AMENDMENT_D2-0004_INFRA-001.md` §§1, 3, 5, 6.
-- Outcome numbers (held-out rates, verdict) ← [AWAITING: D2-0004 closed release id].
+- Outcome numbers (held-out rates, verdict) ← `releases/RAC-EXP-2026-001/` plus the log-attested evidence record `manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json` (FAIL / RAC-D0, held-out 1.00 → 1.00, n=36; surrogate-only rate NOT attested — see `not_log_attested_gaps`; narrative: `docs/D2-0004_CLOSURE_NOTE.md`).
 
 ### 2.7 D2-0005 and D2-0006 as program continuations
 - D2-0005 design summary (cross-reference Paper 5; gating rule "D2-0005 must not open while D2-0004 is open") ← `docs/PREREGISTRATION_D2-0005.md` header.
@@ -70,12 +71,16 @@ not open to post-hoc revision).
   frozen surrogate mean detection rate vs. sealed held-out mean detection rate. Filled
   strictly from sealed `TelemetryRecord`s (`pre.surrogate_mean_detection_rate`,
   `outcome.heldout_detection_rates`); records without attached outcomes are never plotted
-  as estimates. Point coordinates: [AWAITING: D2-0004 release id]; further generations
+  as estimates. Point coordinates: D2-0003 populated in the scaffold; D2-0004 **cannot be
+  plotted on F1** — its surrogate mean detection rate is not log-attested
+  (`not_log_attested_gaps` in `manuscript/evidence/RAC-PER-D2-0004/log-attested-evidence.json`);
+  further generations
   [AWAITING: D2-0005 release id], [AWAITING: D2-0006 release id]. Scaffold:
   `manuscript/figures/F1_transfer_scatter.json`.
 - **F2 — Generation timeline.** Closure date vs. held-out mean detection rate, one series
   per generation, from `experiment.json` plus sealed telemetry `outcome.recorded_utc`.
-  Dates/rates: [AWAITING: closed release ids per generation]. Scaffold:
+  Dates/rates: D2-0003 (2026-09-07, 1.0) and D2-0004 (2026-09-08, 1.0) populated in the
+  scaffold; further generations [AWAITING: closed release ids per generation]. Scaffold:
   `manuscript/figures/F2_generation_timeline.json`.
 - **F3 — Architecture disagreement.** Per-candidate population variance, spread, and max
   pairwise delta of per-surrogate detection rates, recomputed inside
