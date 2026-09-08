@@ -76,9 +76,22 @@ def test_current_published_result_matches_current_generation_when_v2_models_are_
         assert status.get("surrogate_model_set") == "PERSON-SUR-v3"
         assert status.get("heldout_model_set") == "PERSON-HO-v3"
     else:
-        # Historical D2-0003 evidence may remain published while D2-0004 is being
-        # searched or before a manual held-out run. It must retain its old identity.
-        assert status.get("candidate_id") == "RAC-PER-D2-0003"
+        # D2-0004 has closed (FAIL / RAC-D0, log-attested): the root
+        # d2-latest-status.json now carries the D2-0004 outcome while the root
+        # benchmark-results.json remains D2-0003's (D2-0004's benchmark file
+        # was validated in CI but never archived; see
+        # docs/D2-0004_CLOSURE_NOTE.md). D2-0003's identity is retained
+        # byte-identical in the archive.
+        assert status.get("candidate_id") == "RAC-PER-D2-0004"
+        assert status.get("decision") == "FAIL"
+        assert status.get("evidence_state") == "RAC-D0"
+        assert status.get("protocol_version") == "1.2"
+        archived = json.loads(
+            (
+                ROOT / "manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json"
+            ).read_text()
+        )
+        assert archived.get("candidate_id") == "RAC-PER-D2-0003"
 
 
 def test_all_current_model_manifests_match_benchmark_hash_contract():
