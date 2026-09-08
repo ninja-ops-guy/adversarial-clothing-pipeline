@@ -15,9 +15,14 @@ Outputs:
 - <output-dir>/<target_id>.png
 - <output-dir>/calibration-target-manifest.json  (canonical JSON)
 
-The manifest carries target_id, per-patch sRGB + Lab reference values and
-grid coordinates in mm, fiducial coordinates, scale-bar length, and the
-SHA-256 of the PNG, matching the repo conventions (canonical JSON, 64-hex).
+The manifest binds target_id, the generator source SHA-256, the driving
+parameters, per-patch sRGB + Lab reference values and grid coordinates in
+mm, fiducial coordinates, scale-bar length, the SHA-256 of the PNG, the
+generated-only evidence class, and the physical-fabrication USER-ACTION
+status — matching the repo conventions (canonical JSON, 64-hex). Manifest
+validation/promotion-guard logic lives in
+``ruthless_pipeline.certification.calibration_target`` (Wave I, item 10);
+nothing here prints, fabricates, or measures anything.
 """
 
 from __future__ import annotations
@@ -29,6 +34,15 @@ import json
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+
+from ruthless_pipeline.certification.calibration_target import (
+    EVIDENCE_CLASS_GENERATED,
+    FABRICATION_PENDING,
+    GENERATOR_PATH,
+    MANIFEST_FILENAME,
+    MANIFEST_SCHEMA_VERSION,
+    validate_manifest,
+)
 
 # Fixed rasterisation density. Geometry is defined in mm; pixels are derived.
 DPI = 300
@@ -207,9 +221,41 @@ def generate(output_dir: Path) -> dict:
     image.save(png_path, format="PNG", dpi=(DPI, DPI))
     png_sha256 = hashlib.sha256(png_path.read_bytes()).hexdigest()
 
+    # Bind the generator source itself so a measured print can later be
+    # traced to the exact code that produced its digital source.
+    generator_sha256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
     manifest = {
-        "schema_version": "1.0",
+        "schema_version": MANIFEST_SCHEMA_VERSION,
         "target_id": TARGET_ID,
+        "generator": {"path": GENERATOR_PATH, "sha256": generator_sha256},
+        "parameters": {
+            "dpi": DPI,
+            "grid_rows": GRID_ROWS,
+            "grid_cols": GRID_COLS,
+            "patch_mm": PATCH_MM,
+            "patch_gap_mm": PATCH_GAP_MM,
+            "margin_mm": MARGIN_MM,
+            "scale_bar_mm": SCALE_BAR_MM,
+            "scale_bar_height_mm": SCALE_BAR_HEIGHT_MM,
+            "fiducial_radius_mm": FIDUCIAL_RADIUS_MM,
+        },
+        # The digital target is a generated reference, never measured
+        # evidence; the promotion guard in certification.calibration_target
+        # rejects any measured class here.
+        "evidence_class": EVIDENCE_CLASS_GENERATED,
+        "physical_fabrication": {
+            "status": FABRICATION_PENDING,
+            "required_action": (
+                "USER ACTION: print this PNG at 100% scale (300 dpi) on the "
+                "locked P1 printer/substrate, then capture it under the "
+                "locked session rig per physical/p1/CALIBRATION_MANIFEST.json"
+            ),
+            "note": (
+                "The digital side cannot mark fabrication complete; status "
+                "stays PENDING_USER_ACTION until the physical print exists."
+            ),
+        },
         "dpi": DPI,
         "sheet_size_mm": [round(sheet_w_mm, 4), round(sheet_h_mm, 4)],
         "grid": {
@@ -228,9 +274,9 @@ def generate(output_dir: Path) -> dict:
         },
         "png_file": png_name,
         "png_sha256": png_sha256,
-        "evidence_label": "internally_measured",
     }
-    manifest_path = output_dir / "calibration-target-manifest.json"
+    validate_manifest(manifest)
+    manifest_path = output_dir / MANIFEST_FILENAME
     manifest_path.write_text(
         json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n"
     )
