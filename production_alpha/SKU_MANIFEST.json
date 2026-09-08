@@ -1,0 +1,411 @@
+{
+  "candidate_source": {
+    "expected_pattern_sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
+    "generation_candidate": "RAC-PER-D2-0003",
+    "note": "Frozen pattern is tiled onto verified panel rectangles at template dpi; per-placement upload files are then hashed and recorded as artwork_sha256. No regeneration or retuning permitted.",
+    "print_test_kit": "print-test-kit.zip",
+    "print_test_kit_sha256": "b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548"
+  },
+  "color_check_reference": "RAC-CALT-P1-0001 (physical/p1 calibration target); ΔE00 spot-check per RECEIPT_QA_FORM.md",
+  "control_rule": "Identical product, variant, size, placements, panel geometry, dpi, tiling origin and scale as the candidate; printed with the unmodified pre-modification base texture. If no sealed base texture exists in the repo, use flat mid-gray sRGB(128,128,128) full-coverage fill and mark scenario_assumption.",
+  "evidence_label": "scenario_assumption",
+  "evidence_label_note": "Upgrade to internally_measured for each field once verified per ORDER_CHECKLIST.md Step 7; no field may remain a placeholder at order time.",
+  "garment_pair": [
+    {
+      "artwork_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "color": "White",
+      "is_reserve": false,
+      "panel_geometry": {
+        "back": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "front": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "hood": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_inside": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_panel": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "pocket": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_left": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_right": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        }
+      },
+      "placements": [
+        "front",
+        "back",
+        "sleeve_left",
+        "sleeve_right",
+        "pocket",
+        "hood",
+        "label_panel",
+        "label_inside"
+      ],
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+      "product_id": 388,
+      "role": "candidate",
+      "size": "PENDING_USER_SIZE_SELECTION",
+      "sku_id": "PA-HOODIE-CAND-001",
+      "template_archive_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "variant_id": "PENDING_USER_SIZE_SELECTION",
+      "variant_id_note": "product 388 (All-Over Print Recycled Unisex Hoodie), v1 variant map: 2XS:18730, XS:10869, S:10870, M:10871, L:10872, XL:10873, 2XL:10874, 3XL:10875, 4XL:18731, 5XL:18732, 6XL:18733"
+    },
+    {
+      "artwork_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "color": "White",
+      "is_reserve": false,
+      "panel_geometry": {
+        "back": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "front": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "hood": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_inside": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_panel": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "pocket": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_left": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_right": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        }
+      },
+      "placements": [
+        "front",
+        "back",
+        "sleeve_left",
+        "sleeve_right",
+        "pocket",
+        "hood",
+        "label_panel",
+        "label_inside"
+      ],
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+      "product_id": 388,
+      "role": "control",
+      "size": "PENDING_USER_SIZE_SELECTION",
+      "sku_id": "PA-HOODIE-CTRL-001",
+      "template_archive_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "variant_id": "PENDING_USER_SIZE_SELECTION",
+      "variant_id_note": "SAME variant_id and size as PA-HOODIE-CAND-001 (matched-pair rule)"
+    }
+  ],
+  "manifest_id": "RAC-PA-SKU-MANIFEST-0001",
+  "order_execution": "USER ONLY — the agent never places orders or pays (see ORDER_CHECKLIST.md).",
+  "registration_tolerance_mm": 3.0,
+  "reserve_articles": [
+    {
+      "artwork_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "color": "White",
+      "is_reserve": true,
+      "panel_geometry": {
+        "back": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "front": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "hood": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_inside": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_panel": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "pocket": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_left": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_right": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        }
+      },
+      "placements": [
+        "front",
+        "back",
+        "sleeve_left",
+        "sleeve_right",
+        "pocket",
+        "hood",
+        "label_panel",
+        "label_inside"
+      ],
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+      "product_id": 388,
+      "role": "reserve_candidate",
+      "size": "PENDING_USER_SIZE_SELECTION",
+      "sku_id": "PA-HOODIE-CAND-R01",
+      "template_archive_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "variant_id": "PENDING_USER_SIZE_SELECTION",
+      "variant_id_note": "same variant as PA-HOODIE-CAND-001"
+    },
+    {
+      "artwork_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "color": "White",
+      "is_reserve": true,
+      "panel_geometry": {
+        "back": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "front": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "hood": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_inside": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "label_panel": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "pocket": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_left": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_right": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        }
+      },
+      "placements": [
+        "front",
+        "back",
+        "sleeve_left",
+        "sleeve_right",
+        "pocket",
+        "hood",
+        "label_panel",
+        "label_inside"
+      ],
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+      "product_id": 388,
+      "role": "reserve_control",
+      "size": "PENDING_USER_SIZE_SELECTION",
+      "sku_id": "PA-HOODIE-CTRL-R01",
+      "template_archive_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "variant_id": "PENDING_USER_SIZE_SELECTION",
+      "variant_id_note": "same variant as PA-HOODIE-CTRL-001"
+    },
+    {
+      "artwork_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "color": "White",
+      "is_reserve": true,
+      "panel_geometry": {
+        "back": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "front": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_left": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_right": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        }
+      },
+      "placements": [
+        "front",
+        "back",
+        "sleeve_left",
+        "sleeve_right"
+      ],
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+      "product_id": 257,
+      "role": "reserve_fallback_candidate",
+      "size": "PENDING_USER_SIZE_SELECTION",
+      "sku_id": "PA-TEE-CAND-R01",
+      "template_archive_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "variant_id": "PENDING_USER_SIZE_SELECTION",
+      "variant_id_note": "product 257 (AOP Men's Crew Neck Tee), v1 variant map: XS:8850, S:8851, M:8852, L:8853, XL:8854, 2XL:8855"
+    },
+    {
+      "artwork_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "color": "White",
+      "is_reserve": true,
+      "panel_geometry": {
+        "back": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "front": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_left": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        },
+        "sleeve_right": {
+          "dpi": "PENDING_TEMPLATE_DOWNLOAD",
+          "height_mm": "PENDING_TEMPLATE_DOWNLOAD",
+          "source": "Printful printfiles API; mm = px / dpi * 25.4",
+          "width_mm": "PENDING_TEMPLATE_DOWNLOAD"
+        }
+      },
+      "placements": [
+        "front",
+        "back",
+        "sleeve_left",
+        "sleeve_right"
+      ],
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+      "product_id": 257,
+      "role": "reserve_fallback_control",
+      "size": "PENDING_USER_SIZE_SELECTION",
+      "sku_id": "PA-TEE-CTRL-R01",
+      "template_archive_sha256": "PENDING_TEMPLATE_DOWNLOAD",
+      "variant_id": "PENDING_USER_SIZE_SELECTION",
+      "variant_id_note": "same variant as PA-TEE-CAND-R01"
+    }
+  ],
+  "schema_version": "1.0",
+  "title": "Production Alpha golden matched-pair SKU manifest (Printful)",
+  "unverified_fields": [
+    "all variant_id and size fields (user selects order size)",
+    "all panel_geometry values (PENDING_TEMPLATE_DOWNLOAD)",
+    "all artwork_sha256 / template_archive_sha256 fields (PENDING_TEMPLATE_DOWNLOAD)",
+    "v2 catalog-product ID mapping",
+    "live stock status at order time"
+  ]
+}
