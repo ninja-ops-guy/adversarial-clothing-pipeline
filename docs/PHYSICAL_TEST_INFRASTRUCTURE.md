@@ -1,5 +1,7 @@
 # Physical Test Infrastructure (v1.0.0 draft)
 
+> **Stale notice (2026-09-08):** §4.4 "Preregistered stopping rule" below states minimum 20 / maximum 100 valid trials. That draft rule is superseded by the frozen, hash-bound stopping rule **`physical/p1/STOPPING_RULE.json` (rule_id RAC-P1-STOP-2026-001): min 93 / max 144 valid trials**, target interval width 0.20 at z = 1.959963984540054, derived in `ruthless_pipeline/certification/trial_statistics.py` (Wave F Track C). The executable P1 artifacts (calibration manifest, rig checklist, session/ingestion templates, capture naming convention) now live under `physical/p1/`. The historical body below is retained unchanged; this banner is the correction.
+
 **Status:** DRAFT — must be frozen and hash-bound before any capture begins.
 **Scope deliverables:** (A) Calibration Target, (B) P1 Capture Rig Protocol.
 **Deadline constraint:** Both deliverables must be READY BEFORE physical sample garments arrive.
