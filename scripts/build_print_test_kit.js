@@ -46,7 +46,7 @@ function validateStudioManifest(file, cfg, primaryProduct, family) {
   }
 
   const required = {
-    schema_version: '1.3',
+    schema_version: '1.4',
     product: primaryProduct,
     production_status: 'digital_design_ready'
   };
