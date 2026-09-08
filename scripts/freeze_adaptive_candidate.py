@@ -3,7 +3,14 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from ruthless_pipeline.certification.schema_version import require_schema_version
 
 
 def main() -> int:
@@ -21,6 +28,7 @@ def main() -> int:
 
     adaptive_path = Path(args.adaptive)
     adaptive = json.loads(adaptive_path.read_text())
+    require_schema_version(adaptive, "1.0", label=f"adaptive selection report {adaptive_path}")
     if adaptive.get("stage") != "environment_adaptive_surrogate_only":
         raise SystemExit("adaptive report has unexpected stage")
     if adaptive.get("heldout_models_loaded") != []:
@@ -39,6 +47,7 @@ def main() -> int:
         raise SystemExit(f"adaptive winner PNG missing: {winner_path}")
 
     pool = json.loads(Path(args.pool).read_text())
+    require_schema_version(pool, "3.0", label=f"candidate pool {args.pool}")
     pool_by_id = {item["candidate_id"]: item for item in pool.get("candidates", [])}
     source = pool_by_id.get(winner["source_candidate_id"])
     if source is None:
