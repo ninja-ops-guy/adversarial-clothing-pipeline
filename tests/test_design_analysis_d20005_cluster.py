@@ -1,9 +1,11 @@
 """Tests for the D2-0005 cluster-aware pre-arming design-analysis simulation.
 
 Covers: determinism (byte-identical artifact), generator validation (Delta /
-rho / counts), joint-model marginals, intracluster-correlation structure of
-the DGP, probability normalization per cell, equivalence of the simulation's
-unit-level path with the frozen preregistered analysis on simulated datasets,
+icc / counts), joint-model marginals, intracluster-correlation structure of
+the DGP (including the F1-corrected property that the REALIZED pairwise
+correlation matches the LABELED icc parameter), probability normalization per
+cell, equivalence-up-to-documented-divergence of the simulation's unit-level
+path with the frozen preregistered analysis on simulated datasets,
 false-success control at Delta <= 0, and coverage sanity at large cluster
 counts.
 """
@@ -11,6 +13,7 @@ counts.
 from __future__ import annotations
 
 import json
+import math
 
 import pytest
 
@@ -43,10 +46,13 @@ from scripts.design_analysis_d20005_cluster import (
 def _small_grid(monkeypatch):
     """Shrink the grid so run_grid() stays fast under test."""
     monkeypatch.setattr("scripts.design_analysis_d20005_cluster.GRID_DELTAS", (0.0, 0.2))
-    monkeypatch.setattr("scripts.design_analysis_d20005_cluster.GRID_RHOS", (0.0, 0.5))
-    monkeypatch.setattr("scripts.design_analysis_d20005_cluster.GRID_CLUSTER_COUNTS", (36,))
+    monkeypatch.setattr("scripts.design_analysis_d20005_cluster.GRID_ICCS", (0.0, 0.25))
+    monkeypatch.setattr("scripts.design_analysis_d20005_cluster.GRID_CLUSTER_COUNTS", (8,))
     monkeypatch.setattr("scripts.design_analysis_d20005_cluster.MEMBERS_PER_CLUSTER", 2)
     monkeypatch.setattr("scripts.design_analysis_d20005_cluster.SWEEP_MEMBER_COUNTS", (2,))
+    monkeypatch.setattr(
+        "scripts.design_analysis_d20005_cluster.CONFIRMATION_CLUSTER_COUNTS", (8,)
+    )
     monkeypatch.setattr("scripts.design_analysis_d20005_cluster.DATASETS_PER_CELL", 15)
     monkeypatch.setattr("scripts.design_analysis_d20005_cluster.GRID_BOOTSTRAP_RESAMPLES", 100)
     monkeypatch.setattr(
@@ -61,6 +67,19 @@ def test_run_grid_is_byte_identical_across_runs(monkeypatch):
     assert first == second
     assert first.endswith("\n")
     assert json.dumps(json.loads(first), sort_keys=True, separators=(",", ":")) + "\n" == first
+
+
+def test_run_specs_worker_count_independent():
+    """Determinism attestation: the process pool (workers=2) must return
+    byte-identical cell results to serial execution (workers=1), with cell
+    order preserved."""
+    from scripts.design_analysis_d20005_cluster import _run_specs
+
+    specs = [(0.2, 0.25, 8, 2, 100), (0.0, 0.0, 8, 3, 100), (-0.1, 0.5, 8, 2, 100)]
+    serial, serial_excluded = _run_specs(specs, workers=1)
+    parallel, parallel_excluded = _run_specs(specs, workers=2)
+    assert to_canonical_json({"c": serial}) == to_canonical_json({"c": parallel})
+    assert serial_excluded == parallel_excluded == []
 
 
 def test_canonical_json_formatting():
@@ -111,12 +130,12 @@ def test_draw_dataset_deterministic_and_shaped():
 
 
 def test_intracluster_correlation_structure():
-    """At rho = 1 all members of a cluster share one joint state; at rho = 0
+    """At icc = 1 all members of a cluster share one joint state; at icc = 0
     the within-cluster agreement rate matches independent pairing."""
     perfect = draw_clustered_dataset(0.2, 1.0, 24, 6, 0)
     for members in perfect.values():
         assert len(set(members.values())) == 1
-    # rho = 0: expected agreement between two independent draws under the
+    # icc = 0: expected agreement between two independent draws under the
     # symmetric joint model at Delta = 0.2 (p_M = 0.5, p_C = 0.3).
     p_both, p_m_only, p_c_only, p_neither = joint_probabilities(0.2)
     expected_agree = p_both**2 + p_m_only**2 + p_c_only**2 + p_neither**2
@@ -129,6 +148,45 @@ def test_intracluster_correlation_structure():
                 total += 1
                 agree += states[i] == states[j]
     assert agree / total == pytest.approx(expected_agree, abs=0.05)
+
+
+def _mean_pairwise_delta_corr(dataset: dict) -> float:
+    """Empirical Pearson correlation of member deltas over all intra-cluster
+    pairs of one drawn dataset (member delta = arm_m - arm_c in {-1,0,+1})."""
+    pairs = []
+    for members in dataset.values():
+        deltas = [(1 if m else 0) - (1 if c else 0) for m, c in members.values()]
+        for i in range(len(deltas)):
+            for j in range(i + 1, len(deltas)):
+                pairs.append((deltas[i], deltas[j]))
+    n = len(pairs)
+    sx = sum(p[0] for p in pairs)
+    sy = sum(p[1] for p in pairs)
+    sxx = sum(p[0] * p[0] for p in pairs)
+    syy = sum(p[1] * p[1] for p in pairs)
+    sxy = sum(p[0] * p[1] for p in pairs)
+    cov = sxy / n - (sx / n) * (sy / n)
+    var_x = sxx / n - (sx / n) ** 2
+    var_y = syy / n - (sy / n) ** 2
+    if var_x <= 0 or var_y <= 0:
+        return float("nan")
+    return cov / math.sqrt(var_x * var_y)
+
+
+def test_realized_icc_matches_labeled_parameter():
+    """Finding F1: the labeled parameter of the corrected DGP must BE the
+    realized intracluster correlation. Measure the empirical pairwise
+    correlation of member deltas over many clusters and assert it matches the
+    labeled icc within tolerance at several grid points."""
+    for icc in (0.0, 0.1, 0.25, 0.5, 0.7):
+        corrs = []
+        for dataset_index in range(12):
+            dataset = draw_clustered_dataset(0.0, icc, 60, 6, dataset_index)
+            value = _mean_pairwise_delta_corr(dataset)
+            if not math.isnan(value):
+                corrs.append(value)
+        realized = sum(corrs) / len(corrs)
+        assert realized == pytest.approx(icc, abs=0.05), (icc, realized)
 
 
 def test_probabilities_sum_to_one_per_cell():
@@ -157,10 +215,13 @@ def test_cell_simulation_deterministic():
 
 def test_simulation_uses_real_analysis_paths():
     """The cluster path must BE cluster_paired_arm_statistics, and the unit
-    path must classify exactly as the frozen paired_arm_statistics does."""
+    path must classify exactly as the frozen paired_arm_statistics does. The
+    interval may differ from the frozen path ONLY by the documented F8
+    lower-index correction (lower bound at most one order statistic lower;
+    upper bound identical)."""
     for dataset_index in range(4):
-        for delta, rho in ((0.2, 0.5), (0.0, 0.2), (-0.1, 0.8)):
-            dataset = draw_clustered_dataset(delta, rho, 24, 3, dataset_index)
+        for delta, icc in ((0.2, 0.25), (0.0, 0.1), (-0.1, 0.7)):
+            dataset = draw_clustered_dataset(delta, icc, 24, 3, dataset_index)
             both = _classify_both_paths(dataset, 200)
             reference_cluster = cluster_paired_arm_statistics(
                 dataset, bootstrap_resamples=200, min_clusters=DEFAULT_MIN_CLUSTERS
@@ -178,19 +239,21 @@ def test_simulation_uses_real_analysis_paths():
                 bootstrap_seed=DEFAULT_BOOTSTRAP_SEED,
                 width_max=INCONCLUSIVE_WIDTH_MAX,
             )
-            assert both["unit"].risk_difference_interval == (
-                reference_unit.risk_difference_interval
-            )
+            sim_lo, sim_hi = both["unit"].risk_difference_interval
+            ref_lo, ref_hi = reference_unit.risk_difference_interval
+            assert sim_hi == ref_hi  # upper index unchanged by the F8 fix
+            assert sim_lo <= ref_lo  # corrected lower bound never higher
             assert both["unit"].decision == reference_unit.decision
 
 
 def test_false_success_control_at_null_and_reversed():
     """P(SUCCESS) at Delta_true <= 0 must stay near the 97.5% one-sided level
-    for BOTH paths, even under strong clustering."""
+    for the CLUSTER path, even under strong clustering. (The unit path is
+    known-invalid under icc > 0 — quantifying that failure is the point of
+    the study, so no bound is asserted for it here.)"""
     for delta in (0.0, -0.1):
         cell = simulate_cell(delta, 0.5, 36, 4, datasets=100, resamples=200)
-        for path in ("cluster", "unit"):
-            assert cell["analyses"][path]["p_success"] <= 0.08, (delta, path)
+        assert cell["analyses"]["cluster"]["p_success"] <= 0.08, delta
 
 
 def test_cluster_path_dominates_unit_path_under_correlation():
