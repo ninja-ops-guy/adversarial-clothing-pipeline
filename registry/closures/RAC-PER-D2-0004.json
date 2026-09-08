@@ -1,0 +1,107 @@
+{
+  "benchmark_run_id": "34175028944",
+  "bundle_verified": true,
+  "candidate_sha256": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+  "certificate_id": "RAC-PER-D2-0004-1.0.0-1.2",
+  "closed_utc": "2026-09-08T00:00:00Z",
+  "consistency_checks": {
+    "aggregate_identical_steps_18_20": {
+      "ok": true
+    },
+    "candidate_sha256_identical_steps_18_20": {
+      "ok": true,
+      "step18": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+      "step20": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803"
+    },
+    "final_outcome_fail_rac_d0": {
+      "ok": true
+    },
+    "generation_json_model_sets_match": {
+      "ok": true
+    },
+    "model_set_PERSON-HO-v3": {
+      "ok": true,
+      "path": "model_sets/PERSON-HO-v3.json",
+      "sha256": "ad1127659a5615871ff320056415dd3c8e8b6a27acef7c6a3bcc4a96e713495e"
+    },
+    "model_set_PERSON-SUR-v3": {
+      "ok": true,
+      "path": "model_sets/PERSON-SUR-v3.json",
+      "sha256": "2f06c19e9e51f3f607b04b499760ab7f470f4b6e18f9c834013fb0a06a5d8876"
+    },
+    "protocol_version_1_2_match": {
+      "ok": true,
+      "path": "protocols/RAC-PERSON-DETECT-1.2.json"
+    },
+    "source_commit_match": {
+      "ok": true,
+      "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59"
+    }
+  },
+  "decision": "FAIL",
+  "evidence_state": "RAC-D0",
+  "experiment_id": "RAC-EXP-2026-001",
+  "failure_classification": {
+    "category": "cross_architecture_transfer_failure",
+    "confidence": "high",
+    "created_utc": "2026-09-08T00:00:00Z",
+    "experiment_id": "RAC-EXP-2026-001",
+    "explanation": "surrogate suppression did not transfer to held-out detectors of the different architecture family",
+    "generation_id": "RAC-PER-D2-0004",
+    "metrics_provenance": "surrogate_detection_rate is the step-18 full-benchmark aggregate candidate_detection_rate over 144 rows (surrogate-only split not log-attested); held-out numbers are the step-19 bundle values",
+    "record_id": "FR-RAC-EXP-2026-001",
+    "signals": [
+      {
+        "detail": "surrogate suppressed by 0.222",
+        "name": "surrogate_suppression",
+        "value": 0.2222222222222222
+      },
+      {
+        "detail": "held-out rate 1.000 high vs baseline 1.000 (different architecture family)",
+        "name": "heldout_detection_rate",
+        "value": 1.0
+      }
+    ]
+  },
+  "finality": "The scientific outcome FAIL / RAC-D0 is final and was not modified; this record is bookkeeping ingestion only (no tuning, no threshold edits, no post-hoc optimization).",
+  "generation_id": "RAC-PER-D2-0004",
+  "heldout": {
+    "baseline_detection_rate": 1.0,
+    "baseline_mean": 0.9947303864690993,
+    "candidate_detection_rate": 1.0,
+    "candidate_mean": 0.8959943834278319,
+    "mean_delta": -0.0987360030412674,
+    "n": 36,
+    "valid_n": 36
+  },
+  "heldout_model_set": "PERSON-HO-v3",
+  "invalid_condition_fraction": 0.0,
+  "measured_aggregate": {
+    "absolute_detection_reduction": 0.2222222222222222,
+    "baseline_detection_rate": 1.0,
+    "baseline_mean_confidence": 0.9319073851737711,
+    "candidate_detection_rate": 0.7777777777777778,
+    "candidate_mean_confidence": 0.6855992215892507,
+    "n": 144,
+    "relative_confidence_reduction": 0.26430541006882546,
+    "relative_detection_suppression": 0.2222222222222222
+  },
+  "not_log_attested_gaps": [
+    "candidate.png bytes (only its SHA-256 is attested)",
+    "per-model held-out detection rates (only the PERSON-HO-v3 aggregate 1.0 over n=36 is attested)",
+    "surrogate-only split of the step-18 aggregate (the 0.7777777777777778 candidate_detection_rate is the full-benchmark aggregate over 144 rows)",
+    "surrogate-phase optimization telemetry (spectral_band_energy, objective_trajectory, coverage_metrics, optimizer_config) — same D2-0004 gap documented for --legacy-d20004",
+    "benchmark-results.json generated_at timestamp (only the run date 2026-09-08 is attested)"
+  ],
+  "protocol_id": "RAC-PERSON-DETECT",
+  "protocol_version": "1.2",
+  "provenance": "log_attested: true; bundle validated in CI steps 19-21 but never archived (packaging step 22 failed on schema guard; infra fix 5cdce1b; no re-run authorized); evidence extracted from run logs uploaded by maintainer",
+  "raw_rows": 144,
+  "record_kind": "closed_generation_record",
+  "run_date": "2026-09-08",
+  "schema_version": "1.0",
+  "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59",
+  "status": "CLOSED",
+  "surrogate_model_set": "PERSON-SUR-v3",
+  "verification_failures": []
+}
