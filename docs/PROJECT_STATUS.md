@@ -400,7 +400,7 @@ That is the shortest path from the current repository to a credible commercial p
 
 ## Current Measured Digital Truth
 
-Latest published locked run: **RAC-PER-D2-0003** (`machine_static`) from source commit `65646777151966729ab6c06cdbdfe71671e5266d`.
+Historical locked run: **RAC-PER-D2-0003** (`machine_static`) from source commit `65646777151966729ab6c06cdbdfe71671e5266d` (superseded as the published status by D2-0004 on 2026-09-08; its status file is archived byte-identical at `manuscript/evidence/RAC-PER-D2-0003/d2-latest-status.json`).
 
 - Surrogate set: baseline detection rate 1.00 → candidate 0.7222 across 72 valid conditions.
 - Held-out set (`PERSON-HO-v2`): baseline detection rate 1.00 → candidate 1.00 across 36 valid conditions.
