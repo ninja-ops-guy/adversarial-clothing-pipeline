@@ -32,8 +32,6 @@ def _weight_reference_compatible(*, framework: str, frozen_ref: str, measured_re
         return False
     if frozen_ref == measured_ref:
         return True
-    if frozen_ref in measured_ref or measured_ref in frozen_ref:
-        return True
     if framework != "torchvision" or not frozen_ref.endswith(".DEFAULT"):
         return False
     frozen_enum = frozen_ref.rsplit(".", 1)[0]
