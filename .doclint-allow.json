@@ -1,0 +1,61 @@
+{
+  "readme": "Allowlist for scripts/lint_docs.py (ruthless_pipeline/certification/doc_lint.py). Each entry suppresses findings for one path (+ optional check and line-substring filter) where the flagged text is INTENTIONAL history or planned-future reference, not unauthorized staleness. Add entries only with a concrete reason.",
+  "allow": [
+    {
+      "path": "docs/PREREGISTRATION_D2-0005.md",
+      "check": "stale-d2-0004-status",
+      "reason": "FROZEN preregistration (hash-pinned in docs/D2-0005_FREEZE_CANDIDATE.json, sha256 5a26c083...). Its 'D2-0004 is open' gating language was true at freeze time and cannot be edited without breaking the freeze; staleness is explicitly resolved by docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md Addendum."
+    },
+    {
+      "path": "docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md",
+      "check": "stale-d2-0004-status",
+      "reason": "A5 quotes the frozen preregistration's stale lines verbatim in order to resolve them (see its 'Addendum — Resolution of stale \"D2-0004 still open\" lines'); the quotation and resolution are the intended record."
+    },
+    {
+      "path": "docs/PROJECT_PROGRESS.md",
+      "check": "stale-d2-0004-status",
+      "match": "run 34147902820 infrastructure failure",
+      "reason": "Historical log entry retained unchanged for provenance; explicitly superseded by the 2026-09-08 status-update entries in the same file."
+    },
+    {
+      "path": "docs/PROJECT_PROGRESS.md",
+      "check": "stale-ci-run",
+      "match": "the authorized re-run of RAC-PER-D2-0004. Until it closes",
+      "reason": "Historical log entry written while the authorized D2-0004 re-run was live; explicitly superseded by the 2026-09-08 status-update entry in the same file and retained unchanged for provenance."
+    },
+    {
+      "path": "docs/PROJECT_PROGRESS.md",
+      "check": "stale-ci-run",
+      "match": "was \"IN PROGRESS\"",
+      "reason": "Meta-entry quoting a superseded historical entry's 'IN PROGRESS' wording in order to retract it; retained unchanged for provenance."
+    },
+    {
+      "path": "docs/RAC_STUDIO_UX_SPEC.md",
+      "check": "stale-d2-0004-status",
+      "reason": "Forward-looking UX spec whose 'D2-0004 open' text is (a) verbatim quotation of the frozen preregistration header cited as incident source and (b) illustrative mock-UI copy for the dependency-gate display, keyed to the historical incident at commit b4fe0e5, not a live status claim."
+    },
+    {
+      "path": "manuscript/backlog/paper1.md",
+      "check": "stale-d2-0004-status",
+      "reason": "Backlog note quoting the frozen preregistration's gating rule verbatim (marked as a quote with source pointer); the quote is the intended citation, not a status claim."
+    },
+    {
+      "path": "docs/D2-0005_ARMING_PACKET.md",
+      "check": "broken-path",
+      "match": "artifacts/d20005_rehearsal_icc/results.json",
+      "reason": "Planned future artifact path: the rehearsal ICC results file is produced only when the D2-0005 rehearsal runs; the packet describes where it WILL live. D2-0005 is not armed, so the artifact cannot exist yet."
+    },
+    {
+      "path": "docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md",
+      "check": "broken-path",
+      "match": "artifacts/d20005_rehearsal_icc/results.json",
+      "reason": "Planned future artifact path (rehearsal output); cannot exist before the D2-0005 rehearsal runs."
+    },
+    {
+      "path": "docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md",
+      "check": "broken-path",
+      "match": "artifacts/d20005_primary_comparison/results.json",
+      "reason": "Planned future artifact path (primary comparison output); cannot exist before D2-0005 is armed and executed."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Design Analysis (Pre-Arming Operating Characteristics) — RAC-PER-D2-0005
 
-**Status:** PRE-ARMING capability characterization. **NO D2-0005 outcome data exists.** The generation skeleton (`generations/RAC-PER-D2-0005.json`) is frozen with `lock_status: PREREGISTERED`, `lock_inference_performed: false`, trigger fields NOT armed; D2-0004 is still open. Nothing in this document executes, arms, or modifies D2-0005.
+**Status:** PRE-ARMING capability characterization. **NO D2-0005 outcome data exists.** The generation skeleton (`generations/RAC-PER-D2-0005.json`) is frozen with `lock_status: PREREGISTERED`, `lock_inference_performed: false`, trigger fields NOT armed; D2-0004 has since closed (FAIL / RAC-D0, log-attested, 2026-09-08 — see `docs/D2-0004_CLOSURE_NOTE.md`). Nothing in this document executes, arms, or modifies D2-0005.
 
 **What this is:** a deterministic simulation that characterizes **what question the frozen design can answer** — the operating characteristics (power / decision-region probabilities) of the preregistered analysis under hypothetical true effects.
 
@@ -100,7 +100,7 @@ Monte Carlo error per probability ≤ ~0.022 (500 datasets/cell). The infeasible
 | +0.5 | symmetric | 144 | 1.000 | 0.000 | 0.000 | 0.000 | 0.153 | 1000 |
 | +0.5 | m_dominated | 36 | 0.000 | 0.000 | 0.000 | 1.000 | 0.327 | 1000 |
 | +0.5 | m_dominated | 72 | 0.000 | 0.000 | 0.000 | 1.000 | 0.223 | 1000 |
-| +0.5 | m_dominated | 144 | 1.000 | 0.000 | 0.000 | 0.000 | 0.153 | 1000 |
+| +0.5 | m_dominated | 144 | 0.000 | 0.000 | 0.000 | 0.000 | 0.153 | 1000 |
 
 Confirmation block (full preregistered bootstrap_resamples = 10000):
 
