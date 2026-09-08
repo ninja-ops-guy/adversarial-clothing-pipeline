@@ -141,7 +141,7 @@ D2-0006 is the replication link in the longitudinal structure that Paper 1 repor
 | Generation | Role | Status at time of this DRAFT |
 |---|---|---|
 | D2-0003 | Retained **negative** result — published falsifying datapoint, not discarded | closed |
-| D2-0004 | **Prospective closure** + canonical release (first fully preregistered measured generation); infrastructure-failure precedent INFRA-001 | closing |
+| D2-0004 | **Prospective closure** + canonical release (first fully preregistered measured generation); infrastructure-failure precedent INFRA-001 | closed 2026-09-08 — FAIL / RAC-D0, log-attested (`docs/D2-0004_CLOSURE_NOTE.md`); release `releases/RAC-EXP-2026-001/` |
 | D2-0005 | **Controlled ablation** — mean vs CVaR_0.5 objective at final selection, fully paired; pre-arming design analysis (F0) and cluster-robust redesign proposal exist | PREREGISTERED, not executed |
 | D2-0006 | **Replication** — prospective, hypothesis form selected by this policy after D2-0005 closes | this DRAFT; not preregistered |
 
