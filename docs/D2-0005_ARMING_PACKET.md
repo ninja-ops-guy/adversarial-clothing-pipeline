@@ -70,8 +70,9 @@ Verdict: **"do not execute A5 as drafted; fix F1–F4 first."**
 Verdict: **VALID_WITH_NONBLOCKER_GAPS** — all 7 verification checks PASS
 (manifest hash, keyed commit, frozen-surface integrity, pin recompute,
 parameter lock, schema conformance, planned-output contract). 8 non-blocker
-gaps (compact; authoritative enumeration in the verifier's step-7 report —
-the gap table itself is not committed to the repo at HEAD):
+gaps (compact). Authoritative audit reports archived in-repo:
+docs/audits/REDTEAM_WAVE_H.md, docs/audits/FREEZE_VERIFICATION.md,
+docs/audits/BOUNDARY_AUDIT.md:
 
 1. Fixture image manifest `fixtures/d20005_base_images/manifest.json` does
    not exist yet (planned output, sha256 null).
