@@ -1,0 +1,63 @@
+{
+  "created_utc": "2026-09-08T00:00:00Z",
+  "evidence_label": "internally_measured",
+  "experiment_id": "RAC-EXP-2026-001",
+  "generation_id": "RAC-PER-D2-0004",
+  "hypothesis_id": "HYP-D2-0004-01",
+  "stages": [
+    {
+      "artifact_id": "RAC-PER-D2-0004",
+      "metadata": {
+        "bytes_archived": false,
+        "files": [
+          "stages/candidate/candidate-reference.json"
+        ],
+        "log_attested": true,
+        "note": "candidate.png bytes were never archived; only the step-18/20 SHA-256 is attested"
+      },
+      "sha256": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+      "stage": "candidate",
+      "uri": null
+    },
+    {
+      "artifact_id": "RAC-PER-D2-0004",
+      "metadata": {
+        "files": [
+          "stages/generation/RAC-PER-D2-0004.json"
+        ],
+        "protocol": "RAC-PERSON-DETECT 1.2"
+      },
+      "sha256": "f1abcf77bf746d536f95089c415c0ae9b6352a63ebb46ba988ddc48e87937dc7",
+      "stage": "generation",
+      "uri": null
+    },
+    {
+      "artifact_id": "RAC-PER-D2-0004-telemetry",
+      "metadata": {
+        "files": [
+          "stages/optimization_telemetry/telemetry.json"
+        ]
+      },
+      "sha256": "49fbcc19e2508a325186322631ee4d09a681f3a400a4775e8ec96ab593012df1",
+      "stage": "optimization_telemetry",
+      "uri": null
+    }
+  ],
+  "validity_flags": {
+    "bundle_archived": false,
+    "evidence_state": "RAC-D0",
+    "heldout_model_set_sha256": "ad1127659a5615871ff320056415dd3c8e8b6a27acef7c6a3bcc4a96e713495e",
+    "log_attested": true,
+    "mode": "log-attested-d20004",
+    "not_recorded_fields": [
+      "candidate.png bytes (only its SHA-256 is attested)",
+      "per-model held-out detection rates (only the PERSON-HO-v3 aggregate 1.0 over n=36 is attested)",
+      "surrogate-only split of the step-18 aggregate (the 0.7777777777777778 candidate_detection_rate is the full-benchmark aggregate over 144 rows)",
+      "surrogate-phase optimization telemetry (spectral_band_energy, objective_trajectory, coverage_metrics, optimizer_config) \u2014 same D2-0004 gap documented for --legacy-d20004",
+      "benchmark-results.json generated_at timestamp (only the run date 2026-09-08 is attested)"
+    ],
+    "provenance": "log_attested: true; bundle validated in CI steps 19-21 but never archived (packaging step 22 failed on schema guard; infra fix 5cdce1b; no re-run authorized); evidence extracted from run logs uploaded by maintainer",
+    "surrogate_model_set_sha256": "2f06c19e9e51f3f607b04b499760ab7f470f4b6e18f9c834013fb0a06a5d8876",
+    "verdict": "FAIL"
+  }
+}

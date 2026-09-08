@@ -1,0 +1,33 @@
+{
+  "release_id": "RAC-EXP-2026-001",
+  "revisions": [
+    {
+      "action": "append",
+      "created_utc": "2026-09-08T00:00:00Z",
+      "detail": "log-attested ingest RAC-PER-D2-0004",
+      "revision": 0,
+      "stage": "candidate"
+    },
+    {
+      "action": "append",
+      "created_utc": "2026-09-08T00:00:00Z",
+      "detail": "log-attested ingest RAC-PER-D2-0004",
+      "revision": 1,
+      "stage": "generation"
+    },
+    {
+      "action": "append",
+      "created_utc": "2026-09-08T00:00:00Z",
+      "detail": "log-attested ingest RAC-PER-D2-0004-telemetry",
+      "revision": 2,
+      "stage": "optimization_telemetry"
+    },
+    {
+      "action": "freeze",
+      "created_utc": "2026-09-08T00:00:00Z",
+      "detail": "closed with verdict FAIL (RAC-D0), log-attested",
+      "revision": 3,
+      "stage": "generation"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "entries": {
+    "FAILURE.json": "afae50edb183a83cb610aaebead9a76463b584e49d542c9a62831fdd2eab29f9",
+    "RELEASE.json": "c08df2ceb24970529ff672f4fe32749c1b4c83de52091b07ec4eb673a84d6e53",
+    "REPORT.md": "78c0369faa93e31d15d99a4b2ce27a5d3037c125cbc715650540810f7e88939c",
+    "REVISIONS.json": "d66feec74a3c40731d4957b700ae6ac6db6e1570b7b68b72b7e71da62df74030",
+    "evidence/RAC-PER-D2-0004.json": "2e110b57c13593aed6cf5fbf092d2149d6b5723edfca7332b1eff1bcb401ac7d",
+    "evidence/log-attested-evidence.json": "8c5cf8617ef935cae8c662f60d11de96d4a5cb852afff512380e3e317a073ba3",
+    "experiment.json": "470cb5aa7dcfdd63770d508f6ba314fbba9578b18ae8557ae7842102d94d9bcb",
+    "stages/candidate/candidate-reference.json": "58d8aea3dc1fdc268e22dc46f62c86dc7d61ccbf1bfc68224c865e2c2c7de215",
+    "stages/generation/RAC-PER-D2-0004.json": "f1abcf77bf746d536f95089c415c0ae9b6352a63ebb46ba988ddc48e87937dc7",
+    "stages/optimization_telemetry/held-out-outcome.json": "1688253421db141650b3d4e5c7960ffa4f4ffeda22497a0e3c26d2ebb00509ed",
+    "stages/optimization_telemetry/telemetry.json": "49fbcc19e2508a325186322631ee4d09a681f3a400a4775e8ec96ab593012df1"
+  }
+}

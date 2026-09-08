@@ -1,0 +1,7 @@
+{
+  "content_hash": "e877ac817e37d56856bdb41f302e9beae7dd41032ca682017d3c5b71da514373",
+  "created_utc": "2026-09-08T00:00:00Z",
+  "provenance": "log_attested: true; bundle validated in CI steps 19-21 but never archived (packaging step 22 failed on schema guard; infra fix 5cdce1b; no re-run authorized); evidence extracted from run logs uploaded by maintainer",
+  "release_id": "RAC-EXP-2026-001",
+  "source_commit": "b4fe0e5942b56b7fffb8de6f1cb3172744269f59"
+}

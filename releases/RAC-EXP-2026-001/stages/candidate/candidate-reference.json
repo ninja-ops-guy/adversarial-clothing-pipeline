@@ -1,0 +1,8 @@
+{
+  "bytes_archived": false,
+  "candidate_id": "RAC-PER-D2-0004",
+  "candidate_sha256": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+  "log_attested": true,
+  "note": "candidate.png was produced in CI run 34175028944 but never archived (packaging step 22 failed); this reference pins the attested SHA-256 only",
+  "provenance": "log_attested: true; bundle validated in CI steps 19-21 but never archived (packaging step 22 failed on schema guard; infra fix 5cdce1b; no re-run authorized); evidence extracted from run logs uploaded by maintainer"
+}

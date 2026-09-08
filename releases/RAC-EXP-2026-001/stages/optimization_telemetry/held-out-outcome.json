@@ -1,0 +1,9 @@
+{
+  "benchmark_run_id": "34175028944",
+  "candidate_sha256": "9c8ae08de2106634e6a7f301d8d6e5933b0f561f3ea04e90e3c034c96c9e3803",
+  "heldout_detection_rates": {
+    "PERSON-HO-v3:aggregate": 1.0
+  },
+  "recorded_utc": "2026-09-08T00:00:00Z",
+  "verdict": "FAIL"
+}

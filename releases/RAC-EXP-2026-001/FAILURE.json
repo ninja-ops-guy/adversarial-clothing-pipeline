@@ -1,0 +1,34 @@
+{
+  "classification": {
+    "category": "cross_architecture_transfer_failure",
+    "confidence": "high",
+    "created_utc": "2026-09-08T00:00:00Z",
+    "experiment_id": "RAC-EXP-2026-001",
+    "explanation": "surrogate suppression did not transfer to held-out detectors of the different architecture family",
+    "generation_id": "RAC-PER-D2-0004",
+    "metrics_provenance": "surrogate_detection_rate is the step-18 full-benchmark aggregate candidate_detection_rate over 144 rows (surrogate-only split not log-attested); held-out numbers are the step-19 bundle values",
+    "record_id": "FR-RAC-EXP-2026-001",
+    "signals": [
+      {
+        "detail": "surrogate suppressed by 0.222",
+        "name": "surrogate_suppression",
+        "value": 0.2222222222222222
+      },
+      {
+        "detail": "held-out rate 1.000 high vs baseline 1.000 (different architecture family)",
+        "name": "heldout_detection_rate",
+        "value": 1.0
+      }
+    ]
+  },
+  "detected_utc": "2026-09-08T00:00:00Z",
+  "failure_reason": "surrogate suppression did not transfer to held-out detectors of the different architecture family",
+  "failure_stage": "generation",
+  "invalidates": [
+    "calibration_profile",
+    "sku",
+    "physical_session",
+    "certificate"
+  ],
+  "provenance": "log_attested: true; bundle validated in CI steps 19-21 but never archived (packaging step 22 failed on schema guard; infra fix 5cdce1b; no re-run authorized); evidence extracted from run logs uploaded by maintainer"
+}
