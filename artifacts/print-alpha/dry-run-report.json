@@ -1,0 +1,180 @@
+{
+  "claim_boundary": "Dry run of digital package generation only. No physical garment exists, no physical test was executed, and no physical efficacy is claimed. PENDING_USER_ACTION fields are preserved, never resolved by estimation.",
+  "failed_stages": [],
+  "kind": "print_alpha_release_dry_run",
+  "overall_status": "PENDING_USER_ACTION",
+  "pending_stages": [
+    "frozen_artwork",
+    "pending_scan",
+    "production_mapping"
+  ],
+  "physical_efficacy_claimed": false,
+  "physical_test_executed": false,
+  "pipeline": [
+    "frozen_artwork",
+    "production_mapping",
+    "manifests",
+    "calibration_reference",
+    "trial_sheet",
+    "pending_scan",
+    "release_package"
+  ],
+  "report_id": "RAC-PRINT-ALPHA-001-DRY-RUN",
+  "schema_version": "1.0",
+  "simulated_external_tools": [
+    {
+      "dry_run_equivalent": "stages manifests + pending_scan",
+      "intended_invocation": "python3 scripts/check_print_alpha_readiness.py --manifest-dir print-alpha/MANIFESTS",
+      "status": "SIMULATED_NOT_PRESENT",
+      "tool": "scripts/check_print_alpha_readiness.py"
+    },
+    {
+      "dry_run_equivalent": "stage release_package (SHA-256-addressed RELEASE_PACKAGE.json)",
+      "intended_invocation": "python3 scripts/print_package_integrity.py --package artifacts/print-alpha/release-package",
+      "status": "SIMULATED_NOT_PRESENT",
+      "tool": "scripts/print_package_integrity.py"
+    }
+  ],
+  "stages": {
+    "calibration_reference": {
+      "evidence_class": "generated_digital_reference",
+      "fabrication_pending_preserved": true,
+      "generator_sha256": "1239e12d4f3169cb8ce412ce86b995aff9d508672e1e67601f3937197cfd8ee3",
+      "physical_fabrication_status": "PENDING_USER_ACTION",
+      "png_sha256": "f5cbeb1e3b4a33b230017030957d5c3a82f030d45e818538d7b743959baec0c3",
+      "problems": [],
+      "status": "OK",
+      "target_id": "RAC-CALT-P1-0001"
+    },
+    "frozen_artwork": {
+      "expected_pattern_sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
+      "print_test_kit": {
+        "note": "print-test-kit.zip not in repo; expected sha256 b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548 (production_alpha/SKU_MANIFEST.json)",
+        "present": false,
+        "status": "PENDING_USER_ACTION"
+      },
+      "problems": [],
+      "status": "PENDING_USER_ACTION"
+    },
+    "manifests": {
+      "exit_code": 0,
+      "status": "OK",
+      "stderr_tail": [],
+      "stdout_tail": [
+        "all 5 manifests valid; all pending fields are literal PENDING_USER_ACTION"
+      ],
+      "validator": "scripts_print_alpha/validate_manifests.py"
+    },
+    "pending_scan": {
+      "pending_by_manifest": {
+        "artwork-manifest.json": [
+          "$.artworks[0].artwork_sha256",
+          "$.artworks[10].artwork_sha256",
+          "$.artworks[11].artwork_sha256",
+          "$.artworks[12].artwork_sha256",
+          "$.artworks[13].artwork_sha256",
+          "$.artworks[14].artwork_sha256",
+          "$.artworks[15].artwork_sha256",
+          "$.artworks[1].artwork_sha256",
+          "$.artworks[2].artwork_sha256",
+          "$.artworks[3].artwork_sha256",
+          "$.artworks[4].artwork_sha256",
+          "$.artworks[5].artwork_sha256",
+          "$.artworks[6].artwork_sha256",
+          "$.artworks[7].artwork_sha256",
+          "$.artworks[8].artwork_sha256",
+          "$.artworks[9].artwork_sha256"
+        ],
+        "mapping-manifest.json": [
+          "$.placements[0].candidate_file",
+          "$.placements[0].control_file",
+          "$.placements[1].candidate_file",
+          "$.placements[1].control_file",
+          "$.placements[2].candidate_file",
+          "$.placements[2].control_file",
+          "$.placements[3].candidate_file",
+          "$.placements[3].control_file",
+          "$.placements[4].candidate_file",
+          "$.placements[4].control_file",
+          "$.placements[5].candidate_file",
+          "$.placements[5].control_file",
+          "$.placements[6].candidate_file",
+          "$.placements[6].control_file",
+          "$.placements[7].candidate_file",
+          "$.placements[7].control_file"
+        ],
+        "print-alpha-manifest.json": [
+          "$.garment.print_technology",
+          "$.garment.printer_vendor",
+          "$.garment.size"
+        ],
+        "sku-manifest.json": [
+          "$.garments[0].size",
+          "$.garments[0].variant_id",
+          "$.garments[1].size",
+          "$.garments[1].variant_id"
+        ],
+        "template-manifest.json": [
+          "$.panel_geometry.back.dpi",
+          "$.panel_geometry.back.height_mm",
+          "$.panel_geometry.back.width_mm",
+          "$.panel_geometry.front.dpi",
+          "$.panel_geometry.front.height_mm",
+          "$.panel_geometry.front.width_mm",
+          "$.panel_geometry.hood.dpi",
+          "$.panel_geometry.hood.height_mm",
+          "$.panel_geometry.hood.width_mm",
+          "$.panel_geometry.label_inside.dpi",
+          "$.panel_geometry.label_inside.height_mm",
+          "$.panel_geometry.label_inside.width_mm",
+          "$.panel_geometry.label_panel.dpi",
+          "$.panel_geometry.label_panel.height_mm",
+          "$.panel_geometry.label_panel.width_mm",
+          "$.panel_geometry.pocket.dpi",
+          "$.panel_geometry.pocket.height_mm",
+          "$.panel_geometry.pocket.width_mm",
+          "$.panel_geometry.sleeve_left.dpi",
+          "$.panel_geometry.sleeve_left.height_mm",
+          "$.panel_geometry.sleeve_left.width_mm",
+          "$.panel_geometry.sleeve_right.dpi",
+          "$.panel_geometry.sleeve_right.height_mm",
+          "$.panel_geometry.sleeve_right.width_mm",
+          "$.template_archive_sha256"
+        ]
+      },
+      "status": "PENDING_USER_ACTION",
+      "total_pending_fields": 64
+    },
+    "production_mapping": {
+      "pending_slots": 16,
+      "placements": [
+        "back",
+        "front",
+        "hood",
+        "label_inside",
+        "label_panel",
+        "pocket",
+        "sleeve_left",
+        "sleeve_right"
+      ],
+      "problems": [],
+      "resolved_slots": 0,
+      "status": "PENDING_USER_ACTION"
+    },
+    "release_package": {
+      "entry_count": 17,
+      "package_dir": "release-package",
+      "physical_efficacy_claimed": false,
+      "physical_test_executed": false,
+      "release_package_manifest_sha256": "511a6dcf618e8826a73f5ff71f82b62b436f1ec8ef8c5f377ff44c8867f95ba2",
+      "release_ready": false,
+      "status": "OK"
+    },
+    "trial_sheet": {
+      "byte_identical_to_committed": true,
+      "rows": 108,
+      "sha256": "774c2ad68f9fa6794b18e0dcd1dafb988069c1bf302cb1f44a71df46e5d14eaa",
+      "status": "OK"
+    }
+  }
+}
