@@ -100,7 +100,7 @@ Monte Carlo error per probability ≤ ~0.022 (500 datasets/cell). The infeasible
 | +0.5 | symmetric | 144 | 1.000 | 0.000 | 0.000 | 0.000 | 0.153 | 1000 |
 | +0.5 | m_dominated | 36 | 0.000 | 0.000 | 0.000 | 1.000 | 0.327 | 1000 |
 | +0.5 | m_dominated | 72 | 0.000 | 0.000 | 0.000 | 1.000 | 0.223 | 1000 |
-| +0.5 | m_dominated | 144 | 0.000 | 0.000 | 0.000 | 0.000 | 0.153 | 1000 |
+| +0.5 | m_dominated | 144 | 1.000 | 0.000 | 0.000 | 0.000 | 0.153 | 1000 |
 
 Confirmation block (full preregistered bootstrap_resamples = 10000):
 
