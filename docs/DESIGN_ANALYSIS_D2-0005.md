@@ -46,6 +46,11 @@ This document makes no recommendation between those options and proposes **no** 
 
 ## 2. Results
 
+<!-- provenance: source=artifacts/design_analysis_d20005/results.json generator="PYTHONPATH=. python scripts/design_analysis_d20005.py" derived=machine
+     Every numeric cell in the tables below is a transcription of the named
+     canonical-JSON artifact (3-decimal rounding); tests/test_table_provenance.py
+     fails on any drift between this table and the artifact. -->
+
 Monte Carlo error per probability ≤ ~0.022 (500 datasets/cell). The infeasible sparse Δ_true = +0.5 cells (p_C would be −0.2) are excluded and listed below the tables.
 
 | Delta_true | discordance | n | P(SUCCESS) | P(NULL) | P(NEGATIVE) | P(INCONCLUSIVE) | mean CI width | bootstrap R |
