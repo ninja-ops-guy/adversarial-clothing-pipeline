@@ -56,6 +56,21 @@
       "check": "broken-path",
       "match": "artifacts/d20005_primary_comparison/results.json",
       "reason": "Planned future artifact path (primary comparison output); cannot exist before D2-0005 is armed and executed."
+    },
+    {
+      "path": "docs/RAC_PARALLEL_SWARM_HANDOFF.md",
+      "check": "broken-path",
+      "reason": "Barrier-0 planning handoff; backticked paths are prospective deliverables for future waves (do not exist yet by design)."
+    },
+    {
+      "path": "docs/RAC_TECHNICAL_ROADMAP.md",
+      "check": "broken-path",
+      "reason": "Roadmap document; backticked paths are planned future files (schemas, modules, artifacts) that do not exist yet by design."
+    },
+    {
+      "path": "docs/RAC_WORLD_CLASS_GAP_ANALYSIS.md",
+      "check": "broken-path",
+      "reason": "Gap-analysis document; backticked paths name missing/planned components whose absence is the subject of the analysis."
     }
   ]
 }

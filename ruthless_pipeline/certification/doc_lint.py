@@ -54,7 +54,7 @@ INLINE_ALLOW_RE = re.compile(
 )
 
 # Repo-relative path prefixes treated as verifiable repository paths when
-# they appear in backticks.
+they appear in backticks.
 PATH_PREFIXES = (
     "docs/", "scripts/", "ruthless_pipeline/", "tests/", "schemas/",
     "generations/", "manuscript/", "benchmarks/", "releases/", "protocols/",
@@ -97,6 +97,7 @@ D2_0005_NEGATION_RE = re.compile(
     r"\b(not|NOT|never|unarmed|pre[- ]?arm|pending|awaits?|before|cannot|"
     r"without|not yet|must not|MUST NOT)\b"
     r"|\barmed\b\s*[:=]?\s*`?false",
+    re.IGNORECASE,
 )
 
 CI_RUN_RE = re.compile(r"\b(?:CI |workflow )?run\s*#?(?P<num>\d{6,})\b", re.IGNORECASE)
