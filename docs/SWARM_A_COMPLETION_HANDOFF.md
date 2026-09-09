@@ -1,5 +1,7 @@
 # Swarm A Completion Handoff
 
+<!-- doclint:allow check="broken-path" reason="commit-table quotes the gitignored regenerable path artifacts/print-alpha/release-package/ (output of scripts_print_alpha/print_alpha_dry_run.py) while describing the allowlist fix; the path is intentionally absent from the repo" -->
+
 **Document ID:** SWARM-A-COMPLETION-HANDOFF-001
 **Closer:** single-threaded independent verification pass (no new features)
 **Starting HEAD:** `ba45e28c2c1215033e2b0f1b22999cdece0ee670`
