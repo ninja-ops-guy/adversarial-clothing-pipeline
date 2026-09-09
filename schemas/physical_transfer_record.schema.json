@@ -1,0 +1,122 @@
+{
+  "$id": "https://rac.example/schemas/physical_transfer_record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Physical Transfer Record",
+  "description": "Frozen Barrier 1 contract for one physical-transfer provenance record (charter §13). Synthetic pipeline records must use evidence_class 'synthetic_pipeline_validation_only'; a record claiming 'measured_physical_capture' must carry measured_evidence_ref. physical_efficacy_claimed is hard-frozen to false: no record emitted under this contract may assert physical-world efficacy.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artwork_sha256": {
+      "$ref": "#/$defs/sha256hex"
+    },
+    "template_sha256": {
+      "$ref": "#/$defs/sha256hex"
+    },
+    "mapping_sha256": {
+      "$ref": "#/$defs/sha256hex"
+    },
+    "garment_sku": {
+      "type": "string",
+      "minLength": 1
+    },
+    "fabric": {
+      "type": "string",
+      "minLength": 1
+    },
+    "print_process": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capture_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "camera": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lighting": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pose": {
+      "type": "string",
+      "minLength": 1
+    },
+    "view": {
+      "type": "string",
+      "minLength": 1
+    },
+    "captured_frame_sha256": {
+      "$ref": "#/$defs/sha256hex"
+    },
+    "detector_response_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evidence_class": {
+      "enum": [
+        "synthetic_pipeline_validation_only",
+        "measured_physical_capture"
+      ]
+    },
+    "measured_evidence_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "physical_efficacy_claimed": {
+      "const": false,
+      "description": "Hard-frozen false. This contract never certifies physical-world adversarial efficacy."
+    }
+  },
+  "required": [
+    "schema_version",
+    "record_id",
+    "artwork_sha256",
+    "template_sha256",
+    "mapping_sha256",
+    "garment_sku",
+    "fabric",
+    "print_process",
+    "capture_id",
+    "camera",
+    "lighting",
+    "pose",
+    "view",
+    "captured_frame_sha256",
+    "detector_response_refs",
+    "evidence_class",
+    "physical_efficacy_claimed"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence_class": {
+            "const": "measured_physical_capture"
+          }
+        },
+        "required": ["evidence_class"]
+      },
+      "then": {
+        "required": ["measured_evidence_ref"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "$id": "https://rac.example/schemas/print_alpha_manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Print Alpha Manifest",
+  "description": "Frozen Barrier 1 contract for the P0 print-alpha specimen manifest. Vendor fields that are not yet resolved MUST be the literal string 'PENDING_USER_ACTION' (fail-closed; values are never fabricated). physical_efficacy_claimed is const false and evidence_class is const 'experimental_print_specimen': a print-alpha specimen is a manufacturing specimen, not evidence of physical-world efficacy.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "vendorField": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Vendor-sourced value, or the literal string 'PENDING_USER_ACTION' when unresolved."
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "manifest_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "garment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sku": {
+          "type": "string",
+          "minLength": 1
+        },
+        "material": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size": {
+          "type": "string",
+          "minLength": 1
+        },
+        "print_technology": {
+          "$ref": "#/$defs/vendorField"
+        },
+        "printer_vendor": {
+          "$ref": "#/$defs/vendorField"
+        },
+        "manufacturing_batch": {
+          "anyOf": [
+            {"type": "string", "minLength": 1},
+            {"type": "null"}
+          ]
+        }
+      },
+      "required": [
+        "sku",
+        "material",
+        "size",
+        "print_technology",
+        "printer_vendor",
+        "manufacturing_batch"
+      ]
+    },
+    "control_artwork_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_artwork_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_sha256": {
+          "$ref": "#/$defs/sha256hex"
+        },
+        "byte_identical_to_frozen_source": {
+          "type": "boolean",
+          "description": "True only when the candidate artwork bytes are verified byte-identical to the frozen source artifact."
+        }
+      },
+      "required": ["ref", "expected_sha256", "byte_identical_to_frozen_source"]
+    },
+    "physical_efficacy_claimed": {
+      "const": false,
+      "description": "Hard-frozen false: this manifest asserts a print specimen only, never physical efficacy."
+    },
+    "evidence_class": {
+      "const": "experimental_print_specimen"
+    },
+    "user_action_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "References to outstanding user actions (e.g. UA-1..UA-4) gating unresolved fields."
+    }
+  },
+  "required": [
+    "schema_version",
+    "manifest_id",
+    "garment",
+    "control_artwork_ref",
+    "candidate_artwork_ref",
+    "physical_efficacy_claimed",
+    "evidence_class",
+    "user_action_refs"
+  ]
+}

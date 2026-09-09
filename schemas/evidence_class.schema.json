@@ -1,0 +1,14 @@
+{
+  "$id": "https://rac.example/schemas/evidence_class.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Evidence Class Enumeration",
+  "description": "Frozen Barrier 1 additive evidence-class taxonomy. Existing classes are preserved unchanged; 'experimental_print_specimen' is newly registered for print-alpha manufacturing specimens. This taxonomy is additive only — ruthless_pipeline/certification/evidence.py is NOT modified by this registration; governance ratification is a separate handoff item.",
+  "type": "string",
+  "enum": [
+    "synthetic_pipeline_validation_only",
+    "generated_digital_reference",
+    "log_attested",
+    "scenario_assumption",
+    "experimental_print_specimen"
+  ]
+}

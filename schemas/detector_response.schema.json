@@ -1,0 +1,136 @@
+{
+  "$id": "https://rac.example/schemas/detector_response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Detector Response Record",
+  "description": "Frozen Barrier 1 contract for one detector evaluation response (charter §8). RULE: evaluator adapters emit ONLY fields the underlying model/API legitimately exposes. Internals that are unknown or not exposed MUST be null or omitted — never fabricated, interpolated, or back-filled. objectness is null unless the detector genuinely exposes an objectness score; localization_metrics and segmentation_metrics are null unless legitimately computed from exposed outputs.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "rate": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "condition_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "person_detected": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "$ref": "#/$defs/rate"
+    },
+    "objectness": {
+      "anyOf": [
+        {"$ref": "#/$defs/rate"},
+        {"type": "null"}
+      ],
+      "description": "Null unless the detector legitimately exposes an objectness score; never fabricated."
+    },
+    "class_score": {
+      "anyOf": [
+        {"$ref": "#/$defs/rate"},
+        {"type": "null"}
+      ]
+    },
+    "box_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "best_box": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "xyxy": {
+              "type": "array",
+              "items": {"type": "number"},
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "score": {
+              "$ref": "#/$defs/rate"
+            }
+          },
+          "required": ["xyxy", "score"]
+        },
+        {"type": "null"}
+      ]
+    },
+    "localization_metrics": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "minProperties": 1
+        },
+        {"type": "null"}
+      ]
+    },
+    "segmentation_metrics": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "minProperties": 1
+        },
+        {"type": "null"}
+      ]
+    },
+    "invalid_condition": {
+      "type": "boolean",
+      "description": "True when the capture condition was ruled invalid under the preregistered invalid-condition rules; invalid responses are excluded from rates, never silently dropped."
+    },
+    "evaluator_adapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "adapter_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["adapter_id", "adapter_version"]
+    },
+    "raw_provenance_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional reference to the raw detector output artifact for audit replay."
+    }
+  },
+  "required": [
+    "schema_version",
+    "model_id",
+    "model_family",
+    "condition_id",
+    "person_detected",
+    "confidence",
+    "objectness",
+    "class_score",
+    "box_count",
+    "best_box",
+    "localization_metrics",
+    "segmentation_metrics",
+    "invalid_condition",
+    "evaluator_adapter"
+  ]
+}

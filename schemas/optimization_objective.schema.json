@@ -1,0 +1,123 @@
+{
+  "$id": "https://rac.example/schemas/optimization_objective.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Optimization Objective",
+  "description": "Frozen Barrier 1 contract for a composable objective J with separately measurable terms. Every included term must be logged separately (log_separately is const true). CVaR aggregation requires alpha in (0,1]. Applies to FUTURE generations only; never retroactively to frozen D2-0004/D2-0005 surfaces.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "nonNegativeNumber": {
+      "type": "number",
+      "minimum": 0.0
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "objective_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "terms": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "detector_loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "aggregation": {
+              "enum": ["MEAN", "CVAR", "WORST_CASE"]
+            },
+            "alpha": {
+              "type": "number",
+              "exclusiveMinimum": 0.0,
+              "maximum": 1.0,
+              "description": "CVaR tail mass; required iff aggregation == CVAR."
+            },
+            "log_separately": {
+              "const": true,
+              "description": "Each term must be independently measurable and logged per evaluation."
+            }
+          },
+          "required": ["aggregation", "log_separately"],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "aggregation": {"const": "CVAR"}
+                },
+                "required": ["aggregation"]
+              },
+              "then": {
+                "required": ["alpha"]
+              }
+            }
+          ]
+        },
+        "printability_loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lambda_print": {
+              "$ref": "#/$defs/nonNegativeNumber"
+            },
+            "log_separately": {
+              "const": true
+            }
+          },
+          "required": ["lambda_print", "log_separately"]
+        },
+        "style_loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lambda_style": {
+              "$ref": "#/$defs/nonNegativeNumber"
+            },
+            "log_separately": {
+              "const": true
+            }
+          },
+          "required": ["lambda_style", "log_separately"]
+        },
+        "deformation_loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lambda_deformation": {
+              "$ref": "#/$defs/nonNegativeNumber"
+            },
+            "log_separately": {
+              "const": true
+            }
+          },
+          "required": ["lambda_deformation", "log_separately"]
+        },
+        "regularization": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lambda_reg": {
+              "$ref": "#/$defs/nonNegativeNumber"
+            },
+            "log_separately": {
+              "const": true
+            }
+          },
+          "required": ["lambda_reg", "log_separately"]
+        }
+      }
+    },
+    "seed": {
+      "type": "integer"
+    },
+    "future_generations_only": {
+      "const": true,
+      "description": "Hard-frozen true: this objective contract governs only future optimization runs."
+    }
+  },
+  "required": ["schema_version", "objective_id", "terms", "seed", "future_generations_only"]
+}

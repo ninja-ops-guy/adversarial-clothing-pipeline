@@ -1,0 +1,113 @@
+{
+  "$id": "https://rac.example/schemas/rac_r3_manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC-R3 Consolidated Release Manifest",
+  "description": "Frozen Barrier 1 contract for the consolidated RAC-R3 reproducibility manifest (12 charter fields): source commit, dependency lock, model/fixture hashes, seed manifest, optimizer config ref, transformation manifest ref, candidate/analysis hashes, environment manifest, journal ref, release manifest ref.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hashMap": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/sha256hex"
+      }
+    }
+  },
+  "properties": {
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Full 40-hex git commit of the source tree that produced the release."
+    },
+    "dependency_lock_sha256": {
+      "$ref": "#/$defs/sha256hex"
+    },
+    "model_hashes": {
+      "$ref": "#/$defs/hashMap"
+    },
+    "fixture_hashes": {
+      "$ref": "#/$defs/hashMap"
+    },
+    "seed_manifest": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "description": "Named seeds (e.g. optimizer, sampler, evaluator) mapped to integer seed values."
+    },
+    "optimizer_config_ref": {
+      "anyOf": [
+        {"$ref": "#/$defs/nonEmptyString"},
+        {"type": "null"}
+      ]
+    },
+    "transformation_manifest_ref": {
+      "anyOf": [
+        {"$ref": "#/$defs/nonEmptyString"},
+        {"type": "null"}
+      ]
+    },
+    "candidate_sha256": {
+      "anyOf": [
+        {"$ref": "#/$defs/sha256hex"},
+        {"type": "null"}
+      ]
+    },
+    "analysis_sha256": {
+      "anyOf": [
+        {"$ref": "#/$defs/sha256hex"},
+        {"type": "null"}
+      ]
+    },
+    "environment_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "python_version": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "os": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "key_packages": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      },
+      "required": ["python_version", "os", "key_packages"]
+    },
+    "journal_ref": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "release_manifest_ref": {
+      "$ref": "#/$defs/nonEmptyString"
+    }
+  },
+  "required": [
+    "source_commit",
+    "dependency_lock_sha256",
+    "model_hashes",
+    "fixture_hashes",
+    "seed_manifest",
+    "optimizer_config_ref",
+    "transformation_manifest_ref",
+    "candidate_sha256",
+    "analysis_sha256",
+    "environment_manifest",
+    "journal_ref",
+    "release_manifest_ref"
+  ]
+}
