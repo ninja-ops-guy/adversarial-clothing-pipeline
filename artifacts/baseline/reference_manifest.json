@@ -1,0 +1,28 @@
+{
+  "boundary": "synthetic hash-seeded fixtures only; no real detector weights, no held-out models, no measured evidence; nothing here promotes to measured",
+  "chain": "Product Studio candidate pool (schema 3.0) -> surrogate scoring (ComparativeBenchmark) -> two-stage selection (mean arm, CVaR_0.5 arm) via scripts/select_surrogate_candidate.py with hash-seeded mock surrogates",
+  "entries": {
+    "crafted_telemetry_sha256": "c89bc07c439e7a507bee4f118a30ee4c88ce0c5eda49925d66907332e7e7e0a7",
+    "cvar.candidate_config_sha256": "11e07ca3ec9984f581a899cae5f10269ad918a6c37fb1aa5fad43db7f5d77365",
+    "cvar.objective_telemetry_sha256": "aadbae13883cd4c7addbcd333b6e68c6f46d8917aaf40ea60108984014de7094",
+    "cvar.selection_report_sha256": "78fd7e40e84f5325a6a45c5b2b5de5ba5f2f00dc4fb8f8478712b2fc452184cf",
+    "cvar.winner_candidate_id": "cand-002",
+    "design_profile_sha256": "873a46526e4e3d25f9e920078587bab5651a1c721063d76aca2c96fa6d6ad221",
+    "mean.candidate_config_sha256": "11e07ca3ec9984f581a899cae5f10269ad918a6c37fb1aa5fad43db7f5d77365",
+    "mean.selection_report_sha256": "bbe4457ef2c320c4526ea856f42bcf3d68756c2216761191cba576bd782ab89e",
+    "mean.winner_candidate_id": "cand-002",
+    "model_manifest_json_sha256": "51f715ac6cf5df1c9939c9a7ef2c7445ba86608a1a0a384873fb5add2289db55",
+    "png_sha256:cand-001": "5d7ac232820ef3cc36d953d0f85df48a9b62bb592b2be5fa7860d374cf1f6b3f",
+    "png_sha256:cand-002": "1bbeeb0fe9170cd9964fae8e52b6a2b20b15c4c964e9a623c632b3f3ddae9a8c",
+    "png_sha256:cand-003": "d144ac78c78b0c7921ee171bcd51c8f6d3f1eb1ddad490b82e15dcb5056284a4",
+    "png_sha256:cand-004": "c70df7b6812d08f8f47c7c7be332c86b53e273c6e172ac424aac4b2e0a3941ea",
+    "pool_json_sha256": "b61bc7a8d3e815951cb4c15770476255c4f4a6695d7db4705586ec370a79dd04"
+  },
+  "fixture_version": "baseline-fixture-v1",
+  "generator": {
+    "path": "tests/baseline/fixtures.py",
+    "sha256": "44f7eb2f288556c78582b04c7e86541f4c8b72d119f0c80ebce94087cf9ea08c"
+  },
+  "schema_version": "1.0",
+  "seed": 20260207
+}
