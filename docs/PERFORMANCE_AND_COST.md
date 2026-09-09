@@ -13,6 +13,14 @@ PYTHONPATH=. python scripts/profile_pipeline.py --root . --report profile.json
 
 ## Measured timings (median)
 
+<!-- provenance: MANUAL source=local profiling run via scripts/profile_pipeline.py derived=manual
+     These timings are machine-dependent envelopes captured by hand from a
+     profiling run; there is intentionally NO machine-readable authoritative
+     artifact to derive them from, so this table is flagged MANUAL. Do not
+     transcribe these numbers into any other document or artifact; re-run
+     the profiler instead. tests/test_table_provenance.py requires this
+     marker to stay present. -->
+
 | Segment | What it covers | Median | Repeats |
 |---|---|---|---|
 | Status ingestion | `read_d2_status(d2-latest-status.json)` — parse + legacy/packaging normalization | **~0.27 ms** | 200 |
