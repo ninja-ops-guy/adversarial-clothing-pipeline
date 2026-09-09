@@ -1,0 +1,201 @@
+{
+  "artifacts": [
+    {
+      "path": "print-alpha/CALIBRATION/README.md",
+      "role": "calibration_reference",
+      "sha256": "568a9b91e06219b1bf9bba4abf28f614b282e054f6ed8c687adeba1a56a7e622",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/CALIBRATION/calibration-target.png",
+      "role": "calibration_target",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/back.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/front.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/hood.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/label_inside.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/label_panel.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/pocket.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/sleeve_left.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CANDIDATE/sleeve_right.png",
+      "role": "candidate_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CAPTURE/camera-lighting-sheet.md",
+      "role": "capture_protocol",
+      "sha256": "92377b8e4324d835646c9dba4ab4a859aa65538f7a2266527c2f4df0cebae5a0",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/CAPTURE/capture-protocol.md",
+      "role": "capture_protocol",
+      "sha256": "900a86f191724779501959a852227a98edc8fe5f06ec557c968bef1e74e8629e",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/CAPTURE/invalid-condition-rules.json",
+      "role": "capture_protocol",
+      "sha256": "65a23bb91c2462b30cb72d82f08a5522a15fb9f5781db30e8446670cbdd23cda",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/CAPTURE/trial-sheet.csv",
+      "role": "trial_sheet",
+      "sha256": "774c2ad68f9fa6794b18e0dcd1dafb988069c1bf302cb1f44a71df46e5d14eaa",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/CONTROL/back.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/front.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/hood.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/label_inside.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/label_panel.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/pocket.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/sleeve_left.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/CONTROL/sleeve_right.png",
+      "role": "control_artwork",
+      "sha256": "PENDING_USER_ACTION",
+      "status": "PENDING_USER_ACTION"
+    },
+    {
+      "path": "print-alpha/MANIFESTS/artwork-manifest.json",
+      "role": "production_mapping",
+      "sha256": "7d5461474c873cb6a4f5efca9322ed18cc8781ae9367a9a4b6134cc65a51ad35",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/MANIFESTS/mapping-manifest.json",
+      "role": "production_mapping",
+      "sha256": "ff914c9de59f3193fff7954299b1a95a095343662a6d0389d32b670607edc7d9",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/MANIFESTS/print-alpha-manifest.json",
+      "role": "sku",
+      "sha256": "692e359428d203df473f236df53e6a4a4caa7fbc77f868de5564a5b6b44e11f3",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/MANIFESTS/sku-manifest.json",
+      "role": "sku",
+      "sha256": "e4ed47543b3169c8286a30bbb384ef73b27ed477bf5d57e4fc3dabdb35bb8a88",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/MANIFESTS/template-manifest.json",
+      "role": "provider_template",
+      "sha256": "f9f6a137b09ac5885a2e9cc49ef53289fb7f956dfc869f96a6c49b4c4f4fb164",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/QA/chain-of-custody.md",
+      "role": "qa_form",
+      "sha256": "2a6f7e97623b378308347561a7e7f6091cfcdc4206cb391d978e55beb2faecb2",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/QA/garment-pairing-checklist.md",
+      "role": "qa_form",
+      "sha256": "707ba335a14d203c02531145e9e670ec5ab60ce1321a70e7b33fc96280100c5c",
+      "status": "bound"
+    },
+    {
+      "path": "print-alpha/QA/receipt-qa.md",
+      "role": "qa_form",
+      "sha256": "58a376b558d7d05e5c71addbf8eb0aa40408e1bfa1df0dde0e7a149e662a68f8",
+      "status": "bound"
+    },
+    {
+      "path": "production_alpha/RECEIPT_QA_FORM.md",
+      "role": "qa_form",
+      "sha256": "76ba14d8f1e42a49a7f2670c0001b51fc28608628bbcfd1d85fb2c305ee94326",
+      "status": "bound"
+    },
+    {
+      "path": "production_alpha/SKU_MANIFEST.json",
+      "role": "sku",
+      "sha256": "8f6d7614a5c070f68e1afd79b357b868824a54fc50ed693795a5b7216e614f8d",
+      "status": "bound"
+    }
+  ],
+  "evidence_class": "experimental_print_specimen",
+  "package_root_sha256": "3b0eed177f7fec3b723a818391945bd594b351601d3a735f0ca0bf2064c7e38e",
+  "physical_efficacy_claimed": false,
+  "release_id": "RAC-PRINT-ALPHA-001",
+  "schema_version": "1.0"
+}
