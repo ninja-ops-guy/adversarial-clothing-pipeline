@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "ruleset_id": "RAC-PRINT-ALPHA-001-INVALID-CONDITIONS",
+  "derived_from": "physical/p1/STOPPING_RULE.json (RAC-P1-STOP-2026-001) invalid_condition_rule semantics",
+  "evidence_class": "experimental_print_specimen",
+  "physical_efficacy_claimed": false,
+  "semantics": {
+    "invalid_condition_rule": "Control-undetected trials are invalid measurement conditions, never candidate successes; they are accounted via invalid_condition_report and excluded from valid_trials.",
+    "accounting": "Invalid trials are excluded from valid_trials and reported via invalid_condition_report; the preregistered bounds are min_valid_trials=93, max_valid_trials=144, target_interval_width=0.2, confidence_z=1.959963984540054.",
+    "frozen_before_data": "These conditions are fixed before the first P1 garment capture and may not be redefined after data collection begins."
+  },
+  "condition_classes": [
+    {
+      "class_id": "blur",
+      "description": "Frame degraded by defocus or subject/camera motion beyond measurement usability.",
+      "detection": "Laplacian-variance or MTF-based sharpness screen against the session calibration baseline; any blur flagged on either the control or candidate frame of a matched pair.",
+      "disposition": "invalid_trial"
+    },
+    {
+      "class_id": "exposure",
+      "description": "Frame under/over-exposed relative to the locked session exposure (clipped highlights in the print region, crushed shadows, or lighting drift > 5% from the session calibration meter reading).",
+      "detection": "Histogram clipping check on the garment region plus garment-centre meter comparison against the session baseline.",
+      "disposition": "invalid_trial"
+    },
+    {
+      "class_id": "occlusion",
+      "description": "Printed region partially or fully occluded (hands, hair, carried objects, fold/wrinkle shadowing) in either frame of the matched pair.",
+      "detection": "Operator review against the garment mask; occlusion flags logged with photo reference.",
+      "disposition": "invalid_trial"
+    },
+    {
+      "class_id": "framing",
+      "description": "Garment silhouette not fully in frame, backdrop edge visible, or garment plane deviates from the sensor-parallel mounting beyond the 2% fiducial scale acceptance bound.",
+      "detection": "Calibration-target fiducial scale check (left/right agreement within 2%) plus silhouette-in-frame check.",
+      "disposition": "invalid_trial"
+    },
+    {
+      "class_id": "control_undetected",
+      "description": "The matched control garment is not detected under the condition. Per the preregistered rule this is an invalid measurement condition, NEVER a candidate success.",
+      "detection": "split_valid_invalid keeps only control-detected trials; control-undetected trials are routed to invalid_condition_report.",
+      "disposition": "invalid_trial"
+    }
+  ]
+}
