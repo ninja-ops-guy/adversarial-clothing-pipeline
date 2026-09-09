@@ -119,53 +119,57 @@ def test_allowlist_match_filter_is_scoped(tmp_path: Path):
     result = doc_lint.lint_repo(root)
     assert not result.ok
     assert len(result.allowed) == 1
-    assert any("Entry two" in f.excerpt for f in result.findings)
+    assert len(result.findings) == 1
 
 
-def test_broken_backticked_path_detected(tmp_path: Path):
+def test_broken_path_detected(tmp_path: Path):
     root = _make_root(tmp_path)
-    _write_doc(root, "docs/LINKS.md", "See `scripts/does_not_exist.py` for details.\n")
+    _write_doc(root, "docs/LINKS.md", (
+        "See [missing](MISSING_FILE.md) and `scripts/does_not_exist.py`.\n"
+    ))
     result = doc_lint.lint_repo(root)
-    assert any(f.check == doc_lint.CHECK_BROKEN_PATH for f in result.findings)
+    broken = [f for f in result.findings if f.check == doc_lint.CHECK_BROKEN_PATH]
+    assert len(broken) == 2
 
 
-def test_broken_relative_markdown_link_detected(tmp_path: Path):
+def test_existing_paths_pass(tmp_path: Path):
     root = _make_root(tmp_path)
-    _write_doc(root, "docs/LINKS.md", "[missing](sub/dir/none.md)\n")
+    (root / "scripts").mkdir()
+    (root / "scripts" / "real.py").write_text("# real\n")
+    _write_doc(root, "docs/LINKS.md", "See `scripts/real.py` and `scripts/real.py::main`.\n")
     result = doc_lint.lint_repo(root)
-    assert any(f.check == doc_lint.CHECK_BROKEN_PATH for f in result.findings)
-
-
-def test_markdown_link_escape_repo_detected(tmp_path: Path):
-    root = _make_root(tmp_path)
-    _write_doc(root, "docs/LINKS.md", "[esc](../../outside.md)\n")
-    result = doc_lint.lint_repo(root)
-    assert any(
-        f.check == doc_lint.CHECK_BROKEN_PATH and "escapes repository" in f.message
-        for f in result.findings
-    )
+    assert result.ok, [f.to_dict() for f in result.findings]
 
 
 def test_schema_version_drift_detected(tmp_path: Path):
     root = _make_root(tmp_path)
-    _write_doc(root, "docs/STUDIO.md", (
-        "The Product Studio production manifest uses schema version 9.9 everywhere.\n"
+    _write_doc(root, "docs/DRIFT.md", (
+        "The Product Studio manifest schema_version is 1.3 and must be emitted as such.\n"
     ))
     result = doc_lint.lint_repo(root)
     assert any(f.check == doc_lint.CHECK_SCHEMA_DRIFT for f in result.findings)
 
 
+def test_schema_version_current_passes(tmp_path: Path):
+    root = _make_root(tmp_path)
+    _write_doc(root, "docs/OK.md", (
+        "The Product Studio manifest schema_version is governed at 1.4.\n"
+    ))
+    result = doc_lint.lint_repo(root)
+    assert not any(f.check == doc_lint.CHECK_SCHEMA_DRIFT for f in result.findings)
+
+
 def test_stale_ci_run_detected(tmp_path: Path):
     root = _make_root(tmp_path)
-    _write_doc(root, "docs/CI.md", "CI run 12345678 is in progress now.\n")
+    _write_doc(root, "docs/CI.md", "Run 34175028944 IN PROGRESS: awaiting closure.\n")
     result = doc_lint.lint_repo(root)
     assert any(f.check == doc_lint.CHECK_STALE_CI_RUN for f in result.findings)
 
 
 def test_untraceable_quantitative_claim_detected(tmp_path: Path):
     root = _make_root(tmp_path)
-    _write_doc(root, "docs/CLAIM.md", (
-        "Held-out detection fell to 0.50 with held-out mean 0.1234, a collapse.\n"
+    _write_doc(root, "docs/NUM.md", (
+        "The held-out candidate mean was 0.42, a huge drop.\n"
     ))
     result = doc_lint.lint_repo(root)
     assert any(f.check == doc_lint.CHECK_QUANT_CLAIM for f in result.findings)

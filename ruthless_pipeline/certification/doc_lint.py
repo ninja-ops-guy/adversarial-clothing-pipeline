@@ -54,7 +54,7 @@ INLINE_ALLOW_RE = re.compile(
 )
 
 # Repo-relative path prefixes treated as verifiable repository paths when
-they appear in backticks.
+# they appear in backticks.
 PATH_PREFIXES = (
     "docs/", "scripts/", "ruthless_pipeline/", "tests/", "schemas/",
     "generations/", "manuscript/", "benchmarks/", "releases/", "protocols/",
