@@ -1,0 +1,140 @@
+{
+  "artwork_hash_verified": false,
+  "checks": {
+    "artwork_hash_verified": {
+      "category": "physical",
+      "detail": "16 per-placement artworks unresolved (UA-1)",
+      "status": "PENDING_USER_ACTION"
+    },
+    "evidence_boundary": {
+      "category": "software",
+      "detail": "physical_efficacy_claimed=false and evidence_class ok in all manifests",
+      "status": "PASS"
+    },
+    "frozen_schema_conformity": {
+      "category": "software",
+      "detail": "primary manifest validates against frozen schema",
+      "status": "PASS"
+    },
+    "garment_vendor_fields_bound": {
+      "category": "vendor",
+      "detail": "garment vendor fields unresolved (UA-1..UA-4)",
+      "status": "PENDING_USER_ACTION"
+    },
+    "manifests_parse": {
+      "category": "software",
+      "detail": "all manifests parse as JSON",
+      "status": "PASS"
+    },
+    "manifests_present": {
+      "category": "software",
+      "detail": "all 5 manifests present",
+      "status": "PASS"
+    },
+    "pending_literals_canonical": {
+      "category": "software",
+      "detail": "all pending fields are literal PENDING_USER_ACTION",
+      "status": "PASS"
+    },
+    "sku_bound": {
+      "category": "vendor",
+      "detail": "variant_id/size unresolved (user size selection, UA-1/UA-2)",
+      "status": "PENDING_USER_ACTION"
+    },
+    "trial_geometry_108": {
+      "category": "software",
+      "detail": "108 data rows (expected 108)",
+      "status": "PASS"
+    },
+    "trial_sheet_deterministic": {
+      "category": "software",
+      "detail": "re-export byte-identical",
+      "status": "PASS"
+    },
+    "vendor_template_bound": {
+      "category": "vendor",
+      "detail": "template_archive_sha256 unresolved (UA-1)",
+      "status": "PENDING_USER_ACTION"
+    }
+  },
+  "evidence_class": "experimental_print_specimen",
+  "pending_user_action_fields": [
+    "artwork-manifest.json:.artworks[0].artwork_sha256",
+    "artwork-manifest.json:.artworks[10].artwork_sha256",
+    "artwork-manifest.json:.artworks[11].artwork_sha256",
+    "artwork-manifest.json:.artworks[12].artwork_sha256",
+    "artwork-manifest.json:.artworks[13].artwork_sha256",
+    "artwork-manifest.json:.artworks[14].artwork_sha256",
+    "artwork-manifest.json:.artworks[15].artwork_sha256",
+    "artwork-manifest.json:.artworks[1].artwork_sha256",
+    "artwork-manifest.json:.artworks[2].artwork_sha256",
+    "artwork-manifest.json:.artworks[3].artwork_sha256",
+    "artwork-manifest.json:.artworks[4].artwork_sha256",
+    "artwork-manifest.json:.artworks[5].artwork_sha256",
+    "artwork-manifest.json:.artworks[6].artwork_sha256",
+    "artwork-manifest.json:.artworks[7].artwork_sha256",
+    "artwork-manifest.json:.artworks[8].artwork_sha256",
+    "artwork-manifest.json:.artworks[9].artwork_sha256",
+    "mapping-manifest.json:.placements[0].candidate_file",
+    "mapping-manifest.json:.placements[0].control_file",
+    "mapping-manifest.json:.placements[1].candidate_file",
+    "mapping-manifest.json:.placements[1].control_file",
+    "mapping-manifest.json:.placements[2].candidate_file",
+    "mapping-manifest.json:.placements[2].control_file",
+    "mapping-manifest.json:.placements[3].candidate_file",
+    "mapping-manifest.json:.placements[3].control_file",
+    "mapping-manifest.json:.placements[4].candidate_file",
+    "mapping-manifest.json:.placements[4].control_file",
+    "mapping-manifest.json:.placements[5].candidate_file",
+    "mapping-manifest.json:.placements[5].control_file",
+    "mapping-manifest.json:.placements[6].candidate_file",
+    "mapping-manifest.json:.placements[6].control_file",
+    "mapping-manifest.json:.placements[7].candidate_file",
+    "mapping-manifest.json:.placements[7].control_file",
+    "print-alpha-manifest.json:.garment.print_technology",
+    "print-alpha-manifest.json:.garment.printer_vendor",
+    "print-alpha-manifest.json:.garment.size",
+    "sku-manifest.json:.garments[0].size",
+    "sku-manifest.json:.garments[0].variant_id",
+    "sku-manifest.json:.garments[1].size",
+    "sku-manifest.json:.garments[1].variant_id",
+    "template-manifest.json:.panel_geometry.back.dpi",
+    "template-manifest.json:.panel_geometry.back.height_mm",
+    "template-manifest.json:.panel_geometry.back.width_mm",
+    "template-manifest.json:.panel_geometry.front.dpi",
+    "template-manifest.json:.panel_geometry.front.height_mm",
+    "template-manifest.json:.panel_geometry.front.width_mm",
+    "template-manifest.json:.panel_geometry.hood.dpi",
+    "template-manifest.json:.panel_geometry.hood.height_mm",
+    "template-manifest.json:.panel_geometry.hood.width_mm",
+    "template-manifest.json:.panel_geometry.label_inside.dpi",
+    "template-manifest.json:.panel_geometry.label_inside.height_mm",
+    "template-manifest.json:.panel_geometry.label_inside.width_mm",
+    "template-manifest.json:.panel_geometry.label_panel.dpi",
+    "template-manifest.json:.panel_geometry.label_panel.height_mm",
+    "template-manifest.json:.panel_geometry.label_panel.width_mm",
+    "template-manifest.json:.panel_geometry.pocket.dpi",
+    "template-manifest.json:.panel_geometry.pocket.height_mm",
+    "template-manifest.json:.panel_geometry.pocket.width_mm",
+    "template-manifest.json:.panel_geometry.sleeve_left.dpi",
+    "template-manifest.json:.panel_geometry.sleeve_left.height_mm",
+    "template-manifest.json:.panel_geometry.sleeve_left.width_mm",
+    "template-manifest.json:.panel_geometry.sleeve_right.dpi",
+    "template-manifest.json:.panel_geometry.sleeve_right.height_mm",
+    "template-manifest.json:.panel_geometry.sleeve_right.width_mm",
+    "template-manifest.json:.template_archive_sha256"
+  ],
+  "physical_efficacy_claimed": false,
+  "release_id": "RAC-PRINT-ALPHA-001",
+  "schema_version": "1.0",
+  "sku_bound": false,
+  "software_ready": true,
+  "user_action_refs": [
+    "UA-1",
+    "UA-2",
+    "UA-3",
+    "UA-4"
+  ],
+  "vendor_template_bound": false,
+  "verdict": "USER_ACTION_REQUIRED"
+}
