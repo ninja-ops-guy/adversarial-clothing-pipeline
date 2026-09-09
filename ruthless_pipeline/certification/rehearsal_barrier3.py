@@ -518,7 +518,20 @@ def _resume_check(output_dir: Path, journal: dict, stage: str) -> dict | None:
     return json.loads(path.read_text())
 
 
+def _ensure_finite(value: Any, path: str = "payload") -> None:
+    """Fail closed if a stage boundary contains NaN/Inf."""
+    if isinstance(value, float) and not math.isfinite(value):
+        raise Barrier3Error(f"non-finite value at {path}: {value!r}")
+    if isinstance(value, dict):
+        for key, child in value.items():
+            _ensure_finite(child, f"{path}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            _ensure_finite(child, f"{path}[{index}]")
+
+
 def _complete(output_dir: Path, journal_path: Path, journal: dict, stage: str, payload: dict) -> dict:
+    _ensure_finite(payload, stage)
     path = output_dir / "stages" / f"{stage}.json"
     digest = _write_json(path, payload)
     journal["completed"][stage] = {"path": path.relative_to(output_dir).as_posix(), "sha256": digest}
