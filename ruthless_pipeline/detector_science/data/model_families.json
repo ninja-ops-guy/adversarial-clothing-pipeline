@@ -1,0 +1,55 @@
+{
+  "registry_version": "1.0.0",
+  "description": "Additive sidecar mapping model_manifests architectures to detector families. Manifests in model_manifests/ are untouched (read-only).",
+  "families": {
+    "transformer_encoder_decoder": {
+      "description": "Set-prediction transformer detector with encoder-decoder attention (DETR lineage)."
+    },
+    "two_stage_rcnn": {
+      "description": "Two-stage region-proposal detectors (Faster R-CNN, Mask R-CNN lineage)."
+    },
+    "one_stage_anchor": {
+      "description": "One-stage anchor/centre-based dense detectors (FCOS, RetinaNet lineage)."
+    },
+    "one_stage_ssd": {
+      "description": "One-stage single-shot multi-box detectors (SSD/SSDLite lineage)."
+    },
+    "one_stage_yolo": {
+      "description": "One-stage YOLO-lineage detectors."
+    }
+  },
+  "models": {
+    "detr_resnet50": {
+      "architecture": "DETR ResNet-50",
+      "family": "transformer_encoder_decoder"
+    },
+    "fasterrcnn_mobilenet_v3_320": {
+      "architecture": "Faster R-CNN MobileNetV3 320 FPN",
+      "family": "two_stage_rcnn"
+    },
+    "fasterrcnn_resnet50_fpn_v2": {
+      "architecture": "Faster R-CNN ResNet-50 FPN V2",
+      "family": "two_stage_rcnn"
+    },
+    "fcos_resnet50_fpn": {
+      "architecture": "FCOS ResNet-50 FPN",
+      "family": "one_stage_anchor"
+    },
+    "maskrcnn_resnet50_fpn_v2": {
+      "architecture": "Mask R-CNN ResNet-50 FPN V2",
+      "family": "two_stage_rcnn"
+    },
+    "retinanet_resnet50_fpn_v2": {
+      "architecture": "RetinaNet ResNet-50 FPN V2",
+      "family": "one_stage_anchor"
+    },
+    "ssdlite320_mobilenet_v3": {
+      "architecture": "SSDLite320 MobileNetV3",
+      "family": "one_stage_ssd"
+    },
+    "yolov8n": {
+      "architecture": "YOLOv8n",
+      "family": "one_stage_yolo"
+    }
+  }
+}
