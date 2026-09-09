@@ -220,3 +220,25 @@ def test_uppercase_armed_claim_still_detected(tmp_path: Path):
     _write_doc(root, "docs/STALE.md", "D2-0005 is ARMED and running.\n")
     result = doc_lint.lint_repo(root)
     assert any(f.check == doc_lint.CHECK_STALE_D2_0005_ARMED for f in result.findings)
+
+
+def test_print_alpha_dry_run_release_package_path_allowlisted():
+    """Regression: the dry-run doc's backticked release-package path is a
+    gitignored regenerable artifact directory (produced by
+    scripts_print_alpha/print_alpha_dry_run.py), so it must be covered by a
+    scoped broken-path allowlist entry -- not by weakening the global rule."""
+    data = json.loads((ROOT / ".doclint-allow.json").read_text(encoding="utf-8"))
+    entries = [
+        a for a in data.get("allow", [])
+        if a.get("path") == "docs/PRINT_ALPHA_DRY_RUN.md"
+        and a.get("check") == "broken-path"
+    ]
+    assert entries, (
+        "docs/PRINT_ALPHA_DRY_RUN.md broken-path allowlist entry missing; "
+        "do not weaken the global broken-path rule to make lint pass"
+    )
+    assert any(
+        "regenerable" in (a.get("reason") or "").lower()
+        or "generated" in (a.get("reason") or "").lower()
+        for a in entries
+    ), "allowlist entry must record why the path is absent from the checkout"
