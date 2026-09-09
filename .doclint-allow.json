@@ -71,6 +71,12 @@
       "path": "docs/RAC_WORLD_CLASS_GAP_ANALYSIS.md",
       "check": "broken-path",
       "reason": "Gap-analysis document; backticked paths name missing/planned components whose absence is the subject of the analysis."
+    },
+    {
+      "path": "docs/PRINT_ALPHA_DRY_RUN.md",
+      "check": "broken-path",
+      "match": "artifacts/print-alpha/release-package/",
+      "reason": "Gitignored regenerable release-package path; produced deterministically by scripts_print_alpha/print_alpha_dry_run.py, never committed"
     }
   ]
 }
