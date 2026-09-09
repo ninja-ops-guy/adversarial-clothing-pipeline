@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -141,6 +142,15 @@ def test_packaging_writer_script_records_failed_and_complete(tmp_path: Path):
 
     script = ROOT / "scripts" / "package_print_test_kit.py"
 
+    # The subprocess runs with cwd=tmp_path and must still be able to import
+    # ruthless_pipeline; pin PYTHONPATH to the repo root so the outcome is not
+    # dependent on the ambient environment (pip install state, caller's
+    # PYTHONPATH, etc.). Without this, the script can die at its top-level
+    # import before the failure-recording path runs, leaving the status at
+    # NOT_ATTEMPTED instead of FAILED.
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(ROOT) + os.pathsep + env.get("PYTHONPATH", "")
+
     def invoke(extra: list[str]) -> subprocess.CompletedProcess:
         return subprocess.run(
             [
@@ -157,6 +167,7 @@ def test_packaging_writer_script_records_failed_and_complete(tmp_path: Path):
             text=True,
             capture_output=True,
             cwd=tmp_path,
+            env=env,
         )
 
     # Crash path: the print-kit build never ran, so packaging aborts.
@@ -200,3 +211,61 @@ def test_packaging_writer_script_records_failed_and_complete(tmp_path: Path):
     assert status["packaging"]["production_packaging_status"] == PACKAGING_COMPLETE
     assert status["packaging"]["packaging_failure_detail"] is None
     assert _snapshot_scientific(status) == before
+
+
+def test_packaging_writer_crash_path_records_failed_with_scrubbed_env(tmp_path: Path):
+    """Regression: crash path records FAILED even with a hostile ambient env.
+
+    The subprocess used to depend on the caller's environment to import
+    ruthless_pipeline; when run from a clean environment (no PYTHONPATH,
+    package not pip-installed) it died at import time before the failure-
+    recording path ran, leaving production_packaging_status at NOT_ATTEMPTED
+    instead of FAILED. Pin the contract: scrub PYTHONPATH, keep only the
+    interpreter's own env, and rely on the test harness to inject the repo
+    root explicitly.
+    """
+    status_path = tmp_path / "d2-latest-status.json"
+    write_d2_status(status_path, with_packaging(_sealed_scientific_status(), PACKAGING_NOT_ATTEMPTED))
+    before = _snapshot_scientific(read_d2_status(status_path))
+
+    script = ROOT / "scripts" / "package_print_test_kit.py"
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(ROOT)  # exactly the repo root, nothing ambient
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--kit-dir", str(tmp_path / "kit"),
+            "--d2-status", str(status_path),
+            "--zip", str(tmp_path / "kit.zip"),
+        ],
+        text=True,
+        capture_output=True,
+        cwd=tmp_path,
+        env=env,
+    )
+    assert proc.returncode != 0, proc.stderr
+    status = read_d2_status(status_path)
+    assert status["packaging"]["production_packaging_status"] == PACKAGING_FAILED
+    assert status["packaging"]["packaging_failure_detail"]
+    assert _snapshot_scientific(status) == before
+
+    # A second crash must keep FAILED (not revert to NOT_ATTEMPTED) and refresh detail.
+    proc2 = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--kit-dir", str(tmp_path / "kit"),
+            "--d2-status", str(status_path),
+            "--zip", str(tmp_path / "kit.zip"),
+        ],
+        text=True,
+        capture_output=True,
+        cwd=tmp_path,
+        env=env,
+    )
+    assert proc2.returncode != 0
+    status2 = read_d2_status(status_path)
+    assert status2["packaging"]["production_packaging_status"] == PACKAGING_FAILED
+    assert status2["packaging"]["packaging_failure_detail"]
+    assert _snapshot_scientific(status2) == before
