@@ -1,0 +1,94 @@
+{
+  "$id": "https://rac.example/schemas/barrier3_run_manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Barrier 3 Integrated Rehearsal Run Manifest",
+  "description": "Synthetic-only composition manifest for the six-stage Barrier 3 integration proof. It cannot arm D2-0005, carry held-out outcomes, or claim physical efficacy.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256hex": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "stageConfig": {"type": "object"}
+  },
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "schema_id": {"const": "barrier3-run-manifest"},
+    "run_id": {"type": "string", "minLength": 1},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "created_utc": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"},
+    "evidence_class": {"const": "synthetic_pipeline_validation_only"},
+    "rac_evidence_eligible": {"const": false},
+    "physical_efficacy_claimed": {"const": false},
+    "generation_ref": {"const": "RAC-PER-D2-0005"},
+    "arm_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "surrogate_arm": {"const": "surrogate-selection"},
+        "heldout_arm": {"const": "held-out-confirmation"},
+        "heldout_access": {"const": "identity_hash_only"}
+      },
+      "required": ["surrogate_arm", "heldout_arm", "heldout_access"]
+    },
+    "root_seed": {"type": "integer"},
+    "frozen_surface_manifest_sha256": {"$ref": "#/$defs/sha256hex"},
+    "frozen_parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "candidate_pool_seed": {"const": 1337},
+        "bootstrap_seed": {"const": 20260907},
+        "design_simulation_seed": {"const": 20261209},
+        "cvar_alpha": {"const": 0.5},
+        "z": {"const": 1.959963984540054},
+        "bootstrap_resamples": {"const": 10000},
+        "width_gate": {"const": 0.2},
+        "min_clusters": {"const": 8},
+        "design_min_clusters": {"const": 72},
+        "members_per_cluster": {"const": 36},
+        "icc_gate": {"const": 0.25},
+        "confirmatory_floor_delta": {"const": 0.2}
+      },
+      "required": ["candidate_pool_seed","bootstrap_seed","design_simulation_seed","cvar_alpha","z","bootstrap_resamples","width_gate","min_clusters","design_min_clusters","members_per_cluster","icc_gate","confirmatory_floor_delta"]
+    },
+    "stage_configs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "optimization": {"$ref": "#/$defs/stageConfig"},
+        "eot": {"$ref": "#/$defs/stageConfig"},
+        "detector_science": {"$ref": "#/$defs/stageConfig"},
+        "pareto_style": {"$ref": "#/$defs/stageConfig"},
+        "printability": {"$ref": "#/$defs/stageConfig"},
+        "physical_transfer": {"$ref": "#/$defs/stageConfig"}
+      },
+      "required": ["optimization","eot","detector_science","pareto_style","printability","physical_transfer"]
+    },
+    "model_identity_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "surrogate_set_id": {"const": "PERSON-SUR-v3"},
+        "surrogate_set_sha256": {"const": "2f06c19e9e51f3f607b04b499760ab7f470f4b6e18f9c834013fb0a06a5d8876"},
+        "heldout_set_id": {"const": "PERSON-HO-v3"},
+        "heldout_set_sha256": {"const": "ad1127659a5615871ff320056415dd3c8e8b6a27acef7c6a3bcc4a96e713495e"},
+        "heldout_access": {"const": "identity_hash_only"}
+      },
+      "required": ["surrogate_set_id","surrogate_set_sha256","heldout_set_id","heldout_set_sha256","heldout_access"]
+    },
+    "input_hashes": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"$ref": "#/$defs/sha256hex"}
+    },
+    "expected_stage_order": {
+      "const": ["optimization","eot","detector_science","pareto_style","printability","physical_transfer"]
+    }
+  },
+  "required": [
+    "schema_version","schema_id","run_id","source_commit","created_utc",
+    "evidence_class","rac_evidence_eligible","physical_efficacy_claimed",
+    "generation_ref","arm_ref","root_seed","frozen_surface_manifest_sha256",
+    "frozen_parameters","stage_configs","model_identity_refs","input_hashes",
+    "expected_stage_order"
+  ]
+}
