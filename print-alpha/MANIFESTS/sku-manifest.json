@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "RAC-PRINT-ALPHA-001-SKU",
+  "evidence_class": "experimental_print_specimen",
+  "physical_efficacy_claimed": false,
+  "source_manifest_ref": "production_alpha/SKU_MANIFEST.json (RAC-PA-SKU-MANIFEST-0001)",
+  "note": "Print-alpha projection of the production-alpha SKU pair. variant_id and size are PENDING_USER_ACTION (user size selection + UA-1 API fetch); matched-pair rule: identical variant_id/size on both units. Order execution is USER ONLY (production_alpha/ORDER_CHECKLIST.md).",
+  "garments": [
+    {
+      "sku_id": "PA-HOODIE-CAND-001",
+      "role": "candidate",
+      "product_id": 388,
+      "variant_id": "PENDING_USER_ACTION",
+      "size": "PENDING_USER_ACTION",
+      "color": "White",
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)"
+    },
+    {
+      "sku_id": "PA-HOODIE-CTRL-001",
+      "role": "control",
+      "product_id": 388,
+      "variant_id": "PENDING_USER_ACTION",
+      "size": "PENDING_USER_ACTION",
+      "color": "White",
+      "print_technique": "CUT-SEW all-over synthetic (sublimation)"
+    }
+  ],
+  "user_action_refs": ["UA-1", "UA-2"]
+}

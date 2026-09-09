@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "RAC-PRINT-ALPHA-001-TEMPLATE",
+  "evidence_class": "experimental_print_specimen",
+  "physical_efficacy_claimed": false,
+  "template_source": "Printful printfiles API, product_id 388; mm = px / dpi * 25.4 (see production_alpha/SKU_MANIFEST.json panel_geometry source note and production_alpha/TEMPLATE_INGESTION_CHECKLIST.md)",
+  "template_archive_sha256": "PENDING_USER_ACTION",
+  "registration_tolerance_mm": 3.0,
+  "panel_geometry": {
+    "front": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "back": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "sleeve_left": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "sleeve_right": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "pocket": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "hood": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "label_panel": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+    "label_inside": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"}
+  },
+  "user_action_refs": ["UA-1"]
+}

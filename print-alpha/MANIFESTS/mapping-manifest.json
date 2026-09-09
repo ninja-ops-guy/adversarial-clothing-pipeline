@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "RAC-PRINT-ALPHA-001-MAPPING",
+  "evidence_class": "experimental_print_specimen",
+  "physical_efficacy_claimed": false,
+  "description": "Maps each garment placement to the control and candidate upload files and the template panel geometry. File/hash values are PENDING_USER_ACTION until UA-1 (Printful API token + template ZIP download) completes; values are never fabricated.",
+  "placements": [
+    {"placement": "front", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/front"},
+    {"placement": "back", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/back"},
+    {"placement": "sleeve_left", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/sleeve_left"},
+    {"placement": "sleeve_right", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/sleeve_right"},
+    {"placement": "pocket", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/pocket"},
+    {"placement": "hood", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/hood"},
+    {"placement": "label_panel", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/label_panel"},
+    {"placement": "label_inside", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/label_inside"}
+  ],
+  "user_action_refs": ["UA-1"]
+}

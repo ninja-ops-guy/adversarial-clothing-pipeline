@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "RAC-PRINT-ALPHA-001",
+  "garment": {
+    "sku": "PA-HOODIE-CAND-001",
+    "material": "CUT-SEW all-over synthetic (sublimation), Printful product_id 388, White",
+    "size": "PENDING_USER_ACTION",
+    "print_technology": "PENDING_USER_ACTION",
+    "printer_vendor": "PENDING_USER_ACTION",
+    "manufacturing_batch": null
+  },
+  "control_artwork_ref": "print-alpha/CONTROL/ (unmodified base texture per production_alpha/SKU_MANIFEST.json control_rule; control SKU PA-HOODIE-CTRL-001)",
+  "candidate_artwork_ref": {
+    "ref": "print-alpha/CANDIDATE/ (frozen master artwork from generation candidate RAC-PER-D2-0003 per production_alpha/SKU_MANIFEST.json candidate_source; no regeneration or retuning permitted)",
+    "expected_sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
+    "byte_identical_to_frozen_source": false
+  },
+  "physical_efficacy_claimed": false,
+  "evidence_class": "experimental_print_specimen",
+  "user_action_refs": ["UA-1", "UA-2", "UA-3", "UA-4"]
+}

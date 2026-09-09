@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "manifest_id": "RAC-PRINT-ALPHA-001-ARTWORK",
+  "evidence_class": "experimental_print_specimen",
+  "physical_efficacy_claimed": false,
+  "candidate_source": {
+    "generation_candidate": "RAC-PER-D2-0003",
+    "expected_pattern_sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
+    "print_test_kit": "print-test-kit.zip",
+    "print_test_kit_sha256": "b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548",
+    "note": "Frozen pattern tiled onto verified panel rectangles at template dpi; no regeneration or retuning permitted. Per-placement artwork_sha256 fields are PENDING_USER_ACTION until UA-1 (template download) completes; values are never fabricated."
+  },
+  "control_source": {
+    "rule": "production_alpha/SKU_MANIFEST.json control_rule: unmodified base texture; flat mid-gray sRGB(128,128,128) full-coverage fill marked scenario_assumption if no sealed base texture exists",
+    "evidence_label": "scenario_assumption"
+  },
+  "artworks": [
+    {"role": "candidate", "placement": "front", "file": "print-alpha/CANDIDATE/front.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "back", "file": "print-alpha/CANDIDATE/back.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "sleeve_left", "file": "print-alpha/CANDIDATE/sleeve_left.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "sleeve_right", "file": "print-alpha/CANDIDATE/sleeve_right.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "pocket", "file": "print-alpha/CANDIDATE/pocket.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "hood", "file": "print-alpha/CANDIDATE/hood.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "label_panel", "file": "print-alpha/CANDIDATE/label_panel.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "candidate", "placement": "label_inside", "file": "print-alpha/CANDIDATE/label_inside.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "front", "file": "print-alpha/CONTROL/front.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "back", "file": "print-alpha/CONTROL/back.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "sleeve_left", "file": "print-alpha/CONTROL/sleeve_left.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "sleeve_right", "file": "print-alpha/CONTROL/sleeve_right.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "pocket", "file": "print-alpha/CONTROL/pocket.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "hood", "file": "print-alpha/CONTROL/hood.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "label_panel", "file": "print-alpha/CONTROL/label_panel.png", "artwork_sha256": "PENDING_USER_ACTION"},
+    {"role": "control", "placement": "label_inside", "file": "print-alpha/CONTROL/label_inside.png", "artwork_sha256": "PENDING_USER_ACTION"}
+  ]
+}
