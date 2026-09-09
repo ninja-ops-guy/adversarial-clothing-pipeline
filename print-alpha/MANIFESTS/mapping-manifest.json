@@ -3,7 +3,9 @@
   "manifest_id": "RAC-PRINT-ALPHA-001-MAPPING",
   "evidence_class": "experimental_print_specimen",
   "physical_efficacy_claimed": false,
-  "description": "Maps each garment placement to the control and candidate upload files and the template panel geometry. File/hash values are PENDING_USER_ACTION until UA-1 (Printful API token + template ZIP download) completes; values are never fabricated.",
+  "description": "Maps each garment placement to the control and candidate upload files and the template panel geometry. File/hash values are PENDING_USER_ACTION until UA-1 (Printful API token + template ZIP download) completes; values are never fabricated. source_manifest_sha256 pins this mapping to the SKU manifest it was generated from; validation recomputes the source hash and refuses a stale mapping.",
+  "source_manifest_ref": "print-alpha/MANIFESTS/sku-manifest.json",
+  "source_manifest_sha256": "e4ed47543b3169c8286a30bbb384ef73b27ed477bf5d57e4fc3dabdb35bb8a88",
   "placements": [
     {"placement": "front", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/front"},
     {"placement": "back", "control_file": "PENDING_USER_ACTION", "candidate_file": "PENDING_USER_ACTION", "panel_geometry_ref": "template-manifest.json#/panel_geometry/back"},

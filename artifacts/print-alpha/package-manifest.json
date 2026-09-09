@@ -141,7 +141,7 @@
     {
       "path": "print-alpha/MANIFESTS/mapping-manifest.json",
       "role": "production_mapping",
-      "sha256": "ff914c9de59f3193fff7954299b1a95a095343662a6d0389d32b670607edc7d9",
+      "sha256": "43cc9aded1062a3ebf9cac817954fa124962db27da5f9a44c540040553151a0f",
       "status": "bound"
     },
     {
@@ -194,7 +194,7 @@
     }
   ],
   "evidence_class": "experimental_print_specimen",
-  "package_root_sha256": "3b0eed177f7fec3b723a818391945bd594b351601d3a735f0ca0bf2064c7e38e",
+  "package_root_sha256": "547991b11341faab7d646d89e82bc8c4d26ae7dd5b0ce8e7c7d69980b572338c",
   "physical_efficacy_claimed": false,
   "release_id": "RAC-PRINT-ALPHA-001",
   "schema_version": "1.0"
