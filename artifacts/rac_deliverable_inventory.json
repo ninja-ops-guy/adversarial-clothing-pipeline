@@ -1,50 +1,370 @@
 {
-  "inventory_id": "rac-world-class-inventory-1.0",
+  "inventory_id": "rac-world-class-inventory-1.1",
   "generated": "2026-09-09",
   "repo": "ninja-ops-guy/adversarial-clothing-pipeline",
   "head_at_inventory": "b50f6b0",
   "evidence_class": "generated_digital_reference",
   "physical_efficacy_claimed": false,
-  "classes": ["COMPLETE", "PARTIAL", "MISSING", "BLOCKED", "USER_ACTION_REQUIRED", "OWNED_BY_OTHER_SWARM"],
+  "classes": [
+    "COMPLETE",
+    "PARTIAL",
+    "MISSING",
+    "BLOCKED",
+    "USER_ACTION_REQUIRED",
+    "OWNED_BY_OTHER_SWARM"
+  ],
   "scientific_state": {
-    "D2-0004": {"status": "CLOSED", "decision": "FAIL", "evidence_state": "RAC-D0", "verified": true},
-    "D2-0005": {"status": "PREREGISTERED", "ready_to_arm": false, "armed": false, "verified": true}
+    "D2-0004": {
+      "status": "CLOSED",
+      "decision": "FAIL",
+      "evidence_state": "RAC-D0",
+      "verified": true
+    },
+    "D2-0005": {
+      "status": "PREREGISTERED",
+      "ready_to_arm": false,
+      "armed": false,
+      "verified": true
+    }
   },
   "requirements": [
-    {"id": "5-A1", "area": "P0_PRINT_ALPHA", "requirement": "print-alpha charter tree", "class": "MISSING", "evidence": [], "limitations": ["tree and charter-named files absent"]},
-    {"id": "5-A2", "area": "P0_PRINT_ALPHA", "requirement": "control/candidate matched pair", "class": "PARTIAL", "evidence": ["docs/PRODUCTION_ALPHA_SKU.md", "production_alpha/SKU_MANIFEST.json"], "limitations": ["variant IDs PENDING-API-FETCH", "manifest DRAFT"], "user_action": "UA-1"},
-    {"id": "5-A3", "area": "P0_PRINT_ALPHA", "requirement": "candidate byte-identical to frozen source", "class": "PARTIAL", "evidence": ["production_alpha/SKU_MANIFEST.json: expected_pattern_sha256, print_test_kit_sha256"], "limitations": ["per-placement artwork_sha256 pending template download"], "user_action": "UA-1"},
-    {"id": "5-A4", "area": "P0_PRINT_ALPHA", "requirement": "physical_efficacy_claimed=false flag", "class": "MISSING", "evidence": [], "limitations": ["0 grep hits; prose disclaimers only"]},
-    {"id": "5-A5", "area": "P0_PRINT_ALPHA", "requirement": "evidence_class=experimental_print_specimen", "class": "MISSING", "evidence": [], "limitations": ["class not registered in evidence taxonomy"]},
-    {"id": "5-A6", "area": "P0_PRINT_ALPHA", "requirement": "capture protocol set", "class": "PARTIAL", "evidence": ["docs/CAPTURE_LAB.md", "docs/P1_CAPTURE_RIG_SPEC.md", "physical/p1/CAMERA_LIGHTING_SETUP.md", "physical/p1/STOPPING_RULE.json", "ruthless_pipeline/physical_protocol.py", "tests/test_print_test_pipeline.py"], "limitations": ["charter filenames absent", "no trial-sheet.csv"]},
-    {"id": "5-A7", "area": "P0_PRINT_ALPHA", "requirement": "QA set", "class": "PARTIAL", "evidence": ["production_alpha/RECEIPT_QA_FORM.md", "protocols/RAC-PHYSICAL-PRINT-TEST-1.0.md"], "limitations": ["garment-pairing-checklist.md and chain-of-custody.md absent"]},
-    {"id": "5-A8", "area": "P0_PRINT_ALPHA", "requirement": "user-action packets", "class": "COMPLETE", "evidence": ["production_alpha/ORDER_WORKSHEET.md", "production_alpha/TEMPLATE_INGESTION_CHECKLIST.md", "production_alpha/VENDOR_QUESTIONS.md", "ruthless_pipeline/certification/calibration_target.py (fail-closed fabrication guard)"], "limitations": []},
-    {"id": "6", "area": "P1_OPTIMIZATION_V3", "requirement": "optimization engine namespace + composable objective + aggregation + validation suite", "class": "PARTIAL", "evidence": ["ruthless_pipeline/nap.py", "ruthless_pipeline/candidate_optimizer.py (tests/test_candidate_optimizer.py)", "ruthless_pipeline/certification/objectives.py (tests/test_objectives.py)"], "limitations": ["no ruthless_pipeline/optimization/ namespace", "no registry/backends/trajectory/constraints/schemas", "no NaN/divergence refusal", "no checkpoint hashing/resume integrity", "no finite-difference gradient checks", "no baseline parity tests"]},
-    {"id": "7", "area": "P1_EOT", "requirement": "transformation-distribution framework", "class": "MISSING", "evidence": ["adjacent: ruthless_pipeline/benchmark.py fixed augment grid"], "limitations": ["no distribution contract (distribution_id+manifest+seed+index)", "no robustness surfaces"]},
-    {"id": "8", "area": "P1_DETECTOR_SCIENCE", "requirement": "detector response schema + family registry + transfer matrix", "class": "PARTIAL", "evidence": ["ruthless_pipeline/evaluators.py DetectionBatch", "ruthless_pipeline/benchmark.py invalid-condition accounting", "model_manifests/ (8)"], "limitations": ["no detector_science/ package", "no family field", "no LOFO/diversity/concentration analyses"]},
-    {"id": "9", "area": "P1_PARETO", "requirement": "multi-objective Pareto search + candidate classes", "class": "MISSING", "evidence": [], "limitations": ["no dominance/frontier computation; prose mentions only"]},
-    {"id": "10", "area": "P1_STYLE", "requirement": "style-constrained adversarial optimization", "class": "PARTIAL", "evidence": ["design_profiles/ruthless_reference_v1.json (five families)", "studio-style-profiles.js (JS-side scorer)"], "limitations": ["no Python objective coupling", "no initial/final tracking", "no style-Pareto curves"]},
-    {"id": "11", "area": "P2_DEFORMATION", "requirement": "deformation tiers T0-T3 + cross-tier benchmark", "class": "PARTIAL", "evidence": ["ruthless_pipeline/deformation.py (T1, tests/test_deformation.py)", "ruthless_pipeline/physics.py (T2, tests/test_physics.py)"], "limitations": ["T0 implicit", "T3 missing", "no tier interface", "no artifacts/deformation_benchmark/", "no docs/DEFORMATION_VALIDATION.md"]},
-    {"id": "12", "area": "P2_PRINTABILITY", "requirement": "printability_loss(candidate, production_profile)", "class": "MISSING", "evidence": ["adjacent: certification/telemetry_contract.py printability scalar", "certification/calibration_ingest.py MTF/ΔE00 machinery"], "limitations": ["API and all 6 sub-metrics absent", "no versioned vendor measurements"], "user_action": "UA-4"},
-    {"id": "13", "area": "P2_TRANSFER", "requirement": "physical_transfer_record schema + records", "class": "MISSING", "evidence": ["synthetic_pipeline_validation_only flag on experiment journal (experiment_state_machine.py)"], "limitations": ["schema absent; flag not carried on transfer records"]},
-    {"id": "14", "area": "P2_CALIBRATION_FEEDBACK", "requirement": "digital→physical calibration feedback model with uncertainty", "class": "PARTIAL", "evidence": ["docs/CALIBRATION_TARGET_SPEC.md", "certification/calibration_target.py (tests/test_calibration_target_contract.py)", "certification/calibration_ingest.py (tests/test_calibration_ingest.py)"], "limitations": ["no measured data", "no feedback consumer in transformations/optimization", "no explicit uncertainty model"], "scaffold_only_enforced": true, "user_action": "UA-3"},
-    {"id": "15", "area": "P3_ABLATION_LAB", "requirement": "ablation harness covering 9 comparisons (synthetic fixtures only)", "class": "PARTIAL", "evidence": ["certification/rehearsal_d20005.py", "certification/paired_arm_statistics.py", "certification/cluster_paired_arm_statistics.py", "artifacts/design_analysis_d20005/", "artifacts/design_analysis_d20005_cluster/"], "limitations": ["1 of 9 comparisons covered", "no generalized experiment registry"]},
-    {"id": "16", "area": "P3_MECHANISM", "requirement": "mechanism analysis infrastructure", "class": "MISSING", "evidence": [], "limitations": ["six mechanism metrics + competing-hypotheses harness absent"]},
-    {"id": "17", "area": "RAC_R3", "requirement": "reproducibility manifest (12 fields)", "class": "PARTIAL", "evidence": ["benchmarks/runtime_lock.json (tests/test_runtime_lock.py)", "benchmarks/frozen_surface_sha256.json (tests/test_frozen_surface_integrity.py)", "model_manifests/ (tests/test_model_lock.py)", "releases/RAC-EXP-2026-001/MANIFEST.json", "artifacts/provenance/graph.json (tests/test_provenance_graph.py)"], "limitations": ["no consolidated RAC-R3 manifest", "source commit not pinned", "no consolidated seed manifest", "optimizer/transformation/candidate/analysis hashes implicit"]},
-    {"id": "18", "area": "ACCEPTANCE", "requirement": "test coverage standard", "class": "PARTIAL", "evidence": ["tests/ (64 files)", "tests/e2e/ (5 specs)"], "limitations": ["common.py/evaluators.py/physical_protocol.py lack direct tests", "6 certification modules indirect-only", "physics spine smoke-level"]},
-    {"id": "2-21", "area": "BOUNDARY", "requirement": "scientific boundary integrity", "class": "OWNED_BY_OTHER_SWARM", "evidence": ["verified intact at b50f6b0"], "limitations": []}
+    {
+      "id": "5-A1",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "print-alpha charter tree",
+      "class": "COMPLETE",
+      "evidence": [
+        "print-alpha/ charter tree created (CONTROL/CANDIDATE/CALIBRATION/MANIFESTS/CAPTURE/QA)"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "5-A2",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "control/candidate matched pair",
+      "class": "PARTIAL",
+      "evidence": [
+        "docs/PRODUCTION_ALPHA_SKU.md",
+        "production_alpha/SKU_MANIFEST.json"
+      ],
+      "limitations": [
+        "variant IDs PENDING-API-FETCH",
+        "manifest DRAFT"
+      ],
+      "user_action": "UA-1"
+    },
+    {
+      "id": "5-A3",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "candidate byte-identical to frozen source",
+      "class": "PARTIAL",
+      "evidence": [
+        "production_alpha/SKU_MANIFEST.json: expected_pattern_sha256, print_test_kit_sha256"
+      ],
+      "limitations": [
+        "per-placement artwork_sha256 pending template download"
+      ],
+      "user_action": "UA-1"
+    },
+    {
+      "id": "5-A4",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "physical_efficacy_claimed=false flag",
+      "class": "COMPLETE",
+      "evidence": [
+        "schemas/print_alpha_manifest.schema.json const false; print-alpha/MANIFESTS/print-alpha-manifest.json"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "5-A5",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "evidence_class=experimental_print_specimen",
+      "class": "COMPLETE",
+      "evidence": [
+        "schemas/evidence_class.schema.json + ruthless_pipeline/evidence_classes_ext.py"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "5-A6",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "capture protocol set",
+      "class": "COMPLETE",
+      "evidence": [
+        "docs/CAPTURE_LAB.md",
+        "docs/P1_CAPTURE_RIG_SPEC.md",
+        "physical/p1/CAMERA_LIGHTING_SETUP.md",
+        "physical/p1/STOPPING_RULE.json",
+        "ruthless_pipeline/physical_protocol.py",
+        "tests/test_print_test_pipeline.py",
+        "print-alpha/CAPTURE/{capture-protocol.md,camera-lighting-sheet.md,invalid-condition-rules.json,trial-sheet.csv} (108 rows, deterministic sha256 774c2ad6...)"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "5-A7",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "QA set",
+      "class": "COMPLETE",
+      "evidence": [
+        "production_alpha/RECEIPT_QA_FORM.md",
+        "protocols/RAC-PHYSICAL-PRINT-TEST-1.0.md",
+        "print-alpha/QA/{receipt-qa.md,garment-pairing-checklist.md,chain-of-custody.md}"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "5-A8",
+      "area": "P0_PRINT_ALPHA",
+      "requirement": "user-action packets",
+      "class": "COMPLETE",
+      "evidence": [
+        "production_alpha/ORDER_WORKSHEET.md",
+        "production_alpha/TEMPLATE_INGESTION_CHECKLIST.md",
+        "production_alpha/VENDOR_QUESTIONS.md",
+        "ruthless_pipeline/certification/calibration_target.py (fail-closed fabrication guard)"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "6",
+      "area": "P1_OPTIMIZATION_V3",
+      "requirement": "optimization engine namespace + composable objective + aggregation + validation suite",
+      "class": "PARTIAL",
+      "evidence": [
+        "ruthless_pipeline/nap.py",
+        "ruthless_pipeline/candidate_optimizer.py (tests/test_candidate_optimizer.py)",
+        "ruthless_pipeline/certification/objectives.py (tests/test_objectives.py)",
+        "ruthless_pipeline/optimization/ full namespace (9 modules) + tests/optimization/ (72 tests): registry, pool/gradient/blackbox optimizers, trajectory checkpoint hashing+resume integrity, constraints, pareto, style"
+      ],
+      "limitations": [
+        "real detector-backed objective terms remain future work; NAP/candidate_optimizer unification pending"
+      ]
+    },
+    {
+      "id": "7",
+      "area": "P1_EOT",
+      "requirement": "transformation-distribution framework",
+      "class": "COMPLETE",
+      "evidence": [
+        "adjacent: ruthless_pipeline/benchmark.py fixed augment grid",
+        "ruthless_pipeline/transformations/ (distribution, primitives, surfaces, provenance) + tests (33): sha256 sub-seed reproducibility, 4 dimension groups, robustness surfaces, calibration fail-closed"
+      ],
+      "limitations": [
+        "compression mock is 8x8-block DCT quantization proxy; gamut curve documented proxy"
+      ]
+    },
+    {
+      "id": "8",
+      "area": "P1_DETECTOR_SCIENCE",
+      "requirement": "detector response schema + family registry + transfer matrix",
+      "class": "COMPLETE",
+      "evidence": [
+        "ruthless_pipeline/evaluators.py DetectionBatch",
+        "ruthless_pipeline/benchmark.py invalid-condition accounting",
+        "model_manifests/ (8)",
+        "ruthless_pipeline/detector_science/ (response, adapters, family_registry, transfer_matrix) + tests (27): fabrication guard, 8-manifest family coverage, concentration warning, LOFO, diversity report"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "9",
+      "area": "P1_PARETO",
+      "requirement": "multi-objective Pareto search + candidate classes",
+      "class": "COMPLETE",
+      "evidence": [
+        "ruthless_pipeline/optimization/pareto.py: dominates/pareto_front/classify (5 classes, certification=None)"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "10",
+      "area": "P1_STYLE",
+      "requirement": "style-constrained adversarial optimization",
+      "class": "PARTIAL",
+      "evidence": [
+        "design_profiles/ruthless_reference_v1.json (five families)",
+        "studio-style-profiles.js (JS-side scorer)",
+        "ruthless_pipeline/optimization/style.py: five-family proxy scorer, StyleOptimizationRecord, style-Pareto curves"
+      ],
+      "limitations": [
+        "proxy scorer, not the JS studio scorer port"
+      ]
+    },
+    {
+      "id": "11",
+      "area": "P2_DEFORMATION",
+      "requirement": "deformation tiers T0-T3 + cross-tier benchmark",
+      "class": "PARTIAL",
+      "evidence": [
+        "ruthless_pipeline/deformation.py (T1, tests/test_deformation.py)",
+        "ruthless_pipeline/physics.py (T2, tests/test_physics.py)",
+        "ruthless_pipeline/physical_transfer/deformation_tiers.py T0-T3 interface + benchmark + docs/DEFORMATION_VALIDATION.md"
+      ],
+      "limitations": [
+        "T3 SCAFFOLD_ONLY (measured data required); predictive_value null (future)"
+      ]
+    },
+    {
+      "id": "12",
+      "area": "P2_PRINTABILITY",
+      "requirement": "printability_loss(candidate, production_profile)",
+      "class": "COMPLETE",
+      "evidence": [
+        "adjacent: certification/telemetry_contract.py printability scalar",
+        "certification/calibration_ingest.py MTF/\u0394E00 machinery",
+        "ruthless_pipeline/physical_transfer/printability.py: 6 components, partial renormalization, fail-closed; production_profiles.py versioned store"
+      ],
+      "limitations": [
+        "measured vendor values still UA-4"
+      ],
+      "user_action": "UA-4"
+    },
+    {
+      "id": "13",
+      "area": "P2_TRANSFER",
+      "requirement": "physical_transfer_record schema + records",
+      "class": "COMPLETE",
+      "evidence": [
+        "synthetic_pipeline_validation_only flag on experiment journal (experiment_state_machine.py)",
+        "ruthless_pipeline/physical_transfer/transfer_record.py: schema-validated builder, synthetic-class enforcement, measured-ref guard"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "14",
+      "area": "P2_CALIBRATION_FEEDBACK",
+      "requirement": "digital\u2192physical calibration feedback model with uncertainty",
+      "class": "PARTIAL",
+      "evidence": [
+        "docs/CALIBRATION_TARGET_SPEC.md",
+        "certification/calibration_target.py (tests/test_calibration_target_contract.py)",
+        "certification/calibration_ingest.py (tests/test_calibration_ingest.py)"
+      ],
+      "limitations": [
+        "no measured data",
+        "no feedback consumer in transformations/optimization",
+        "no explicit uncertainty model"
+      ],
+      "scaffold_only_enforced": true,
+      "user_action": "UA-3"
+    },
+    {
+      "id": "15",
+      "area": "P3_ABLATION_LAB",
+      "requirement": "ablation harness covering 9 comparisons (synthetic fixtures only)",
+      "class": "PARTIAL",
+      "evidence": [
+        "certification/rehearsal_d20005.py",
+        "certification/paired_arm_statistics.py",
+        "certification/cluster_paired_arm_statistics.py",
+        "artifacts/design_analysis_d20005/",
+        "artifacts/design_analysis_d20005_cluster/"
+      ],
+      "limitations": [
+        "1 of 9 comparisons covered",
+        "no generalized experiment registry"
+      ]
+    },
+    {
+      "id": "16",
+      "area": "P3_MECHANISM",
+      "requirement": "mechanism analysis infrastructure",
+      "class": "MISSING",
+      "evidence": [],
+      "limitations": [
+        "six mechanism metrics + competing-hypotheses harness absent"
+      ]
+    },
+    {
+      "id": "17",
+      "area": "RAC_R3",
+      "requirement": "reproducibility manifest (12 fields)",
+      "class": "PARTIAL",
+      "evidence": [
+        "benchmarks/runtime_lock.json (tests/test_runtime_lock.py)",
+        "benchmarks/frozen_surface_sha256.json (tests/test_frozen_surface_integrity.py)",
+        "model_manifests/ (tests/test_model_lock.py)",
+        "releases/RAC-EXP-2026-001/MANIFEST.json",
+        "artifacts/provenance/graph.json (tests/test_provenance_graph.py)"
+      ],
+      "limitations": [
+        "no consolidated RAC-R3 manifest",
+        "source commit not pinned",
+        "no consolidated seed manifest",
+        "optimizer/transformation/candidate/analysis hashes implicit"
+      ]
+    },
+    {
+      "id": "18",
+      "area": "ACCEPTANCE",
+      "requirement": "test coverage standard",
+      "class": "PARTIAL",
+      "evidence": [
+        "tests/ (64 files)",
+        "tests/e2e/ (5 specs)"
+      ],
+      "limitations": [
+        "common.py/evaluators.py/physical_protocol.py lack direct tests",
+        "6 certification modules indirect-only",
+        "physics spine smoke-level"
+      ]
+    },
+    {
+      "id": "2-21",
+      "area": "BOUNDARY",
+      "requirement": "scientific boundary integrity",
+      "class": "OWNED_BY_OTHER_SWARM",
+      "evidence": [
+        "verified intact at b50f6b0"
+      ],
+      "limitations": []
+    }
   ],
   "user_actions": [
-    {"id": "UA-1", "action": "Printful API token + template ZIP download", "blocks": ["5-A2", "5-A3"]},
-    {"id": "UA-2", "action": "Printful order + payment (matched pair)", "blocks": ["physical specimens", "receipt QA"]},
-    {"id": "UA-3", "action": "Physical capture session (P1 rig)", "blocks": ["14"]},
-    {"id": "UA-4", "action": "Vendor answers: placement tolerance, ΔE", "blocks": ["12"]},
-    {"id": "UA-5", "action": "D2-0005 arming decision (governance swarm + user only)", "blocks": []}
+    {
+      "id": "UA-1",
+      "action": "Printful API token + template ZIP download",
+      "blocks": [
+        "5-A2",
+        "5-A3"
+      ]
+    },
+    {
+      "id": "UA-2",
+      "action": "Printful order + payment (matched pair)",
+      "blocks": [
+        "physical specimens",
+        "receipt QA"
+      ]
+    },
+    {
+      "id": "UA-3",
+      "action": "Physical capture session (P1 rig)",
+      "blocks": [
+        "14"
+      ]
+    },
+    {
+      "id": "UA-4",
+      "action": "Vendor answers: placement tolerance, \u0394E",
+      "blocks": [
+        "12"
+      ]
+    },
+    {
+      "id": "UA-5",
+      "action": "D2-0005 arming decision (governance swarm + user only)",
+      "blocks": []
+    }
   ],
   "final_assertions": {
     "D2_0004_MODIFIED": false,
     "D2_0005_ARMED": false,
     "NEW_HELDOUT_ACCESS": false,
     "SCIENTIFIC_THRESHOLDS_CHANGED": false
-  }
+  },
+  "updated": "2026-09-09",
+  "head_after_barrier_1_2": "pending-push"
 }

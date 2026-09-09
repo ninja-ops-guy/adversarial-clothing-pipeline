@@ -83,7 +83,13 @@ def test_adapter_missing_version_fails(validate):
 
 def test_no_fabrication_rule_documented(validate):
     # The anti-fabrication rule must be encoded in the schema description.
-    from conftest import load_schema
+    import importlib.util, json
+    from pathlib import Path
+    _cf = Path(__file__).resolve().parent / "conftest.py"
+    _spec = importlib.util.spec_from_file_location("schemas_conftest", _cf)
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    load_schema = _mod.load_schema
 
     desc = load_schema(SCHEMA)["description"].lower()
     assert "never fabricat" in desc

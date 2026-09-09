@@ -65,3 +65,31 @@
 - `SCIENTIFIC_THRESHOLDS_CHANGED = false`
 
 All four assertions are truthfully made: this swarm performed read-only inspection and added 5 new files; no boundary file was opened for write, no experiment armed, no held-out evidence accessed, no threshold touched.
+
+---
+
+# APPENDIX — Barrier 1 + Barrier 2 (2026-09-09, second session wave)
+
+## Barrier 1 (commit bb3dad5)
+- 7 frozen contracts + additive evidence-class registry + tests/schemas/ (69 tests).
+- RAC-G independent verification: PASS (21/21 independent negative-case checks).
+
+## Barrier 2 lanes (this commit series)
+| Lane | Namespace | Tests | Notes |
+|---|---|---|---|
+| RAC-A PRINT | print-alpha/, scripts_print_alpha/, tests/print_alpha/ | 21 | RAC-PRINT-ALPHA-001 tree; 5 manifests vs frozen schema; trial-sheet.csv 108 rows deterministic (sha256 774c2ad6…); PENDING_USER_ACTION fail-closed; byte_identical=false honestly until UA-1 |
+| RAC-B OPT | ruthless_pipeline/optimization/, tests/optimization/ | 72 | 9 modules; NaN/divergence refusal; checkpoint hashing + resume integrity; FD gradient <1e-4; pool-baseline brute-force parity; pareto + 5 candidate classes (certification=None); style proxy scorer + style-Pareto |
+| RAC-C EOT | ruthless_pipeline/transformations/, tests/transformations/ | 33 | sha256 sub-seed per-sample reproducibility; 4 dimension groups; robustness surfaces; calibration refusal |
+| RAC-D DET | ruthless_pipeline/detector_science/, tests/detector_science/ | 27 | fabrication guard; 8-manifest family sidecar (5 families); concentration warning; transfer matrix; LOFO; diversity report |
+| RAC-E PHY | ruthless_pipeline/physical_transfer/, docs/DEFORMATION_VALIDATION.md, tests/physical_transfer/ | 33 (+1 skip) | printability_loss 6 components w/ partial renormalization; versioned profile store; transfer record builder; deformation tiers T0–T3 (T3 SCAFFOLD_ONLY); benchmark: T0 9.2e-4s deterministic PSNR inf; T2 2.2e-2s PSNR 127.7dB; T1 49s one-time fit PSNR 39.5dB |
+
+## Integration
+- Cross-lane test-isolation fix: tests/schemas bare `conftest` import → importlib path load (2 files).
+- Full suite: ~975 passed, 2 skipped, 1 FAILED = tests/test_provenance_graph.py::test_committed_graph_rederives_exactly — known hash drift from new schema files; artifacts/provenance/** regeneration OWNED_BY_OTHER_SWARM (governance).
+- artifacts/rac_deliverable_inventory.json bumped to 1.1 with post-Barrier-2 classifications.
+
+## Final assertions (re-affirmed)
+- D2_0004_MODIFIED = false
+- D2_0005_ARMED = false
+- NEW_HELDOUT_ACCESS = false
+- SCIENTIFIC_THRESHOLDS_CHANGED = false

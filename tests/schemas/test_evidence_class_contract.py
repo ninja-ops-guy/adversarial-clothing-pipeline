@@ -32,7 +32,13 @@ def test_non_string_fails(validate):
 
 
 def test_enum_is_exactly_five_classes(validate):
-    from conftest import load_schema
+    import importlib.util, json
+    from pathlib import Path
+    _cf = Path(__file__).resolve().parent / "conftest.py"
+    _spec = importlib.util.spec_from_file_location("schemas_conftest", _cf)
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    load_schema = _mod.load_schema
 
     enum = load_schema(SCHEMA)["enum"]
     assert len(enum) == 5
