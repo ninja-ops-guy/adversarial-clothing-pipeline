@@ -1,5 +1,7 @@
 # Print Alpha Release Dry Run
 
+<!-- doclint:allow check="broken-path" reason="references gitignored regenerable dry-run outputs under artifacts/print-alpha/ (release-package/, calibration-target/); produced deterministically by scripts_print_alpha/print_alpha_dry_run.py, sha256-bound in the committed dry-run-report.json" -->
+
 **Document ID:** PRINT-ALPHA-DRY-RUN-001
 **Applies to:** RAC-PRINT-ALPHA-001
 **Runner:** `scripts_print_alpha/print_alpha_dry_run.py`
