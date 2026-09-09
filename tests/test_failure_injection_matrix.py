@@ -483,36 +483,73 @@ def test_capture_rows_are_matched_pairs_by_construction():
         assert row["control_file"] != row["candidate_file"]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "DESIRED refusal, not yet implemented: the print-alpha mapping "
-        "manifest schema accepts control_file == candidate_file (a "
-        "candidate/control mismatch that would silently compare a garment "
-        "against itself). Add a pairing guard to "
-        "scripts_print_alpha/validate_manifests.py. Issue: "
-        f"{ISSUE_BASE} (failure-injection matrix item 13)"
-    ),
-)
-def test_candidate_control_mismatch_fails_closed():
-    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+def _mapping_fixture(**overrides):
+    """Minimal mapping manifest that passes the source pin guard."""
+    from scripts_print_alpha.validate_manifests import (
+        REPO_ROOT,
+        _sha256_file,
+    )
 
     mapping = {
         "schema_version": "1.0",
         "manifest_id": "fixture-mapping",
         "evidence_class": "experimental_print_specimen",
         "physical_efficacy_claimed": False,
+        # live pin: sha256 of the committed print-alpha SKU manifest
+        "source_manifest_sha256": _sha256_file(
+            REPO_ROOT / "print-alpha" / "MANIFESTS" / "sku-manifest.json"
+        ),
         "placements": [
+            {
+                "placement": "front",
+                "control_file": "trial001__control.jpg",
+                "candidate_file": "trial001__candidate.jpg",
+                "panel_geometry_ref": "front",
+            }
+        ],
+    }
+    mapping.update(overrides)
+    return mapping
+
+
+def test_candidate_control_mismatch_fails_closed():
+    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+
+    mapping = _mapping_fixture(
+        placements=[
             {
                 "placement": "front",
                 "control_file": "same-file.jpg",
                 "candidate_file": "same-file.jpg",
                 "panel_geometry_ref": "front",
             }
-        ],
-    }
+        ]
+    )
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(instance=mapping, schema=_MAPPING_SCHEMA)
+
+
+def test_candidate_control_mismatched_trial_fails_closed():
+    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+
+    mapping = _mapping_fixture(
+        placements=[
+            {
+                "placement": "front",
+                "control_file": "trial001__control.jpg",
+                "candidate_file": "trial002__candidate.jpg",
+                "panel_geometry_ref": "front",
+            }
+        ]
+    )
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(instance=mapping, schema=_MAPPING_SCHEMA)
+
+
+def test_candidate_control_valid_pair_accepted():
+    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+
+    jsonschema.validate(instance=_mapping_fixture(), schema=_MAPPING_SCHEMA)
 
 
 # ---------------------------------------------------------------------------
@@ -520,40 +557,38 @@ def test_candidate_control_mismatch_fails_closed():
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "DESIRED refusal, not yet implemented: the print-alpha mapping "
-        "manifest carries no pin to the SKU manifest / trial sheet it was "
-        "generated from, so a stale mapping survives validation undetected. "
-        "Desired: mapping manifest pins source_manifest_sha256 and "
-        "validation rejects a pin that does not match the current source. "
-        f"Issue: {ISSUE_BASE} (failure-injection matrix item 14)"
-    ),
-)
 def test_stale_production_mapping_fails_closed(tmp_path):
     from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
 
     source = tmp_path / "sku-manifest.json"
     source.write_text(json.dumps({"garments": ["v1"]}))
     stale_pin = hashlib.sha256(b'{"garments": ["v0"]}').hexdigest()
-    mapping = {
-        "schema_version": "1.0",
-        "manifest_id": "fixture-mapping",
-        "evidence_class": "experimental_print_specimen",
-        "physical_efficacy_claimed": False,
-        "source_manifest_sha256": stale_pin,  # desired field: pin of source
-        "placements": [
-            {
-                "placement": "front",
-                "control_file": "c.jpg",
-                "candidate_file": "p.jpg",
-                "panel_geometry_ref": "front",
-            }
-        ],
-    }
-    # Desired behavior: validation recomputes the source hash and refuses the
-    # stale pin. Today the schema neither requires the pin nor checks it, so
-    # this validation erroneously passes -> xfail(strict) until the guard lands.
+    mapping = _mapping_fixture(source_manifest_sha256=stale_pin)
+    # Validation recomputes the live source hash and refuses the stale pin.
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(instance=mapping, schema=_MAPPING_SCHEMA)
+
+
+def test_correct_source_pin_accepted():
+    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+
+    jsonschema.validate(instance=_mapping_fixture(), schema=_MAPPING_SCHEMA)
+
+
+def test_missing_source_pin_refused():
+    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+
+    mapping = _mapping_fixture()
+    del mapping["source_manifest_sha256"]
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(instance=mapping, schema=_MAPPING_SCHEMA)
+
+
+def test_missing_source_file_refused():
+    from scripts_print_alpha.validate_manifests import _MAPPING_SCHEMA
+
+    mapping = _mapping_fixture(
+        source_manifest_ref="print-alpha/MANIFESTS/does-not-exist.json"
+    )
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate(instance=mapping, schema=_MAPPING_SCHEMA)
