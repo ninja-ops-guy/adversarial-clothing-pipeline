@@ -403,6 +403,25 @@ def _render_report(
     return "\n".join(lines)
 
 
+def _append_failure_taxonomy_to_report(
+    report_path: Path,
+    failure_payload: dict[str, Any],
+) -> None:
+    """Append the already-computed closure taxonomy to the human report.
+
+    Classification is computed exactly once during closure. This helper only
+    renders that immutable result; it never reclassifies or changes evidence.
+    """
+    classification = failure_payload["classification"]
+    report_path.write_text(
+        report_path.read_text()
+        + "\n## Failure taxonomy\n\n"
+        + f"- Category: `{classification['category']}`\n"
+        + f"- Confidence: `{classification['confidence']}`\n"
+        + f"- Explanation: {failure_payload['failure_reason']}\n"
+    )
+
+
 def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
     run_dir = Path(args.run_dir) if args.run_dir else None
 
@@ -413,7 +432,9 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
             raise IngestError(f"--run-dir or an explicit path is required for {label}")
         return _require_file(run_dir / default_name, label)
 
-    surrogate_selection_path = resolve(args.surrogate_selection, "surrogate-selection.json", "surrogate-selection report")
+    surrogate_selection_path = resolve(
+        args.surrogate_selection, "surrogate-selection.json", "surrogate-selection report"
+    )
     candidate_config_path = resolve(args.candidate_config, "candidate-config.json", "candidate config")
     candidate_png_path = resolve(args.candidate_png, "candidate.png", "candidate image")
     measured_path = resolve(args.measured_result, "benchmark-results.json", "measured benchmark result")
@@ -480,7 +501,12 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
             stage="candidate",
             artifact_id=candidate_id,
             sha256=candidate_sha256,
-            metadata={"files": ["stages/candidate/candidate.png", "stages/candidate/candidate-config.json"]},
+            metadata={
+                "files": [
+                    "stages/candidate/candidate.png",
+                    "stages/candidate/candidate-config.json",
+                ]
+            },
         ),
         StageRef(
             stage="generation",
@@ -496,12 +522,14 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
         ),
     ]
     if certificate_path is not None:
-        stages.append(StageRef(
-            stage="certificate",
-            artifact_id=certificate_path.stem,
-            sha256=hash_file(certificate_path),
-            metadata={"files": [f"stages/certificate/{certificate_path.name}"]},
-        ))
+        stages.append(
+            StageRef(
+                stage="certificate",
+                artifact_id=certificate_path.stem,
+                sha256=hash_file(certificate_path),
+                metadata={"files": [f"stages/certificate/{certificate_path.name}"]},
+            )
+        )
 
     artifact = ExperimentArtifact(
         experiment_id=args.experiment_id,
@@ -524,8 +552,9 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
     except ValueError as exc:
         raise IngestError(f"registry rejected the experiment: {exc}") from exc
 
-    # -- release bundle ------------------------------------------------------
+    # -- release bundle -----------------------------------------------------
     release_dir.mkdir(parents=True)
+    failure_payload: dict[str, Any] | None = None
     try:
         _write_json(release_dir / "experiment.json", artifact.to_dict())
 
@@ -553,16 +582,18 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
             cert_dir.mkdir(parents=True)
             shutil.copyfile(certificate_path, cert_dir / certificate_path.name)
 
-        (release_dir / "REPORT.md").write_text(_render_report(
-            artifact=artifact,
-            verdict=outcome.verdict,
-            pre=pre,
-            outcome=outcome,
-            not_recorded=not_recorded,
-            frozen_hash=frozen_hash,
-        ))
+        report_path = release_dir / "REPORT.md"
+        report_path.write_text(
+            _render_report(
+                artifact=artifact,
+                verdict=outcome.verdict,
+                pre=pre,
+                outcome=outcome,
+                not_recorded=not_recorded,
+                frozen_hash=frozen_hash,
+            )
+        )
 
-        failure_payload: dict[str, Any] | None = None
         if outcome.verdict == "FAIL":
             _, transformation_rates = _transformation_sweep(measured.get("rows") or [])
             winner = surrogate_selection.get("winner") or {}
@@ -592,6 +623,13 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
                 "invalidates": list(FAIL_INVALIDATES),
                 "classification": classification,
             }
+
+            # Taxonomy is a post-closure classification of the immutable
+            # outcome, not a new experimental result. Persist the exact same
+            # record in all three closure surfaces before sealing the release.
+            artifact.validity_flags["failure_taxonomy"] = classification
+            _write_json(release_dir / "experiment.json", artifact.to_dict())
+            _append_failure_taxonomy_to_report(report_path, failure_payload)
             _write_json(release_dir / "FAILURE.json", failure_payload)
 
         # Seal in the documented order (RESEARCH_RELEASE_FORMAT.md §3):
@@ -599,17 +637,24 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
         # 4) rebuild manifest, 5) REVISIONS.json freeze + final manifest.
         manifest = ReleaseManifest.build(release_dir)
         content_hash = compute_content_hash(manifest)
-        _write_json(release_dir / "RELEASE.json", {
-            "release_id": args.experiment_id,
-            "created_utc": created_utc,
-            "source_commit": args.source_commit,
-            "content_hash": content_hash,
-        })
+        _write_json(
+            release_dir / "RELEASE.json",
+            {
+                "release_id": args.experiment_id,
+                "created_utc": created_utc,
+                "source_commit": args.source_commit,
+                "content_hash": content_hash,
+            },
+        )
         ReleaseManifest.build(release_dir).write(release_dir)
         log = ReleaseRevisionLog(release_id=args.experiment_id)
         for stage in artifact.stages:
             log = log.record(stage.stage, created_utc, detail=f"ingest {stage.artifact_id}")
-        log = log.freeze(created_utc, stage="generation", detail=f"closed with verdict {outcome.verdict}")
+        log = log.freeze(
+            created_utc,
+            stage="generation",
+            detail=f"closed with verdict {outcome.verdict}",
+        )
         (release_dir / "REVISIONS.json").write_text(log.to_json())
         final_manifest = ReleaseManifest.build(release_dir)
         final_manifest.write(release_dir)
@@ -643,6 +688,9 @@ def run_ingest(args: argparse.Namespace) -> dict[str, Any]:
         "verify_release_ok": verification.ok,
         "legacy_d20004": bool(args.legacy_d20004),
         "not_recorded_fields": not_recorded,
+        "failure_taxonomy": (
+            failure_payload["classification"] if failure_payload is not None else None
+        ),
     }
     return summary
 
@@ -651,27 +699,54 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Ingest a CLOSED measured-benchmark generation into a sealed RAC-EXP release."
     )
-    parser.add_argument("--run-dir", help="benchmark runtime dir holding the default artifact names")
+    parser.add_argument(
+        "--run-dir", help="benchmark runtime dir holding the default artifact names"
+    )
     parser.add_argument("--surrogate-selection", help="path to surrogate-selection.json")
     parser.add_argument("--candidate-config", help="path to candidate-config.json")
     parser.add_argument("--candidate-png", help="path to candidate.png")
-    parser.add_argument("--measured-result", help="path to the measured benchmark result JSON")
-    parser.add_argument("--generation", required=True, help="path to the generation JSON (must be CLOSED)")
+    parser.add_argument(
+        "--measured-result", help="path to the measured benchmark result JSON"
+    )
+    parser.add_argument(
+        "--generation", required=True, help="path to the generation JSON (must be CLOSED)"
+    )
     parser.add_argument("--experiment-id", required=True, help="RAC-EXP-YYYY-NNN")
-    parser.add_argument("--hypothesis-id", required=True, help="hypothesis id for the experiment artifact")
-    parser.add_argument("--run-id", required=True, help="benchmark run identity (e.g. CI run id)")
-    parser.add_argument("--registry", required=True, help="ExperimentRegistry JSON (created or appended)")
-    parser.add_argument("--release-root", required=True, help="parent dir; release dir is <root>/<experiment-id>")
+    parser.add_argument(
+        "--hypothesis-id", required=True, help="hypothesis id for the experiment artifact"
+    )
+    parser.add_argument(
+        "--run-id", required=True, help="benchmark run identity (e.g. CI run id)"
+    )
+    parser.add_argument(
+        "--registry", required=True, help="ExperimentRegistry JSON (created or appended)"
+    )
+    parser.add_argument(
+        "--release-root", required=True, help="parent dir; release dir is <root>/<experiment-id>"
+    )
     parser.add_argument("--certificate", help="optional certificate artifact to attach")
     parser.add_argument("--source-commit", default=os.getenv("GITHUB_SHA", "local"))
-    parser.add_argument("--pass-threshold", type=float, default=0.5,
-                        help="max mean held-out candidate detection rate for a PASS verdict")
-    parser.add_argument("--heldout-same-family", action="store_true",
-                        help="held-out detectors share the surrogate architecture family")
-    parser.add_argument("--legacy-d20004", action="store_true",
-                        help="record fields the D2-0004 pipeline did not capture as null "
-                             "with a validity flag, instead of refusing")
-    parser.add_argument("--timestamp", help="override UTC timestamp (YYYY-MM-DDTHH:MM:SSZ); testing only")
+    parser.add_argument(
+        "--pass-threshold",
+        type=float,
+        default=0.5,
+        help="max mean held-out candidate detection rate for a PASS verdict",
+    )
+    parser.add_argument(
+        "--heldout-same-family",
+        action="store_true",
+        help="held-out detectors share the surrogate architecture family",
+    )
+    parser.add_argument(
+        "--legacy-d20004",
+        action="store_true",
+        help="record fields the D2-0004 pipeline did not capture as null "
+        "with a validity flag, instead of refusing",
+    )
+    parser.add_argument(
+        "--timestamp",
+        help="override UTC timestamp (YYYY-MM-DDTHH:MM:SSZ); testing only",
+    )
     return parser
 
 

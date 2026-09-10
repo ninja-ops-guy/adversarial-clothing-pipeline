@@ -159,6 +159,7 @@
     }
   ],
   "manifest_id": "RAC-PA-SKU-MANIFEST-0001",
+  "provenance_note": "No RAC-PER-D2-0004 print kit was produced: the authorized D2-0004 run stopped at step 22 on the Product Studio schema guard. The operative Production Alpha kit remains the sealed RAC-PER-D2-0003 print-test-kit.zip identified in candidate_source; the later schema repair did not authorize retrospective D2-0004 kit creation.",
   "order_execution": "USER ONLY — the agent never places orders or pays (see ORDER_CHECKLIST.md).",
   "registration_tolerance_mm": 3.0,
   "reserve_articles": [

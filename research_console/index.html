@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RAC Research Console</title>
+  <link rel="stylesheet" href="console.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">RUTHLESS // RESEARCH OPERATIONS</div>
+      <h1>RAC Research Console</h1>
+      <p>Read-only view of browser tools, experimental state, governance, evidence, and releases.</p>
+    </div>
+    <a class="home-link" href="../index.html">← Pattern Lab</a>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-heading"><h2>Applications</h2><span>FRIDAY TEST SURFACE</span></div>
+      <div class="card-grid app-grid">
+        <a class="card app-card" href="../index.html"><strong>Pattern Lab</strong><span>Generate, simulate, analyze, export.</span></a>
+        <a class="card app-card" href="../product-studio.html"><strong>Product Studio</strong><span>Reference-conditioned textile generation and mockups.</span></a>
+        <a class="card app-card" href="../production-studio.html"><strong>Production Mapper</strong><span>Seam-aware mapping and evidence-bound exports.</span></a>
+        <a class="card app-card" href="../capture-lab.html"><strong>Capture Lab</strong><span>Preregistered control/candidate capture and session export.</span></a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Latest closed generation</h2><span>LIVE JSON</span></div>
+      <div id="experimentStatus" class="card status-card" aria-live="polite">
+        <div class="loading">Loading d2-latest-status.json…</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Governance</h2><span>READ ONLY</span></div>
+      <div class="card table-card">
+        <table>
+          <thead><tr><th>Surface</th><th>State</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Pass 1 · Governance Core</td><td><span class="badge closed">CLOSED</span></td><td><a href="https://github.com/ninja-ops-guy/adversarial-clothing-pipeline/blob/main/docs/experimental_governance/PASS1_CLOSURE_2026-09-10.md">closure record</a></td></tr>
+            <tr><td>Pass 2 · Constraint Lineage</td><td><span class="badge closed">CLOSED</span></td><td><a href="https://github.com/ninja-ops-guy/adversarial-clothing-pipeline/blob/main/docs/experimental_governance/PASS2_CLOSURE_2026-09-10.md">closure record</a></td></tr>
+            <tr><td>Pass 3 · Seal + Reproducibility</td><td><span class="badge gated">AUDIT-GATED</span></td><td>code presence ≠ closure</td></tr>
+            <tr><td>Pass 4 · Sentinel + Bridge + Overlap</td><td><span class="badge gated">AUDIT-GATED</span></td><td>code presence ≠ closure</td></tr>
+            <tr><td>Pass 5 · CIC Adapter</td><td><span class="badge gated">AUDIT-GATED</span></td><td>code presence ≠ closure</td></tr>
+            <tr><td>Pass 6 · Sampling + Diagnostics</td><td><span class="badge gated">AUDIT-GATED</span></td><td>implementation exists; formal closure pending</td></tr>
+            <tr><td>Pass 7 · Adaptive / Chaos</td><td><span class="badge deferred">DEFERRED</span></td><td>prototype present; multiple sealed waves required</td></tr>
+            <tr><td>Pattern Genome v1</td><td><span class="badge frozen">FROZEN</span></td><td>53-feature schema</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Evidence ladder</h2><span>NO CLAIM PROMOTION</span></div>
+      <div class="card table-card">
+        <table>
+          <thead><tr><th>Stage</th><th>Artifact / state</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>D2</td><td>RAC-PER-D2-0003 · FAIL / RAC-D0</td><td><span class="badge closed">CLOSED</span></td></tr>
+            <tr><td>D2</td><td>RAC-PER-D2-0004 · FAIL / RAC-D0</td><td><span class="badge closed">CLOSED</span></td></tr>
+            <tr><td>P1</td><td>Physical garment validation</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
+            <tr><td>P2</td><td>Durability / repeated physical validation</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
+            <tr><td>M1</td><td>Manufacturing conformity</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
+            <tr><td>M2</td><td>Manufacturing scale / repeatability</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Release references</h2><span>TRACEABLE OUTPUTS</span></div>
+      <div class="card-grid release-grid">
+        <a class="card app-card" href="https://github.com/ninja-ops-guy/adversarial-clothing-pipeline/tree/main/releases/RAC-EXP-2026-001"><strong>RAC-EXP-2026-001</strong><span>Sealed research release directory.</span></a>
+        <a class="card app-card" href="../manuscript/exports/paper1_longitudinal.csv"><strong>paper1_longitudinal.csv</strong><span>Longitudinal closed-generation export.</span></a>
+      </div>
+    </section>
+
+    <footer>Research Console is intentionally read-only. It does not arm experiments, mutate governance state, or promote evidence.</footer>
+  </main>
+  <script src="console.js"></script>
+</body>
+</html>
