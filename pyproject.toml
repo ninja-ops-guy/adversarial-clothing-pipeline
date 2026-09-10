@@ -9,8 +9,11 @@ description = "Research pipeline for machine-optimized apparel evaluation in own
 requires-python = ">=3.10"
 dependencies = [
   "torch>=2.1",
+  "torchvision>=0.16",
   "numpy>=1.24",
+  "scipy>=1.11",
   "Pillow>=10",
+  "jsonschema>=4.20",
 ]
 
 [project.optional-dependencies]
