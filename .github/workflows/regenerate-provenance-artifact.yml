@@ -26,7 +26,7 @@ jobs:
         run: PYTHONPATH=. python scripts/build_provenance_graph.py --verify
       - name: Commit verified graph when changed
         run: |
-          git add artifacts/provenance/graph.json
+          git add -f artifacts/provenance/graph.json
           if git diff --cached --quiet; then
             echo "Provenance graph is already current."
             exit 0
