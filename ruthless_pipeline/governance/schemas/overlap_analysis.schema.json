@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-overlap-analysis/1.0",
+  "type": "object",
+  "required": ["schema_version", "overlap_id", "left_constraint_id", "right_constraint_id", "method"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "overlap_id": {"type": "string", "pattern": "^RAC-OVR-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "left_constraint_id": {"type": "string", "pattern": "^RAC-CST-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "right_constraint_id": {"type": "string", "pattern": "^RAC-CST-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "method": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
