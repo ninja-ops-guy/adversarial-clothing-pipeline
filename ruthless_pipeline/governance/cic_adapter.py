@@ -297,7 +297,7 @@ def check(
         independent_support=tuple(representation.independent_support),
         unsat_core=(
             tuple(reply.unsat_core)
-            if explain_unsat and reply.status is SolveStatus.UNSAT
+            if explain_unsat and status is SolveStatus.UNSAT
             else ()
         ),
         proof_artifact=reply.proof_artifact,
