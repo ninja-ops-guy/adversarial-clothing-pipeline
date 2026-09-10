@@ -16,7 +16,8 @@ from .cic_adapter import CICError, CICResult, ConstraintRepresentation, SolveSta
 from .sampling import (BackendSelection, BackendTelemetry, CalibrationMetrics, DiagnosticBundle, DiagnosticPolicy, ExactProjectedPopulationBackend, ExternalSamplerReply, PopulationIdentity, ProjectedSamplerAdapter, RepresentativenessState, SamplerLane, SamplingGovernanceError, SamplingRequest, SamplingResult, build_sampling_manifest, diagnose, require_confirmatory_eligible, select_backend)
 from .sampling_diagnostics import exact_distribution_diagnostics, repeated_seed_instability
 from .sampling_routing import EmpiricalLaneModel, select_backend_empirical
-from .adaptive import AdaptiveGovernanceError, EvidenceSeal, FrozenPolicy, PolicyState, propose_next_wave_policy, require_policy_frozen_before_sampling
+from .adaptive import (AdaptiveGovernanceError, AllocationPolicy, EvidenceSeal, FrozenPolicy, PolicyState, freeze_allocation_policy, propose_next_wave_policy, require_policy_frozen_before_sampling)
 from .chaos import ChaosArchive, ChaosCandidate, ChaosEvent, ChaosGovernanceError, ChaosStatus
+from .ctm_comparison import (CTMComparisonDecision, CTMComparisonGovernanceError, CohortComparisonContext, ComparisonMode, PipelineMigrationClass, assess_ctm_comparison, require_ctm_comparison_eligible)
 
 __all__ = [name for name in globals() if not name.startswith("_")]
