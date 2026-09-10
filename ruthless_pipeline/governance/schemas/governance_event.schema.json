@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-governance-event/1.0",
+  "type": "object",
+  "required": ["schema_version", "event_id", "experiment_id", "event_type", "payload"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "event_id": {"type": "string", "pattern": "^RAC-EVT-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "event_type": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"}
+  },
+  "additionalProperties": true
+}
