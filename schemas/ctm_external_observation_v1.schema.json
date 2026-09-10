@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_external_observation_v1.schema.json",
+  "title": "RAC CTM External Physical Observation v1 (SPEC-16; additive, secondary evidence)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","observation_id","artifact_ref","dataset","genome_measurement_sha256","channel_completeness","evidence_class","cohort"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-external-observation/1.0"},
+    "observation_id": {"type":"string","pattern":"^RAC-CTM-EXT-[0-9a-f]{16}$"},
+    "artifact_ref": {"type":"string","minLength":1},
+    "dataset": {
+      "type":"object","additionalProperties":false,
+      "required":["dataset_name","version","source_paper_ref","license","registered_utc"],
+      "properties":{
+        "dataset_name":{"type":"string","minLength":1},
+        "version":{"type":"string","minLength":1},
+        "source_paper_ref":{"type":"string","minLength":1},
+        "license":{"type":"string","minLength":1},
+        "registered_utc":{"type":"string","minLength":1}
+      }
+    },
+    "genome_measurement_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "channel_completeness": {
+      "type":"object","additionalProperties":false,
+      "required":["camera","isp","codec","resize","lighting","geometry"],
+      "properties":{
+        "camera":{"enum":["known","unknown","inferred"]},
+        "isp":{"enum":["known","unknown","inferred"]},
+        "codec":{"enum":["known","unknown","inferred"]},
+        "resize":{"enum":["known","unknown","inferred"]},
+        "lighting":{"enum":["known","unknown","inferred"]},
+        "geometry":{"enum":["known","unknown","inferred"]}
+      }
+    },
+    "evidence_class": {"const":"external_physical_observation"},
+    "cohort": {"const":"external_fabricated"}
+  }
+}
