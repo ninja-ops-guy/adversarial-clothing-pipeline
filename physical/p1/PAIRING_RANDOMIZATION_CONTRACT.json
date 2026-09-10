@@ -1,0 +1,45 @@
+{
+  "balance_check": {
+    "first_arm_counts": {
+      "candidate": 72,
+      "control": 72
+    },
+    "trials": 144
+  },
+  "contract_id": "RAC-P1-PAIRING-2026-001",
+  "derivation": "SHA-256 keyed ordering (see ruthless_pipeline/certification/p1_pairing_schedule.py); no random module, no wall clock",
+  "evidence_class": "synthetic_pipeline_validation_only",
+  "grid": {
+    "captures_per_trial": 2,
+    "distances_m": [
+      1.0,
+      3.0,
+      5.0
+    ],
+    "lighting_variants": [
+      "session-locked"
+    ],
+    "pitch_deg": [
+      0
+    ],
+    "planned_valid_trials": 144,
+    "poses": [
+      "standing",
+      "seated"
+    ],
+    "repetitions_per_cell": 8,
+    "yaw_deg": [
+      -45,
+      0,
+      45
+    ]
+  },
+  "matched_pair_rule": "Each trial is one matched pair: one control capture and one candidate capture of the same grid cell, same session, same variant/size; the pair differs ONLY in the printed artwork. Control-undetected trials are invalid measurement conditions, never candidate successes (STOPPING_RULE.json invalid_condition_rule).",
+  "physical_efficacy_claimed": false,
+  "randomization_rule": "Cell execution order is the frozen SHA-256 permutation; first_arm per repetition is the frozen parity bit. The operator executes the schedule as recorded in the session manifest; no on-site re-randomization, no substitution of cells or arms.",
+  "reserve_rule": "Reserve garments (PA-HOODIE-CAND-002 / PA-HOODIE-CTRL-002, fallback tees) replace a failed unit only after receipt-QA failure is recorded; the pairing checks in print-alpha/QA/garment-pairing-checklist.md re-run on the replacement before capture.",
+  "schedule_sha256": "c7a424c0c7afc51b27ae6e3fd3f9b7f9e44f24bdb31e6152a329276556197a1f",
+  "schema_version": "1.0",
+  "seed": "RAC-P1-PAIRING-SEED-2026-001",
+  "stopping_rule_ref": "physical/p1/STOPPING_RULE.json"
+}
