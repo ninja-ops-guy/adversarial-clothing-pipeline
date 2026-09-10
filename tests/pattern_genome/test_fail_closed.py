@@ -34,7 +34,7 @@ def test_corrupt_bytes_refused():
 
 def test_wrong_shape_refused():
     bad=np.zeros((64,64),dtype=np.uint8)
-    with pytest.raises(PatternGenomeInputError, match=r"expected (H,W,3)"): _extract(bad)
+    with pytest.raises(PatternGenomeInputError, match=r"expected \(H,W,3\)"): _extract(bad)
 
 def test_zero_size_refused():
     with pytest.raises(PatternGenomeInputError):
