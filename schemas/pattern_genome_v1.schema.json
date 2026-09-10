@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/pattern_genome_v1.schema.json",
+  "title": "RAC Pattern Genome v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","genome_id","candidate_sha256","source","spectral","topology","color","geometry","quality","provenance"],
+  "properties": {
+    "schema_version": {"const":"rac-pattern-genome/1.0"},
+    "genome_id": {"type":"string","pattern":"^RAC-GENOME-[0-9a-f]{16}$"},
+    "candidate_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "source": {"type":"object"},
+    "spectral": {"type":"object","required":["radial_energy"],"properties":{"radial_energy":{"type":"array","minItems":8,"maxItems":8,"items":{"type":"number","minimum":0,"maximum":1}}}},
+    "topology": {"type":"object"},
+    "color": {"type":"object","required":["palette_size"],"properties":{"palette_size":{"type":"integer","minimum":1}}},
+    "geometry": {"type":"object"},
+    "quality": {"type":"object","required":["all_finite"],"properties":{"all_finite":{"const":true}}},
+    "provenance": {"type":"object","required":["candidate_sha256","source_artifact_ref","extractor_version","genome_schema","source_commit","runtime_lock_sha256","extractor_config_sha256","extracted_utc","evidence_class"],"properties":{"evidence_class":{"const":"derived_digital_measurement"}}}
+  }
+}
