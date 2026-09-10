@@ -1,0 +1,84 @@
+{
+  "candidate_sha256": "a9503fd441d5e71eeef592864db74e74af38617179df3fd1f0b5c49e2febd33c",
+  "color": {
+    "chromatic_contrast": 8.975274404790292e-06,
+    "color_entropy": 1.0,
+    "dominant_palette": [
+      {"fraction": 0.5, "lab": [0.0, 0.0, 0.0]},
+      {"fraction": 0.5, "lab": [100.00000386666655, -1.6666666158293708e-05, 6.666666463317483e-06]}
+    ],
+    "lab_covariance": [
+      [2500.0001933333497, -0.0004166666700684539, 0.00016666666802738189],
+      [-0.0004166666700684539, 6.944444020800352e-11, -2.7777776083201376e-11],
+      [0.00016666666802738189, -2.7777776083201376e-11, 1.1111110433280545e-11]
+    ],
+    "lab_mean": [50.00000193333459, -8.333333079146854e-06, 3.3333332316587416e-06],
+    "lab_range_a": 1.6666666158293708e-05,
+    "lab_range_b": 6.666666463317483e-06,
+    "lab_range_l": 100.00000386666655,
+    "luminance_contrast": 0.5,
+    "max_pairwise_delta_e": 100.00000386666815,
+    "mean_pairwise_delta_e": 100.00000386666815,
+    "palette_size": 2,
+    "rgb_mean": [0.5, 0.5, 0.5],
+    "rgb_std": [0.5, 0.5, 0.5]
+  },
+  "genome_id": "RAC-GENOME-ef092eb3a36f678a",
+  "geometry": {
+    "bbox_occupancy_fraction": 1.0,
+    "center_of_mass_x": 0.5,
+    "center_of_mass_y": 0.5,
+    "edge_to_area_ratio": 0.4375,
+    "foreground_coverage_fraction": 0.5,
+    "mean_feature_width_normalized": 0.12628865979381443,
+    "mean_feature_width_px": 8.082474226804123,
+    "median_feature_width_px": 8.0,
+    "min_feature_width_normalized": 0.125,
+    "min_feature_width_px": 8.0,
+    "quadrant_energy": [0.5, 0.5, 0.5, 0.5],
+    "spatial_entropy": 0.875
+  },
+  "provenance": {
+    "candidate_sha256": "a9503fd441d5e71eeef592864db74e74af38617179df3fd1f0b5c49e2febd33c",
+    "evidence_class": "derived_digital_measurement",
+    "extracted_utc": "2026-09-10T03:30:00Z",
+    "extractor_config_sha256": "508a4b589af66f6b7a7d4879008f76f1040f933c1c5310bd5e53c2de0776eba9",
+    "extractor_version": "1.0.0",
+    "genome_schema": "rac-pattern-genome/1.0",
+    "runtime_lock_sha256": "3c7ca4696a8066f3485e2141bab46570ab3265f591ffc87cd3a44795cd361186",
+    "source_artifact_ref": "synthetic://checkerboard-64.png",
+    "source_commit": "871e6090dc9ed450b04028c8e7416e6bfabaf013"
+  },
+  "quality": {"all_finite": true, "warnings": []},
+  "schema_version": "rac-pattern-genome/1.0",
+  "source": {"artifact_ref": "synthetic://checkerboard-64.png", "channels": 3, "height_px": 64, "width_px": 64},
+  "spectral": {
+    "dominant_orientation_deg": 92.5,
+    "high_frequency_ratio": 0.12385457795005148,
+    "low_frequency_ratio": 0.6770547775038235,
+    "mid_frequency_ratio": 0.19909064454612502,
+    "orientation_strength": 0.14553078120894408,
+    "radial_energy": [0.005017234217694015,0.6720375432861294,0.02025810366533377,0.14751575594429975,0.03131678493649152,0.059280922288095984,0.028161643790942787,0.036412011871012694],
+    "spectral_centroid": 0.31257833943486096,
+    "spectral_entropy": 0.5540402167665687
+  },
+  "topology": {
+    "component_area_std": 0.0,
+    "connected_component_count": 1,
+    "diagonal_symmetry_anti": 0.0,
+    "diagonal_symmetry_main": 1.0,
+    "edge_density": 0.21875,
+    "euler_characteristic": 0,
+    "fragmentation_index": 0.00048828125,
+    "hole_count": 1,
+    "horizontal_symmetry": 0.0,
+    "largest_component_fraction": 0.5,
+    "mean_component_fraction": 0.5,
+    "median_component_fraction": 0.5,
+    "motif_autocorrelation_peak": 1.0,
+    "motif_period_x": 32.0,
+    "motif_period_y": 32.0,
+    "rotational_symmetry_180": 1.0,
+    "vertical_symmetry": 0.0
+  }
+}
