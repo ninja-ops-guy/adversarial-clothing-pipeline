@@ -39,6 +39,12 @@ from .corpus import (
     build_snapshot,
     verify_snapshot,
 )
+from .evaluation_surface import (
+    GOODHART_EXPOSURE_SCHEMA_VERSION,
+    EvaluationSurface,
+    derive_evaluation_surface,
+    derive_manifest_evaluation_surface,
+)
 from .external_cohort import (
     EXTERNAL_OBSERVATION_SCHEMA_VERSION,
     EVIDENCE_CLASS as EXTERNAL_EVIDENCE_CLASS,
@@ -109,6 +115,8 @@ __all__ = [
     "TypedScalar", "SCALAR_CLASSES", "ANALYSIS_ROLES",
     "OptimizerConstraints", "OPTIMIZER_CONSTRAINTS_SCHEMA_VERSION",
     "experimental_unit_id", "same_experimental_unit",
+    "EvaluationSurface", "GOODHART_EXPOSURE_SCHEMA_VERSION",
+    "derive_evaluation_surface", "derive_manifest_evaluation_surface",
     "ChannelRecord", "CHANNEL_SCHEMA_VERSION", "ChannelSemanticsError",
     "claim_ceiling", "require_digital_claim_eligible",
     "require_strong_physical_eligible", "require_physical_replicated_eligible",
