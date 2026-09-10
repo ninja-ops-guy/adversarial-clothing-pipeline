@@ -27,6 +27,7 @@ on:
       - 'production-studio.css'
       - 'production-studio.js'
       - 'vendor-template-guard.js'
+      - 'research_console/**'
       - 'templates/**'
       - 'benchmark-results.json'
       - 'package.json'
@@ -68,8 +69,8 @@ jobs:
         with:
           node-version: '24'
       - run: npm install
-      - run: npx playwright install --with-deps chromium
-      - name: Verify deployed site interactions
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Verify deployed Pattern Lab
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
         run: npx playwright test --project=chromium-desktop --grep "all pattern generators|PNG, JSON, SVG"
@@ -81,6 +82,18 @@ jobs:
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
         run: npx playwright test tests/e2e/production-studio.spec.js --project=chromium-desktop --grep "generic template|imports exact vendor template"
+      - name: Verify deployed Capture Lab in Chromium
+        env:
+          BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
+        run: npx playwright test tests/e2e/capture-lab.spec.js --project=chromium-desktop --grep "deployed smoke surface"
+      - name: Verify deployed Capture Lab in WebKit
+        env:
+          BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
+        run: npx playwright test tests/e2e/capture-lab.spec.js --project=webkit-mobile --grep "deployed smoke surface"
+      - name: Verify deployed Research Console
+        env:
+          BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
+        run: npx playwright test tests/e2e/research-console.spec.js --project=chromium-desktop
       - name: Verify deployed measured benchmark JSON when published
         if: ${{ hashFiles('benchmark-results.json') != '' }}
         run: |
