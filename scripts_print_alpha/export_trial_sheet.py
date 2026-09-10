@@ -7,7 +7,7 @@ print-alpha/CAPTURE/trial-sheet.csv and prints the file's sha256.
 
 Determinism contract: same repo state -> byte-identical CSV. Row order is the
 preregistered loop order of capture_rows(); floats are rendered with repr-free
-fixed formatting; the file ends with a trailing newline and uses \\n line
+fixed formatting; the file ends with a trailing newline and uses \n line
 endings regardless of platform.
 
 Usage:
@@ -16,11 +16,14 @@ Usage:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # import-safe CLI entrypoint (E2)
+
 import csv
 import hashlib
 import io
-import sys
-from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:

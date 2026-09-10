@@ -12,11 +12,14 @@ character. Also asserts the Python major.minor version.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # import-safe CLI entrypoint (E2)
+
 import argparse
 import importlib
 import json
-import sys
-from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
