@@ -21,6 +21,18 @@ class ComparisonError(CTMBridgeError):
     """Genome comparison could not be performed (missing registry entry, bad genome)."""
 
 
+class SwapValidityError(CTMBridgeError):
+    """Factor-swap validity contract violated (SPEC-1). Fail closed."""
+
+
+class ScalarTypingError(CTMBridgeError):
+    """Scalar-class / analysis-role typing violated (SPEC-2). Fail closed."""
+
+
+class OptimizerConstraintsError(CTMBridgeError):
+    """Imposed-structure provenance contract violated (SPEC-5). Fail closed."""
+
+
 class PendingUserAction(CTMBridgeError):
     """A physical/calibration path requires human action. Carries the JSON packet."""
 
