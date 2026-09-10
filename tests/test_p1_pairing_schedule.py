@@ -57,8 +57,10 @@ class TestFrozenArtifacts:
 
     def test_frozen_schedule_matches_derivation(self):
         frozen = json.loads((REPO_ROOT / "physical/p1/P1_CAPTURE_SCHEDULE.json").read_text())
-        assert frozen["schedule"] == ps.derive_schedule()
+        assert frozen["schedule_sha256"] == ps.schedule_sha256(ps.derive_schedule())
+        assert frozen["planned_valid_trials"] == 144
         assert frozen["contract_id"] == ps.CONTRACT_ID
+        assert frozen["seed"] == ps.CONTRACT_SEED
 
     def test_grid_matches_stopping_rule(self):
         stopping = json.loads((REPO_ROOT / "physical/p1/STOPPING_RULE.json").read_text())
