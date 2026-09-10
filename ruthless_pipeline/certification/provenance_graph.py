@@ -56,6 +56,9 @@ NODE_TYPES = (
     "rac_release",
     "production_asset",
     "document",
+    "ctm_claim",
+    "ctm_artifact",
+    "ctm_null",
 )
 
 EDGE_VERIFIED = "VERIFIED"
@@ -290,6 +293,47 @@ def build_graph(repo_root: str | Path = REPO_ROOT) -> dict[str, Any]:
     for schema_path in sorted((root / "schemas").glob("*.json")):
         rel = schema_path.relative_to(root).as_posix()
         file_node(f"schema:{schema_path.name}", "document", rel)
+
+    # --- CTM claim/null artifacts -------------------------------------------
+    # CTM uses the same canonical provenance graph rather than a parallel
+    # trust system. Claim files may reference pre-outcome artifacts by id and
+    # SHA; dependency edges follow the CTM convention source=consumer,
+    # target=dependency so the certification firewall can walk them.
+    ctm_claim_root = root / "artifacts" / "ctm" / "claims"
+    for claim_path in sorted(ctm_claim_root.glob("*.json")) if ctm_claim_root.is_dir() else []:
+        rel = claim_path.relative_to(root).as_posix()
+        payload = json.loads(claim_path.read_text())
+        claim_id = str(payload.get("claim_id", claim_path.stem))
+        claim_node_id = f"ctm_claim:{claim_id}"
+        file_node(claim_node_id, "ctm_claim", rel)
+        for use in payload.get("consumed_artifacts", []):
+            artifact_id = str(use.get("artifact_id", ""))
+            if not artifact_id:
+                continue
+            node_id = artifact_id
+            if node_id not in nodes:
+                add_node(_node(
+                    node_id,
+                    "ctm_artifact",
+                    sha256=use.get("sha256"),
+                    label=f"CTM consumed artifact ({use.get('role', 'unknown')})",
+                ))
+            add_edge(_edge(
+                claim_node_id,
+                node_id,
+                "consumes",
+                expected_sha256=use.get("sha256"),
+                evidence_class=EVIDENCE_CLASS_FILE_PINNED,
+                verify_mode="none",
+                note="CTM claim consumed-artifact binding",
+            ))
+
+    ctm_null_root = root / "artifacts" / "ctm" / "nulls"
+    for null_path in sorted(ctm_null_root.glob("*.json")) if ctm_null_root.is_dir() else []:
+        rel = null_path.relative_to(root).as_posix()
+        payload = json.loads(null_path.read_text())
+        null_id = str(payload.get("null_id", null_path.stem))
+        file_node(f"ctm_null:{null_id}", "ctm_null", rel)
 
     # --- benchmark results (inference record + statistics) ------------------
     bench_rel = "benchmark-results.json"
