@@ -1,0 +1,13 @@
+{
+  "schema_version": "rac-pattern-genome-config/1.0",
+  "luminance_method": "rec709",
+  "fft_window": "hann",
+  "radial_bins": 8,
+  "palette_method": "deterministic_kmeans",
+  "palette_max_colors": 8,
+  "palette_seed": 1337,
+  "palette_iterations": 20,
+  "connectivity": 8,
+  "spatial_hist_bins": 16,
+  "max_image_dimension": 4096
+}
