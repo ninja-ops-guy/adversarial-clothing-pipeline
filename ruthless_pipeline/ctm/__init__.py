@@ -8,8 +8,62 @@ from .contracts import (
     CTM_SCHEMA_VERSION,
     validate_anti_optimization_invariant,
 )
+from .channel import (
+    CHANNEL_SCHEMA_VERSION,
+    ChannelRecord,
+    ChannelSemanticsError,
+    claim_ceiling,
+    require_digital_claim_eligible,
+    require_physical_replicated_eligible,
+    require_strong_physical_eligible,
+)
+from .citations import (
+    CITATION_SCHEMA_VERSION,
+    Citation,
+    CitationVerificationError,
+    check_claim_export,
+    export_claim_artifact,
+)
+from .claim_lint import (
+    CLAIM_LINT_RULESET_VERSION,
+    ClaimLintResult,
+    ClaimLintViolation,
+    lint_text,
+    require_bounded,
+)
+from .corpus import (
+    CORPUS_SNAPSHOT_SCHEMA_VERSION,
+    CorpusSnapshot,
+    LiteratureEntry,
+    SnapshotVerificationError,
+    build_snapshot,
+    verify_snapshot,
+)
 from .firewall import FirewallResult, check_provenance_firewall, require_provenance_firewall
 from .nulls import MatchedNullDesign, MatchedNullType
+from .pipeline_stage import (
+    CLAIM_SCOPE_SCHEMA_VERSION,
+    PIPELINE_STAGES,
+    ClaimScope,
+    ScopeConformanceError,
+    require_prose_conformant,
+)
+from .positioning import (
+    POSITIONING_SCHEMA_VERSION,
+    Positioning,
+    PositioningError,
+    require_narrative_conformant,
+    serialize_positioning,
+)
+from .target_semantics import (
+    HEAD_CLASSES,
+    MECHANISM_CLASSES,
+    TARGET_SEMANTICS_SCHEMA_VERSION,
+    MechanismTag,
+    TargetSemantics,
+    TargetSemanticsError,
+    require_not_identity_collapse,
+)
 from .optimizer_constraints import (
     OPTIMIZER_CONSTRAINTS_SCHEMA_VERSION,
     OptimizerConstraints,
@@ -35,4 +89,20 @@ __all__ = [
     "TypedScalar", "SCALAR_CLASSES", "ANALYSIS_ROLES",
     "OptimizerConstraints", "OPTIMIZER_CONSTRAINTS_SCHEMA_VERSION",
     "experimental_unit_id", "same_experimental_unit",
+    "ChannelRecord", "CHANNEL_SCHEMA_VERSION", "ChannelSemanticsError",
+    "claim_ceiling", "require_digital_claim_eligible",
+    "require_strong_physical_eligible", "require_physical_replicated_eligible",
+    "TargetSemantics", "MechanismTag", "TARGET_SEMANTICS_SCHEMA_VERSION",
+    "HEAD_CLASSES", "MECHANISM_CLASSES", "TargetSemanticsError",
+    "require_not_identity_collapse",
+    "LiteratureEntry", "CorpusSnapshot", "CORPUS_SNAPSHOT_SCHEMA_VERSION",
+    "build_snapshot", "verify_snapshot", "SnapshotVerificationError",
+    "Citation", "CITATION_SCHEMA_VERSION", "CitationVerificationError",
+    "check_claim_export", "export_claim_artifact",
+    "ClaimScope", "CLAIM_SCOPE_SCHEMA_VERSION", "PIPELINE_STAGES",
+    "ScopeConformanceError", "require_prose_conformant",
+    "ClaimLintResult", "ClaimLintViolation", "CLAIM_LINT_RULESET_VERSION",
+    "lint_text", "require_bounded",
+    "Positioning", "POSITIONING_SCHEMA_VERSION", "PositioningError",
+    "serialize_positioning", "require_narrative_conformant",
 ]
