@@ -2,13 +2,62 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rac-governance-event/1.0",
   "type": "object",
-  "required": ["schema_version", "event_id", "experiment_id", "event_type", "payload"],
+  "required": [
+    "schema_version",
+    "event_id",
+    "experiment_id",
+    "event_type",
+    "created_at",
+    "actor",
+    "payload",
+    "payload_sha256",
+    "previous_event_sha256",
+    "event_sha256"
+  ],
   "properties": {
     "schema_version": {"const": "1.0"},
-    "event_id": {"type": "string", "pattern": "^RAC-EVT-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "event_id": {"type": "string", "pattern": "^RAC-(GOV-EVT|EVT)-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
-    "event_type": {"type": "string", "minLength": 1},
-    "payload": {"type": "object"}
+    "event_type": {
+      "enum": [
+        "CREATE",
+        "STATE_TRANSITION",
+        "SEAL",
+        "HALT",
+        "RESUME",
+        "REVERSAL",
+        "SUPERSESSION",
+        "INVALIDATION",
+        "CONSTRAINT_MIGRATION",
+        "PIPELINE_MIGRATION",
+        "RESCREEN",
+        "BRIDGE_DECISION",
+        "REGIME_RESET"
+      ]
+    },
+    "created_at": {"type": "string", "pattern": "Z$"},
+    "actor": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"},
+    "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "previous_event_sha256": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      ]
+    },
+    "event_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reverses_event_id": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^RAC-(GOV-EVT|EVT)-[A-Z0-9][A-Z0-9._-]{2,63}$"}
+      ]
+    },
+    "supersedes_event_id": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^RAC-(GOV-EVT|EVT)-[A-Z0-9][A-Z0-9._-]{2,63}$"}
+      ]
+    }
   },
   "additionalProperties": true
 }
