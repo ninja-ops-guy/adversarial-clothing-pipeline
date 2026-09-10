@@ -1,0 +1,48 @@
+{
+  "created_utc": "2026-04-01",
+  "entries": [
+    {
+      "entry_id": "RAC-CTM-LIT-016a7dad0898de17",
+      "entry_sha256": "e1229db396c9a3e5c18b1cbe39cc7f2b5751ecf95086083475b1c50e5913d54a"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-105e72c0d893fe1d",
+      "entry_sha256": "41e109ec8e73d66af8fb2bc8d9faa668bb46010d9dcb0ade3a2e19766855fe8f"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-3a390f8d4d848545",
+      "entry_sha256": "b9fa58ac338edb9e1be8de91162d9ccd0de7ae42a7f2e5709cf83bc4e96f4256"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-62ec08c0c42a6554",
+      "entry_sha256": "9f5dca52dfbd8ac8304abb8c8468f898dcd9df31955f5155bcc250c22636ff00"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-62fbce776a9f284b",
+      "entry_sha256": "dc85be0aeef7408ce356ea340b8f1ad1458198505c2a1e210cd067063fb973b3"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-b0db088c607bb355",
+      "entry_sha256": "bf29922e9c12b8fe870b7746301162853f9851ae837e52c2f72de7c9d4007d21"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-b46e1dba8c2fa954",
+      "entry_sha256": "666a246ea1fb99c65e3be6ece3fa53bf6207feca547923d550d13a964bcd3bf5"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-d2b012274da44766",
+      "entry_sha256": "9043d4d75a08c05454d156c4c4f37fe750fc1bf674cb31772ddbb81999956c29"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-dff41ae4ef86b466",
+      "entry_sha256": "9f2a1fee76b00d505c4a36947675e3f9f95650a409d5ef5813bd235e8bc63482"
+    },
+    {
+      "entry_id": "RAC-CTM-LIT-fed40ba6a5bb9366",
+      "entry_sha256": "0102e1bcb76b3e66726acf0a64f3504bbf02252a94a6f497ec03dcd6e8404ccd"
+    }
+  ],
+  "entry_count": 10,
+  "schema_version": "rac-ctm-corpus-snapshot/1.0",
+  "snapshot_id": "RAC-CTM-CORPUS-SNAPSHOT-1fa6285372d1c434"
+}

@@ -1,0 +1,23 @@
+{
+  "entry_class": "near_miss",
+  "entry_id": "RAC-CTM-LIT-016a7dad0898de17",
+  "failure_axes": [
+    "digital_only",
+    "single_family_bound"
+  ],
+  "identifier": {
+    "kind": "arxiv",
+    "value": "capgen"
+  },
+  "notes": "Factorial pattern/color decomposition varying color within the optimization neighborhood (main-effect probe; L2 contrast with Voronoi). Digital-only, surrogate-bound.",
+  "quadrant": "quadrant_2",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "detection/garment-attacks",
+    "survey_ref": "acm-csur-2026-physical-world-tasks"
+  },
+  "title": "CAPGen pattern-dominant adversarial garment generation",
+  "verification_status": "abstract_only",
+  "year": 2025
+}

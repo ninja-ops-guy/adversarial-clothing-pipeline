@@ -1,0 +1,23 @@
+{
+  "entry_class": "boundary",
+  "entry_id": "RAC-CTM-LIT-fed40ba6a5bb9366",
+  "failure_axes": [
+    "camera_confounded",
+    "threshold_arbitrary"
+  ],
+  "identifier": {
+    "kind": "doi",
+    "value": "zhang-2025-garment-nine-defenses"
+  },
+  "notes": "L18: 96.06% ASR undefended, >64.84% against nine defended models, fabricated garment, public code. Quadrant-1 boundary paper and seed entry for the defense-side tensor (9 defended models x 1 garment): defenses validated at patch scale collapse at garment scale (spatial-extent x frequency interaction).",
+  "quadrant": "quadrant_1",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "detection/garment-attacks",
+    "survey_ref": "acm-csur-2026-physical-world-tasks"
+  },
+  "title": "Zhang et al. garment-scale attack defeating nine defended models",
+  "verification_status": "abstract_only",
+  "year": 2025
+}

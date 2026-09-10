@@ -1,0 +1,22 @@
+{
+  "entry_class": "survey",
+  "entry_id": "RAC-CTM-LIT-105e72c0d893fe1d",
+  "failure_axes": [
+    "not_applicable"
+  ],
+  "identifier": {
+    "kind": "doi",
+    "value": "wang-neurocomputing-2026-fr-survey"
+  },
+  "notes": "SPEC-15 taxonomy seed: media-based FR categories. The 129-ref survey explicitly tracks transferability as the open challenge, bounding the shape of the gap (L14).",
+  "quadrant": "not_applicable",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "root",
+    "survey_ref": "wang-neurocomputing-2026-fr-media"
+  },
+  "title": "Wang et al. 2026 survey of FR adversarial attacks (media-based)",
+  "verification_status": "abstract_only",
+  "year": 2026
+}

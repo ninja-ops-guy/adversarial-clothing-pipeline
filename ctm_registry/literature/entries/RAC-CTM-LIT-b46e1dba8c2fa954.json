@@ -1,0 +1,22 @@
+{
+  "entry_class": "foundational",
+  "entry_id": "RAC-CTM-LIT-b46e1dba8c2fa954",
+  "failure_axes": [
+    "not_applicable"
+  ],
+  "identifier": {
+    "kind": "doi",
+    "value": "10.1145/2976749.2978392"
+  },
+  "notes": "L15 foundational anchor: origin of NPS, foundational physical FR attack, historical anchor for physical realizability. Load-bearing in three independent threads; full-text verification is a hard precondition for load-bearing use.",
+  "quadrant": "not_applicable",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "physical-media/eyeglass-frames",
+    "survey_ref": "wang-neurocomputing-2026-fr-media"
+  },
+  "title": "Sharif et al. 2016 — Accessorize to a Crime",
+  "verification_status": "full_text_verified",
+  "year": 2016
+}

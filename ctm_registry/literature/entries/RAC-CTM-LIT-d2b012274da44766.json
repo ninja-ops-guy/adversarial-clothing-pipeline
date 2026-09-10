@@ -1,0 +1,22 @@
+{
+  "entry_class": "cross_domain_boundary",
+  "entry_id": "RAC-CTM-LIT-d2b012274da44766",
+  "failure_axes": [
+    "no_commensurable_physical_conditions"
+  ],
+  "identifier": {
+    "kind": "doi",
+    "value": "advhat-placement-fr"
+  },
+  "notes": "Adversarial accessory is really adversarial region placement. Cross-domain boundary only (SPEC-13).",
+  "quadrant": "not_applicable",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "physical-media/face-accessory",
+    "survey_ref": "wang-neurocomputing-2026-fr-media"
+  },
+  "title": "AdvHat region-placement-dominant physical FR attack",
+  "verification_status": "abstract_only",
+  "year": 2021
+}

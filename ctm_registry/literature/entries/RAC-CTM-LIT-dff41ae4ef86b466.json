@@ -1,0 +1,23 @@
+{
+  "entry_class": "near_miss",
+  "entry_id": "RAC-CTM-LIT-dff41ae4ef86b466",
+  "failure_axes": [
+    "abstract_only_evidence",
+    "digital_only"
+  ],
+  "identifier": {
+    "kind": "arxiv",
+    "value": "2606.17711-advart-adj"
+  },
+  "notes": "Does not enter the upper-right quadrant of the gap map.",
+  "quadrant": "quadrant_2",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "detection/2d-pattern-attacks",
+    "survey_ref": "acm-csur-2026-physical-world-tasks"
+  },
+  "title": "AdvART adversarial art patterns",
+  "verification_status": "abstract_only",
+  "year": 2026
+}

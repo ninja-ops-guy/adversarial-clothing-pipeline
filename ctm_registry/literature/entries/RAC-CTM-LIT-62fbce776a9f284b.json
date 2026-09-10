@@ -1,0 +1,22 @@
+{
+  "entry_class": "survey",
+  "entry_id": "RAC-CTM-LIT-62fbce776a9f284b",
+  "failure_axes": [
+    "not_applicable"
+  ],
+  "identifier": {
+    "kind": "doi",
+    "value": "acm-csur-2026-physical-world-survey"
+  },
+  "notes": "SPEC-15 taxonomy seed: task-based physical-world categories.",
+  "quadrant": "not_applicable",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "root",
+    "survey_ref": "acm-csur-2026-physical-world-tasks"
+  },
+  "title": "ACM Computing Surveys 2026 physical-world adversarial survey",
+  "verification_status": "abstract_only",
+  "year": 2026
+}

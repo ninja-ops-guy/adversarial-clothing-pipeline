@@ -1,0 +1,22 @@
+{
+  "entry_class": "cross_domain_boundary",
+  "entry_id": "RAC-CTM-LIT-3a390f8d4d848545",
+  "failure_axes": [
+    "no_commensurable_physical_conditions"
+  ],
+  "identifier": {
+    "kind": "doi",
+    "value": "gap-symmetry-fr"
+  },
+  "notes": "Symmetry constraint raised ASR 65.4%->80.7%: a topological pattern property with a measured effect. Cross-domain boundary only; does NOT inherit person-detection claims (SPEC-13 bridge required).",
+  "quadrant": "not_applicable",
+  "recheck_date": "2026-07-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "physical-media/face-accessory",
+    "survey_ref": "wang-neurocomputing-2026-fr-media"
+  },
+  "title": "GaP bilateral-symmetry enforcement for physical FR attacks",
+  "verification_status": "abstract_only",
+  "year": 2024
+}
