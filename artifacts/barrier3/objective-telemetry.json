@@ -1,0 +1,142 @@
+{
+  "detector_loss_dispersion": {
+    "b3-cand-000": {
+      "max": 0.8277116427303083,
+      "mean": 0.7518110250590736,
+      "min": 0.6056150032265233
+    },
+    "b3-cand-001": {
+      "max": 0.8185772453502295,
+      "mean": 0.7442375614302922,
+      "min": 0.601880239804894
+    },
+    "b3-cand-002": {
+      "max": 0.7853965200015435,
+      "mean": 0.7336587883401625,
+      "min": 0.6315650648175742
+    },
+    "b3-cand-003": {
+      "max": 0.8142173579993758,
+      "mean": 0.7348028070092433,
+      "min": 0.6342348991142573
+    },
+    "b3-cand-004": {
+      "max": 0.8445201843050983,
+      "mean": 0.7489371131276554,
+      "min": 0.6289128660774064
+    },
+    "b3-cand-005": {
+      "max": 0.8325792090088626,
+      "mean": 0.7453365846353152,
+      "min": 0.6149995772380512
+    },
+    "b3-cand-006": {
+      "max": 0.851919785758282,
+      "mean": 0.7567989547299053,
+      "min": 0.6271440867103238
+    },
+    "b3-cand-007": {
+      "max": 0.8103443332272561,
+      "mean": 0.7333306688266813,
+      "min": 0.6078068075306711
+    }
+  },
+  "evaluations": [
+    {
+      "iteration": 0,
+      "params_hash": "43720dbd4f0225a9fd011ce623e130b7ec38e118f4130055c359a54b3ac8fa27",
+      "term_values": {
+        "detector_loss": 0.28613928377654374,
+        "printability_loss": 0.5829030967568428,
+        "regularization": 0.30683502311851496,
+        "style_loss": 0.5191498898529668
+      },
+      "total": 0.5096182313296908
+    },
+    {
+      "iteration": 1,
+      "params_hash": "ded6122577df09239c5c561ec548210bcf2bf075f19e327deb40811daf20d386",
+      "term_values": {
+        "detector_loss": 0.29293228052967646,
+        "printability_loss": 0.5739823675081375,
+        "regularization": 0.3158163557384947,
+        "style_loss": 0.18450604556147976
+      },
+      "total": 0.44778812670098483
+    },
+    {
+      "iteration": 2,
+      "params_hash": "d0eabe14fd488187cfeb5852cb504319a779e7d1b7709bfdda4aa1e3954218a5",
+      "term_values": {
+        "detector_loss": 0.29221007749052796,
+        "printability_loss": 0.5771353862702974,
+        "regularization": 0.31287365971336395,
+        "style_loss": 0.18474603128693257
+      },
+      "total": 0.4477150975991076
+    },
+    {
+      "iteration": 3,
+      "params_hash": "e9cd3cbfcd6254be38d8a805a1309231d8c5bee2f74be21a931c8fb93aa47cb1",
+      "term_values": {
+        "detector_loss": 0.30490446848582287,
+        "printability_loss": 0.5790552351152798,
+        "regularization": 0.3144795781937664,
+        "style_loss": 0.35141529822313033
+      },
+      "total": 0.4941433709354425
+    },
+    {
+      "iteration": 4,
+      "params_hash": "68fea9d0203ccff8c727273af127c8057f2378a6fb3b82dff61e370d93ee747b",
+      "term_values": {
+        "detector_loss": 0.298854422461066,
+        "printability_loss": 0.5765655666261263,
+        "regularization": 0.3187087491446062,
+        "style_loss": 0.3504865043778733
+      },
+      "total": 0.487451924153312
+    },
+    {
+      "iteration": 5,
+      "params_hash": "62658371a9e8921568b6bb1a89109fec9ff6141f09af82d99ede494f6dd8725a",
+      "term_values": {
+        "detector_loss": 0.29828472755145863,
+        "printability_loss": 0.5801529726325871,
+        "regularization": 0.3257191020961099,
+        "style_loss": 0.37684659935777387
+      },
+      "total": 0.49294183297049193
+    },
+    {
+      "iteration": 6,
+      "params_hash": "1e90fb28ad76d3a818eb270e31bc4fa263280af2fd222f9c3d3968307f7bfc4b",
+      "term_values": {
+        "detector_loss": 0.290761460784283,
+        "printability_loss": 0.5802072782211101,
+        "regularization": 0.330490342054762,
+        "style_loss": 0.3846513871417242
+      },
+      "total": 0.4870380972773975
+    },
+    {
+      "iteration": 7,
+      "params_hash": "faed2f8c5f1c6d3137db73d0d5cec1324b4946d5cf6fbdb478b8216a775235cc",
+      "term_values": {
+        "detector_loss": 0.30517616337360615,
+        "printability_loss": 0.5772852908883621,
+        "regularization": 0.31737176510120063,
+        "style_loss": 0.517586485065755
+      },
+      "total": 0.5273242362154417
+    }
+  ],
+  "objective_id": "RAC-BARRIER3-SYNTHETIC-OBJECTIVE",
+  "run_id": "RAC-BARRIER3-SYNTHETIC-001",
+  "tail": {
+    "aggregation": "CVAR",
+    "alpha": 0.5,
+    "best_candidate": "b3-cand-000",
+    "worst_candidate": "b3-cand-007"
+  }
+}
