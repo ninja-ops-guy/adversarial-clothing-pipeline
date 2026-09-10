@@ -93,3 +93,22 @@ All four assertions are truthfully made: this swarm performed read-only inspecti
 - D2_0005_ARMED = false
 - NEW_HELDOUT_ACCESS = false
 - SCIENTIFIC_THRESHOLDS_CHANGED = false
+
+---
+
+# APPENDIX 2 — CTM-B wave (bridges) — 2026-09-09
+
+Base: e169706 (post-CTM-A). Scope: CTM-B only (CTM-A authored by governance swarm).
+
+## Deliverables
+- ruthless_pipeline/ctm/{ids,errors,genome_adapter,registry,compare,cli}.py — Pattern Genome v1 ADAPTER (pattern_genome/ internals untouched); content-addressed pattern_id = "RAC-CTM-PAT-"+sha256(canonical genome bytes minus self-fields + schema-version)[:16]; ctm_registry/ skeleton (sidecar-only masters, large binaries out of git); compare_genomes (claim_state hard EXPLORATORY); CLI `python -m ruthless_pipeline.ctm.cli genome compare digital <file>` functional, physical half exit 3 + PENDING_USER_ACTION packet.
+- ruthless_pipeline/ctm/manifests.py — CTM experiment manifest (rac-ctm-experiment/1.0), manifest lock (drift fail-closed), ESM adapter (wraps, never edits; arm/execute → ArbitrationError), claim-artifact bridge validated against frozen ctm_claim_v1 schema.
+- tests/ctm/ — 49 tests (B1: ids/adapter/registry/compare/cli + B2: 21 manifest/adapter/lock/claim tests).
+
+## Upstream red-main observed at wave start (NOT ours, governance in-flight)
+- tests/test_barrier3_rehearsal.py = 17-byte PLACEHOLDER at e169706 (collection NameError).
+- 14 failures on governance surfaces: objective_telemetry(5), select_surrogate_candidate_objective(4), stale_artifacts(2), provenance_graph rederive(1), ctm_a controlled_effect regex(1), pattern_genome wrong_shape regex(1).
+- Disposition: classified as in-flight upstream drift, documented, not edited (per seam-reconciliation protocol: real conflict vs additive consistency — all are on foreign files).
+
+## Assertions
+D2_0004_MODIFIED=false D2_0005_ARMED=false NEW_HELDOUT_ACCESS=false SCIENTIFIC_THRESHOLDS_CHANGED=false PHYSICAL_EFFICACY_CLAIMED=false
