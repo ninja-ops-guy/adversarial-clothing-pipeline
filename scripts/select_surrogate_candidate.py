@@ -23,6 +23,7 @@ from ruthless_pipeline.certification.objectives import (
     worst_tail_members,
 )
 from ruthless_pipeline.certification.telemetry_contract import cross_model_disagreement
+from ruthless_pipeline.pattern_genome import freeze_pool_genomes
 from scripts.run_measured_benchmark import build_evaluators, prepare_fixture
 
 
@@ -183,6 +184,9 @@ def main() -> int:
     parser.add_argument("--top-k", type=int, default=6)
     parser.add_argument("--objective", choices=("mean", "cvar"), default="mean")
     parser.add_argument("--cvar-alpha", type=float, default=0.5)
+    parser.add_argument("--pattern-genome-config", default=str(ROOT / "configs" / "pattern_genome_v1.json"))
+    parser.add_argument("--pattern-genome-runtime-lock", default=str(ROOT / "benchmarks" / "runtime_lock.json"))
+    parser.add_argument("--genome-source-commit", default=None)
     parser.add_argument(
         "--objective-telemetry",
         default=None,
@@ -209,6 +213,19 @@ def main() -> int:
         raise SystemExit("candidate pool count does not match candidate records")
     if not pool.get("design_profile_sha256"):
         raise SystemExit("candidate pool missing preregistered design-profile hash")
+
+    # Freeze intrinsic candidate measurements BEFORE any surrogate evaluator is
+    # instantiated. Genome fields are sidecar-only in v1 and never participate
+    # in candidate ranking or thresholding.
+    genome_index = freeze_pool_genomes(
+        pool["candidates"],
+        pool_dir=pool_path.parent,
+        output_dir=output_dir / "pattern-genomes",
+        config_path=args.pattern_genome_config,
+        runtime_lock_path=args.pattern_genome_runtime_lock,
+        source_commit=args.genome_source_commit,
+        repo_root=ROOT,
+    )
 
     evaluators, provenance, state_hashes = build_evaluators(manifest, roles={"surrogate"})
     surrogate_ids = tuple(item["id"] for item in manifest["models"] if item.get("role") == "surrogate")
@@ -257,6 +274,23 @@ def main() -> int:
         winner = min(stage_b_eligible, key=sort_key)
 
     shutil.copyfile(winner["pattern_path"], output_dir / "candidate.png")
+    winner_genome_ref = genome_index["candidates"][winner["candidate_id"]]
+    (output_dir / "candidate-genome-ref.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "rac-pattern-genome-ref/1.0",
+                "candidate_id": winner["candidate_id"],
+                "final_id": args.final_id,
+                "selection_influence": "NONE_MEASUREMENT_ONLY",
+                "heldout_access": False,
+                "genome_ref": winner_genome_ref,
+                "index_sha256": genome_index["index_sha256"],
+            },
+            sort_keys=True,
+            indent=2,
+        )
+        + "\n"
+    )
     final_config = {
         "schema_version": "3.0",
         **{k: v for k, v in winner["config"].items() if k not in {"png", "candidate_id"}},
