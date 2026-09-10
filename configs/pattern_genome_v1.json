@@ -4,10 +4,10 @@
   "fft_window": "hann",
   "radial_bins": 8,
   "palette_method": "deterministic_kmeans",
-  "palette_max_colors": 8,
+  "palette_max_colors": 16,
   "palette_seed": 1337,
   "palette_iterations": 20,
   "connectivity": 8,
-  "spatial_hist_bins": 16,
-  "max_image_dimension": 4096
+  "symmetry_method": "normalized_pixel_similarity",
+  "autocorrelation_method": "fft_ncc"
 }
