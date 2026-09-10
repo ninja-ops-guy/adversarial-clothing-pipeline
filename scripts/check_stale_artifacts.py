@@ -18,10 +18,13 @@ touching D2-0004/D2-0005) requires its own review and is never automatic.
 
 from __future__ import annotations
 
-import argparse
-import json
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # import-safe CLI entrypoint (E2)
+
+import argparse
+import json
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
