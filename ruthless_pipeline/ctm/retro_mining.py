@@ -1,33 +1,12 @@
 """SPEC-7 — Retrospective property-mining protocol (pre-CTM-F gate).
 
-Lesson L9: a standalone, preregistered analysis module over the living corpus
-(SPEC-4) and eligible external-fabrication observations (SPEC-16). It
-evaluates the four cheap predictor families against published transfer deltas
-and emits a SEALED three-state decision artifact.
+The gate is deliberately conservative. It emits exactly one of CONTINUE,
+RESCOPE, or REJECT_HYPOTHESIS_FAMILY. Rejection is legal only when every
+preregistered family has adequate cohort size, power, homogeneity, channel
+metadata, provenance, and minimum-effect exclusion.
 
-Hard rules (fail closed with :class:`RetroMiningError`):
-
-- Exactly three decision states: ``CONTINUE``, ``RESCOPE``,
-  ``REJECT_HYPOTHESIS_FAMILY``. No fourth state exists.
-- ``REJECT_HYPOTHESIS_FAMILY`` is IMPOSSIBLE unless the preregistered power,
-  homogeneity, and minimum-effect conditions are all satisfied for EVERY
-  preregistered predictor family. A null pooled regression across
-  non-commensurable papers is never falsification: families with
-  insufficient cohort size, inadequate power, or excess heterogeneity
-  dispositions to RESCOPE, not rejection.
-- The preregistration must define: minimum useful effect, minimum analyzable
-  cohort, multiplicity correction, missing-data policy, and (via the
-  required power/homogeneity/min-effect fields) the exact conditions under
-  which rejection is legal. Sealing the preregistration is content-hashed
-  and immutable.
-- Decisions are DERIVED, never asserted: the only way to obtain a decision
-  artifact is :func:`seal_decision`. A user-asserted decision or a tampered
-  artifact refuses at verification.
-- Claim state is capped at EXPLORATORY/observational by construction;
-  corpus-derived digital measurements and external physical observations
-  never promote to a controlled physical efficacy claim.
-
-Additive: no frozen schema, Genome v1, or CTM-A contract is mutated.
+External/corpus observations remain EXPLORATORY and never become controlled
+physical-efficacy evidence through this module.
 """
 from __future__ import annotations
 
@@ -39,25 +18,24 @@ from typing import Any, Iterable
 import jsonschema
 
 from ruthless_pipeline.pattern_genome.canonical import canonical_json, sha256_bytes
-
 from .errors import CTMBridgeError
 
 RETRO_PREREG_SCHEMA_VERSION = "rac-ctm-retro-prereg/1.0"
-RETRO_DECISION_SCHEMA_VERSION = "rac-ctm-retro-decision/1.0"
+RETRO_DECISION_SCHEMA_VERSION = "rac-ctm-retro-decision/1.1"
 
 _SCHEMA_DIR = Path(__file__).resolve().parents[2] / "schemas"
 _PREREG_SCHEMA_PATH = _SCHEMA_DIR / "ctm_retro_prereg_v1.schema.json"
-_DECISION_SCHEMA_PATH = _SCHEMA_DIR / "ctm_retro_decision_v1.schema.json"
+_DECISION_SCHEMA_PATH = _SCHEMA_DIR / "ctm_retro_decision_v1_1.schema.json"
 
 
 class RetroMiningError(CTMBridgeError):
     """SPEC-7 retro-mining contract violated. Fail closed."""
 
 
-#: The sealed three-state decision enum (exactly three; no fourth state).
-DECISION_STATES = frozenset({"CONTINUE", "RESCOPE", "REJECT_HYPOTHESIS_FAMILY"})
+DECISION_STATES = frozenset({
+    "CONTINUE", "RESCOPE", "REJECT_HYPOTHESIS_FAMILY"
+})
 
-#: The four cheap preregistered predictor families (SPEC-7(b)).
 PREDICTOR_FAMILIES = frozenset({
     "harmonic_energy_curve",
     "description_length",
@@ -66,10 +44,8 @@ PREDICTOR_FAMILIES = frozenset({
 })
 
 MULTIPLICITY_METHODS = frozenset({"holm", "bonferroni", "bh"})
-
 MISSING_DATA_POLICIES = frozenset({"complete_case", "stratum_specific"})
 
-#: Minimum stratification metadata (SPEC-7: stratify or model heterogeneity).
 STRATIFICATION_AXES = (
     "target_head_class",
     "channel_class",
@@ -77,46 +53,22 @@ STRATIFICATION_AXES = (
     "cohort",
 )
 
-#: Claim ceiling: secondary/derived evidence, exploratory by construction.
 CLAIM_STATE = "EXPLORATORY"
 
-#: Per-family dispositions inside a decision.
 _FAMILY_DISPOSITIONS = frozenset({
     "incremental_signal",
     "legally_rejected",
     "insufficient_cohort",
     "underpowered",
     "heterogeneous",
+    "metadata_inadequate",
     "no_signal_not_rejectable",
 })
-
-_SHA256_LEN = 64
-
-
-def _is_sha256(value: Any) -> bool:
-    if not isinstance(value, str) or len(value) != _SHA256_LEN:
-        return False
-    try:
-        int(value, 16)
-    except ValueError:
-        return False
-    return value == value.lower()
-
-
-# ---------------------------------------------------------------------------
-# Preregistration
-# ---------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
 class RetroPreregistration:
-    """Immutable, content-hashed SPEC-7 preregistration.
-
-    The rejection-legality contract is structural: ``min_power``,
-    ``max_heterogeneity``, and ``minimum_useful_effect`` are required fields,
-    so the exact conditions under which REJECT_HYPOTHESIS_FAMILY is legal
-    are always defined.
-    """
+    """Immutable, content-hashed SPEC-7 preregistration."""
 
     created_utc: str
     minimum_useful_effect: float
@@ -136,24 +88,35 @@ class RetroPreregistration:
             )
         if not self.created_utc:
             raise RetroMiningError("created_utc is required (fail closed)")
-        if not isinstance(self.minimum_useful_effect, (int, float)) or not (self.minimum_useful_effect > 0):
+        if (
+            isinstance(self.minimum_useful_effect, bool)
+            or not isinstance(self.minimum_useful_effect, (int, float))
+            or self.minimum_useful_effect <= 0
+        ):
             raise RetroMiningError(
-                "minimum_useful_effect must be > 0: the preregistration must "
-                "prespecify the smallest effect worth rejecting for (fail closed)"
+                "minimum_useful_effect must be > 0 (fail closed)"
             )
-        if not isinstance(self.minimum_analyzable_cohort, int) or self.minimum_analyzable_cohort < 2:
+        if (
+            isinstance(self.minimum_analyzable_cohort, bool)
+            or not isinstance(self.minimum_analyzable_cohort, int)
+            or self.minimum_analyzable_cohort < 2
+        ):
             raise RetroMiningError(
                 "minimum_analyzable_cohort must be an integer >= 2 (fail closed)"
             )
-        if not isinstance(self.min_power, (int, float)) or not (0.0 < self.min_power <= 1.0):
+        if (
+            isinstance(self.min_power, bool)
+            or not isinstance(self.min_power, (int, float))
+            or not (0.0 < self.min_power <= 1.0)
+        ):
+            raise RetroMiningError("min_power must be in (0, 1] (fail closed)")
+        if (
+            isinstance(self.max_heterogeneity, bool)
+            or not isinstance(self.max_heterogeneity, (int, float))
+            or not (0.0 <= self.max_heterogeneity <= 1.0)
+        ):
             raise RetroMiningError(
-                "min_power must be in (0, 1]: rejection requires adequate power "
-                "(fail closed)"
-            )
-        if not isinstance(self.max_heterogeneity, (int, float)) or not (0.0 <= self.max_heterogeneity <= 1.0):
-            raise RetroMiningError(
-                "max_heterogeneity must be in [0, 1]: rejection requires "
-                "sufficient homogeneity (fail closed)"
+                "max_heterogeneity must be in [0, 1] (fail closed)"
             )
         if self.multiplicity_correction not in MULTIPLICITY_METHODS:
             raise RetroMiningError(
@@ -166,23 +129,17 @@ class RetroPreregistration:
                 f"allowed: {sorted(MISSING_DATA_POLICIES)} (fail closed)"
             )
         if not self.predictor_families:
-            raise RetroMiningError(
-                "predictor_families must not be empty: the preregistration names "
-                "the families under test (fail closed)"
-            )
+            raise RetroMiningError("predictor_families must not be empty")
+        if len(set(self.predictor_families)) != len(self.predictor_families):
+            raise RetroMiningError("predictor_families must not contain duplicates")
         for family in self.predictor_families:
             if family not in PREDICTOR_FAMILIES:
                 raise RetroMiningError(
                     f"unknown predictor family {family!r}; allowed: "
                     f"{sorted(PREDICTOR_FAMILIES)} (fail closed)"
                 )
-        if len(set(self.predictor_families)) != len(self.predictor_families):
-            raise RetroMiningError("predictor_families must not contain duplicates")
         if not self.luminance_baseline:
-            raise RetroMiningError(
-                "luminance_baseline is required: incremental information is "
-                "defined against the luminance-only baseline (fail closed)"
-            )
+            raise RetroMiningError("luminance_baseline is required")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -198,6 +155,29 @@ class RetroPreregistration:
             "luminance_baseline": self.luminance_baseline,
             "stratification_axes": list(STRATIFICATION_AXES),
         }
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "RetroPreregistration":
+        if not isinstance(payload, dict):
+            raise RetroMiningError("preregistration payload must be an object")
+        axes = payload.get("stratification_axes")
+        if axes is not None and tuple(axes) != STRATIFICATION_AXES:
+            raise RetroMiningError(
+                "preregistration stratification_axes disagree with the frozen "
+                "SPEC-7 axes (fail closed)"
+            )
+        return cls(
+            created_utc=payload.get("created_utc", ""),
+            minimum_useful_effect=payload.get("minimum_useful_effect", 0),
+            minimum_analyzable_cohort=payload.get("minimum_analyzable_cohort", 0),
+            min_power=payload.get("min_power", 0),
+            max_heterogeneity=payload.get("max_heterogeneity", -1),
+            multiplicity_correction=payload.get("multiplicity_correction", ""),
+            missing_data_policy=payload.get("missing_data_policy", ""),
+            predictor_families=tuple(payload.get("predictor_families", ())),
+            luminance_baseline=payload.get("luminance_baseline", ""),
+            schema_version=payload.get("schema_version", ""),
+        )
 
     def canonical_bytes(self) -> bytes:
         return canonical_json(self.to_dict())
@@ -215,23 +195,18 @@ class RetroPreregistration:
             jsonschema.validate(self.to_dict(), schema)
         except jsonschema.ValidationError as exc:
             raise RetroMiningError(
-                f"retro preregistration fails ctm_retro_prereg_v1 schema: {exc.message}"
+                f"retro preregistration fails ctm_retro_prereg_v1 schema: "
+                f"{exc.message}"
             ) from exc
-
-
-# ---------------------------------------------------------------------------
-# Per-family analysis result (input to the gate)
-# ---------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
 class FamilyResult:
-    """Preregistered analysis outcome for one predictor family.
+    """One preregistered predictor-family analysis result.
 
-    ``incremental_signal`` = reproducible incremental information beyond the
-    luminance-only baseline under the preregistered multiplicity correction.
-    ``min_effect_excluded`` = the analysis excludes the prespecified minimum
-    useful effect for this family.
+    Channel/provenance adequacy are explicit booleans. They have no defaults:
+    callers cannot omit these validity judgments and still obtain a
+    rejection-capable result.
     """
 
     family: str
@@ -240,6 +215,9 @@ class FamilyResult:
     heterogeneity: float
     incremental_signal: bool
     min_effect_excluded: bool
+    channel_metadata_adequate: bool
+    provenance_adequate: bool
+    metadata_gaps: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.family not in PREDICTOR_FAMILIES:
@@ -247,12 +225,47 @@ class FamilyResult:
                 f"unknown predictor family {self.family!r}; allowed: "
                 f"{sorted(PREDICTOR_FAMILIES)} (fail closed)"
             )
-        if not isinstance(self.cohort_size, int) or self.cohort_size < 0:
+        if (
+            isinstance(self.cohort_size, bool)
+            or not isinstance(self.cohort_size, int)
+            or self.cohort_size < 0
+        ):
             raise RetroMiningError("cohort_size must be a non-negative integer")
         for name in ("achieved_power", "heterogeneity"):
             value = getattr(self, name)
-            if not isinstance(value, (int, float)) or not (0.0 <= value <= 1.0):
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not (0.0 <= value <= 1.0)
+            ):
                 raise RetroMiningError(f"{name} must be in [0, 1], got {value!r}")
+        for name in (
+            "incremental_signal",
+            "min_effect_excluded",
+            "channel_metadata_adequate",
+            "provenance_adequate",
+        ):
+            if not isinstance(getattr(self, name), bool):
+                raise RetroMiningError(f"{name} must be boolean (fail closed)")
+        if isinstance(self.metadata_gaps, str):
+            raise RetroMiningError("metadata_gaps must be a sequence, not a string")
+        if any(not isinstance(gap, str) or not gap for gap in self.metadata_gaps):
+            raise RetroMiningError("metadata_gaps must contain non-empty strings")
+        if len(set(self.metadata_gaps)) != len(self.metadata_gaps):
+            raise RetroMiningError("metadata_gaps must not contain duplicates")
+        if (
+            self.channel_metadata_adequate
+            and self.provenance_adequate
+            and self.metadata_gaps
+        ):
+            raise RetroMiningError(
+                "metadata_gaps cannot be non-empty when channel/provenance "
+                "adequacy are both true"
+            )
+
+    @property
+    def metadata_adequate(self) -> bool:
+        return self.channel_metadata_adequate and self.provenance_adequate
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -262,15 +275,47 @@ class FamilyResult:
             "heterogeneity": self.heterogeneity,
             "incremental_signal": self.incremental_signal,
             "min_effect_excluded": self.min_effect_excluded,
+            "channel_metadata_adequate": self.channel_metadata_adequate,
+            "provenance_adequate": self.provenance_adequate,
+            "metadata_gaps": list(self.metadata_gaps),
         }
 
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "FamilyResult":
+        if not isinstance(payload, dict):
+            raise RetroMiningError("family result payload must be an object")
+        required = (
+            "family",
+            "cohort_size",
+            "achieved_power",
+            "heterogeneity",
+            "incremental_signal",
+            "min_effect_excluded",
+            "channel_metadata_adequate",
+            "provenance_adequate",
+        )
+        missing = [name for name in required if name not in payload]
+        if missing:
+            raise RetroMiningError(
+                f"family result missing required fields {missing} (fail closed)"
+            )
+        return cls(
+            family=payload["family"],
+            cohort_size=payload["cohort_size"],
+            achieved_power=payload["achieved_power"],
+            heterogeneity=payload["heterogeneity"],
+            incremental_signal=payload["incremental_signal"],
+            min_effect_excluded=payload["min_effect_excluded"],
+            channel_metadata_adequate=payload["channel_metadata_adequate"],
+            provenance_adequate=payload["provenance_adequate"],
+            metadata_gaps=tuple(payload.get("metadata_gaps", ())),
+        )
 
-def require_reject_legal(prereg: RetroPreregistration, result: FamilyResult) -> None:
-    """Fail-closed legality check for rejecting one hypothesis family.
 
-    Rejection is legal ONLY when the preregistered power, homogeneity, and
-    minimum-effect conditions are ALL satisfied for an analyzable cohort.
-    """
+def require_reject_legal(
+    prereg: RetroPreregistration, result: FamilyResult
+) -> None:
+    """Refuse rejection unless every preregistered adequacy condition holds."""
     unmet: list[str] = []
     if result.cohort_size < prereg.minimum_analyzable_cohort:
         unmet.append(
@@ -286,31 +331,31 @@ def require_reject_legal(prereg: RetroPreregistration, result: FamilyResult) -> 
             f"heterogeneity {result.heterogeneity} > max_heterogeneity "
             f"{prereg.max_heterogeneity}"
         )
+    if not result.channel_metadata_adequate:
+        unmet.append("channel metadata inadequate")
+    if not result.provenance_adequate:
+        unmet.append("provenance inadequate")
     if not result.min_effect_excluded:
-        unmet.append(
-            "minimum useful effect not excluded by the preregistered analysis"
-        )
+        unmet.append("minimum useful effect not excluded")
     if unmet:
         raise RetroMiningError(
             f"REJECT_HYPOTHESIS_FAMILY is illegal for {result.family!r}: "
             + "; ".join(unmet)
-            + " — a null result without preregistered power, homogeneity, and "
-            "minimum-effect exclusion is RESCOPE, never rejection (fail closed)"
+            + " — inadequate comparability/metadata/power is RESCOPE, never "
+            "rejection (fail closed)"
         )
 
 
-# ---------------------------------------------------------------------------
-# Sealed decision artifact
-# ---------------------------------------------------------------------------
-
-
-def _family_disposition(prereg: RetroPreregistration, result: FamilyResult) -> str:
+def _family_disposition(
+    prereg: RetroPreregistration, result: FamilyResult
+) -> str:
+    if not result.metadata_adequate:
+        return "metadata_inadequate"
     if result.incremental_signal:
         if result.cohort_size < prereg.minimum_analyzable_cohort:
             raise RetroMiningError(
                 f"family {result.family!r} claims incremental signal below the "
-                "minimum analyzable cohort: signal claims require an analyzable "
-                "cohort (fail closed)"
+                "minimum analyzable cohort (fail closed)"
             )
         return "incremental_signal"
     if result.cohort_size < prereg.minimum_analyzable_cohort:
@@ -328,17 +373,7 @@ def seal_decision(
     prereg: RetroPreregistration,
     results: Iterable[FamilyResult],
 ) -> dict[str, Any]:
-    """Derive and seal the three-state decision artifact. The ONLY way to
-    obtain a decision.
-
-    - CONTINUE: >= 1 preregistered family shows incremental signal beyond the
-      luminance-only baseline on an analyzable cohort.
-    - REJECT_HYPOTHESIS_FAMILY: EVERY preregistered family is legally
-      rejected (power + homogeneity + minimum-effect exclusion, verified
-      through :func:`require_reject_legal`).
-    - RESCOPE: anything else — heterogeneity, missing channel metadata,
-      insufficient cohort, or inadequate power prevents rejection.
-    """
+    """Derive and seal the three-state decision artifact."""
     prereg.validate_against_schema()
     results = list(results)
     by_family = {r.family: r for r in results}
@@ -347,14 +382,12 @@ def seal_decision(
     missing = [f for f in prereg.predictor_families if f not in by_family]
     if missing:
         raise RetroMiningError(
-            f"missing preregistered family results {missing}: the gate "
-            "evaluates exactly the preregistered families (fail closed)"
+            f"missing preregistered family results {missing} (fail closed)"
         )
     extra = [f for f in by_family if f not in prereg.predictor_families]
     if extra:
         raise RetroMiningError(
-            f"unpreregistered family results {extra}: post-hoc families cannot "
-            "enter the sealed gate (fail closed)"
+            f"unpreregistered family results {extra} (fail closed)"
         )
 
     dispositions: dict[str, str] = {}
@@ -362,8 +395,6 @@ def seal_decision(
         result = by_family[family]
         disposition = _family_disposition(prereg, result)
         if disposition == "legally_rejected":
-            # mechanical re-verification: rejection is impossible unless the
-            # preregistered conditions hold
             require_reject_legal(prereg, result)
         dispositions[family] = disposition
 
@@ -379,21 +410,36 @@ def seal_decision(
         "decision": decision,
         "preregistration_sha256": prereg.preregistration_sha256(),
         "preregistration_id": prereg.preregistration_id,
+        "preregistration": prereg.to_dict(),
         "family_dispositions": dispositions,
         "family_results": [by_family[f].to_dict() for f in sorted(by_family)],
         "stratification_axes": list(STRATIFICATION_AXES),
         "claim_state": CLAIM_STATE,
         "physical_efficacy_claimed": False,
     }
+    report_sha = sha256_bytes(canonical_json(artifact_body))
     artifact = dict(artifact_body)
-    artifact["report_sha256"] = sha256_bytes(canonical_json(artifact_body))
-    artifact["decision_id"] = "RAC-CTM-RETRO-DECISION-" + artifact["report_sha256"][:16]
+    artifact["report_sha256"] = report_sha
+    artifact["decision_id"] = "RAC-CTM-RETRO-DECISION-" + report_sha[:16]
+    schema = json.loads(_DECISION_SCHEMA_PATH.read_text())
+    try:
+        jsonschema.validate(artifact, schema)
+    except jsonschema.ValidationError as exc:
+        raise RetroMiningError(
+            f"derived decision artifact fails ctm_retro_decision_v1_1 schema: "
+            f"{exc.message}"
+        ) from exc
     return artifact
 
 
 def verify_decision(artifact: dict[str, Any]) -> None:
-    """Fail-closed verification of a sealed decision artifact: schema,
-    derived hash, decision-state enum, and rejection legality."""
+    """Fully re-derive a sealed decision, not merely its hash.
+
+    v1.1 embeds the preregistration contract so verification can reconstruct
+    every family result and re-run the legality/decision logic. A caller
+    cannot forge a different decision and make it valid merely by recomputing
+    report_sha256.
+    """
     if not isinstance(artifact, dict):
         raise RetroMiningError("decision artifact must be an object")
     schema = json.loads(_DECISION_SCHEMA_PATH.read_text())
@@ -401,18 +447,27 @@ def verify_decision(artifact: dict[str, Any]) -> None:
         jsonschema.validate(artifact, schema)
     except jsonschema.ValidationError as exc:
         raise RetroMiningError(
-            f"decision artifact fails ctm_retro_decision_v1 schema: {exc.message}"
+            f"decision artifact fails ctm_retro_decision_v1_1 schema: "
+            f"{exc.message}"
         ) from exc
-    body = {k: v for k, v in artifact.items() if k not in ("report_sha256", "decision_id")}
-    if sha256_bytes(canonical_json(body)) != artifact["report_sha256"]:
+
+    prereg = RetroPreregistration.from_dict(artifact["preregistration"])
+    prereg.validate_against_schema()
+    if artifact["preregistration_sha256"] != prereg.preregistration_sha256():
         raise RetroMiningError(
-            "decision artifact report_sha256 does not re-derive: the sealed "
-            "report was tampered with or asserted (fail closed)"
+            "preregistration_sha256 does not match embedded preregistration "
+            "(fail closed)"
         )
-    if artifact["decision"] == "REJECT_HYPOTHESIS_FAMILY":
-        dispositions = artifact["family_dispositions"]
-        if not dispositions or any(d != "legally_rejected" for d in dispositions.values()):
-            raise RetroMiningError(
-                "REJECT_HYPOTHESIS_FAMILY artifact with a non-rejected family "
-                "disposition is structurally impossible and refused (fail closed)"
-            )
+    if artifact["preregistration_id"] != prereg.preregistration_id:
+        raise RetroMiningError(
+            "preregistration_id does not match embedded preregistration "
+            "(fail closed)"
+        )
+
+    results = [FamilyResult.from_dict(row) for row in artifact["family_results"]]
+    expected = seal_decision(prereg, results)
+    if artifact != expected:
+        raise RetroMiningError(
+            "sealed decision does not fully re-derive from the embedded "
+            "preregistration and family results (fail closed)"
+        )
