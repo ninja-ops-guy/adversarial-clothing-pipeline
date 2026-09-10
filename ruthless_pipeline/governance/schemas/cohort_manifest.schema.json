@@ -5,7 +5,7 @@
   "required": ["schema_version", "cohort_id", "experiment_id", "specimen_ids", "artifact_sha256"],
   "properties": {
     "schema_version": {"const": "1.0"},
-    "cohort_id": {"type": "string", "pattern": "^RAC-COH-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "cohort_id": {"type": "string", "pattern": "^RAC-(COHORT|COH)-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "specimen_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
     "artifact_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
