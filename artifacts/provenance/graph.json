@@ -880,6 +880,90 @@
       "type": "document"
     },
     {
+      "id": "schema:ctm_channel_v1.schema.json",
+      "path": "schemas/ctm_channel_v1.schema.json",
+      "sha256": "a04223af5c905f22911781a92b88fd2e474885e82b741618158c46ba29fdb349",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_citation_v1.schema.json",
+      "path": "schemas/ctm_citation_v1.schema.json",
+      "sha256": "08ab6681db6a273a3d4cf1f8e024e61421aa6bd67591041b06befa290f8ecd42",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_claim_scope_v1.schema.json",
+      "path": "schemas/ctm_claim_scope_v1.schema.json",
+      "sha256": "f17517434fb81bc0d587df8430affb102fc14dae7e2588784296b0ff02c3ebb1",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_claim_v1.schema.json",
+      "path": "schemas/ctm_claim_v1.schema.json",
+      "sha256": "bf1bb56f359b62655a0eb119ad6cc2005bacb1047336a3fb9a13800e9ee7d82a",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_corpus_entry_v1.schema.json",
+      "path": "schemas/ctm_corpus_entry_v1.schema.json",
+      "sha256": "b4580437375dd3c7c5bc5f615efe49f2362428f2c4802c4020d18cd40ae9ff77",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_corpus_snapshot_v1.schema.json",
+      "path": "schemas/ctm_corpus_snapshot_v1.schema.json",
+      "sha256": "c5f5738d217ed89a51f1600944fc4025adf62f44126e12cc325116c3c1f2fe02",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_external_observation_v1.schema.json",
+      "path": "schemas/ctm_external_observation_v1.schema.json",
+      "sha256": "bc9e3692dfdf572d81e3955fe6ad58509be64f4056848494152c764d95fd5bc4",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_matched_null_v1.schema.json",
+      "path": "schemas/ctm_matched_null_v1.schema.json",
+      "sha256": "80203c12068d051d7451fa3f89b68ba7ae6fb539839ab7cb75d5758a50f14105",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_positioning_v1.schema.json",
+      "path": "schemas/ctm_positioning_v1.schema.json",
+      "sha256": "1fdcdc43ae41df9f268916cf2726089238c51bd3fe1c04909b35828ef641ac90",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_retro_decision_v1.schema.json",
+      "path": "schemas/ctm_retro_decision_v1.schema.json",
+      "sha256": "44654d0c2d56c6044b88a7c4fd5b8229d6943ae591b4c3d8935a501434a37902",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_retro_decision_v1_1.schema.json",
+      "path": "schemas/ctm_retro_decision_v1_1.schema.json",
+      "sha256": "2f5c75755773f7335b28abf4702d6369cbcdde8ddda4ff11715b6062a42216ac",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_retro_prereg_v1.schema.json",
+      "path": "schemas/ctm_retro_prereg_v1.schema.json",
+      "sha256": "00565e9ed1ba5ef64b1eb6a7c18606df5d33319e08d4939d6e06f881856fe96c",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_swap_validity_v1.schema.json",
+      "path": "schemas/ctm_swap_validity_v1.schema.json",
+      "sha256": "21207bc9b037809a64acc6c98da757d4977abca91a8c64e11ded1e8355af2350",
+      "type": "document"
+    },
+    {
+      "id": "schema:ctm_target_semantics_v1.schema.json",
+      "path": "schemas/ctm_target_semantics_v1.schema.json",
+      "sha256": "9c6fc60e361b6d63da8c7eea994de916503dd7a763db19cadf5e42b021d11902",
+      "type": "document"
+    },
+    {
       "id": "schema:detector_response.schema.json",
       "path": "schemas/detector_response.schema.json",
       "sha256": "bf8b50e61c746a9e90996fed03e91307b76ef73631171f876710c6c7a6ff3f12",
@@ -895,6 +979,12 @@
       "id": "schema:optimization_objective.schema.json",
       "path": "schemas/optimization_objective.schema.json",
       "sha256": "397eb70a6ca64ee253a206ca346859da5ed2acb0a345053b3179b1d344369c3b",
+      "type": "document"
+    },
+    {
+      "id": "schema:pattern_genome_v1.schema.json",
+      "path": "schemas/pattern_genome_v1.schema.json",
+      "sha256": "ebeea16d39aa71fd32ccb946d144c5cb9f2ff747f1cce11c880548f3e06526c8",
       "type": "document"
     },
     {
