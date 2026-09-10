@@ -146,3 +146,12 @@ def test_json_round_trip():
         == registry.get("RAC-EXP-2026-001").lineage_hash
     )
     restored.validate()
+
+
+def test_pattern_genome_stage_is_valid_between_candidate_and_generation():
+    stages = [
+        StageRef(stage="candidate", artifact_id="CAND-001", sha256=H1),
+        StageRef(stage="pattern_genome", artifact_id="RAC-GENOME-0123456789abcdef", sha256=H4),
+        StageRef(stage="generation", artifact_id="GEN-001", sha256=H2),
+    ]
+    _artifact(stages=stages).validate()
