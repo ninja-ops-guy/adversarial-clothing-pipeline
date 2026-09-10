@@ -56,3 +56,15 @@ New namespaces only.
 ## Dependency notes
 - UA-1..UA-4 (user actions) gate Wave 2 completion and Wave 4 measured-data promotion only; all synthetic work proceeds independently.
 - Nothing in Waves 2–6 touches D2-0004/D2-0005 surfaces; crossing Barrier 5 does not authorize D2-0005 execution.
+
+
+## External research integration — noRecognition (2026-09-10)
+
+**Status:** REVIEW COMPLETE; runtime audit and implementation PENDING.  
+**Review:** [noRecognition review and RAC integration](research/NORECOGNITION_REVIEW_2026-09-10.md).
+
+- [ ] Pass A: audit evaluation-exposure provenance, stage accounting, and report consistency (NR-01/04/05); implement only confirmed gaps.
+- [ ] Pass B: reconcile observation-medium labels and control estimands with existing physical readiness (NR-02/03).
+- [ ] Pass C: require predictor provenance and prospective evaluation when such a study is proposed; complete the physical-paper full-text review (NR-06).
+
+Preserve current physical/production priorities and frozen experiment boundaries. The review maps acceptance checks to existing components; it does not certify implementation completeness or create a new performance claim.

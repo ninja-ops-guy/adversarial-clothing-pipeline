@@ -173,3 +173,24 @@ claim_impact
 ```
 
 A paper's headline percentage should never be copied into an internal “current performance” dashboard without the source conditions and evidence label.
+
+
+## External project review — noRecognition (2026-09-10)
+
+**source_id:** EXT-NORECOGNITION-2026-09-10  
+**citation/title:** noRecognition public repository and current research disclosures  
+**official_or_primary_url:** [public repository](https://github.com/hevnsnt/norecognition), [research page](https://sandbox.norecognition.org/research)  
+**publication_date:** mixed historical/live sources; see pinned versions in the review  
+**reviewed_date:** 2026-09-10  
+**evidence_label:** External result — replication needed  
+**task/threat_model:** task-specific person detection, face detection, and recognition; protocols differ  
+**digital_or_physical:** use each source's explicit observation medium  
+**models/sensors:** source-specific; not mapped to RAC model identities by nickname  
+**conditions:** mixed cohorts, garments, and source versions; not pooled  
+**reported_metric + definition:** heterogeneous source metrics; no numeric result imported  
+**limitations:** unresolved source inconsistencies and incomplete reproducibility of the current private stack  
+**internal_replication_status:** not reproduced  
+**roadmap_impact:** bounded evaluation/reporting audit, passes A–C  
+**claim_impact:** no RAC efficacy or certification change
+
+See the [detailed review, primary-literature checks, and acceptance criteria](research/NORECOGNITION_REVIEW_2026-09-10.md). This entry is prospective external-research integration; it does not refresh unrelated historical entries above.
