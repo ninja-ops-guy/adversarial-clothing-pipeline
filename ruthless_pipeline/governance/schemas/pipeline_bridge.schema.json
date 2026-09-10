@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-pipeline-bridge/1.0",
+  "type": "object",
+  "required": ["schema_version", "bridge_id", "sentinel_id", "old_pipeline_id", "new_pipeline_id", "paired_evaluation_required"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "bridge_id": {"type": "string", "pattern": "^RAC-BRIDGE-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "sentinel_id": {"type": "string", "pattern": "^RAC-SENT-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "old_pipeline_id": {"type": "string", "pattern": "^RAC-PIPE-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "new_pipeline_id": {"type": "string", "pattern": "^RAC-PIPE-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "paired_evaluation_required": {"const": true}
+  },
+  "additionalProperties": false
+}

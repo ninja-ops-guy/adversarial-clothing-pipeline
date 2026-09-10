@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-evaluation-pipeline/1.0",
+  "type": "object",
+  "required": ["schema_version", "pipeline_id", "software_version", "code_hash", "detector_hash", "preprocessing_hash", "random_seed", "preprocessing_mode", "prior_outcome_access"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "pipeline_id": {"type": "string", "pattern": "^RAC-PIPE-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "software_version": {"type": "string", "minLength": 1},
+    "code_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "detector_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "preprocessing_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "random_seed": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+    "preprocessing_mode": {"enum": ["STATELESS", "CALIBRATED"]},
+    "calibration_id": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^RAC-CAL-[A-Z0-9][A-Z0-9._-]{2,63}$"}]},
+    "calibration_state_hash": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{64}$"}]},
+    "prior_outcome_access": {"const": false}
+  },
+  "additionalProperties": false
+}
