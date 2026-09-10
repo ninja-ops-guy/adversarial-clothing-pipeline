@@ -1,0 +1,85 @@
+{
+  "classifications": [
+    {
+      "candidate_id": "b3-cand-000",
+      "classification": "TRANSFER_BEST",
+      "metrics": {
+        "detector_objective": 0.5096182313296908,
+        "physical_robustness": 0.4170969032431572,
+        "style": 0.48085011014703316,
+        "transfer": 0.7518110250590736
+      }
+    },
+    {
+      "candidate_id": "b3-cand-001",
+      "classification": "PHYSICAL_ROBUSTNESS_BEST",
+      "metrics": {
+        "detector_objective": 0.44778812670098483,
+        "physical_robustness": 0.42601763249186253,
+        "style": 0.8154939544385202,
+        "transfer": 0.7442375614302922
+      }
+    },
+    {
+      "candidate_id": "b3-cand-002",
+      "classification": "DIGITAL_BEST",
+      "metrics": {
+        "detector_objective": 0.4477150975991076,
+        "physical_robustness": 0.42286461372970263,
+        "style": 0.8152539687130674,
+        "transfer": 0.7336587883401625
+      }
+    },
+    {
+      "candidate_id": "b3-cand-003",
+      "classification": "STYLE_BEST",
+      "metrics": {
+        "detector_objective": 0.4941433709354425,
+        "physical_robustness": 0.4209447648847202,
+        "style": 0.6485847017768697,
+        "transfer": 0.7348028070092433
+      }
+    },
+    {
+      "candidate_id": "b3-cand-004",
+      "classification": "PHYSICAL_ROBUSTNESS_BEST",
+      "metrics": {
+        "detector_objective": 0.487451924153312,
+        "physical_robustness": 0.42343443337387365,
+        "style": 0.6495134956221267,
+        "transfer": 0.7489371131276554
+      }
+    },
+    {
+      "candidate_id": "b3-cand-005",
+      "classification": "TRANSFER_BEST",
+      "metrics": {
+        "detector_objective": 0.49294183297049193,
+        "physical_robustness": 0.41984702736741286,
+        "style": 0.6231534006422261,
+        "transfer": 0.7453365846353152
+      }
+    },
+    {
+      "candidate_id": "b3-cand-006",
+      "classification": "TRANSFER_BEST",
+      "metrics": {
+        "detector_objective": 0.4870380972773975,
+        "physical_robustness": 0.41979272177888993,
+        "style": 0.6153486128582758,
+        "transfer": 0.7567989547299053
+      }
+    },
+    {
+      "candidate_id": "b3-cand-007",
+      "classification": "PHYSICAL_ROBUSTNESS_BEST",
+      "metrics": {
+        "detector_objective": 0.5273242362154417,
+        "physical_robustness": 0.4227147091116379,
+        "style": 0.482413514934245,
+        "transfer": 0.7333306688266813
+      }
+    }
+  ],
+  "stage": "pareto_style"
+}

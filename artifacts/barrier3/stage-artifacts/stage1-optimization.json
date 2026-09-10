@@ -1,0 +1,18 @@
+{
+  "best_candidate_id": "b3-cand-002",
+  "best_value": 0.4477150975991076,
+  "n_evaluations": 8,
+  "objective_id": "RAC-BARRIER3-SYNTHETIC-OBJECTIVE",
+  "objective_sha256": "11159fb80f377d5da204ef612dd1e8916caff5e9ef556e9e1d50322b7f108ee8",
+  "per_candidate_total": {
+    "b3-cand-000": 0.5096182313296908,
+    "b3-cand-001": 0.44778812670098483,
+    "b3-cand-002": 0.4477150975991076,
+    "b3-cand-003": 0.4941433709354425,
+    "b3-cand-004": 0.487451924153312,
+    "b3-cand-005": 0.49294183297049193,
+    "b3-cand-006": 0.4870380972773975,
+    "b3-cand-007": 0.5273242362154417
+  },
+  "stage": "optimization_v3"
+}

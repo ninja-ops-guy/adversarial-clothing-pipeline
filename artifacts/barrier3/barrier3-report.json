@@ -1,0 +1,16 @@
+{
+  "artifact_integrity": "PASS",
+  "artifact_violations": [],
+  "barrier3_closed": true,
+  "deterministic_replay": "PASS",
+  "provenance": "PASS",
+  "provenance_violations": [],
+  "run_id": "RAC-BARRIER3-SYNTHETIC-001",
+  "scientific_boundaries": {
+    "d2_0004_modified": false,
+    "d2_0005_armed": false,
+    "evidence_class": "synthetic_pipeline_validation_only",
+    "held_out_models_accessed": false,
+    "physical_efficacy_claimed": false
+  }
+}

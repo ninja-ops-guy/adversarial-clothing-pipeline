@@ -1,0 +1,13 @@
+{
+  "config_sha256": [
+    "f2ef6c6e3bca533ea34d849e50540f45515405c14277866591dfe6e302ef44ec",
+    "f2ef6c6e3bca533ea34d849e50540f45515405c14277866591dfe6e302ef44ec"
+  ],
+  "excluded_from_equivalence": [
+    "runtime-environment.json"
+  ],
+  "mismatched_artifacts": [],
+  "replay_equivalent": true,
+  "stage_seeds_equal": true,
+  "verdict": "PASS"
+}

@@ -1,0 +1,75 @@
+{
+  "adapter": {
+    "adapter_id": "rac-synthetic-detection-adapter",
+    "adapter_version": "1.0.0"
+  },
+  "aggregation": "CVAR",
+  "alpha": 0.5,
+  "detector_loss": {
+    "b3-cand-000": 0.28613928377654374,
+    "b3-cand-001": 0.29293228052967646,
+    "b3-cand-002": 0.29221007749052796,
+    "b3-cand-003": 0.30490446848582287,
+    "b3-cand-004": 0.298854422461066,
+    "b3-cand-005": 0.29828472755145863,
+    "b3-cand-006": 0.290761460784283,
+    "b3-cand-007": 0.30517616337360615
+  },
+  "detectors": [
+    {
+      "model_family": "synthetic-family",
+      "model_id": "rac-synthetic-detector-0"
+    },
+    {
+      "model_family": "synthetic-family",
+      "model_id": "rac-synthetic-detector-1"
+    },
+    {
+      "model_family": "synthetic-family",
+      "model_id": "rac-synthetic-detector-2"
+    }
+  ],
+  "per_candidate_detector_confidence": {
+    "b3-cand-000": {
+      "rac-synthetic-detector-0": 0.8221064292203892,
+      "rac-synthetic-detector-1": 0.8277116427303083,
+      "rac-synthetic-detector-2": 0.6056150032265233
+    },
+    "b3-cand-001": {
+      "rac-synthetic-detector-0": 0.8185772453502295,
+      "rac-synthetic-detector-1": 0.8122551991357531,
+      "rac-synthetic-detector-2": 0.601880239804894
+    },
+    "b3-cand-002": {
+      "rac-synthetic-detector-0": 0.7853965200015435,
+      "rac-synthetic-detector-1": 0.7840147802013698,
+      "rac-synthetic-detector-2": 0.6315650648175742
+    },
+    "b3-cand-003": {
+      "rac-synthetic-detector-0": 0.8142173579993758,
+      "rac-synthetic-detector-1": 0.7559561639140969,
+      "rac-synthetic-detector-2": 0.6342348991142573
+    },
+    "b3-cand-004": {
+      "rac-synthetic-detector-0": 0.7733782890004616,
+      "rac-synthetic-detector-1": 0.8445201843050983,
+      "rac-synthetic-detector-2": 0.6289128660774064
+    },
+    "b3-cand-005": {
+      "rac-synthetic-detector-0": 0.8325792090088626,
+      "rac-synthetic-detector-1": 0.7884309676590315,
+      "rac-synthetic-detector-2": 0.6149995772380512
+    },
+    "b3-cand-006": {
+      "rac-synthetic-detector-0": 0.851919785758282,
+      "rac-synthetic-detector-1": 0.7913329917211102,
+      "rac-synthetic-detector-2": 0.6271440867103238
+    },
+    "b3-cand-007": {
+      "rac-synthetic-detector-0": 0.8103443332272561,
+      "rac-synthetic-detector-1": 0.7818408657221166,
+      "rac-synthetic-detector-2": 0.6078068075306711
+    }
+  },
+  "stage": "detector_science"
+}

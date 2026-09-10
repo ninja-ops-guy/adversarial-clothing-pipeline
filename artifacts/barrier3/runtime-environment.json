@@ -1,0 +1,6 @@
+{
+  "coordinator_version": "1.0.0",
+  "note": "non-scientific metadata; excluded from replay equivalence",
+  "numpy": "2.2.5",
+  "python": "3.12.12"
+}

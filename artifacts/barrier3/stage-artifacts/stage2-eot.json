@@ -1,0 +1,8 @@
+{
+  "distribution_id": "RAC-BARRIER3-EOT-SYNTHETIC",
+  "manifest_sha256": "04814882ede7b1b03e5de3b824413ac4533c278de00761690297a658fcd32482",
+  "n_samples": 6,
+  "samples_sha256": "ba19c07090b7edb1025eaedd63070da92dee90f3f897e6b34f575c815278d32a",
+  "seed": 1120217001,
+  "stage": "eot"
+}

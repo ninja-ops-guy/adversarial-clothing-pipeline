@@ -1,0 +1,15 @@
+{
+  "candidate_pool_sha256": "83f397e623b30330adbef8372d5e43667ed6a13b515f9e8ec26cbb5a5605ea24",
+  "config_sha256": "f2ef6c6e3bca533ea34d849e50540f45515405c14277866591dfe6e302ef44ec",
+  "evidence_boundaries": {
+    "d2_0004_evidence_touched": false,
+    "d2_0005_armed": false,
+    "held_out_models_accessed": false
+  },
+  "frozen_contracts": {
+    "detector_response": "schemas/detector_response.schema.json",
+    "optimization_objective": "schemas/optimization_objective.schema.json",
+    "physical_transfer_record": "schemas/physical_transfer_record.schema.json",
+    "transformation_distribution": "schemas/transformation_distribution.schema.json"
+  }
+}

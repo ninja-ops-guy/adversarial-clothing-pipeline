@@ -1,0 +1,22 @@
+{
+  "record": {
+    "artwork_sha256": "d0eabe14fd488187cfeb5852cb504319a779e7d1b7709bfdda4aa1e3954218a5",
+    "camera": "synthetic",
+    "capture_id": "synthetic-capture-b3",
+    "captured_frame_sha256": "d0eabe14fd488187cfeb5852cb504319a779e7d1b7709bfdda4aa1e3954218a5",
+    "detector_response_refs": [],
+    "evidence_class": "synthetic_pipeline_validation_only",
+    "fabric": "synthetic",
+    "garment_sku": "SYNTHETIC-BARRIER3",
+    "lighting": "synthetic",
+    "mapping_sha256": "4fb4afebf1aff74d29b43c6432ecb87de9eb2bcb290cdea49cbd3a74af46fca7",
+    "physical_efficacy_claimed": false,
+    "pose": "synthetic",
+    "print_process": "synthetic",
+    "record_id": "ptr-b3-26139ac59be19ab2",
+    "schema_version": "1.0",
+    "template_sha256": "9f9c60154f9ec47a4fd362dcbd4ef8b471711a73902a100d00cb13490f8b22e6",
+    "view": "synthetic"
+  },
+  "stage": "physical_transfer"
+}
