@@ -1,8 +1,8 @@
 # RAC Current Project Progress Ledger
 
-**Version:** 1.1.0  
+**Version:** 1.2.0  
 **Last updated:** 2026-09-10  
-**Verified code baseline:** `main` at `d7eed338e404dc287cce416147523dd37828112e` — CI run #821 (`34515747476`) PASS.  
+**Verified governance baseline:** `7ff05187b223d7479a934bb6912799bb943e57f2` — CI run #836 (`34517061829`) PASS.  
 **Authority:** This file is the current-state overlay for RAC/CTM. `PROJECT_PROGRESS.md` remains the historical Sep. 8 ledger and is not rewritten retroactively.
 
 > Engineering completion is not efficacy evidence. Software, schemas, simulations, governance, and CI can be complete while RAC-P physical evidence, RAC-M manufacturing evidence, or a product-efficacy claim remain unavailable.
@@ -11,7 +11,7 @@
 
 RAC is now best described as a research and experimental-governance platform spanning design generation, controlled evaluation, provenance, claim certification, production preparation, and a gated physical program.
 
-The September 10 CTM integration/hardening cycle is **software-integrated and CI-green**. Governance Pass 1 is now **CLOSED / PASS** against the adopted Governance v1 contract. That does **not** advance the physical-evidence ladder. The next high-value work should remain evidence-driven rather than feature-count-driven.
+The September 10 CTM integration/hardening cycle is **software-integrated and CI-green**. Governance Passes 1 and 2 are now **CLOSED / PASS** against the adopted Governance v1 contract. That does **not** advance the physical-evidence ladder. The next high-value work should remain evidence-driven rather than feature-count-driven.
 
 ## Current completion snapshot
 
@@ -21,13 +21,14 @@ The September 10 CTM integration/hardening cycle is **software-integrated and CI
 | CTM contracts / governance | **INTEGRATED** | CTM contract surfaces, matched-null logic, anti-optimization controls, channel/claim semantics and research-integrity layers are implemented and reconciled |
 | CTM B–D integration audit | **PASS** | Semantic mismatches found during audit were corrected; the historical Barrier-3 blocker is resolved and retained only as provenance |
 | Governance Pass 1 | **CLOSED / PASS** | Adopted IDs, append-only ledger, ledger-backed state transitions, structured HALT, schemas and semantic validation are CI-verified |
-| Governance Passes 2–7 | **AUDIT-GATED** | Later-pass modules may already exist, but code presence is not pass certification until each adopted-contract exit gate is independently closed |
+| Governance Pass 2 | **CLOSED / PASS** | Immutable constraint lineage, three-axis impact analysis, preregistered tolerance policy, migration decisions/logging and frozen-D2 protection are CI-verified |
+| Governance Passes 3–7 | **AUDIT-GATED** | Later-pass modules may already exist, but code presence is not pass certification until each adopted-contract exit gate is independently closed |
 | Provenance graph | **CURRENT / VERIFIED** | Deterministic graph is committed and independently verifiable; regeneration no longer requires the ML runtime |
-| Repository CI | **GREEN** | Run #821 passed Python 3.10/3.11/3.12, package build, dependency audit and lightweight provenance |
+| Repository CI | **GREEN at Pass-2 verification baseline** | Run #836 passed Python 3.10/3.11/3.12, package build, dependency audit and lightweight provenance |
 | Pattern Genome v1 | **FROZEN** | v1 remains unchanged; later Genome work must be additive/versioned |
 | D2-0004 | **CLOSED — NEGATIVE / RAC-D0** | Historical retained result remains immutable and log-attested |
 | D2-0005 | **PREREGISTERED / NOT ARMED** | No arming occurred during CTM/governance hardening or CI work |
-| Production Alpha | **IN PROGRESS / EXTERNAL DEPENDENCIES REMAIN** | Provider/template/order steps remain outside software completion |
+| Production Alpha | **IN PROGRESS / EXTERNAL DEPENDENCIES REMAIN** | Fail-closed Printful vendor-snapshot tooling has advanced, but provider authorization/exact live product/template/order evidence remains external |
 | P1 physical evidence | **OPEN — EXTERNAL** | No software or CI change substitutes for matched physical testing |
 | P2 durability evidence | **OPEN — EXTERNAL** | Requires real durability/wash evidence |
 | M1/M2 manufacturing evidence | **OPEN — EXTERNAL** | Requires golden-sample and lot-conformity measurements |
@@ -74,13 +75,34 @@ The closure corrected prototype/adopted-contract drift without rewriting histori
 - [x] canonical identifiers are accepted consistently by Python semantic validation and JSON Schema;
 - [x] adopted-contract tests cover happy-path completion, structured HALT, tamper detection, alias collision, invalid references and anti-bypass behavior.
 
-A Pass-6 sampling/diagnostics merge landed during this hardening cycle and was preserved. CI #821 therefore verifies the Pass-1 closure together with that merged sampling layer. Pass 6 itself remains roadmap-open until a pass-specific audit verifies all of its adopted exit criteria.
+A Pass-6 sampling/diagnostics merge landed during this hardening cycle and was preserved. CI #821 therefore verified the Pass-1 closure together with that merged sampling layer. Pass 6 itself remains roadmap-open until a pass-specific audit verifies all of its adopted exit criteria.
+
+## Governance Pass 2 closure
+
+Governance Pass 2 is formally closed in `experimental_governance/PASS2_CLOSURE_2026-09-10.md`.
+
+The closure hardened the pre-existing constraint prototype into the adopted scientific-lineage contract:
+
+- [x] `ConstraintSetRegistry` provides immutable parent-first registration and canonical alias collision protection;
+- [x] prospective records carry explicit encoder version separately from software version and scientific impact;
+- [x] `MigrationImpactAnalysis` requires population displacement, historical cohort impact, and estimand impact as separate axes;
+- [x] `TolerancePolicy` is constraint-family-specific, preregistered-before-outcomes, schema-valid and SHA-256 bound into the decision;
+- [x] migration outputs are formal `NO_IMPACT`, `MINOR_CORRECTION`, `BRIDGE_REQUIRED`, `COHORT_INVALIDATION`, or `NEW_REGIME` decisions;
+- [x] semantic definition or estimand change forces `NEW_REGIME` regardless of permissive numerical tolerance;
+- [x] patch-level software version changes cannot hide scientific population change;
+- [x] `CONSTRAINT_MIGRATION` events log the complete decision append-only;
+- [x] protected D2 snapshots must remain complete and hash-identical before migration logging can append;
+- [x] the predecessor constraint artifact remains unchanged in the exit-gate fixture.
+
+CI #836 verified this state on Python 3.10/3.11/3.12. The Python 3.11 lane reported **1,653 passed, 2 skipped, 16 warnings**, followed by **12/12 certification tests passed**, passing smoke test, and Ruff clean.
+
+Independent Printful vendor-snapshot P0 commits landed after the Pass-2 verification commit. They are descendants of the verified governance state and do not alter the Pass-2 governance files covered by the closure.
 
 ## CI / reproducibility state
 
-### Authoritative verification
+### Authoritative governance verification
 
-GitHub Actions CI run #821 at `d7eed338e404dc287cce416147523dd37828112e` completed successfully across all six jobs:
+GitHub Actions CI run #836 at `7ff05187b223d7479a934bb6912799bb943e57f2` completed successfully across all six jobs:
 
 - Python 3.10 — PASS
 - Python 3.11 — PASS
@@ -89,7 +111,7 @@ GitHub Actions CI run #821 at `d7eed338e404dc287cce416147523dd37828112e` complet
 - dependency audit — PASS
 - lightweight provenance — PASS
 
-The Python 3.11 repository-wide run reported **1,638 passed, 2 skipped, 16 warnings**, followed by **12/12 certification-contract tests passed** and a passing smoke test. Ruff passed.
+The Python 3.11 repository-wide run reported **1,653 passed, 2 skipped, 16 warnings**, followed by **12/12 certification-contract tests passed** and a passing smoke test. Ruff passed.
 
 ### Infrastructure hardening completed
 
@@ -107,7 +129,7 @@ The September 10 integration/governance/CI work did **not**:
 - modify Pattern Genome v1;
 - arm D2-0005;
 - introduce new held-out access;
-- alter scientific thresholds or decision-rule values;
+- alter scientific efficacy thresholds or decision-rule values;
 - convert exploratory evidence into controlled evidence;
 - execute P1 physical work;
 - create RAC-P or RAC-M evidence;
@@ -117,8 +139,8 @@ The September 10 integration/governance/CI work did **not**:
 
 ### Software / research work that can proceed without physical evidence
 
-- [ ] Audit Governance Pass 2 against its adopted contract and close only the requirements actually demonstrated by code/tests.
-- [ ] Continue the same pass-by-pass audit for Passes 3–6; do not infer completion from namespace presence.
+- [ ] Audit Governance Pass 3 against its adopted seal/reproducibility contract and close only requirements demonstrated by code/tests.
+- [ ] Continue the same pass-by-pass audit for Passes 4–6; do not infer completion from namespace presence.
 - [ ] Keep Pass 7 adaptive/chaos lifecycle deferred until multiple sealed waves or an actual experimental need justify it.
 - [ ] Keep manuscript/corpus exports synchronized with integrated CTM schemas and bounded-claim rules.
 - [ ] Continue prospective evidence collection through preregistered research questions rather than generic optimization.
@@ -128,7 +150,7 @@ The September 10 integration/governance/CI work did **not**:
 
 These remain the project’s primary evidence bottleneck:
 
-- [ ] Resolve exact POD provider/product/variant/template inputs.
+- [ ] Resolve exact POD provider/product/variant/template inputs using the fail-closed vendor snapshot path once authorization/live inputs are available.
 - [ ] Freeze the exact first-SKU production template and provenance.
 - [ ] Produce/order matched control and candidate garments.
 - [ ] Produce the calibration target through the same physical process.
