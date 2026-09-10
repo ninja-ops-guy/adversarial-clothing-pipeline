@@ -5,7 +5,7 @@
   "required": ["schema_version", "sampling_id", "experiment_id", "seed", "target_distribution"],
   "properties": {
     "schema_version": {"const": "1.0"},
-    "sampling_id": {"type": "string", "pattern": "^RAC-SMP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "sampling_id": {"type": "string", "pattern": "^RAC-(SAMP|SMP)-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "seed": {"type": "integer", "minimum": 0},
     "target_distribution": {"type": ["string", "object"]}
