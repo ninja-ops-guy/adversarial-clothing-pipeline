@@ -1,0 +1,30 @@
+name: Regenerate provenance artifact
+
+on:
+  push:
+    paths:
+      - .github/workflows/regenerate-provenance-artifact.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Regenerate deterministic provenance graph
+        run: PYTHONPATH=. python scripts/build_provenance_graph.py
+      - name: Verify regenerated graph
+        run: PYTHONPATH=. python scripts/build_provenance_graph.py --verify
+      - name: Upload regenerated graph
+        uses: actions/upload-artifact@v6
+        with:
+          name: regenerated-provenance-graph
+          path: artifacts/provenance/graph.json
+          if-no-files-found: error
+          retention-days: 1
