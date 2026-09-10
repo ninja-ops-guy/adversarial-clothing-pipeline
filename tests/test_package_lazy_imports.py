@@ -54,9 +54,14 @@ def test_provenance_import_is_independent_of_ml_dependencies() -> None:
 
 
 def test_lazy_public_export_resolves_and_is_cached() -> None:
-    import ruthless_pipeline
+    result = _run_isolated(
+        """
+        import ruthless_pipeline
 
-    assert "BenchmarkConfig" not in ruthless_pipeline.__dict__
-    resolved = ruthless_pipeline.BenchmarkConfig
-    assert resolved.__module__ == "ruthless_pipeline.benchmark"
-    assert ruthless_pipeline.__dict__["BenchmarkConfig"] is resolved
+        assert "BenchmarkConfig" not in ruthless_pipeline.__dict__
+        resolved = ruthless_pipeline.BenchmarkConfig
+        assert resolved.__module__ == "ruthless_pipeline.benchmark"
+        assert ruthless_pipeline.__dict__["BenchmarkConfig"] is resolved
+        """
+    )
+    assert result.returncode == 0, result.stderr
