@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-sentinel-cohort/1.0",
+  "type": "object",
+  "required": [
+    "schema_version", "sentinel_id", "source_wave_id", "source_cohort_id",
+    "experiment_id", "constraint_id", "specimen_ids", "selection_seed",
+    "selection_policy_hash", "source_manifest_hash"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "sentinel_id": {"type": "string", "pattern": "^RAC-SEN-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "source_wave_id": {"type": "string", "minLength": 1},
+    "source_cohort_id": {"type": "string", "pattern": "^RAC-COH-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "constraint_id": {"type": "string", "pattern": "^RAC-CST-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "specimen_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "selection_seed": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+    "selection_policy_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_manifest_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}
