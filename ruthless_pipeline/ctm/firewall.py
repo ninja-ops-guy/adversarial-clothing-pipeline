@@ -2,6 +2,7 @@
 
 Certification walks the dependency chain from a CTM claim and refuses any
 claim whose DOE/generator/acceptance lineage reaches a held-out observation.
+It also refuses missing provenance roots and claim↔graph hash mismatches.
 This is an executable certification condition, not merely a test policy.
 """
 from __future__ import annotations
@@ -29,6 +30,8 @@ class FirewallResult:
     ok: bool
     visited_nodes: tuple[str, ...]
     prohibited_paths: tuple[tuple[str, ...], ...]
+    missing_roots: tuple[str, ...] = ()
+    hash_mismatches: tuple[str, ...] = ()
 
 
 def _node_role(node: dict) -> str | None:
@@ -36,9 +39,11 @@ def _node_role(node: dict) -> str | None:
 
 
 def check_provenance_firewall(claim: CTMClaim, graph: dict) -> FirewallResult:
-    """Walk claim dependency paths and reject held-out leakage into pre-outcome paths.
+    """Walk claim dependency paths and reject held-out leakage.
 
     CTM graph convention: edge source consumes/depends on edge target.
+    Every pre-outcome artifact named by the claim must exist in the graph and
+    its graph SHA, when supplied, must match the claim's pinned SHA.
     """
     claim.validate()
     nodes = {n["id"]: n for n in graph.get("nodes", [])}
@@ -47,15 +52,34 @@ def check_provenance_firewall(claim: CTMClaim, graph: dict) -> FirewallResult:
         if edge.get("edge_type") in DEPENDENCY_EDGE_TYPES:
             outgoing[edge["source"]].append(edge["target"])
 
-    roots = [
-        a.artifact_id
-        for a in claim.consumed_artifacts
-        if a.role in PRE_OUTCOME_ROLES
+    pre_outcome = [
+        a for a in claim.consumed_artifacts if a.role in PRE_OUTCOME_ROLES
     ]
+    missing_roots: list[str] = []
+    hash_mismatches: list[str] = []
+
+    for artifact in pre_outcome:
+        node = nodes.get(artifact.artifact_id)
+        if node is None:
+            missing_roots.append(artifact.artifact_id)
+            continue
+        graph_sha = node.get("sha256")
+        if not graph_sha:
+            hash_mismatches.append(
+                f"{artifact.artifact_id}: graph node missing sha256"
+            )
+        elif graph_sha != artifact.sha256:
+            hash_mismatches.append(
+                f"{artifact.artifact_id}: claim={artifact.sha256} graph={graph_sha}"
+            )
+
     prohibited: list[tuple[str, ...]] = []
     visited: set[str] = set()
 
-    for root in roots:
+    for artifact in pre_outcome:
+        root = artifact.artifact_id
+        if root not in nodes:
+            continue
         queue = deque([(root, (root,))])
         local_seen: set[str] = set()
         while queue:
@@ -76,19 +100,31 @@ def check_provenance_firewall(claim: CTMClaim, graph: dict) -> FirewallResult:
             for target in sorted(outgoing.get(node_id, ())):
                 queue.append((target, path + (target,)))
 
+    ok = not prohibited and not missing_roots and not hash_mismatches
     return FirewallResult(
-        ok=not prohibited,
+        ok=ok,
         visited_nodes=tuple(sorted(visited)),
         prohibited_paths=tuple(sorted(prohibited)),
+        missing_roots=tuple(sorted(missing_roots)),
+        hash_mismatches=tuple(sorted(hash_mismatches)),
     )
 
 
 def require_provenance_firewall(claim: CTMClaim, graph: dict) -> FirewallResult:
     result = check_provenance_firewall(claim, graph)
-    if not result.ok:
-        rendered = " | ".join(" -> ".join(p) for p in result.prohibited_paths)
-        raise ValueError(
-            "CTM certification firewall failure: pre-outcome provenance reaches "
-            f"held-out observation: {rendered}"
+    if result.ok:
+        return result
+
+    reasons: list[str] = []
+    if result.missing_roots:
+        reasons.append("missing roots: " + ", ".join(result.missing_roots))
+    if result.hash_mismatches:
+        reasons.append("hash mismatch: " + " | ".join(result.hash_mismatches))
+    if result.prohibited_paths:
+        reasons.append(
+            "held-out path: "
+            + " | ".join(" -> ".join(p) for p in result.prohibited_paths)
         )
-    return result
+    raise ValueError(
+        "CTM certification firewall failure: " + "; ".join(reasons)
+    )
