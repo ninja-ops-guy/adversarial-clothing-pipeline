@@ -13,7 +13,9 @@ from .migration import record_migration_decision
 from .seal import CohortSeal, GovernanceCohortSeal, SealError, TimestampAdapter, seal_cohort, seal_governed_cohort, verify_governed_seal, verify_seal
 from .bridge_overlap import BridgeGovernanceError, OverlapEstimate, RegimeDecision, SentinelRecord, assert_calibration_isolation, classify_regime, require_blind_re_evaluation, require_pooling_legal
 from .cic_adapter import CICError, CICResult, ConstraintRepresentation, SolveStatus, SolverReply, StructuralMetrics, check as cic_check, require_cross_encoding_agreement
-from .sampling import BackendSelection, BackendTelemetry, DiagnosticBundle, DiagnosticPolicy, RepresentativenessState, SamplerLane, SamplingGovernanceError, SamplingRequest, SamplingResult, diagnose, require_confirmatory_eligible, select_backend
+from .sampling import (BackendSelection, BackendTelemetry, CalibrationMetrics, DiagnosticBundle, DiagnosticPolicy, ExactProjectedPopulationBackend, ExternalSamplerReply, PopulationIdentity, ProjectedSamplerAdapter, RepresentativenessState, SamplerLane, SamplingGovernanceError, SamplingRequest, SamplingResult, build_sampling_manifest, diagnose, require_confirmatory_eligible, select_backend)
+from .sampling_diagnostics import exact_distribution_diagnostics, repeated_seed_instability
+from .sampling_routing import EmpiricalLaneModel, select_backend_empirical
 from .adaptive import AdaptiveGovernanceError, EvidenceSeal, FrozenPolicy, PolicyState, propose_next_wave_policy, require_policy_frozen_before_sampling
 from .chaos import ChaosArchive, ChaosCandidate, ChaosEvent, ChaosGovernanceError, ChaosStatus
 
