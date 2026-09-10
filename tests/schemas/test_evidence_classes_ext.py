@@ -7,7 +7,7 @@ import pytest
 from ruthless_pipeline import evidence_classes_ext as ext
 
 
-def test_registry_contains_all_five_classes():
+def test_registry_contains_all_six_classes():
     assert ext.EVIDENCE_CLASSES == frozenset(
         {
             "synthetic_pipeline_validation_only",
@@ -15,13 +15,16 @@ def test_registry_contains_all_five_classes():
             "log_attested",
             "scenario_assumption",
             "experimental_print_specimen",
+            "derived_digital_measurement",
         }
     )
 
 
-def test_new_class_registered():
+def test_new_classes_registered():
     assert ext.EXPERIMENTAL_PRINT_SPECIMEN == "experimental_print_specimen"
     assert ext.EXPERIMENTAL_PRINT_SPECIMEN in ext.EVIDENCE_CLASSES
+    assert ext.DERIVED_DIGITAL_MEASUREMENT == "derived_digital_measurement"
+    assert ext.DERIVED_DIGITAL_MEASUREMENT in ext.EVIDENCE_CLASSES
 
 
 def test_is_valid():
