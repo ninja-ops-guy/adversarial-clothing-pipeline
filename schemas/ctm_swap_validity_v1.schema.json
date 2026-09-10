@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_swap_validity_v1.schema.json",
+  "title": "RAC CTM Factor-Swap Validity v1 (SPEC-1 extension; additive to frozen matched-null core)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","varied_factor","held_factors","factor_relationships","swap_scope","constraint_set_ref","interpretation_class"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-swap-validity/1.0"},
+    "varied_factor": {"type":"string","minLength":1},
+    "held_factors": {"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "factor_relationships": {
+      "type":"object","minProperties":1,
+      "propertyNames":{"type":"string","minLength":1},
+      "additionalProperties":{"enum":["optimized_variable","hard_constraint","bounded_constraint","soft_regularizer","derived_dependency","unconstrained","posthoc_only"]}
+    },
+    "swap_scope": {"enum":["within_optimization_neighborhood","out_of_optimum","reoptimized_after_swap"]},
+    "constraint_set_ref": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "interpretation_class": {"enum":["main_effect_probe","invalidation_test","reoptimized_swap"]}
+  }
+}
