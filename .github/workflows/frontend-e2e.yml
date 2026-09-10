@@ -91,9 +91,19 @@ jobs:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
         run: npx playwright test tests/e2e/capture-lab.spec.js --project=webkit-mobile --grep "deployed smoke surface"
       - name: Verify deployed Research Console
+        if: ${{ github.event_name != 'pull_request' }}
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
-        run: npx playwright test tests/e2e/research-console.spec.js --project=chromium-desktop
+        run: |
+          for i in {1..18}; do
+            if curl -fsS 'https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/research_console/index.html' -o /dev/null; then
+              npx playwright test tests/e2e/research-console.spec.js --project=chromium-desktop
+              exit $?
+            fi
+            sleep 10
+          done
+          echo 'Research Console was not available from deployed Pages in time.' >&2
+          exit 1
       - name: Verify deployed measured benchmark JSON when published
         if: ${{ hashFiles('benchmark-results.json') != '' }}
         run: |
