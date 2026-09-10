@@ -36,7 +36,16 @@ from .constraints import (
     classify_migration,
 )
 from .migration import record_migration_decision
-from .seal import CohortSeal, SealError, seal_cohort, verify_seal
+from .seal import (
+    CohortSeal,
+    GovernanceCohortSeal,
+    SealError,
+    TimestampAdapter,
+    seal_cohort,
+    seal_governed_cohort,
+    verify_governed_seal,
+    verify_seal,
+)
 from .bridge_overlap import (
     BridgeGovernanceError,
     OverlapEstimate,
@@ -90,6 +99,7 @@ __all__ = [
     "ExperimentState",
     "FROZEN_D2_ARTIFACT_IDS",
     "FrozenArtifactMutationError",
+    "GovernanceCohortSeal",
     "GovernanceEvent",
     "GovernanceEventType",
     "GovernanceId",
@@ -115,6 +125,7 @@ __all__ = [
     "SolverReply",
     "StateTransitionError",
     "StructuralMetrics",
+    "TimestampAdapter",
     "TolerancePolicy",
     "assess_migration",
     "assert_calibration_isolation",
@@ -130,7 +141,9 @@ __all__ = [
     "require_cross_encoding_agreement",
     "require_pooling_legal",
     "seal_cohort",
+    "seal_governed_cohort",
     "select_backend",
     "validate_manifest",
+    "verify_governed_seal",
     "verify_seal",
 ]
