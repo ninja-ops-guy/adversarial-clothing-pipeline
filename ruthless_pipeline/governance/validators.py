@@ -112,7 +112,7 @@ def _canonical_id(value: Any, expected: IdKind, field: str) -> GovernanceId:
     parsed = _typed_id(value, expected, field)
     if parsed.is_legacy_alias:
         raise GovernanceValidationError(
-            f"{field}: adopted Governance v1 records require canonical {expected.value} prefix"
+            f"{field}: adopted Governance v1 records require canonical RAC-{expected.value}-* prefix"
         )
     return parsed
 
