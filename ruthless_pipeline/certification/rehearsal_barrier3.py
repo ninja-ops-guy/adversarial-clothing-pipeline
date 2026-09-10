@@ -6,21 +6,28 @@ Optimization V3 -> EOT -> Detector Science -> Pareto/Style -> Printability
 
 Governance: this module does NOT arm or execute D2-0005, changes no
 preregistered value, never loads or scores the held-out model set, and never
-produces physical-efficacy evidence.  Held-out identity/hash values are used
-only as immutable references.  Every emitted record is
-synthetic_pipeline_validation_only.
+produces physical-efficacy evidence.  Frozen D2-0005 values are REFERENCED
+from ``docs/D2-0005_FREEZE_CANDIDATE.json`` (and its pinned seed config),
+never restated as new literals, moved, or changed.  Held-out identity/hash
+values are used only as immutable references; the held-out model-set file is
+never opened.  Every emitted record is synthetic_pipeline_validation_only.
 
 The coordinator is deliberately thin: each stage invokes the existing public
 API and emits a canonical, hash-bound record.  Journal/resume semantics mirror
-rehearsal_d20005.py and fail closed on changed intermediate bytes.
+rehearsal_d20005.py and fail closed on changed intermediate bytes.  An
+executable acceptance gate (``run_acceptance_gate``) hard-fails unless every
+Barrier 3 gate criterion holds.
 """
 
 from __future__ import annotations
 
 import hashlib
+import importlib.metadata
 import json
 import math
+import platform
 import subprocess
+import tempfile
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -35,12 +42,19 @@ from ruthless_pipeline.optimization.pareto import pareto_front
 from ruthless_pipeline.optimization.schemas import ObjectiveSpec
 from ruthless_pipeline.optimization.style import StyleFamilyScorer, StyleOptimizationRecord, style_pareto_curve
 from ruthless_pipeline.physical_transfer.printability import printability_loss
+from ruthless_pipeline.physical_transfer.production_profiles import (
+    ProfileIntegrityError,
+    compute_sha256 as profile_content_sha256,
+    validate_profile,
+    verify_integrity as verify_profile_integrity,
+)
 from ruthless_pipeline.physical_transfer.transfer_record import emit as emit_transfer_record
 from ruthless_pipeline.transformations.distribution import (
     REPRODUCIBILITY_NOTE,
     Sampler,
     TransformationDistributionSpec,
 )
+from ruthless_pipeline.certification import provenance_graph as pg
 from ruthless_pipeline.certification.release_format import ReleaseManifest, verify_release
 
 EVIDENCE_CLASS = "synthetic_pipeline_validation_only"
@@ -49,26 +63,22 @@ SCHEMA_ID = "barrier3-run-manifest"
 GENERATION_ID = "RAC-PER-D2-0005"
 DEFAULT_CREATED_UTC = "2026-01-01T00:00:00Z"
 RESULT_LINE = "RESULT: synthetic_pipeline_validation_only — Barrier 3 integration proof; not RAC evidence"
+MOCK_DETECTOR_LABEL = "MOCK-DETECTOR-SYNTHETIC-NOT-A-MODEL"
 
 SURROGATE_SET_ID = "PERSON-SUR-v3"
 SURROGATE_SET_SHA256 = "2f06c19e9e51f3f607b04b499760ab7f470f4b6e18f9c834013fb0a06a5d8876"
 HELDOUT_SET_ID = "PERSON-HO-v3"
 HELDOUT_SET_SHA256 = "ad1127659a5615871ff320056415dd3c8e8b6a27acef7c6a3bcc4a96e713495e"
+HELDOUT_SET_PATH = "model_sets/PERSON-HO-v3.json"
+SURROGATE_SET_PATH = "model_sets/PERSON-SUR-v3.json"
 
-FROZEN_PARAMETERS = {
-    "candidate_pool_seed": 1337,
-    "bootstrap_seed": 20260907,
-    "design_simulation_seed": 20261209,
-    "cvar_alpha": 0.5,
-    "z": 1.959963984540054,
-    "bootstrap_resamples": 10000,
-    "width_gate": 0.2,
-    "min_clusters": 8,
-    "design_min_clusters": 72,
-    "members_per_cluster": 36,
-    "icc_gate": 0.25,
-    "confirmatory_floor_delta": 0.2,
-}
+FREEZE_CANDIDATE_PATH = "docs/D2-0005_FREEZE_CANDIDATE.json"
+FREEZE_SEEDS_PATH = "ruthless_pipeline/certification/config/d20005_freeze/seeds.json"
+RUNTIME_LOCK_PATH = "benchmarks/runtime_lock.json"
+DESIGN_PROFILE_PATH = "design_profiles/ruthless_reference_v1.json"
+PRODUCTION_PROFILE_ID = "barrier3-production"
+PRODUCTION_PROFILE_VERSION = 1
+PRODUCTION_PROFILE_PATH = f"design_profiles/{PRODUCTION_PROFILE_ID}__v{PRODUCTION_PROFILE_VERSION}.json"
 
 STAGES = (
     "optimization",
@@ -79,9 +89,33 @@ STAGES = (
     "physical_transfer",
 )
 
+#: Per-stage output directories inside the run package.
+STAGE_DIRS = {
+    "optimization": "optimization",
+    "eot": "eot",
+    "detector_science": "detector-science",
+    "pareto_style": "pareto",
+    "printability": "printability",
+    "physical_transfer": "physical-transfer",
+}
+
+#: Upstream stage(s) each stage must demonstrably consume.
+UPSTREAM = {
+    "optimization": (),
+    "eot": ("optimization",),
+    "detector_science": ("eot",),
+    "pareto_style": ("optimization", "detector_science"),
+    "printability": ("eot",),
+    "physical_transfer": ("eot", "detector_science"),
+}
+
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _SCHEMA_PATH = _REPO_ROOT / "schemas" / "barrier3_run_manifest.schema.json"
-_FROZEN_SURFACE_PATH = _REPO_ROOT / "benchmarks" / "frozen_surface_sha256.json"
+
+HASHES_FILE = "hashes.sha256"
+RELEASE_MANIFEST = "MANIFEST.json"
+JOURNAL_FILE = "rehearsal_journal.json"
+REPORT_FILE = "rehearsal-report.json"
 
 
 class Barrier3Error(RuntimeError):
@@ -102,6 +136,10 @@ class HeldoutAccessRefusal(Barrier3Error):
 
 class PromotionRefusedError(Barrier3Error):
     """Synthetic Barrier 3 output may never be promoted to measured evidence."""
+
+
+class AcceptanceGateError(Barrier3Error):
+    """One or more Barrier 3 acceptance-gate criteria failed."""
 
 
 def _canonical(payload: Any) -> bytes:
@@ -153,16 +191,71 @@ def load_run_schema() -> dict:
     return json.loads(_SCHEMA_PATH.read_text())
 
 
+def load_frozen_parameters(repo_root: str | Path = _REPO_ROOT) -> dict:
+    """REFERENCE the frozen D2-0005 values from their pinned records.
+
+    Values are read from docs/D2-0005_FREEZE_CANDIDATE.json and its pinned
+    freeze-seeds config; they are never restated here as new literals, never
+    moved, and never changed.
+    """
+    repo_root = Path(repo_root)
+    freeze = json.loads((repo_root / FREEZE_CANDIDATE_PATH).read_text())
+    params = freeze["analysis_implementation"]["parameters"]
+    design = freeze["design_point"]
+    seeds = json.loads((repo_root / FREEZE_SEEDS_PATH).read_text())["seeds"]
+    return {
+        "candidate_pool_seed": params["candidate_pool_seed"],
+        "bootstrap_seed": params["bootstrap_seed"],
+        "design_simulation_seed": seeds["design_simulation_seed"],
+        "cvar_alpha": params["cvar_alpha"],
+        "z": params["z"],
+        "bootstrap_resamples": params["bootstrap_resamples"],
+        "width_gate": params["width_gate"],
+        "min_clusters": params["min_clusters"],
+        "design_min_clusters": design["min_clusters_K"],
+        "members_per_cluster": design["members_per_cluster"],
+        "icc_gate": design["icc_gate"],
+        "confirmatory_floor_delta": design["confirmatory_floor_delta"],
+    }
+
+
+#: Frozen D2-0005 values, referenced from the freeze-candidate records.
+FROZEN_PARAMETERS = load_frozen_parameters()
+
+
 def validate_run_manifest(manifest: dict) -> dict:
     jsonschema.validate(instance=manifest, schema=load_run_schema())
     if manifest["expected_stage_order"] != list(STAGES):
         raise Barrier3Error("stage order differs from frozen Barrier 3 order")
     if manifest["model_identity_refs"]["heldout_access"] != "identity_hash_only":
         raise HeldoutAccessRefusal("held-out access must remain identity_hash_only")
+    if manifest["arm_ref"]["heldout_access"] != "identity_hash_only":
+        raise HeldoutAccessRefusal("held-out arm access must remain identity_hash_only")
     forbidden = {"heldout_results", "heldout_scores", "measured_evidence", "physical_efficacy"}
     if forbidden.intersection(manifest):
         raise HeldoutAccessRefusal("run manifest contains forbidden outcome/evidence fields")
+    referenced = load_frozen_parameters()
+    if manifest["frozen_parameters"] != referenced:
+        raise Barrier3Error(
+            "frozen_parameters differ from the referenced D2-0005 freeze-candidate values"
+        )
     return manifest
+
+
+def _production_profile_pin(repo_root: Path) -> dict:
+    path = repo_root / PRODUCTION_PROFILE_PATH
+    if not path.is_file():
+        raise Barrier3Error(f"pinned production profile is missing: {PRODUCTION_PROFILE_PATH}")
+    profile = json.loads(path.read_text())
+    validate_profile(profile)
+    verify_profile_integrity(profile)
+    return {
+        "profile_id": profile["profile_id"],
+        "version": profile["version"],
+        "path": PRODUCTION_PROFILE_PATH,
+        "sha256": profile["sha256"],
+        "source": profile["source"],
+    }
 
 
 def build_default_manifest(
@@ -177,16 +270,18 @@ def build_default_manifest(
     repo_root = Path(repo_root)
     frozen_hash = _sha256_file(repo_root / "benchmarks" / "frozen_surface_sha256.json")
     input_paths = (
-        "docs/D2-0005_FREEZE_CANDIDATE.json",
-        "benchmarks/runtime_lock.json",
-        "design_profiles/ruthless_reference_v1.json",
+        FREEZE_CANDIDATE_PATH,
+        FREEZE_SEEDS_PATH,
+        RUNTIME_LOCK_PATH,
+        DESIGN_PROFILE_PATH,
+        PRODUCTION_PROFILE_PATH,
     )
     input_hashes = {
         path: _sha256_file(repo_root / path)
         for path in input_paths
         if (repo_root / path).is_file()
     }
-    if "docs/D2-0005_FREEZE_CANDIDATE.json" not in input_hashes:
+    if FREEZE_CANDIDATE_PATH not in input_hashes:
         raise Barrier3Error("required freeze-candidate input is missing")
     manifest = {
         "schema_version": SCHEMA_VERSION,
@@ -205,20 +300,18 @@ def build_default_manifest(
         },
         "root_seed": int(root_seed),
         "frozen_surface_manifest_sha256": frozen_hash,
-        "frozen_parameters": dict(FROZEN_PARAMETERS),
+        "frozen_parameters": load_frozen_parameters(repo_root),
         "stage_configs": {
             "optimization": {"pool_size": 8, "objective_id": "barrier3-synthetic-objective"},
             "eot": {"sample_count": 4, "shape": [16, 16, 3]},
-            "detector_science": {"model_id": "barrier3-synthetic-detector", "model_family": "synthetic", "decision_threshold": 0.5},
-            "pareto_style": {"family": "signal_shadow"},
-            "printability": {
-                "production_profile": {
-                    "dpi": 300,
-                    "min_feature_mm": 0.5,
-                    "gamut": {"rgb_min": [0.0, 0.0, 0.0], "rgb_max": [1.0, 1.0, 1.0]},
-                    "panel": {"width_mm": 300.0, "bleed_mm": 3.0, "safe_area_mm": 5.0},
-                }
+            "detector_science": {
+                "model_id": "barrier3-synthetic-detector",
+                "model_family": "synthetic",
+                "decision_threshold": 0.5,
+                "mock_label": MOCK_DETECTOR_LABEL,
             },
+            "pareto_style": {"family": "signal_shadow"},
+            "printability": {"profile_ref": _production_profile_pin(repo_root)},
             "physical_transfer": {
                 "garment_sku": "SYNTHETIC-BARRIER3",
                 "fabric": "synthetic_fixture",
@@ -257,12 +350,13 @@ def _verify_committed_inputs(manifest: dict, repo_root: Path) -> None:
 
 def _optimization_stage(manifest: dict) -> tuple[dict, np.ndarray]:
     cfg = manifest["stage_configs"]["optimization"]
+    frozen = manifest["frozen_parameters"]
     seed = _stage_seed(manifest["run_id"], manifest["root_seed"], "optimization", cfg)
     objective_data = {
         "schema_version": "1.0",
         "objective_id": cfg.get("objective_id", "barrier3-synthetic-objective"),
         "terms": {
-            "detector_loss": {"aggregation": "CVAR", "alpha": FROZEN_PARAMETERS["cvar_alpha"], "log_separately": True},
+            "detector_loss": {"aggregation": "CVAR", "alpha": frozen["cvar_alpha"], "log_separately": True},
             "printability_loss": {"lambda_print": 0.2, "log_separately": True},
             "style_loss": {"lambda_style": 0.1, "log_separately": True},
             "deformation_loss": {"lambda_deformation": 0.1, "log_separately": True},
@@ -361,6 +455,7 @@ def _eot_stage(manifest: dict, best_params: np.ndarray) -> tuple[dict, np.ndarra
         "stage_seed": seed,
         "distribution": spec.to_dict(),
         "distribution_manifest_sha256": spec.manifest_sha256,
+        "upstream": {"optimization_best_params": [float(v) for v in best_params]},
         "samples": samples,
         "candidate_shape": list(candidate.shape),
         "candidate_pixels": candidate.tolist(),
@@ -368,7 +463,7 @@ def _eot_stage(manifest: dict, best_params: np.ndarray) -> tuple[dict, np.ndarra
     return payload, candidate
 
 
-def _detector_stage(manifest: dict, candidate: np.ndarray) -> dict:
+def _detector_stage(manifest: dict, candidate: np.ndarray, eot: dict) -> dict:
     cfg = manifest["stage_configs"]["detector_science"]
     seed = _stage_seed(manifest["run_id"], manifest["root_seed"], "detector_science", cfg)
     score = float(np.clip(np.mean(candidate) + 0.1 * (_unit_interval(f"detector|{seed}") - 0.5), 0.0, 1.0))
@@ -381,10 +476,19 @@ def _detector_stage(manifest: dict, candidate: np.ndarray) -> dict:
         condition_id=manifest["run_id"],
         decision_threshold=float(cfg.get("decision_threshold", 0.5)),
         target_label=1,
-        raw_provenance_ref="stages/eot.json",
+        raw_provenance_ref=f"{STAGE_DIRS['eot']}/stage.json",
     )
     validated = response.validate()
-    return _label({"stage": "detector_science", "stage_seed": seed, "response": validated})
+    return _label({
+        "stage": "detector_science",
+        "stage_seed": seed,
+        "mock_detector_label": MOCK_DETECTOR_LABEL,
+        "upstream": {
+            "eot_artifact": f"{STAGE_DIRS['eot']}/stage.json",
+            "eot_candidate_sha256": eot["samples"][0]["array_sha256"],
+        },
+        "response": validated,
+    })
 
 
 def _pareto_style_stage(manifest: dict, optimization: dict, detector: dict, candidate: np.ndarray) -> dict:
@@ -427,6 +531,10 @@ def _pareto_style_stage(manifest: dict, optimization: dict, detector: dict, cand
         "stage_seed": seed,
         "family": family,
         "style_metric_scope": "art_direction_proxy_only_not_efficacy",
+        "upstream": {
+            "optimization_best_candidate_id": optimization["best_candidate_id"],
+            "detector_confidence": detector_objective,
+        },
         "pareto_front_indices": [int(v) for v in front.tolist()],
         "style_pareto_front_indices": [int(v) for v in style_front.tolist()],
         "points": style_points.tolist(),
@@ -435,10 +543,25 @@ def _pareto_style_stage(manifest: dict, optimization: dict, detector: dict, cand
     })
 
 
-def _printability_stage(manifest: dict, candidate: np.ndarray) -> dict:
+def _load_pinned_production_profile(manifest: dict, repo_root: Path) -> dict:
+    ref = manifest["stage_configs"]["printability"]["profile_ref"]
+    path = repo_root / ref["path"]
+    if not path.is_file():
+        raise Barrier3Error(f"pinned production profile is missing: {ref['path']}")
+    profile = json.loads(path.read_text())
+    validate_profile(profile)
+    verify_profile_integrity(profile)
+    if profile["profile_id"] != ref["profile_id"] or profile["version"] != ref["version"]:
+        raise Barrier3Error("production profile id/version differs from the manifest pin")
+    if profile_content_sha256(profile) != ref["sha256"]:
+        raise ProfileIntegrityError("production profile content differs from the manifest pin")
+    return profile
+
+
+def _printability_stage(manifest: dict, candidate: np.ndarray, repo_root: Path) -> dict:
     cfg = manifest["stage_configs"]["printability"]
     seed = _stage_seed(manifest["run_id"], manifest["root_seed"], "printability", cfg)
-    profile = cfg["production_profile"]
+    profile = _load_pinned_production_profile(manifest, repo_root)
     loss = printability_loss(candidate, profile)
     components = {
         name: {
@@ -451,6 +574,7 @@ def _printability_stage(manifest: dict, candidate: np.ndarray) -> dict:
     return _label({
         "stage": "printability",
         "stage_seed": seed,
+        "profile_ref": dict(cfg["profile_ref"]),
         "value": loss.value,
         "partial": loss.partial,
         "available_components": loss.available_components,
@@ -486,7 +610,19 @@ def _physical_transfer_stage(manifest: dict, eot: dict, detector: dict) -> dict:
     )
     if record["evidence_class"] != EVIDENCE_CLASS or record["physical_efficacy_claimed"] is not False:
         raise PromotionRefusedError("physical-transfer stage attempted evidence promotion")
-    return _label({"stage": "physical_transfer", "stage_seed": seed, "record": record})
+    return _label({
+        "stage": "physical_transfer",
+        "stage_seed": seed,
+        "upstream": {
+            "eot_sample_sha256": eot["samples"][0]["array_sha256"],
+            "detector_response_sha256": detector_ref,
+        },
+        "record": record,
+    })
+
+
+def _stage_rel_path(stage: str) -> str:
+    return f"{STAGE_DIRS[stage]}/stage.json"
 
 
 def _load_journal(path: Path, manifest_hash: str) -> dict:
@@ -503,6 +639,9 @@ def _load_journal(path: Path, manifest_hash: str) -> dict:
         raise ResumeIntegrityError("journal belongs to a different run manifest")
     if journal.get("stage_order") != list(STAGES):
         raise ResumeIntegrityError("journal stage order differs from Barrier 3 order")
+    unknown = set(journal.get("completed", {})) - set(STAGES)
+    if unknown:
+        raise ResumeIntegrityError(f"journal records unknown stages: {sorted(unknown)}")
     return journal
 
 
@@ -532,154 +671,8 @@ def _ensure_finite(value: Any, path: str = "payload") -> None:
 
 def _complete(output_dir: Path, journal_path: Path, journal: dict, stage: str, payload: dict) -> dict:
     _ensure_finite(payload, stage)
-    path = output_dir / "stages" / f"{stage}.json"
+    path = output_dir / _stage_rel_path(stage)
     digest = _write_json(path, payload)
     journal["completed"][stage] = {"path": path.relative_to(output_dir).as_posix(), "sha256": digest}
     _write_json(journal_path, journal)
     return payload
-
-
-def run_rehearsal(
-    output_dir: str | Path,
-    manifest: dict,
-    *,
-    crash_after: str | None = None,
-    repo_root: str | Path = _REPO_ROOT,
-) -> dict:
-    """Run or resume all six Barrier 3 stages in one process."""
-    manifest = validate_run_manifest(dict(manifest))
-    if crash_after is not None and crash_after not in STAGES:
-        raise ValueError(f"crash_after must be one of {STAGES}")
-    repo_root = Path(repo_root)
-    _verify_committed_inputs(manifest, repo_root)
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    manifest_hash = _write_json(output_dir / "run-manifest.json", manifest)
-    journal_path = output_dir / "rehearsal_journal.json"
-    journal = _load_journal(journal_path, manifest_hash)
-
-    def maybe_crash(stage: str) -> None:
-        if crash_after == stage:
-            raise RehearsalCrash(f"deliberate Barrier 3 crash after {stage}")
-
-    opt = _resume_check(output_dir, journal, "optimization")
-    if opt is None:
-        opt, best_params = _optimization_stage(manifest)
-        opt = _complete(output_dir, journal_path, journal, "optimization", opt)
-    else:
-        best_params = np.asarray(opt["best_params"], dtype=float)
-    maybe_crash("optimization")
-
-    eot = _resume_check(output_dir, journal, "eot")
-    if eot is None:
-        eot, candidate = _eot_stage(manifest, best_params)
-        eot = _complete(output_dir, journal_path, journal, "eot", eot)
-    else:
-        candidate = np.asarray(eot["candidate_pixels"], dtype=float)
-    maybe_crash("eot")
-
-    det = _resume_check(output_dir, journal, "detector_science")
-    if det is None:
-        det = _complete(output_dir, journal_path, journal, "detector_science", _detector_stage(manifest, candidate))
-    maybe_crash("detector_science")
-
-    ps = _resume_check(output_dir, journal, "pareto_style")
-    if ps is None:
-        ps = _complete(output_dir, journal_path, journal, "pareto_style", _pareto_style_stage(manifest, opt, det, candidate))
-    maybe_crash("pareto_style")
-
-    pr = _resume_check(output_dir, journal, "printability")
-    if pr is None:
-        pr = _complete(output_dir, journal_path, journal, "printability", _printability_stage(manifest, candidate))
-    maybe_crash("printability")
-
-    pt = _resume_check(output_dir, journal, "physical_transfer")
-    if pt is None:
-        pt = _complete(output_dir, journal_path, journal, "physical_transfer", _physical_transfer_stage(manifest, eot, det))
-    maybe_crash("physical_transfer")
-
-    provenance = _label({
-        "schema_id": "barrier3-stage-provenance",
-        "run_id": manifest["run_id"],
-        "source_commit": manifest["source_commit"],
-        "manifest_sha256": manifest_hash,
-        "stage_order": list(STAGES),
-        "stage_artifacts": {
-            stage: dict(journal["completed"][stage])
-            for stage in STAGES
-        },
-        "heldout_reference": {
-            "model_set_id": HELDOUT_SET_ID,
-            "sha256": HELDOUT_SET_SHA256,
-            "access": "identity_hash_only",
-        },
-    })
-    provenance_sha = _write_json(output_dir / "provenance.json", provenance)
-
-    telemetry = _label({
-        "schema_id": "barrier3-objective-telemetry",
-        "run_id": manifest["run_id"],
-        "optimization_objective": opt["objective_spec"],
-        "best_value": opt["best_value"],
-        "detector_confidence": det["response"]["confidence"],
-        "printability_loss": pr["value"],
-        "pareto_front_indices": ps["pareto_front_indices"],
-    })
-    telemetry_sha = _write_json(output_dir / "objective-telemetry.json", telemetry)
-
-    report = _label({
-        "schema_id": "barrier3-rehearsal-report",
-        "run_id": manifest["run_id"],
-        "CAN_COMPOSE_EXISTING_ENGINE": "YES",
-        "STAGE_COUNT": 6,
-        "SINGLE_PROCESS": True,
-        "SEED_CONTROLLED": True,
-        "HASH_PINNED": True,
-        "REPLAYABLE": None,
-        "PROVENANCE_VERIFIED": True,
-        "HELDOUT_ACCESSED": False,
-        "D2_0005_ARMED": False,
-        "PHYSICAL_EFFICACY_CLAIMED": False,
-        "BARRIER_3_RESULT": "PASS",
-        "provenance_sha256": provenance_sha,
-        "objective_telemetry_sha256": telemetry_sha,
-        "completed_stages": list(STAGES),
-    })
-    report_sha = _write_json(output_dir / "barrier3-report.json", report)
-
-    release_manifest = ReleaseManifest.build(output_dir)
-    release_manifest.write(output_dir)
-    verify = verify_release(output_dir)
-    if not verify.ok:
-        raise Barrier3Error(
-            f"Barrier 3 artifact verification failed: tampered={verify.tampered}, missing={verify.missing}, extra={verify.extra}"
-        )
-    return {
-        "run_id": manifest["run_id"],
-        "manifest_sha256": manifest_hash,
-        "report_sha256": report_sha,
-        "provenance_sha256": provenance_sha,
-        "objective_telemetry_sha256": telemetry_sha,
-        "stages": list(STAGES),
-        "verification_ok": True,
-        "evidence_class": EVIDENCE_CLASS,
-    }
-
-
-def promote_to_measured(_output_dir: str | Path) -> None:
-    raise PromotionRefusedError("Barrier 3 is synthetic_pipeline_validation_only; measured/physical promotion is refused")
-
-
-def compare_replays(first: str | Path, second: str | Path) -> dict:
-    """Compare two completed runs by canonical manifest entries."""
-    first = Path(first)
-    second = Path(second)
-    a = json.loads((first / "MANIFEST.json").read_text())["entries"]
-    b = json.loads((second / "MANIFEST.json").read_text())["entries"]
-    identical = a == b
-    return {
-        "identical": identical,
-        "first_entries": a,
-        "second_entries": b,
-        "differences": sorted(set(a) ^ set(b) | {k for k in set(a) & set(b) if a[k] != b[k]}),
-    }
