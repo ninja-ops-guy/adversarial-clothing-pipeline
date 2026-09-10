@@ -73,10 +73,10 @@ def test_clean_firewall_certifies_correlation():
     claim = clean_claim()
     g = graph(
         [
-            {"id": "doe:001", "ctm_role": "doe"},
-            {"id": "generator:001", "ctm_role": "generator"},
-            {"id": "acceptance:001", "ctm_role": "acceptance"},
-            {"id": "surrogate:001", "ctm_role": "surrogate_observation"},
+            {"id": "doe:001", "ctm_role": "doe", "sha256": H},
+            {"id": "generator:001", "ctm_role": "generator", "sha256": H},
+            {"id": "acceptance:001", "ctm_role": "acceptance", "sha256": H},
+            {"id": "surrogate:001", "ctm_role": "surrogate_observation", "sha256": H2},
         ],
         [
             {"source": "doe:001", "target": "surrogate:001", "edge_type": "uses_surrogate_observation"},
@@ -96,7 +96,7 @@ def test_firewall_is_certification_failure_not_policy():
             {"id": "doe:001", "ctm_role": "doe"},
             {"id": "generator:001", "ctm_role": "generator"},
             {"id": "acceptance:001", "ctm_role": "acceptance"},
-            {"id": "heldout:001", "ctm_role": "heldout_observation"},
+            {"id": "heldout:001", "ctm_role": "heldout_observation", "sha256": H2},
         ],
         [
             {"source": "generator:001", "target": "heldout:001", "edge_type": "derived_from"},
@@ -113,8 +113,8 @@ def test_indirect_heldout_path_is_detected():
             {"id": "doe:001", "ctm_role": "doe"},
             {"id": "generator:001", "ctm_role": "generator"},
             {"id": "acceptance:001", "ctm_role": "acceptance"},
-            {"id": "mid:001", "ctm_role": "genome"},
-            {"id": "heldout:001", "data_split": "heldout"},
+            {"id": "mid:001", "ctm_role": "genome", "sha256": H2},
+            {"id": "heldout:001", "data_split": "heldout", "sha256": H3},
         ],
         [
             {"source": "doe:001", "target": "mid:001", "edge_type": "consumes"},
@@ -168,7 +168,14 @@ def test_controlled_effect_with_matched_null_certifies():
     )
     result = certify_ctm_claim(
         claim,
-        provenance_graph=graph([], []),
+        provenance_graph=graph(
+            [
+                {"id": "doe:001", "ctm_role": "doe", "sha256": H},
+                {"id": "generator:001", "ctm_role": "generator", "sha256": H},
+                {"id": "acceptance:001", "ctm_role": "acceptance", "sha256": H},
+            ],
+            [],
+        ),
         matched_nulls=(matched_null(),),
     )
     assert result.certified is True
@@ -203,3 +210,22 @@ def test_manipulated_feature_cannot_be_listed_as_matched():
     )
     with pytest.raises(ValueError, match="cannot also be declared matched"):
         bad.validate()
+
+
+def test_missing_pre_outcome_root_is_certification_failure():
+    with pytest.raises(ValueError, match="missing roots"):
+        certify_ctm_claim(clean_claim(), provenance_graph=graph([], []))
+
+
+def test_pre_outcome_hash_mismatch_is_certification_failure():
+    claim = clean_claim()
+    g = graph(
+        [
+            {"id": "doe:001", "ctm_role": "doe", "sha256": H2},
+            {"id": "generator:001", "ctm_role": "generator", "sha256": H},
+            {"id": "acceptance:001", "ctm_role": "acceptance", "sha256": H},
+        ],
+        [],
+    )
+    with pytest.raises(ValueError, match="hash mismatch"):
+        certify_ctm_claim(claim, provenance_graph=g)
