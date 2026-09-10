@@ -156,8 +156,16 @@ def test_controlled_effect_requires_referenced_matched_null_to_exist():
         cohorts=2,
         null_ids=("NULL-001",),
     )
+    clean_roots = graph(
+        [
+            {"id": "doe:001", "ctm_role": "doe", "sha256": H},
+            {"id": "generator:001", "ctm_role": "generator", "sha256": H},
+            {"id": "acceptance:001", "ctm_role": "acceptance", "sha256": H},
+        ],
+        [],
+    )
     with pytest.raises(ValueError, match="missing matched-null"):
-        certify_ctm_claim(claim, provenance_graph=graph([], []), matched_nulls=())
+        certify_ctm_claim(claim, provenance_graph=clean_roots, matched_nulls=())
 
 
 def test_controlled_effect_with_matched_null_certifies():
