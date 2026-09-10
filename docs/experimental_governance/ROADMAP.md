@@ -51,18 +51,19 @@ These items already determine whether RAC advances from software-complete infras
 
 ### Week 2 — Pass 2: Constraint Lineage
 
-**Target:** 2026-09-17 through 2026-09-23
+**Target:** 2026-09-17 through 2026-09-23  
+**Status:** **CLOSED / PASS — 2026-09-10**, verified by CI run #836 at `7ff05187`; see `PASS2_CLOSURE_2026-09-10.md`.
 
-- [ ] immutable constraint-set registry;
-- [ ] parent/child lineage;
-- [ ] semantic/rules/encoder hashes;
-- [ ] software version separated from scientific-impact class;
-- [ ] population/cohort/estimand impact model;
-- [ ] preregistered tolerance-policy schema;
-- [ ] migration decision classes;
-- [ ] explicit read-only protection for existing frozen D2 artifacts.
+- [x] immutable constraint-set registry;
+- [x] parent/child lineage;
+- [x] semantic/rules/encoder hashes;
+- [x] software version separated from scientific-impact class;
+- [x] population/cohort/estimand impact model;
+- [x] preregistered tolerance-policy schema;
+- [x] migration decision classes;
+- [x] explicit read-only protection for existing frozen D2 artifacts.
 
-**Exit:** synthetic bugfix migrates `CS-A -> CS-B` through an impact analysis without rewriting `CS-A`.
+**Exit:** **PASS** — a synthetic encoder correction migrates `RAC-CS-PASS2-LOG-001 -> RAC-CS-PASS2-LOG-002` through explicit three-axis impact analysis, produces a formal decision, records a `CONSTRAINT_MIGRATION` event, preserves the predecessor, and refuses logging when protected frozen-D2 hashes drift.
 
 **Reason for priority:** this must exist before future constraint definitions start changing across waves.
 
@@ -238,9 +239,9 @@ This is enough to materially improve future experimental integrity. CIC routing,
 ## Checkpoint A — Governance skeleton
 
 - [x] Pass 1 complete — CI #821 / `d7eed338`; closure record: `PASS1_CLOSURE_2026-09-10.md`
-- [ ] Pass 2 complete
+- [x] Pass 2 complete — CI #836 / `7ff05187`; closure record: `PASS2_CLOSURE_2026-09-10.md`
 
-**Decision:** are any imminent experiments changing constraints? If no, keep P0 ahead of Pass 3.
+**Decision:** Governance skeleton is closed. Keep P0 physical/production work ahead of Pass 3 whenever external inputs are actionable.
 
 ## Checkpoint B — Reproducible experimental foundation
 
