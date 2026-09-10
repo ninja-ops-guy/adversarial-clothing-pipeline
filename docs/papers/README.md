@@ -3,6 +3,10 @@
 **Status:** Pre-results manuscript series  
 **Rule:** Methods may be completed before experiments. Results, Discussion and final Conclusions remain explicitly pending until the corresponding immutable RAC experiment releases exist.
 
+## Literature foundation
+
+- [Do Pattern Properties Predict Cross-Architecture Transfer in Physical Adversarial Textiles?](00_SYSTEMATIC_REVIEW.md) — structured 2017–2026 evidence review establishing the prospective property→transfer research gap, CAPGen baseline, Pattern Genome hypotheses, and replication requirements.
+
 ## Foundation papers
 
 0. [RAC: A Reproducible Architecture for Physical Adversarial Textile Research](00_RAC_SYSTEM_ARCHITECTURE.md) — system topology, four-plane architecture, held-out trust boundary, provenance model and digital-to-physical research flow.
