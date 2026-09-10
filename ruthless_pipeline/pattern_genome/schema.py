@@ -1,16 +1,17 @@
+"""Pattern Genome v1 frozen dataclasses. Immutable measurement record."""
 from __future__ import annotations
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import Any
 
 SCHEMA_VERSION = "rac-pattern-genome/1.0"
-EVIDENCE_CLASS = "derived_digital_measurement"
+EXTRACTOR_VERSION = "1.0.0"
 
 @dataclass(frozen=True)
 class GenomeSource:
     artifact_ref: str
     width_px: int
     height_px: int
-    channels: int = 3
+    channels: int
 
 @dataclass(frozen=True)
 class SpectralGenome:
@@ -42,6 +43,8 @@ class TopologyGenome:
     motif_period_x: float
     motif_period_y: float
     fragmentation_index: float
+    segmentation_method: str
+    palette_k: int
 
 @dataclass(frozen=True)
 class ColorGenome:
@@ -49,7 +52,7 @@ class ColorGenome:
     rgb_mean: tuple[float, float, float]
     rgb_std: tuple[float, float, float]
     lab_mean: tuple[float, float, float]
-    lab_covariance: tuple[tuple[float, float, float], tuple[float, float, float], tuple[float, float, float]]
+    lab_covariance: tuple[tuple[float, float, float], ...]
     lab_range_l: float
     lab_range_a: float
     lab_range_b: float
@@ -90,7 +93,7 @@ class GenomeProvenance:
     runtime_lock_sha256: str
     extractor_config_sha256: str
     extracted_utc: str
-    evidence_class: str = EVIDENCE_CLASS
+    evidence_class: str
 
 @dataclass(frozen=True)
 class PatternGenome:
@@ -104,6 +107,3 @@ class PatternGenome:
     geometry: GeometryGenome
     quality: GenomeQuality
     provenance: GenomeProvenance
-
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
