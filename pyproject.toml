@@ -36,3 +36,9 @@ include = ["ruthless_pipeline*"]
 # cleaned incrementally. These rules catch syntax/parse errors and invalid or
 # undefined names without turning formatting debt into a release blocker.
 select = ["E9", "F63", "F7", "F82"]
+
+[tool.ruff.lint.per-file-ignores]
+# Barrier 3 deliberately re-exports the preserved coordinator core dynamically
+# so stage hooks remain monkeypatchable at the historical public module path.
+# Runtime tests exercise those bindings; F821 cannot infer globals() injection.
+"ruthless_pipeline/certification/rehearsal_barrier3.py" = ["F821"]
