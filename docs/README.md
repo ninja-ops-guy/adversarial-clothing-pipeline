@@ -21,15 +21,20 @@ For a new technical reviewer, read in this order:
 
 1. **[Product Thesis](PRODUCT_THESIS.md)** — why RAC exists, public-interest mission, evidence/claim philosophy.
 2. **[Perpetual Improvement Master](PERPETUAL_IMPROVEMENT_MASTER.md)** — research governance, evidence labels, open questions and R&D roadmap.
-3. **[Experimental Governance v1](experimental_governance/RAC_EXPERIMENTAL_GOVERNANCE_V1.md)** — prospective constraint-lineage, cohort-sealing, sampling, sentinel/bridge and adaptive-governance specification. **Status: planned / prospective; does not retroactively mutate frozen experiments.**
-4. **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — critical-first multi-week implementation sequence; keeps current physical/POD work ahead of lower-priority infrastructure.
+3. **[Experimental Governance v1](experimental_governance/RAC_EXPERIMENTAL_GOVERNANCE_V1.md)** — prospective constraint-lineage, cohort-sealing, sampling, sentinel/bridge and adaptive-governance specification. **Status: prospective adopted contract; Passes 1–2 are closed/verified, later passes remain audit-gated; frozen experiments are not retroactively mutated.**
+4. **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — critical-first implementation sequence and authoritative pass-completion checklist; keeps current physical/POD work ahead of lower-priority infrastructure.
 5. **[Seven Implementation Passes](experimental_governance/IMPLEMENTATION_PASSES.md)** — pass-by-pass deliverables, tests and exit gates for Governance v1.
-6. **[Production Completion Checklist](PRODUCTION_COMPLETION_CHECKLIST.md)** — execution order and Production Alpha/Beta/v1 gates.
-7. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — current completion status, verified baseline and active gates.
+6. **[Pass 1 Closure](experimental_governance/PASS1_CLOSURE_2026-09-10.md)** — adopted Governance Core closure, verified by CI #821.
+7. **[Pass 2 Closure](experimental_governance/PASS2_CLOSURE_2026-09-10.md)** — adopted Constraint Lineage closure, verified by CI #836.
+8. **[Production Completion Checklist](PRODUCTION_COMPLETION_CHECKLIST.md)** — execution order and Production Alpha/Beta/v1 gates.
+9. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — current completion status, verified baseline and active gates.
 
 ## Current status
 
 - **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — recommended source for current RAC/CTM state.
+- **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — Passes 1–2 closed; Passes 3–7 audit-gated even where prototype code exists.
+- **[Pass 1 Closure](experimental_governance/PASS1_CLOSURE_2026-09-10.md)** — immutable IDs/events/state/HALT foundation closure.
+- **[Pass 2 Closure](experimental_governance/PASS2_CLOSURE_2026-09-10.md)** — immutable constraint lineage, three-axis impact, tolerance policy and migration logging closure.
 - **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** — detailed Sep. 7–8 milestone history; preserved rather than rewritten retroactively.
 - **[CTM B–D Integration Audit](CTM_BD_INTEGRATION_AUDIT_2026-09-10.md)** — closed PASS audit for the September 10 integration/hardening cycle.
 - **[Project Status](PROJECT_STATUS.md)** — architecture/readiness narrative; historical sections may lag the current ledger.
