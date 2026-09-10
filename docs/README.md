@@ -1,6 +1,6 @@
 # RAC Documentation Index
 
-**Last updated:** 2026-09-09
+**Last updated:** 2026-09-10
 
 This page is the navigation layer for the RAC documentation stack. Use the documents below according to their authority and purpose.
 
@@ -20,8 +20,11 @@ For a new technical reviewer, read in this order:
 
 1. **[Product Thesis](PRODUCT_THESIS.md)** — why RAC exists, public-interest mission, evidence/claim philosophy.
 2. **[Perpetual Improvement Master](PERPETUAL_IMPROVEMENT_MASTER.md)** — research governance, evidence labels, open questions and R&D roadmap.
-3. **[Production Completion Checklist](PRODUCTION_COMPLETION_CHECKLIST.md)** — execution order and Production Alpha/Beta/v1 gates.
-4. **[Project Progress Ledger](PROJECT_PROGRESS.md)** — current completion status, completed work and active tasks.
+3. **[Experimental Governance v1](experimental_governance/RAC_EXPERIMENTAL_GOVERNANCE_V1.md)** — prospective constraint-lineage, cohort-sealing, sampling, sentinel/bridge and adaptive-governance specification. **Status: planned / prospective; does not retroactively mutate frozen experiments.**
+4. **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — critical-first multi-week implementation sequence; keeps current physical/POD work ahead of lower-priority infrastructure.
+5. **[Seven Implementation Passes](experimental_governance/IMPLEMENTATION_PASSES.md)** — pass-by-pass deliverables, tests and exit gates for Governance v1.
+6. **[Production Completion Checklist](PRODUCTION_COMPLETION_CHECKLIST.md)** — execution order and Production Alpha/Beta/v1 gates.
+7. **[Project Progress Ledger](PROJECT_PROGRESS.md)** — current completion status, completed work and active tasks.
 
 ## Current status
 
