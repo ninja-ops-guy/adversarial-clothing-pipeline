@@ -34,7 +34,14 @@ test('analysis manifest defaults to identity matching disabled', async ({ page }
   const text = await page.locator('#modelManifest').inputValue();
   const manifest = JSON.parse(text);
   expect(manifest.identity_mode).toBe('disabled');
-  expect(manifest.models).toEqual([]);
+  expect(manifest.models).toEqual([
+    'yolov8n',
+    'fasterrcnn_mobilenet_v3_320',
+    'detr_resnet50',
+    'ssdlite320_mobilenet_v3',
+    'retinanet_resnet50_fpn_v2',
+    'fcos_resnet50_fpn'
+  ]);
 });
 
 test('synthetic dry-run evidence class remains explicit', async ({ page }) => {
@@ -51,7 +58,8 @@ test('frozen ensemble includes deterministic motion sampling contract', async ({
   expect(manifest.motion_sampling).toEqual({
     fps: 2.0,
     max_frames: 120,
-    aggregation: 'sequence_fraction'
+    aggregation: 'sequence_fraction',
+    sequence_detection_threshold: 0.5
   });
   await page.selectOption('#ensemblePreset', 'heldout');
   const heldout = JSON.parse(await page.locator('#modelManifest').inputValue());
