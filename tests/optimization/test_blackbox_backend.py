@@ -11,7 +11,7 @@ from ruthless_pipeline.optimization.gradient_backend import DivergenceRefusalErr
 from ruthless_pipeline.optimization.objective_registry import Objective
 from ruthless_pipeline.optimization.trajectory import TrajectoryRecorder
 
-from conftest import make_quadratic_objective
+from tests.optimization.conftest import make_quadratic_objective
 
 
 def _run(spec, seed=42, max_iter=60):

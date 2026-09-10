@@ -14,7 +14,7 @@ from ruthless_pipeline.optimization.gradient_backend import (
 from ruthless_pipeline.optimization.objective_registry import Objective
 from ruthless_pipeline.optimization.trajectory import TrajectoryRecorder
 
-from conftest import make_quadratic_objective
+from tests.optimization.conftest import make_quadratic_objective
 
 
 def test_finite_difference_gradient_on_quadratic():

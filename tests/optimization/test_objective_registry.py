@@ -12,7 +12,7 @@ from ruthless_pipeline.optimization.objective_registry import (
 )
 from ruthless_pipeline.optimization.schemas import DetectorAggregation
 
-from conftest import make_quadratic_objective
+from tests.optimization.conftest import make_quadratic_objective
 
 
 def test_per_term_values_sum_to_weighted_total(spec):

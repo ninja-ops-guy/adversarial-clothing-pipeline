@@ -24,7 +24,7 @@ from ruthless_pipeline.optimization.trajectory import (
     TrajectoryRecorder,
 )
 
-from conftest import make_quadratic_objective
+from tests.optimization.conftest import make_quadratic_objective
 
 
 def _es_run(spec, recorder, seed=123, start_iter_offset=0, x0=None, max_iter=30):

@@ -13,7 +13,7 @@ from ruthless_pipeline.optimization.schemas import (
     load_schema,
 )
 
-from conftest import synthetic_objective_dict
+from tests.optimization.conftest import synthetic_objective_dict
 
 
 def test_valid_spec_loads():
