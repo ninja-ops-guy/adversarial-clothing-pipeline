@@ -10,6 +10,29 @@ permissions:
   contents: read
 
 jobs:
+  lightweight-provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Enforce dependency-light package boundary
+        run: |
+          PYTHONPATH=. python - <<'PY'
+          import sys
+          import ruthless_pipeline
+          from ruthless_pipeline.certification import provenance_graph
+
+          forbidden = {"torch", "torchvision", "numpy", "scipy", "PIL"}
+          loaded = sorted(name for name in forbidden if name in sys.modules)
+          if loaded:
+              raise SystemExit(f"heavy modules imported eagerly: {loaded}")
+          assert provenance_graph.GRAPH_SCHEMA_ID == "rac-provenance-graph"
+          PY
+      - name: Verify committed provenance graph without project install
+        run: PYTHONPATH=. python scripts/build_provenance_graph.py --verify
+
   test:
     runs-on: ubuntu-latest
     strategy:
