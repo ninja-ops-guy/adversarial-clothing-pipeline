@@ -1,9 +1,23 @@
-class PatternGenomeError(Exception):
-    """Base error for Pattern Genome v1."""
+"""Pattern Genome error hierarchy. Every failure mode is a typed refusal."""
+from __future__ import annotations
 
-class PatternGenomeInputError(PatternGenomeError): pass
-class PatternGenomeValidationError(PatternGenomeError): pass
-class PatternGenomeProvenanceError(PatternGenomeError): pass
-class PatternGenomeNonFiniteError(PatternGenomeValidationError): pass
-class PatternGenomeDeterminismError(PatternGenomeError): pass
-class PatternGenomeSchemaError(PatternGenomeValidationError): pass
+class PatternGenomeError(Exception):
+    """Base class for all Pattern Genome failures."""
+
+class PatternGenomeInputError(PatternGenomeError):
+    """Input image is invalid, corrupt, or unsupported."""
+
+class PatternGenomeValidationError(PatternGenomeError):
+    """Genome record failed schema or invariant validation."""
+
+class PatternGenomeProvenanceError(PatternGenomeError):
+    """Required provenance field is absent or inconsistent."""
+
+class PatternGenomeNonFiniteError(PatternGenomeError):
+    """NaN, Infinity, or out-of-range value detected."""
+
+class PatternGenomeDeterminismError(PatternGenomeError):
+    """Golden-vector or cross-process determinism check failed."""
+
+class PatternGenomeSchemaError(PatternGenomeError):
+    """Unknown or incompatible schema version."""
