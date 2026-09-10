@@ -14,7 +14,7 @@ different constraints are mechanically distinguishable.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from ruthless_pipeline.pattern_genome.canonical import canonical_json, sha256_bytes
@@ -26,8 +26,9 @@ OPTIMIZER_CONSTRAINTS_SCHEMA_VERSION = "rac-ctm-optimizer-constraints/1.0"
 
 EXPERIMENTAL_UNIT_PREFIX = "RAC-CTM-UNIT-"
 
-#: Recognized imposed-structure channels (documented, not restrictive —
-#: unknown names are legal but must carry parameters).
+#: Recognized imposed-structure channels. Unknown names are legal only when
+#: they carry explicit parameters; this prevents an ad-hoc label from looking
+#: equivalent to a specified optimizer intervention.
 KNOWN_REGULARIZERS = frozenset({"total_variation", "nps", "laplacian", "entropy"})
 KNOWN_STRUCTURAL_CONSTRAINTS = frozenset({
     "tileability",
@@ -37,7 +38,11 @@ KNOWN_STRUCTURAL_CONSTRAINTS = frozenset({
 })
 
 
-def _validate_named_block(block: dict[str, Any], kind: str) -> None:
+def _validate_named_block(
+    block: dict[str, Any],
+    kind: str,
+    known_names: frozenset[str],
+) -> None:
     if not isinstance(block, dict):
         raise OptimizerConstraintsError(f"{kind} entries must be objects")
     name = block.get("name")
@@ -47,6 +52,11 @@ def _validate_named_block(block: dict[str, Any], kind: str) -> None:
     if not isinstance(params, dict):
         raise OptimizerConstraintsError(
             f"{kind} entry {name!r}: 'parameters' must be an object"
+        )
+    if name not in known_names and not params:
+        raise OptimizerConstraintsError(
+            f"unknown {kind} {name!r} requires explicit non-empty parameters; "
+            "an ad-hoc name without a parameterization is not reproducible"
         )
 
 
@@ -66,9 +76,11 @@ class OptimizerConstraints:
                 f"{self.schema_version!r}"
             )
         for block in self.regularizers:
-            _validate_named_block(block, "regularizer")
+            _validate_named_block(block, "regularizer", KNOWN_REGULARIZERS)
         for block in self.structural_constraints:
-            _validate_named_block(block, "structural_constraint")
+            _validate_named_block(
+                block, "structural_constraint", KNOWN_STRUCTURAL_CONSTRAINTS
+            )
 
     def to_dict(self) -> dict[str, Any]:
         return {
