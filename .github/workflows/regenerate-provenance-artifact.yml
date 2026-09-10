@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+      - name: Install project runtime dependencies
+        run: python -m pip install .
       - name: Regenerate deterministic provenance graph
         run: PYTHONPATH=. python scripts/build_provenance_graph.py
       - name: Verify regenerated graph
