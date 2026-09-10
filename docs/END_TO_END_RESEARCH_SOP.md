@@ -107,6 +107,13 @@ Freeze:
 - manifest;
 - SHA-256 of every artifact;
 - source commit.
+- Pattern Genome v1 sidecar for every candidate entering surrogate screening;
+- genome index SHA-256 and selected-winner genome reference.
+
+Pattern Genome extraction is automatic in the candidate-selection path. It is
+an intrinsic digital measurement only (`derived_digital_measurement`): genome
+features are frozen before surrogate evaluation, are not read by the v1
+ranking function, and can never satisfy a physical evidence state.
 
 ### D2 generation rule
 
