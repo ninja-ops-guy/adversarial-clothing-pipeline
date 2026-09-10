@@ -41,7 +41,7 @@ def test_semantic_validator_rejects_legacy_prefix_in_adopted_field() -> None:
         "scientific_projection_version": "RAC-PG-1.0",
         "scientific_impact": "NONE",
     }
-    with pytest.raises(GovernanceValidationError, match="canonical RAC-CS"):
+    with pytest.raises(GovernanceValidationError, match="canonical CS prefix"):
         validate_manifest("constraint_set", manifest)
 
 
