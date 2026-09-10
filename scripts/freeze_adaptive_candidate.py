@@ -11,6 +11,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from ruthless_pipeline.certification.schema_version import require_schema_version
+from ruthless_pipeline.pattern_genome import freeze_candidate_genome, load_config, resolve_source_commit
+from ruthless_pipeline.pattern_genome.integration import resolve_commit_utc
 
 
 def main() -> int:
@@ -24,6 +26,9 @@ def main() -> int:
     parser.add_argument("--output-dir", default="benchmarks/runtime")
     parser.add_argument("--pool", default="benchmarks/runtime/pool/pool.json")
     parser.add_argument("--candidate-id", default="RAC-PER-D2-0004")
+    parser.add_argument("--pattern-genome-config", default=str(ROOT / "configs" / "pattern_genome_v1.json"))
+    parser.add_argument("--pattern-genome-runtime-lock", default=str(ROOT / "benchmarks" / "runtime_lock.json"))
+    parser.add_argument("--genome-source-commit", default=None)
     args = parser.parse_args()
 
     adaptive_path = Path(args.adaptive)
@@ -55,6 +60,33 @@ def main() -> int:
 
     candidate_path = output_dir / "candidate.png"
     shutil.copyfile(winner_path, candidate_path)
+
+    # Freeze the adapted winner's intrinsic genome before any held-out stage.
+    # The sidecar is measurement-only and does not affect the adaptive winner.
+    source_commit = resolve_source_commit(args.genome_source_commit, repo_root=ROOT)
+    genome_ref = freeze_candidate_genome(
+        candidate_path,
+        artifact_ref=f"candidate://{args.candidate_id}/candidate.png",
+        output_path=output_dir / "pattern-genomes" / f"{args.candidate_id}.json",
+        config=load_config(args.pattern_genome_config),
+        runtime_lock_path=args.pattern_genome_runtime_lock,
+        source_commit=source_commit,
+        extracted_utc=resolve_commit_utc(source_commit, repo_root=ROOT),
+    )
+    (output_dir / "candidate-genome-ref.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "rac-pattern-genome-ref/1.0",
+                "candidate_id": args.candidate_id,
+                "selection_influence": "NONE_MEASUREMENT_ONLY",
+                "heldout_access": False,
+                "genome_ref": genome_ref,
+            },
+            sort_keys=True,
+            indent=2,
+        )
+        + "\n"
+    )
 
     config = {
         "schema_version": "4.0",
