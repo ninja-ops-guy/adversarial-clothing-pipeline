@@ -17,6 +17,12 @@ from .ids import GovernanceId, IdKind
 from .ledger import GovernanceEventType, payload_sha256
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+SCIENTIFIC_IMPACTS = {
+    "NONE",
+    "SEMANTIC_CORRECTION",
+    "POPULATION_CHANGE",
+    "DEFINITION_CHANGE",
+}
 
 
 class GovernanceValidationError(ValueError):
@@ -50,9 +56,11 @@ REQUIRED = {
         "specimen_ids",
         "artifact_sha256",
     ),
+    # Identity/version fields are handled below because Governance v1 accepts
+    # the adopted constraint_set_id shape while preserving read compatibility
+    # with the pre-adoption constraint_id prototype.
     "constraint_set": (
         "schema_version",
-        "constraint_id",
         "semantic_hash",
         "rules_hash",
         "encoder_hash",
@@ -71,13 +79,20 @@ REQUIRED = {
         "checks",
         "thresholds_hash",
     ),
+    "tolerance_policy": (
+        "constraint_family",
+        "created_at",
+        "max_population_displacement",
+        "max_cohort_change_fraction",
+        "registered_before_outcomes",
+        "version",
+    ),
 }
 
 ID_FIELDS = {
     "governance_event": ("event_id", IdKind.EVENT),
     "sampling_manifest": ("sampling_id", IdKind.SAMPLING),
     "cohort_manifest": ("cohort_id", IdKind.COHORT),
-    "constraint_set": ("constraint_id", IdKind.CONSTRAINT),
     "overlap_analysis": ("overlap_id", IdKind.OVERLAP),
     "diagnostic_bundle": ("diagnostic_id", IdKind.DIAGNOSTIC),
 }
@@ -173,24 +188,108 @@ def _validate_governance_event(manifest: dict[str, Any]) -> None:
         raise GovernanceValidationError("event_sha256: does not bind event metadata")
 
 
+def _validate_constraint_set(manifest: dict[str, Any]) -> None:
+    for name in ("semantic_hash", "rules_hash", "encoder_hash"):
+        _sha(manifest[name], name)
+
+    canonical_present = "constraint_set_id" in manifest
+    legacy_present = "constraint_id" in manifest
+    if canonical_present == legacy_present:
+        raise GovernanceValidationError(
+            "constraint set must contain exactly one of constraint_set_id or constraint_id"
+        )
+
+    if legacy_present:
+        _typed_id(manifest["constraint_id"], IdKind.CONSTRAINT, "constraint_id")
+        return
+
+    parsed = _typed_id(
+        manifest["constraint_set_id"], IdKind.CONSTRAINT, "constraint_set_id"
+    )
+    if parsed.is_legacy_alias:
+        raise GovernanceValidationError(
+            "constraint_set_id must use the canonical RAC-CS-* prefix"
+        )
+    required = (
+        "software_version",
+        "parent_constraint_set_id",
+        "encoder_version",
+        "scientific_projection_version",
+        "scientific_impact",
+    )
+    missing = [field for field in required if field not in manifest]
+    if missing:
+        raise GovernanceValidationError(
+            "missing adopted constraint-set fields: " + ", ".join(missing)
+        )
+    parent = manifest["parent_constraint_set_id"]
+    if parent is not None:
+        parent_id = _typed_id(
+            parent, IdKind.CONSTRAINT, "parent_constraint_set_id"
+        )
+        if parent_id.is_legacy_alias:
+            raise GovernanceValidationError(
+                "parent_constraint_set_id must use the canonical RAC-CS-* prefix"
+            )
+    for field in (
+        "software_version",
+        "encoder_version",
+        "scientific_projection_version",
+    ):
+        if not isinstance(manifest[field], str) or not manifest[field].strip():
+            raise GovernanceValidationError(f"{field}: non-empty string required")
+    if manifest["scientific_impact"] not in SCIENTIFIC_IMPACTS:
+        raise GovernanceValidationError("scientific_impact: unsupported classification")
+
+
+def _validate_tolerance_policy(manifest: dict[str, Any]) -> None:
+    if not isinstance(manifest["constraint_family"], str) or not manifest[
+        "constraint_family"
+    ].strip():
+        raise GovernanceValidationError("constraint_family: non-empty string required")
+    _utc_timestamp(manifest["created_at"], "created_at")
+    for field in (
+        "max_population_displacement",
+        "max_cohort_change_fraction",
+    ):
+        value = manifest[field]
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or not 0.0 <= float(value) <= 1.0
+        ):
+            raise GovernanceValidationError(f"{field}: must be numeric in [0, 1]")
+    if manifest["registered_before_outcomes"] is not True:
+        raise GovernanceValidationError(
+            "registered_before_outcomes: must be true for preregistered policy"
+        )
+    if not isinstance(manifest["version"], str) or not manifest["version"].strip():
+        raise GovernanceValidationError("version: non-empty string required")
+
+
 def validate_manifest(kind: str, manifest: dict[str, Any]) -> bool:
     if kind not in REQUIRED or not isinstance(manifest, dict):
         raise GovernanceValidationError("unknown manifest kind or invalid object")
     missing = [name for name in REQUIRED[kind] if name not in manifest]
     if missing:
         raise GovernanceValidationError("missing required fields: " + ", ".join(missing))
-    if manifest["schema_version"] != "1.0":
+    if kind != "tolerance_policy" and manifest["schema_version"] != "1.0":
         raise GovernanceValidationError("schema_version must be 1.0")
 
     if "experiment_id" in manifest:
         _typed_id(manifest["experiment_id"], IdKind.EXPERIMENT, "experiment_id")
-    field, expected = ID_FIELDS[kind]
-    _typed_id(manifest[field], expected, field)
+    if kind in ID_FIELDS:
+        field, expected = ID_FIELDS[kind]
+        _typed_id(manifest[field], expected, field)
 
     if kind == "governance_event":
         _validate_governance_event(manifest)
     elif kind == "sampling_manifest":
-        if not isinstance(manifest["seed"], int) or isinstance(manifest["seed"], bool) or manifest["seed"] < 0:
+        if (
+            not isinstance(manifest["seed"], int)
+            or isinstance(manifest["seed"], bool)
+            or manifest["seed"] < 0
+        ):
             raise GovernanceValidationError("seed must be a non-negative integer")
         target = manifest["target_distribution"]
         if not isinstance(target, (str, dict)) or not target:
@@ -203,8 +302,7 @@ def validate_manifest(kind: str, manifest: dict[str, Any]) -> bool:
             raise GovernanceValidationError("specimen_ids must contain non-empty strings")
         _sha(manifest["artifact_sha256"], "artifact_sha256")
     elif kind == "constraint_set":
-        for name in ("semantic_hash", "rules_hash", "encoder_hash"):
-            _sha(manifest[name], name)
+        _validate_constraint_set(manifest)
     elif kind == "overlap_analysis":
         _typed_id(manifest["left_constraint_id"], IdKind.CONSTRAINT, "left_constraint_id")
         _typed_id(manifest["right_constraint_id"], IdKind.CONSTRAINT, "right_constraint_id")
@@ -214,4 +312,6 @@ def validate_manifest(kind: str, manifest: dict[str, Any]) -> bool:
         _sha(manifest["thresholds_hash"], "thresholds_hash")
         if not isinstance(manifest["checks"], list):
             raise GovernanceValidationError("checks must be a list")
+    elif kind == "tolerance_policy":
+        _validate_tolerance_policy(manifest)
     return True
