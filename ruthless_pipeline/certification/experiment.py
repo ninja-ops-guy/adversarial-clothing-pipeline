@@ -30,6 +30,7 @@ from typing import Any
 # stages that are present must appear in this order.
 PIPELINE_ORDER: tuple[str, ...] = (
     "candidate",
+    "pattern_genome",
     "generation",
     "optimization_telemetry",
     "calibration_profile",
