@@ -2,13 +2,39 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rac-constraint-set/1.0",
   "type": "object",
-  "required": ["schema_version", "constraint_id", "semantic_hash", "rules_hash", "encoder_hash"],
   "properties": {
     "schema_version": {"const": "1.0"},
-    "constraint_id": {"type": "string", "pattern": "^RAC-(CS|CST)-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "constraint_set_id": {"type": "string", "pattern": "^RAC-CS-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "parent_constraint_set_id": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string", "pattern": "^RAC-CS-[A-Z0-9][A-Z0-9._-]{2,63}$"}
+      ]
+    },
+    "software_version": {"type": "string", "minLength": 1},
     "semantic_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "rules_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "encoder_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    "encoder_version": {"type": "string", "minLength": 1},
+    "encoder_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "scientific_projection_version": {"type": "string", "minLength": 1},
+    "scientific_impact": {
+      "enum": ["NONE", "SEMANTIC_CORRECTION", "POPULATION_CHANGE", "DEFINITION_CHANGE"]
+    },
+    "constraint_id": {"type": "string", "pattern": "^RAC-(CS|CST)-[A-Z0-9][A-Z0-9._-]{2,63}$"}
   },
+  "required": ["schema_version", "semantic_hash", "rules_hash", "encoder_hash"],
+  "oneOf": [
+    {
+      "required": [
+        "constraint_set_id",
+        "software_version",
+        "parent_constraint_set_id",
+        "encoder_version",
+        "scientific_projection_version",
+        "scientific_impact"
+      ]
+    },
+    {"required": ["constraint_id"]}
+  ],
   "additionalProperties": true
 }
