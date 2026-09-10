@@ -1,0 +1,194 @@
+{
+  "evidence_class": "experimental_print_specimen",
+  "order": {
+    "artworks": [
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/front.png",
+        "placement": "front",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/back.png",
+        "placement": "back",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/sleeve_left.png",
+        "placement": "sleeve_left",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/sleeve_right.png",
+        "placement": "sleeve_right",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/pocket.png",
+        "placement": "pocket",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/hood.png",
+        "placement": "hood",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/label_panel.png",
+        "placement": "label_panel",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CANDIDATE/label_inside.png",
+        "placement": "label_inside",
+        "role": "candidate"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/front.png",
+        "placement": "front",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/back.png",
+        "placement": "back",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/sleeve_left.png",
+        "placement": "sleeve_left",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/sleeve_right.png",
+        "placement": "sleeve_right",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/pocket.png",
+        "placement": "pocket",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/hood.png",
+        "placement": "hood",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/label_panel.png",
+        "placement": "label_panel",
+        "role": "control"
+      },
+      {
+        "artwork_sha256": "PENDING_USER_ACTION",
+        "file": "print-alpha/CONTROL/label_inside.png",
+        "placement": "label_inside",
+        "role": "control"
+      }
+    ],
+    "garments": [
+      {
+        "color": "White",
+        "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+        "product_id": 388,
+        "role": "candidate",
+        "size": "PENDING_USER_ACTION",
+        "sku_id": "PA-HOODIE-CAND-001",
+        "variant_id": "PENDING_USER_ACTION"
+      },
+      {
+        "color": "White",
+        "print_technique": "CUT-SEW all-over synthetic (sublimation)",
+        "product_id": 388,
+        "role": "control",
+        "size": "PENDING_USER_ACTION",
+        "sku_id": "PA-HOODIE-CTRL-001",
+        "variant_id": "PENDING_USER_ACTION"
+      }
+    ],
+    "placements": [
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/front",
+        "placement": "front"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/back",
+        "placement": "back"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/sleeve_left",
+        "placement": "sleeve_left"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/sleeve_right",
+        "placement": "sleeve_right"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/pocket",
+        "placement": "pocket"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/hood",
+        "placement": "hood"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/label_panel",
+        "placement": "label_panel"
+      },
+      {
+        "candidate_file": "PENDING_USER_ACTION",
+        "control_file": "PENDING_USER_ACTION",
+        "panel_geometry_ref": "template-manifest.json#/panel_geometry/label_inside",
+        "placement": "label_inside"
+      }
+    ],
+    "primary_manifest_id": "RAC-PRINT-ALPHA-001",
+    "template_archive_sha256": "PENDING_USER_ACTION"
+  },
+  "pending_user_action_fields": 64,
+  "physical_efficacy_claimed": false,
+  "readiness_verdict": "USER_ACTION_REQUIRED",
+  "schema_version": "1.0",
+  "source_manifests": {
+    "artwork-manifest.json": "7d5461474c873cb6a4f5efca9322ed18cc8781ae9367a9a4b6134cc65a51ad35",
+    "mapping-manifest.json": "b5c895b15fc9df937696a904f96eb09a5a877230c279bad650b6abc8e9c6df18",
+    "print-alpha-manifest.json": "692e359428d203df473f236df53e6a4a4caa7fbc77f868de5564a5b6b44e11f3",
+    "sku-manifest.json": "e4ed47543b3169c8286a30bbb384ef73b27ed477bf5d57e4fc3dabdb35bb8a88",
+    "template-manifest.json": "f9f6a137b09ac5885a2e9cc49ef53289fb7f956dfc869f96a6c49b4c4f4fb164"
+  },
+  "status": "USER_ACTION_REQUIRED",
+  "user_action_refs": [
+    "UA-1",
+    "UA-2",
+    "UA-3",
+    "UA-4"
+  ],
+  "worksheet_id": "RAC-PRINT-ALPHA-001-ORDER-WORKSHEET"
+}
