@@ -95,12 +95,19 @@ class SentinelRegistry:
         self._by_id[sentinel.sentinel_id] = sentinel
         self._by_wave[sentinel.source_wave_id] = sentinel.sentinel_id
 
+    def get(self, sentinel_id: str) -> SentinelCohort:
+        try:
+            return self._by_id[sentinel_id]
+        except KeyError as exc:
+            raise KeyError(f"unknown sentinel_id: {sentinel_id}") from exc
+
 
 def create_sentinel(
     *, sentinel_id: str, source_wave_id: str, source_seal: CohortSeal,
     cohort_manifest: Mapping[str, object], specimen_ids: Iterable[str],
     selection_seed: int, selection_policy_hash: str,
 ) -> SentinelCohort:
+    """Select the immutable sentinel only from a previously sealed cohort."""
     if source_seal.state != "SEALED":
         raise SentinelGovernanceError("sentinel source cohort must be SEALED")
     manifest_hash = sha256(
@@ -108,8 +115,12 @@ def create_sentinel(
     ).hexdigest()
     if manifest_hash != source_seal.manifest_hash:
         raise SentinelGovernanceError("cohort manifest hash does not match source seal")
-    if cohort_manifest.get("cohort_id") != source_seal.cohort_id or cohort_manifest.get("constraint_id") != source_seal.constraint_id:
-        raise SentinelGovernanceError("cohort/constraint identity does not match source seal")
+    if (
+        cohort_manifest.get("cohort_id") != source_seal.cohort_id
+        or cohort_manifest.get("experiment_id") != source_seal.experiment_id
+        or cohort_manifest.get("constraint_id") != source_seal.constraint_id
+    ):
+        raise SentinelGovernanceError("cohort/experiment/constraint identity does not match source seal")
     available = cohort_manifest.get("specimen_ids")
     selected = tuple(specimen_ids)
     if not isinstance(available, list) or not selected or not set(selected).issubset(set(available)):
@@ -146,6 +157,18 @@ class CalibrationState:
         _seed(self.random_seed, "calibration random_seed")
         if self.outcome_labels_consumed:
             raise SentinelGovernanceError("calibration state may not consume experimental outcome labels")
+
+    def to_dict(self) -> dict[str, object]:
+        self.validate()
+        return {
+            "schema_version": "1.0",
+            "calibration_id": self.calibration_id,
+            "member_ids": list(self.member_ids),
+            "state_hash": self.state_hash,
+            "source_manifest_hash": self.source_manifest_hash,
+            "random_seed": self.random_seed,
+            "outcome_labels_consumed": self.outcome_labels_consumed,
+        }
 
 
 @dataclass(frozen=True)
@@ -190,12 +213,29 @@ class EvaluationPipeline:
             self.calibration_id, self.calibration_state_hash,
         )
 
+    def to_dict(self) -> dict[str, object]:
+        self.validate()
+        return {
+            "schema_version": "1.0",
+            "pipeline_id": self.pipeline_id,
+            "software_version": self.software_version,
+            "code_hash": self.code_hash,
+            "detector_hash": self.detector_hash,
+            "preprocessing_hash": self.preprocessing_hash,
+            "random_seed": self.random_seed,
+            "preprocessing_mode": self.preprocessing_mode.value,
+            "calibration_id": self.calibration_id,
+            "calibration_state_hash": self.calibration_state_hash,
+            "prior_outcome_access": self.prior_outcome_access,
+        }
+
 
 def validate_blind_sentinel_evaluation(
     sentinel: SentinelCohort, pipeline: EvaluationPipeline, *,
     calibration: CalibrationState | None = None, bridge_ids: Iterable[str] = (),
     treatment_ids: Iterable[str] = (), heldout_ids: Iterable[str] = (),
 ) -> None:
+    """Fail closed on direct or initialization-state leakage from prior outcomes."""
     sentinel.validate()
     pipeline.validate()
     if pipeline.preprocessing_mode is PreprocessingMode.CALIBRATED:
@@ -232,6 +272,17 @@ class PipelineBridgePlan:
         if not self.paired_evaluation_required:
             raise SentinelGovernanceError("pipeline bridge must require paired sentinel evaluation")
 
+    def to_dict(self) -> dict[str, object]:
+        self.validate()
+        return {
+            "schema_version": "1.0",
+            "bridge_id": self.bridge_id,
+            "sentinel_id": self.sentinel_id,
+            "old_pipeline_id": self.old_pipeline_id,
+            "new_pipeline_id": self.new_pipeline_id,
+            "paired_evaluation_required": self.paired_evaluation_required,
+        }
+
 
 def pipeline_change_requires_bridge(old: EvaluationPipeline, new: EvaluationPipeline) -> bool:
     return old.fingerprint != new.fingerprint
@@ -241,6 +292,7 @@ def validate_pipeline_transition(
     old: EvaluationPipeline, new: EvaluationPipeline, *,
     sentinel: SentinelCohort, bridge: PipelineBridgePlan | None,
 ) -> None:
+    sentinel.validate()
     changed = pipeline_change_requires_bridge(old, new)
     if not changed:
         if bridge is not None:
