@@ -874,6 +874,12 @@
       "type": "rac_release"
     },
     {
+      "id": "schema:barrier3_run_manifest.schema.json",
+      "path": "schemas/barrier3_run_manifest.schema.json",
+      "sha256": "cdc8304d2087f5c4c7a7ab097528f380578089c35411d33c84be42cd213ce3fa",
+      "type": "document"
+    },
+    {
       "id": "schema:detector_response.schema.json",
       "path": "schemas/detector_response.schema.json",
       "sha256": "bf8b50e61c746a9e90996fed03e91307b76ef73631171f876710c6c7a6ff3f12",
