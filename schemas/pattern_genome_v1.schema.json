@@ -1,20 +1,127 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://rac.local/schemas/pattern_genome_v1.schema.json",
+  "$id": "https://rac.dev/schemas/pattern_genome_v1.schema.json",
   "title": "RAC Pattern Genome v1",
   "type": "object",
-  "additionalProperties": false,
   "required": ["schema_version","genome_id","candidate_sha256","source","spectral","topology","color","geometry","quality","provenance"],
+  "additionalProperties": false,
   "properties": {
     "schema_version": {"const":"rac-pattern-genome/1.0"},
     "genome_id": {"type":"string","pattern":"^RAC-GENOME-[0-9a-f]{16}$"},
     "candidate_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
-    "source": {"type":"object"},
-    "spectral": {"type":"object","required":["radial_energy"],"properties":{"radial_energy":{"type":"array","minItems":8,"maxItems":8,"items":{"type":"number","minimum":0,"maximum":1}}}},
-    "topology": {"type":"object"},
-    "color": {"type":"object","required":["palette_size"],"properties":{"palette_size":{"type":"integer","minimum":1}}},
-    "geometry": {"type":"object"},
-    "quality": {"type":"object","required":["all_finite"],"properties":{"all_finite":{"const":true}}},
-    "provenance": {"type":"object","required":["candidate_sha256","source_artifact_ref","extractor_version","genome_schema","source_commit","runtime_lock_sha256","extractor_config_sha256","extracted_utc","evidence_class"],"properties":{"evidence_class":{"const":"derived_digital_measurement"}}}
+    "source": {
+      "type":"object",
+      "required":["artifact_ref","width_px","height_px","channels"],
+      "additionalProperties": false,
+      "properties":{
+        "artifact_ref":{"type":"string","minLength":1},
+        "width_px":{"type":"integer","minimum":1},
+        "height_px":{"type":"integer","minimum":1},
+        "channels":{"const":3}
+      }
+    },
+    "spectral": {
+      "type":"object",
+      "required":["radial_energy","low_frequency_ratio","mid_frequency_ratio","high_frequency_ratio","spectral_centroid","spectral_entropy","dominant_orientation_deg","orientation_strength"],
+      "additionalProperties": false,
+      "properties":{
+        "radial_energy":{"type":"array","minItems":8,"maxItems":8,"items":{"type":"number","minimum":0,"maximum":1}},
+        "low_frequency_ratio":{"type":"number","minimum":0,"maximum":1},
+        "mid_frequency_ratio":{"type":"number","minimum":0,"maximum":1},
+        "high_frequency_ratio":{"type":"number","minimum":0,"maximum":1},
+        "spectral_centroid":{"type":"number","minimum":0},
+        "spectral_entropy":{"type":"number","minimum":0,"maximum":1},
+        "dominant_orientation_deg":{"type":"number","minimum":0,"maximum":180},
+        "orientation_strength":{"type":"number","minimum":0,"maximum":1}
+      }
+    },
+    "topology": {
+      "type":"object",
+      "required":["connected_component_count","largest_component_fraction","mean_component_fraction","median_component_fraction","component_area_std","hole_count","euler_characteristic","edge_density","horizontal_symmetry","vertical_symmetry","diagonal_symmetry_main","diagonal_symmetry_anti","rotational_symmetry_180","motif_autocorrelation_peak","motif_period_x","motif_period_y","fragmentation_index","segmentation_method","palette_k"],
+      "additionalProperties": false,
+      "properties":{
+        "connected_component_count":{"type":"integer","minimum":0},
+        "largest_component_fraction":{"type":"number","minimum":0,"maximum":1},
+        "mean_component_fraction":{"type":"number","minimum":0,"maximum":1},
+        "median_component_fraction":{"type":"number","minimum":0,"maximum":1},
+        "component_area_std":{"type":"number","minimum":0,"maximum":1},
+        "hole_count":{"type":"integer","minimum":0},
+        "euler_characteristic":{"type":"integer"},
+        "edge_density":{"type":"number","minimum":0,"maximum":1},
+        "horizontal_symmetry":{"type":"number","minimum":0,"maximum":1},
+        "vertical_symmetry":{"type":"number","minimum":0,"maximum":1},
+        "diagonal_symmetry_main":{"type":"number","minimum":0,"maximum":1},
+        "diagonal_symmetry_anti":{"type":"number","minimum":0,"maximum":1},
+        "rotational_symmetry_180":{"type":"number","minimum":0,"maximum":1},
+        "motif_autocorrelation_peak":{"type":"number","minimum":0,"maximum":1},
+        "motif_period_x":{"type":"number","minimum":0},
+        "motif_period_y":{"type":"number","minimum":0},
+        "fragmentation_index":{"type":"number","minimum":0},
+        "segmentation_method":{"const":"deterministic_palette_v1"},
+        "palette_k":{"type":"integer","minimum":1}
+      }
+    },
+    "color": {
+      "type":"object",
+      "required":["palette_size","rgb_mean","rgb_std","lab_mean","lab_covariance","lab_range_l","lab_range_a","lab_range_b","mean_pairwise_delta_e","max_pairwise_delta_e","luminance_contrast","chromatic_contrast","color_entropy","dominant_palette"],
+      "additionalProperties": false,
+      "properties":{
+        "palette_size":{"type":"integer","minimum":1},
+        "rgb_mean":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"number","minimum":0,"maximum":255}},
+        "rgb_std":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"number","minimum":0}},
+        "lab_mean":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"number"}},
+        "lab_covariance":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"number"}}},
+        "lab_range_l":{"type":"number","minimum":0},
+        "lab_range_a":{"type":"number","minimum":0},
+        "lab_range_b":{"type":"number","minimum":0},
+        "mean_pairwise_delta_e":{"type":"number","minimum":0},
+        "max_pairwise_delta_e":{"type":"number","minimum":0},
+        "luminance_contrast":{"type":"number","minimum":0,"maximum":1},
+        "chromatic_contrast":{"type":"number","minimum":0,"maximum":1},
+        "color_entropy":{"type":"number","minimum":0},
+        "dominant_palette":{"type":"array","minItems":1,"items":{"type":"object","required":["lab","fraction"],"additionalProperties":false,"properties":{"lab":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"number"}},"fraction":{"type":"number","minimum":0,"maximum":1}}}}
+      }
+    },
+    "geometry": {
+      "type":"object",
+      "required":["foreground_coverage_fraction","edge_to_area_ratio","mean_feature_width_px","median_feature_width_px","min_feature_width_px","mean_feature_width_normalized","min_feature_width_normalized","bbox_occupancy_fraction","center_of_mass_x","center_of_mass_y","quadrant_energy","spatial_entropy"],
+      "additionalProperties": false,
+      "properties":{
+        "foreground_coverage_fraction":{"type":"number","minimum":0,"maximum":1},
+        "edge_to_area_ratio":{"type":"number","minimum":0},
+        "mean_feature_width_px":{"type":"number","minimum":0},
+        "median_feature_width_px":{"type":"number","minimum":0},
+        "min_feature_width_px":{"type":"number","minimum":0},
+        "mean_feature_width_normalized":{"type":"number","minimum":0,"maximum":1},
+        "min_feature_width_normalized":{"type":"number","minimum":0,"maximum":1},
+        "bbox_occupancy_fraction":{"type":"number","minimum":0,"maximum":1},
+        "center_of_mass_x":{"type":"number","minimum":0,"maximum":1},
+        "center_of_mass_y":{"type":"number","minimum":0,"maximum":1},
+        "quadrant_energy":{"type":"array","minItems":4,"maxItems":4,"items":{"type":"number"}},
+        "spatial_entropy":{"type":"number","minimum":0}
+      }
+    },
+    "quality": {
+      "type":"object",
+      "required":["all_finite","warnings"],
+      "additionalProperties": false,
+      "properties":{"all_finite":{"const":true},"warnings":{"type":"array","items":{"type":"string"}}}
+    },
+    "provenance": {
+      "type":"object",
+      "required":["candidate_sha256","source_artifact_ref","extractor_version","genome_schema","source_commit","runtime_lock_sha256","extractor_config_sha256","extracted_utc","evidence_class"],
+      "additionalProperties": false,
+      "properties":{
+        "candidate_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "source_artifact_ref":{"type":"string","minLength":1},
+        "extractor_version":{"const":"1.0.0"},
+        "genome_schema":{"const":"rac-pattern-genome/1.0"},
+        "source_commit":{"type":"string","minLength":1},
+        "runtime_lock_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "extractor_config_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "extracted_utc":{"type":"string","minLength":1},
+        "evidence_class":{"const":"derived_digital_measurement"}
+      }
+    }
   }
 }
