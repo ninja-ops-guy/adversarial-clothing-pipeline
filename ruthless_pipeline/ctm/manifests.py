@@ -49,6 +49,18 @@ from .contracts import CTMClaim
 
 CTM_MANIFEST_SCHEMA_VERSION = "rac-ctm-experiment/1.0"
 
+#: SPEC-12 additive extension (L12, evaluation-as-attack-surface). v1.1 adds
+#: an optional-but-required-at-1.1 ``evaluation_audit`` block; v1.0 manifests
+#: validate and lock byte-identically to before (backward compatible).
+CTM_MANIFEST_SCHEMA_VERSION_V11 = "rac-ctm-experiment/1.1"
+SUPPORTED_MANIFEST_SCHEMA_VERSIONS = frozenset({
+    CTM_MANIFEST_SCHEMA_VERSION,
+    CTM_MANIFEST_SCHEMA_VERSION_V11,
+})
+
+#: SPEC-12 threshold regimes.
+THRESHOLD_REGIMES = frozenset({"fixed", "swept"})
+
 EXPERIMENT_ID_RE = re.compile(r"^CTM-E-[0-9]{6}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
@@ -117,6 +129,79 @@ def _sha256_bytes(blob: bytes) -> str:
     return hashlib.sha256(blob).hexdigest()
 
 
+def _validate_evaluation_audit(audit: dict[str, Any]) -> None:
+    """SPEC-12 evaluation-surface audit block (fail closed on any gap).
+
+    Required keys:
+    - ``decision_thresholds``: non-empty list of finite numbers actually used.
+    - ``threshold_regime``: ``fixed`` | ``swept`` (a swept regime with a
+      single threshold is refused — that is a fixed regime mislabeled).
+    - ``frames_per_sample``: int >= 1 (1 = single-frame evaluation; the
+      single-frame Goodhart surface must be explicit, not absent).
+    - ``firewall_attestation_ref``: 64-hex sha256 of the firewall attestation
+      stating whether any selection step saw held-out outcomes.
+    - ``goodhart_guard``: non-empty string naming which evaluation choices
+      candidate selection could have implicitly optimized against.
+    """
+    if not isinstance(audit, dict):
+        raise ValueError("evaluation_audit must be a dict (SPEC-12)")
+    required = {
+        "decision_thresholds",
+        "threshold_regime",
+        "frames_per_sample",
+        "firewall_attestation_ref",
+        "goodhart_guard",
+    }
+    missing = required - set(audit)
+    if missing:
+        raise ValueError(
+            f"evaluation_audit is missing required keys {sorted(missing)} "
+            "(SPEC-12, fail closed)"
+        )
+    thresholds = audit["decision_thresholds"]
+    if (
+        not isinstance(thresholds, list)
+        or not thresholds
+        or any(
+            isinstance(t, bool) or not isinstance(t, (int, float)) for t in thresholds
+        )
+    ):
+        raise ValueError(
+            "evaluation_audit.decision_thresholds must be a non-empty list of "
+            "numbers: the thresholds actually used are load-bearing"
+        )
+    regime = audit["threshold_regime"]
+    if regime not in THRESHOLD_REGIMES:
+        raise ValueError(
+            f"evaluation_audit.threshold_regime must be one of "
+            f"{sorted(THRESHOLD_REGIMES)}, got {regime!r}"
+        )
+    if regime == "swept" and len(thresholds) < 2:
+        raise ValueError(
+            "threshold_regime 'swept' requires >=2 decision thresholds; a "
+            "single-threshold regime is 'fixed'"
+        )
+    fps = audit["frames_per_sample"]
+    if isinstance(fps, bool) or not isinstance(fps, int) or fps < 1:
+        raise ValueError(
+            "evaluation_audit.frames_per_sample must be an int >= 1 "
+            "(1 = single-frame evaluation, declared explicitly)"
+        )
+    if not _is_sha256(audit["firewall_attestation_ref"]):
+        raise ValueError(
+            "evaluation_audit.firewall_attestation_ref must be a 64-hex sha256 "
+            "of the firewall attestation (whether any selection step saw "
+            "held-out outcomes)"
+        )
+    guard = audit["goodhart_guard"]
+    if not isinstance(guard, str) or not guard.strip():
+        raise ValueError(
+            "evaluation_audit.goodhart_guard must be a non-empty string naming "
+            "the evaluation choices candidate selection could have implicitly "
+            "optimized against"
+        )
+
+
 # ---------------------------------------------------------------------------
 # The manifest
 # ---------------------------------------------------------------------------
@@ -142,12 +227,30 @@ class CTMExperimentManifest:
     status: str = "DRAFT"
     schema_version: str = CTM_MANIFEST_SCHEMA_VERSION
     evidence_class: str = EVIDENCE_CLASS
+    evaluation_audit: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
-        if self.schema_version != CTM_MANIFEST_SCHEMA_VERSION:
+        if self.schema_version not in SUPPORTED_MANIFEST_SCHEMA_VERSIONS:
             raise ValueError(
                 f"unsupported CTM manifest schema_version: {self.schema_version!r}"
             )
+        # SPEC-12: the audit block defines the version. v1.0 manifests carry
+        # no audit block (and remain byte-identical to pre-SPEC-12 builds);
+        # v1.1 manifests MUST carry a valid one.
+        if self.evaluation_audit is None:
+            if self.schema_version == CTM_MANIFEST_SCHEMA_VERSION_V11:
+                raise ValueError(
+                    "schema_version rac-ctm-experiment/1.1 requires an "
+                    "evaluation_audit block (SPEC-12, fail closed)"
+                )
+        else:
+            if self.schema_version != CTM_MANIFEST_SCHEMA_VERSION_V11:
+                raise ValueError(
+                    "an evaluation_audit block requires schema_version "
+                    "rac-ctm-experiment/1.1 (additive versioning; a v1.0 "
+                    "manifest cannot silently grow new semantics)"
+                )
+            _validate_evaluation_audit(self.evaluation_audit)
         if not EXPERIMENT_ID_RE.match(self.experiment_id):
             raise ValueError(
                 f"experiment_id {self.experiment_id!r} does not match "
@@ -192,7 +295,7 @@ class CTMExperimentManifest:
     # -- canonical encoding --------------------------------------------------
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d = {
             "schema_version": self.schema_version,
             "evidence_class": self.evidence_class,
             "experiment_id": self.experiment_id,
@@ -207,6 +310,9 @@ class CTMExperimentManifest:
             "physical_efficacy_claimed": self.physical_efficacy_claimed,
             "status": self.status,
         }
+        if self.evaluation_audit is not None:
+            d["evaluation_audit"] = self.evaluation_audit
+        return d
 
     def canonical_bytes(self) -> bytes:
         return _canonical_bytes(self.to_dict())
