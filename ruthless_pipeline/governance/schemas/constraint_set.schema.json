@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-constraint-set/1.0",
+  "type": "object",
+  "required": ["schema_version", "constraint_id", "semantic_hash", "rules_hash", "encoder_hash"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "constraint_id": {"type": "string", "pattern": "^RAC-CST-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "semantic_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "rules_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "encoder_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}
