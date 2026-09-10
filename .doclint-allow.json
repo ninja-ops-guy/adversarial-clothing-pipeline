@@ -77,6 +77,11 @@
       "check": "broken-path",
       "match": "artifacts/print-alpha/release-package/",
       "reason": "Gitignored regenerable release-package path; produced deterministically by scripts_print_alpha/print_alpha_dry_run.py, never committed"
+    },
+    {
+      "path": "docs/experimental_governance/IMPLEMENTATION_PASSES.md",
+      "check": "broken-path",
+      "reason": "Prospective governance implementation plan; backticked module paths intentionally name deliverables that do not exist until their scheduled pass is implemented."
     }
   ]
 }
