@@ -17,6 +17,7 @@ from .ids import GovernanceId, IdKind
 from .ledger import GovernanceEventType, payload_sha256
 
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 SCIENTIFIC_IMPACTS = {
     "NONE",
     "SEMANTIC_CORRECTION",
@@ -54,7 +55,6 @@ REQUIRED = {
         "cohort_id",
         "experiment_id",
         "specimen_ids",
-        "artifact_sha256",
     ),
     # Identity/version fields are handled below because Governance v1 accepts
     # the adopted constraint_set_id shape while preserving read compatibility
@@ -105,6 +105,15 @@ def _typed_id(value: Any, expected: IdKind, field: str) -> GovernanceId:
         raise GovernanceValidationError(f"{field}: invalid identifier") from exc
     if parsed.kind is not expected:
         raise GovernanceValidationError(f"{field}: wrong identifier kind")
+    return parsed
+
+
+def _canonical_id(value: Any, expected: IdKind, field: str) -> GovernanceId:
+    parsed = _typed_id(value, expected, field)
+    if parsed.is_legacy_alias:
+        raise GovernanceValidationError(
+            f"{field}: adopted Governance v1 records require canonical {expected.value} prefix"
+        )
     return parsed
 
 
@@ -203,13 +212,7 @@ def _validate_constraint_set(manifest: dict[str, Any]) -> None:
         _typed_id(manifest["constraint_id"], IdKind.CONSTRAINT, "constraint_id")
         return
 
-    parsed = _typed_id(
-        manifest["constraint_set_id"], IdKind.CONSTRAINT, "constraint_set_id"
-    )
-    if parsed.is_legacy_alias:
-        raise GovernanceValidationError(
-            "constraint_set_id must use the canonical RAC-CS-* prefix"
-        )
+    _canonical_id(manifest["constraint_set_id"], IdKind.CONSTRAINT, "constraint_set_id")
     required = (
         "software_version",
         "parent_constraint_set_id",
@@ -224,13 +227,7 @@ def _validate_constraint_set(manifest: dict[str, Any]) -> None:
         )
     parent = manifest["parent_constraint_set_id"]
     if parent is not None:
-        parent_id = _typed_id(
-            parent, IdKind.CONSTRAINT, "parent_constraint_set_id"
-        )
-        if parent_id.is_legacy_alias:
-            raise GovernanceValidationError(
-                "parent_constraint_set_id must use the canonical RAC-CS-* prefix"
-            )
+        _canonical_id(parent, IdKind.CONSTRAINT, "parent_constraint_set_id")
     for field in (
         "software_version",
         "encoder_version",
@@ -267,6 +264,98 @@ def _validate_tolerance_policy(manifest: dict[str, Any]) -> None:
         raise GovernanceValidationError("version: non-empty string required")
 
 
+def _validate_sampling_manifest(manifest: dict[str, Any]) -> None:
+    if (
+        not isinstance(manifest["seed"], int)
+        or isinstance(manifest["seed"], bool)
+        or manifest["seed"] < 0
+    ):
+        raise GovernanceValidationError("seed must be a non-negative integer")
+    target = manifest["target_distribution"]
+    if not isinstance(target, (str, dict)) or not target:
+        raise GovernanceValidationError("target_distribution must be non-empty")
+
+    adopted_fields = ("constraint_set_id", "sample_count", "sampler_version")
+    present = [field in manifest for field in adopted_fields]
+    if any(present) and not all(present):
+        raise GovernanceValidationError(
+            "adopted sampling manifest requires constraint_set_id, sample_count, and sampler_version together"
+        )
+    if all(present):
+        _canonical_id(manifest["sampling_id"], IdKind.SAMPLING, "sampling_id")
+        _canonical_id(
+            manifest["constraint_set_id"], IdKind.CONSTRAINT, "constraint_set_id"
+        )
+        count = manifest["sample_count"]
+        if not isinstance(count, int) or isinstance(count, bool) or count <= 0:
+            raise GovernanceValidationError("sample_count must be a positive integer")
+        if not isinstance(manifest["sampler_version"], str) or not manifest[
+            "sampler_version"
+        ].strip():
+            raise GovernanceValidationError("sampler_version: non-empty string required")
+
+
+def _validate_cohort_manifest(manifest: dict[str, Any]) -> None:
+    ids = manifest["specimen_ids"]
+    if not isinstance(ids, list) or not ids or len(ids) != len(set(ids)):
+        raise GovernanceValidationError("specimen_ids must be non-empty and unique")
+    if any(not isinstance(specimen_id, str) or not specimen_id for specimen_id in ids):
+        raise GovernanceValidationError("specimen_ids must contain non-empty strings")
+
+    adopted_fields = (
+        "sampling_id",
+        "constraint_set_id",
+        "code_commit",
+        "code_version",
+        "pipeline_id",
+        "pipeline_version",
+        "calibration_id",
+        "calibration_version",
+        "diagnostic_threshold_hash",
+        "artifacts",
+    )
+    present = [field in manifest for field in adopted_fields]
+    if any(present):
+        missing = [field for field in adopted_fields if field not in manifest]
+        if missing:
+            raise GovernanceValidationError(
+                "missing adopted cohort fields: " + ", ".join(missing)
+            )
+        if "artifact_sha256" in manifest:
+            raise GovernanceValidationError(
+                "adopted cohort manifest must use artifacts map, not legacy artifact_sha256"
+            )
+        _canonical_id(manifest["cohort_id"], IdKind.COHORT, "cohort_id")
+        _canonical_id(manifest["sampling_id"], IdKind.SAMPLING, "sampling_id")
+        _canonical_id(
+            manifest["constraint_set_id"], IdKind.CONSTRAINT, "constraint_set_id"
+        )
+        _canonical_id(manifest["pipeline_id"], IdKind.PIPELINE, "pipeline_id")
+        _canonical_id(manifest["calibration_id"], IdKind.CALIBRATION, "calibration_id")
+        if not isinstance(manifest["code_commit"], str) or not COMMIT_RE.fullmatch(
+            manifest["code_commit"]
+        ):
+            raise GovernanceValidationError("code_commit must be a lowercase 40-hex Git commit")
+        for field in ("code_version", "pipeline_version", "calibration_version"):
+            if not isinstance(manifest[field], str) or not manifest[field].strip():
+                raise GovernanceValidationError(f"{field}: non-empty string required")
+        _sha(manifest["diagnostic_threshold_hash"], "diagnostic_threshold_hash")
+        artifacts = manifest["artifacts"]
+        if not isinstance(artifacts, dict) or not artifacts:
+            raise GovernanceValidationError("artifacts must be a non-empty path-to-sha256 map")
+        for path, digest in artifacts.items():
+            if not isinstance(path, str) or not path:
+                raise GovernanceValidationError("artifact paths must be non-empty strings")
+            _sha(digest, f"artifacts[{path!r}]")
+        return
+
+    if "artifact_sha256" not in manifest:
+        raise GovernanceValidationError(
+            "legacy cohort manifest requires artifact_sha256; adopted manifest requires complete Pass 3 fields"
+        )
+    _sha(manifest["artifact_sha256"], "artifact_sha256")
+
+
 def validate_manifest(kind: str, manifest: dict[str, Any]) -> bool:
     if kind not in REQUIRED or not isinstance(manifest, dict):
         raise GovernanceValidationError("unknown manifest kind or invalid object")
@@ -285,22 +374,9 @@ def validate_manifest(kind: str, manifest: dict[str, Any]) -> bool:
     if kind == "governance_event":
         _validate_governance_event(manifest)
     elif kind == "sampling_manifest":
-        if (
-            not isinstance(manifest["seed"], int)
-            or isinstance(manifest["seed"], bool)
-            or manifest["seed"] < 0
-        ):
-            raise GovernanceValidationError("seed must be a non-negative integer")
-        target = manifest["target_distribution"]
-        if not isinstance(target, (str, dict)) or not target:
-            raise GovernanceValidationError("target_distribution must be non-empty")
+        _validate_sampling_manifest(manifest)
     elif kind == "cohort_manifest":
-        ids = manifest["specimen_ids"]
-        if not isinstance(ids, list) or not ids or len(ids) != len(set(ids)):
-            raise GovernanceValidationError("specimen_ids must be non-empty and unique")
-        if any(not isinstance(specimen_id, str) or not specimen_id for specimen_id in ids):
-            raise GovernanceValidationError("specimen_ids must contain non-empty strings")
-        _sha(manifest["artifact_sha256"], "artifact_sha256")
+        _validate_cohort_manifest(manifest)
     elif kind == "constraint_set":
         _validate_constraint_set(manifest)
     elif kind == "overlap_analysis":
