@@ -1,3 +1,4 @@
+# Audited regeneration surface: edits to this workflow intentionally trigger a one-shot provenance rebuild.
 name: Regenerate provenance artifact
 
 on:
