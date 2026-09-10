@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-diagnostic-bundle/1.0",
+  "type": "object",
+  "required": ["schema_version", "diagnostic_id", "experiment_id", "checks", "thresholds_hash"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "diagnostic_id": {"type": "string", "pattern": "^RAC-DGN-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "checks": {"type": "array"},
+    "thresholds_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}
