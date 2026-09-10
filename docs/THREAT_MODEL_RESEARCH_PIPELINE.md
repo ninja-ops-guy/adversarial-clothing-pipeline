@@ -48,7 +48,10 @@ WITH_CAVEATS") and `docs/audits/FREEZE_VERIFICATION.md`.
   model sets, freeze configs — all re-verified byte-for-byte by the independent
   boundary audit); `benchmarks/frozen_surface_sha256.json` +
   `tests/test_frozen_surface_integrity.py` guard the frozen code surface;
-  `SHA256SUMS.txt` + `tests/test_repository_integrity.py` guard release files;
+  release files are guarded by the authoritative hash systems
+  (`benchmarks/frozen_surface_sha256.json`, Barrier 3 / print-alpha package
+  manifests) — legacy `SHA256SUMS.txt` is DEPRECATED (stale since `1f42666`,
+  superseded to avoid two competing authorities);
   sealed release directories are never overwritten
   (`scripts/ingest_closed_generation.py` raises "release directory already
   exists, refusing to overwrite").

@@ -1,34 +1,24 @@
-f7eff82a77e67b7b94a8177ced8f87ed5ee8e7d22677aef69e6df103d917c63c  .env.example
-2022cbe19c58fddcba30eaa4d86920cbb5522e3d6ae42591949e97ab5e0214c8  .github/dependabot.yml
-481a63366cb06d056a9f867e8def00eaa5aacd2f9383c9187db91255f5794d77  .github/workflows/ci.yml
-7fc4d19c7d61f058a40df28e1a794477f7915e902a805bdccf79354e28ced47b  .gitignore
-d7e164cf2f4220c157bff631295cde13f95834a1bc777992c56867f97346d4f0  01_enhanced_black_box_nap.py
-6567127d90e0a8476978b328299c84979e4970083a71058c70c5ed527a2d1f45  02_neural_deformation_module.py
-224c5bdd1cad56089755a868e1805d81ca8148dde58e5f7be212c69bd4cf448d  03_differentiable_physics_pipeline.py
-7653a8938a58759f55386cb015353a9afce6300b4aed382c7ae41e4c77dc9bbe  04_comparative_benchmark.py
-53eae0313a602b8daa4e90750c02e281f1f7f7c863a3fe5804ee8437c9aa09fa  CHANGELOG.md
-a05e3a267bfcedf85bce36e7a75ab0b3d9e35a14cd8a45beab00f57cae58b1b6  CONTRIBUTING.md
-c7a169eea8c869929a33e3cb5089f4738d3cc720903732a37721e2f3423bdfc4  LICENSE
-89346e37296a105f2b67bfc7f8f04be59a7d5824620fa8b2d23bb76800f25248  MIGRATION_NOTES.md
-0d3d29c14c6f29f625034ab443b8dece720be4a1d05104f751fe11f2cb5ebce1  PRODUCTION_READINESS.md
-81de48145787070fd0ac1164d582b7683ac0d5fc25de3c3dcb82a060675e5346  README.md
-dd61ef46d32485bb2b8ded57e083bd0222d3a34f9ced8fdc771bcc8f80270eb4  RESPONSIBLE_USE.md
-aa338fad38d878e8ccc6332381453135278b8651e6530701eb4ea682e9c05acd  SECURITY.md
-9786321f3851b3157f0739584d5bf871182295326c8959f51c7d817cd4ad667c  docs/ARCHITECTURE.md
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  examples/__init__.py
-a793298366709a084a3dd02b0913f6b18d73f723aa31f324a2d17532b0336e5b  examples/smoke_test.py
-3f4f4effe6901d6589186b2e527b909456aaf4410a24740e2694bd049e9b5086  pyproject.toml
-7dc90a5044d1d81db6613f6466e47114a346243c043fd5eea163c0723459a5d9  requirements.txt
-d8504b9af4f21ebadf1ad0c2a8a3847b3047ce25a6c5e3c0d48d32079567ec2f  ruthless_pipeline/__init__.py
-27666b1f2abe0497a28723d8e7bb195f92f78913d580afd1708c3e93b87013f4  ruthless_pipeline/benchmark.py
-1555d2f308efcb261d4b0e77c376273947b0010f0fc801ac9fb1a56cff5e6b1d  ruthless_pipeline/common.py
-ba90a517be50e414092cc8e5983a60d18e790c1d18fa88822c00377282c290c5  ruthless_pipeline/deformation.py
-2f857527b920bbe2f1d5f11c06f444c4c4dd97708cb0d3c8f236553ce0b622e5  ruthless_pipeline/evaluators.py
-43429b7bab725f2d1276c8721aaffcfb58110dd0b99884de8509bbd4859de4a4  ruthless_pipeline/nap.py
-179c49d81495b915162f3498768efe1f1e102ceb8c42272431d93f09f131ca39  ruthless_pipeline/physics.py
-80f6e2c5ba045a019f7532b3b809ecc4902f30c3d96991ee611555bfedbd816e  ruthless_pipeline/scene.py
-aa78a129ebaf50fd3dfdf3363012f7aa4b208f0eb91f50c241fc845fc23f5686  tests/test_benchmark.py
-f9ee1e316404540f0511b8491c4f2f18acd9e00b0fbb6017afcf6f26c2d0af2f  tests/test_deformation.py
-60c27787d5ab1518d992d12310c0ce847e8a3fb6a16075f82719f4c8b2c2074b  tests/test_nap.py
-a0e0bf02caecc93a9242274dd7defa965526a0e51a90d849ef6b44900022c763  tests/test_physics.py
-027fa2ea4fb78e765d7f47fd7b00425cbed2098930cfae5e4d84b7c541387714  tests/test_scene.py
+DEPRECATED — DO NOT USE AS AN INTEGRITY AUTHORITY
+=================================================
+
+This legacy top-level hash manifest is formally DEPRECATED as of the
+Barrier 3 wave (2026-09-10). It has been stale since commit 1f42666
+(Wave I item 7) and was never regenerated; 12 entries no longer match
+their files. Keeping it as a live manifest would create two competing
+hash authorities, which is prohibited.
+
+Authoritative integrity systems (use these):
+
+1. benchmarks/frozen_surface_sha256.json — the frozen scientific surface
+   (generations/, protocols/, model_manifests/, model_sets/,
+   design_profiles/, benchmarks/model_manifest.json,
+   benchmarks/runtime_lock.json), guarded by
+   tests/test_frozen_surface_integrity.py. 24/24 exact at deprecation time.
+2. artifacts/barrier3/hashes.sha256 + run-manifest.json — Barrier 3
+   integration package pinning, verified by
+   ruthless_pipeline/integration/barrier3.verify_artifact_hashes.
+3. artifacts/print-alpha/package-manifest.json — print package integrity
+   (ruthless_pipeline/certification/print_package_integrity.py).
+
+Historical entries are preserved in git history (see any commit at or
+before f5fe07f). This file intentionally contains no live hash entries.
