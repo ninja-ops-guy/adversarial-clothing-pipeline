@@ -1,0 +1,146 @@
+{
+  "P1_NO_SPEND_READINESS": "PASS",
+  "boundary_assertions": {
+    "D2_0004_MODIFIED": false,
+    "D2_0005_ARMED": false,
+    "NEW_HELDOUT_ACCESS": false,
+    "PHYSICAL_EFFICACY_CLAIMED": false,
+    "SCIENTIFIC_THRESHOLDS_CHANGED": false
+  },
+  "checks": {
+    "failure_injection": {
+      "gate_local_injections": {
+        "defaulted_ua_field_flagged": {
+          "detail": "a fabricated 64-hex value is not a pending literal; pending-set mismatch fails the gate",
+          "rejected": true
+        },
+        "mutated_schedule_detected": {
+          "detail": "any schedule mutation fails the frozen-schedule equality check",
+          "rejected": true
+        },
+        "tampered_pinned_artifact_would_be_detected": {
+          "detail": "pin comparison detects any byte change (pin != tampered content hash)",
+          "rejected": true
+        }
+      },
+      "rehearsal_battery": {
+        "all_injections_handled": true,
+        "calibration_association_missing": {
+          "detail": "capture 'CAP-002' is not associated with session calibration profile 'RAC-PCP-SYNTHETIC-2' (got None)",
+          "rejected": true
+        },
+        "duplicate_capture_identity": {
+          "detail": "capture identity 'CAP-001' already registered; duplicate capture identities are rejected",
+          "rejected": true
+        },
+        "evidence_label": "synthetic_pipeline_validation_only",
+        "invalid_condition_over_threshold": {
+          "condition_id": "D02_Y+00_P0_STANDING_INDOOR_EVEN",
+          "counted_as_candidate_success": false,
+          "detail": "control-undetected trials are invalid measurement conditions, never candidate successes",
+          "excluded_from_valid_trials": true,
+          "flag_threshold": 0.1,
+          "flagged": true,
+          "invalid_fraction": 1.0,
+          "rejected": true
+        },
+        "promotion_attempt": {
+          "detail": "promotion to 'physical_garment_p1' refused: release 'RAC-REHEARSAL-RELEASE-SYNTHETIC-001' carries evidence_label 'synthetic_pipeline_validation_only'; synthetic pipeline validation output can never promote to physical-measured evidence (physical_test_executed=false)",
+          "rejected": true
+        },
+        "stopping_rule_replay_deterministic": {
+          "decision": {
+            "may_stop": true,
+            "must_continue": false,
+            "reason": "preregistered stopping criteria satisfied",
+            "rule_id": "RAC-P1-STOP-2026-001",
+            "valid_trials": 103
+          },
+          "identical": true,
+          "rejected": true
+        },
+        "tampered_trial_store": {
+          "detail": "trial store line 4: hash-chain break (prev_record_sha256 does not match the previous record)",
+          "rejected": true
+        }
+      },
+      "status": "PASS"
+    },
+    "freeze_integrity": {
+      "detail": "every pinned protocol artifact re-hashed and compared",
+      "mismatches": [],
+      "pinned": 26,
+      "status": "PASS"
+    },
+    "freeze_self_consistency": {
+      "problems": [],
+      "status": "PASS"
+    },
+    "ingestion_contracts": {
+      "promotion_refusals": [
+        true,
+        true
+      ],
+      "status": "PASS"
+    },
+    "pairing_contract": {
+      "first_arm_counts": {
+        "candidate": 72,
+        "control": 72
+      },
+      "planned_valid_trials": 144,
+      "problems": [],
+      "schedule_sha256": "c7a424c0c7afc51b27ae6e3fd3f9b7f9e44f24bdb31e6152a329276556197a1f",
+      "status": "PASS"
+    },
+    "pending_literals_canonical": {
+      "non_canonical_markers": [],
+      "status": "PASS"
+    },
+    "schedule_frozen": {
+      "problems": [],
+      "status": "PASS",
+      "trials": 144
+    },
+    "scientific_boundaries": {
+      "assertions": {
+        "D2_0004_MODIFIED": false,
+        "D2_0005_ARMED": false,
+        "NEW_HELDOUT_ACCESS": false,
+        "PHYSICAL_EFFICACY_CLAIMED": false,
+        "SCIENTIFIC_THRESHOLDS_CHANGED": false
+      },
+      "problems": [],
+      "status": "PASS"
+    },
+    "surface_completeness": {
+      "missing": [],
+      "required": 26,
+      "status": "PASS",
+      "unpinned": []
+    },
+    "synthetic_rehearsal_deterministic": {
+      "detail": "full chain rehearsed twice from receipt to sealed release; byte-identical summary required",
+      "evidence_label": "synthetic_pipeline_validation_only",
+      "status": "PASS",
+      "summary_sha256_a": "a8b8466b0a1ded4140c57e5e4fcd1901bd68e194f9a5c1c2e905ddf44423df36",
+      "summary_sha256_b": "a8b8466b0a1ded4140c57e5e4fcd1901bd68e194f9a5c1c2e905ddf44423df36"
+    },
+    "ua_fields_pending": {
+      "detail": "vendor/fabrication/garment/measurement fields remain explicitly pending; none defaulted",
+      "pending_fields": 208,
+      "problems": [],
+      "status": "PASS"
+    }
+  },
+  "evidence_class": "synthetic_pipeline_validation_only",
+  "findings": [],
+  "freeze_manifest": "physical/p1/P1_READINESS_FREEZE.json",
+  "gate_id": "P1-NO-SPEND-READINESS-GATE",
+  "note": "Readiness to execute, not evidence. No garment ordered, no physical efficacy claimed, D2-0005 remains PREREGISTERED/unarmed. Spend remains blocked on UA-1..UA-8 real values.",
+  "physical_efficacy_claimed": false,
+  "refusals": {},
+  "schema_version": "1.0",
+  "spend_authorized": false,
+  "verdict_rule": "FAIL if any FINDING or REFUSED; PASS otherwise. Refusals are never silent."
+}
