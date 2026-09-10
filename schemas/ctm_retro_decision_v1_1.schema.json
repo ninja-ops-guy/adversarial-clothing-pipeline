@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_retro_decision_v1_1.schema.json",
+  "title": "RAC CTM SPEC-7 Sealed Retro-Mining Decision v1.1 (additive hardening)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision",
+    "decision_id",
+    "preregistration_sha256",
+    "preregistration_id",
+    "preregistration",
+    "family_dispositions",
+    "family_results",
+    "stratification_axes",
+    "claim_state",
+    "physical_efficacy_claimed",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "rac-ctm-retro-decision/1.1"},
+    "decision": {"enum": ["CONTINUE", "RESCOPE", "REJECT_HYPOTHESIS_FAMILY"]},
+    "decision_id": {"type": "string", "pattern": "^RAC-CTM-RETRO-DECISION-[0-9a-f]{16}$"},
+    "preregistration_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "preregistration_id": {"type": "string", "pattern": "^RAC-CTM-RETRO-PREREG-[0-9a-f]{16}$"},
+    "preregistration": {"type": "object"},
+    "family_dispositions": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "enum": [
+          "incremental_signal",
+          "legally_rejected",
+          "insufficient_cohort",
+          "underpowered",
+          "heterogeneous",
+          "metadata_inadequate",
+          "no_signal_not_rejectable"
+        ]
+      }
+    },
+    "family_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "family",
+          "cohort_size",
+          "achieved_power",
+          "heterogeneity",
+          "incremental_signal",
+          "min_effect_excluded",
+          "channel_metadata_adequate",
+          "provenance_adequate",
+          "metadata_gaps"
+        ],
+        "properties": {
+          "family": {"enum": ["harmonic_energy_curve", "description_length", "group_risk", "persistence_summary"]},
+          "cohort_size": {"type": "integer", "minimum": 0},
+          "achieved_power": {"type": "number", "minimum": 0, "maximum": 1},
+          "heterogeneity": {"type": "number", "minimum": 0, "maximum": 1},
+          "incremental_signal": {"type": "boolean"},
+          "min_effect_excluded": {"type": "boolean"},
+          "channel_metadata_adequate": {"type": "boolean"},
+          "provenance_adequate": {"type": "boolean"},
+          "metadata_gaps": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "stratification_axes": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "claim_state": {"const": "EXPLORATORY"},
+    "physical_efficacy_claimed": {"const": false},
+    "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
