@@ -11,6 +11,52 @@ Incorporate the methodological lessons into RAC's evidence and reporting work. P
 
 This is a targeted review of the public README, persona documentation, license, current research/about pages, conference-slide text, and selected primary literature. It is not a reproduction, exhaustive source-code audit, or verification of the newer private research stack. Source publication versions differ, so historical and current numbers must remain separate.
 
+## Addendum — learning from reported winners
+
+**Added after user review, 2026-09-10. Implementation snapshot: `4d4719773cbcc6e4e61c23a7f79e22c288d8595a`.**
+
+The original review underweighted positive findings. Reported winning candidates are useful research leads even when their generality remains uncertain. The next question is which capabilities RAC actually uses and which differences merit investigation.
+
+### External leads
+
+The [project's research narrative](https://sandbox.norecognition.org/about) reports multi-model winners, reuse of historical experiments, improved candidate ranking with persona context, and a transition from fixed recipes to a learned generator and reinforcement learning. These are architectural leads, not isolated causal demonstrations that each component produced the gains. The [current results](https://sandbox.norecognition.org/research) additionally make garment-specific outcomes visible. A successful garment/model combination remains informative even when it does not establish universal effectiveness.
+
+### What RAC actually implements
+
+This is a static review of code, configuration, workflow, and selected tests. Configured wiring is distinguished from a successful runtime measurement.
+
+| Capability | Observed RAC implementation | Assessment |
+| --- | --- | --- |
+| Multi-model scoring | [model manifest](../../benchmarks/model_manifest.json) and [selection script](../../scripts/select_surrogate_candidate.py) configure six surrogate models and two separate held-out models for person detection. | Already wired into the configured selection workflow; this is not the same task panel as the external project. |
+| Finite design families | [pool exporter](../../scripts/export_candidate_pool.js) enumerates style-profile families, variants, and seeds. The inspected manifest declares 100 candidates. | Current initial pool is procedural and predetermined. |
+| Adaptation to environment | [adaptive script](../../scripts/adapt_surrogate_shortlist.py) extracts environment colors and evaluates a finite recoloring grid. | Already wired; does not train a persistent context-aware predictor. |
+| Continuous optimization | [NAP](../../ruthless_pipeline/nap.py), [CAPGen-inspired module](../../ruthless_pipeline/capgen.py), and [optimizer namespace](../../ruthless_pipeline/optimization/optimizer.py) contain actual optimization implementations. | Present as components; it would be incorrect to describe the repository as only a procedural generator. |
+| Which optimization path the workflow uses | [adaptive workflow](../../.github/workflows/adaptive-candidate.yml) invokes pool export, selection, and recoloring. | The inspected workflow does not invoke NAP training or CAPGen's gradient-based optimize method. Component availability is not workflow adoption. |
+| Evolutionary search | [black-box backend](../../ruthless_pipeline/optimization/blackbox_backend.py) implements a seeded evolution strategy. | Partial conceptual overlap; not evidence of a learned, persistent breeding population or PPO policy. |
+| Generative model prior | NAP offers an optional Diffusers image prior, with procedural initialization as the default. | An image prior exists; no learned generator trained on RAC experiment history was identified in the inspected workflow. |
+| Active-learning label | NAP defines `ACTIVE_LEARNING`, but its optimization loop treats non-transfer modes through the same query-update branch. | The label does not establish a separate surrogate-fitting or uncertainty-learning system. |
+| Context-aware prediction and historical learning | The inspected selection path stores results and provenance but contains no persistent predictor training stage. | Not established in this path. An evidence archive alone is not a learning system. |
+| Cohort breadth | The inspected manifest explicitly uses a two-crop convenience fixture. | Useful for repeatable CI; not comparable to a broad wearer/garment research corpus. |
+| Learned recipe composition | No sequence-trained recipe model was identified in the inspected generation/selection path. | Research candidate, not existing capability. |
+| Garment rendering | [scene composer](../../ruthless_pipeline/scene.py) provides masked alpha composition and optional warped texture input. | A scene interface exists; its presence does not prove fidelity for every garment or material. |
+
+The [NAP test](../../tests/test_nap.py) uses a synthetic image-mean objective. The [optimization integration tests](../../tests/optimization/test_optimization_integration.py) explicitly use synthetic fixtures. These demonstrate software behavior, not observed textile efficacy. No benchmark or training job was run for this review.
+
+### Decisions to consider
+
+1. **Prioritize a capability-to-evidence map.** For each existing approach, identify a retained result, exact entry point, dataset, and artifact. This will show whether a promising component has merely been written or has actually been evaluated.
+2. **Prioritize cohort and context research.** RAC should investigate how garment, wearer, acquisition conditions, and existing visual features relate to observed outcomes. This is the strongest immediate conceptual gap in the inspected workflow. Environment recoloring only covers part of context.
+3. **Consider retrospective predictive analysis.** Where enough comparable, independently usable observations exist, assess whether historical results contain predictive information beyond simple reference models. This establishes whether a learned representation is justified; it does not require adopting the external architecture.
+4. **Keep learned generation and recipe-sequence models on the research shortlist.** They address representational limits that a finite pool does not address. They are not established upgrades until data sufficiency, prospective usefulness, and physical relevance are demonstrated.
+5. **Defer choosing PPO or specialized hardware.** A reported winning system can contain many simultaneous changes. Current evidence does not isolate the learning algorithm from data, representation, rendering, or compute.
+6. **Consider garment-specific hypotheses separately.** A useful result for one product need not work for every garment to deserve study. The present person-detection manifest should not be treated as evidence that face-recognition research is already implemented.
+
+The practical correction is to give capability research an explicit place alongside evidence integrity. Preserve existing physical preparations while evaluating these research leads. The investigation should build on RAC's implemented components and keep adoption decisions tied to demonstrated usefulness.
+
+**Scope:** documentation and static capability assessment only. No new training workflow, algorithm implementation, experiment execution, or efficacy claim is introduced.
+
+---
+
 ## What the sources establish
 
 ### The public repository is historical
