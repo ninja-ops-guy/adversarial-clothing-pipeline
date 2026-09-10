@@ -1,41 +1,69 @@
+"""Frozen extraction configuration for Pattern Genome v1."""
 from __future__ import annotations
-import hashlib, json
+import json
 from dataclasses import dataclass
 from pathlib import Path
-from .errors import PatternGenomeValidationError
+from .canonical import sha256_bytes
+from .errors import PatternGenomeSchemaError
+
+CONFIG_SCHEMA = "rac-pattern-genome-config/1.0"
 
 @dataclass(frozen=True)
 class PatternGenomeConfig:
-    schema_version: str = "rac-pattern-genome-config/1.0"
-    luminance_method: str = "rec709"
-    fft_window: str = "hann"
-    radial_bins: int = 8
-    palette_method: str = "deterministic_kmeans"
-    palette_max_colors: int = 8
-    palette_seed: int = 1337
-    palette_iterations: int = 20
-    connectivity: int = 8
-    spatial_hist_bins: int = 16
-    max_image_dimension: int = 4096
+    luminance_method: str
+    fft_window: str
+    radial_bins: int
+    palette_method: str
+    palette_max_colors: int
+    palette_seed: int
+    palette_iterations: int
+    connectivity: int
+    symmetry_method: str
+    autocorrelation_method: str
 
     def validate(self) -> None:
-        if self.radial_bins != 8: raise PatternGenomeValidationError("Pattern Genome v1 requires radial_bins=8")
-        if self.palette_method != "deterministic_kmeans": raise PatternGenomeValidationError("unsupported palette_method")
-        if not (1 <= self.palette_max_colors <= 32): raise PatternGenomeValidationError("palette_max_colors out of range")
-        if self.palette_iterations <= 0: raise PatternGenomeValidationError("palette_iterations must be positive")
-        if self.connectivity not in (4, 8): raise PatternGenomeValidationError("connectivity must be 4 or 8")
-        if self.spatial_hist_bins <= 1: raise PatternGenomeValidationError("spatial_hist_bins must be >1")
-        if self.max_image_dimension <= 0: raise PatternGenomeValidationError("max_image_dimension must be positive")
-
-    def canonical_json(self) -> bytes:
-        self.validate()
-        return json.dumps(self.__dict__, sort_keys=True, separators=(",", ":")).encode()
+        if self.luminance_method != "rec709":
+            raise PatternGenomeSchemaError(f"unsupported luminance_method: {self.luminance_method!r}")
+        if self.fft_window not in {"hann", "none"}:
+            raise PatternGenomeSchemaError(f"unsupported fft_window: {self.fft_window!r}")
+        if self.radial_bins != 8:
+            raise PatternGenomeSchemaError("Pattern Genome v1 requires radial_bins=8")
+        if self.palette_method != "deterministic_kmeans":
+            raise PatternGenomeSchemaError(f"unsupported palette_method: {self.palette_method!r}")
+        if not (1 <= self.palette_max_colors <= 32):
+            raise PatternGenomeSchemaError("palette_max_colors must be in [1,32]")
+        if self.palette_iterations <= 0:
+            raise PatternGenomeSchemaError("palette_iterations must be positive")
+        if self.connectivity not in {4, 8}:
+            raise PatternGenomeSchemaError("connectivity must be 4 or 8")
+        if not self.symmetry_method:
+            raise PatternGenomeSchemaError("symmetry_method is required")
+        if not self.autocorrelation_method:
+            raise PatternGenomeSchemaError("autocorrelation_method is required")
 
     @property
-    def sha256(self) -> str:
-        return hashlib.sha256(self.canonical_json()).hexdigest()
+    def config_sha256(self) -> str:
+        return sha256_bytes(json.dumps({
+            "luminance_method": self.luminance_method, "fft_window": self.fft_window,
+            "radial_bins": self.radial_bins, "palette_method": self.palette_method,
+            "palette_max_colors": self.palette_max_colors, "palette_seed": self.palette_seed,
+            "palette_iterations": self.palette_iterations, "connectivity": self.connectivity,
+            "symmetry_method": self.symmetry_method,
+            "autocorrelation_method": self.autocorrelation_method,
+        }, sort_keys=True, separators=(",", ":")).encode("utf-8"))
 
-def load_config(path: str | Path) -> PatternGenomeConfig:
-    data=json.loads(Path(path).read_text())
-    cfg=PatternGenomeConfig(**data)
-    cfg.validate(); return cfg
+def load_config(path):
+    raw = json.loads(Path(path).read_text(encoding="utf-8"))
+    if raw.get("schema_version") != CONFIG_SCHEMA:
+        raise PatternGenomeSchemaError(f"unknown config schema: {raw.get('schema_version')!r}")
+    config = PatternGenomeConfig(
+        luminance_method=raw["luminance_method"], fft_window=raw["fft_window"],
+        radial_bins=int(raw["radial_bins"]), palette_method=raw["palette_method"],
+        palette_max_colors=int(raw["palette_max_colors"]),
+        palette_seed=int(raw["palette_seed"]),
+        palette_iterations=int(raw["palette_iterations"]),
+        connectivity=int(raw["connectivity"]), symmetry_method=raw["symmetry_method"],
+        autocorrelation_method=raw["autocorrelation_method"],
+    )
+    config.validate()
+    return config
