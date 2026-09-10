@@ -24,6 +24,13 @@ numbers below are exactly what the authorized CI run printed.
     `5cdce1b`.
   - Steps 23–28 (artifact upload, publish): SKIPPED as a consequence.
 
+**Print-kit provenance:** no D2-0004 print kit was produced. Step 22 failed
+before a kit could be emitted, and the later schema-guard repair did not
+retroactively authorize rebuilding D2-0004 outputs. The operative Production
+Alpha kit therefore remains the sealed `RAC-PER-D2-0003` kit referenced by
+`production_alpha/SKU_MANIFEST.json`; D2-0004 contributes a retained negative
+digital result, not a replacement production artifact.
+
 ## 2. Evidence basis and its limits
 
 Because step 22 failed, the validated evidence bundle was **never archived**;
