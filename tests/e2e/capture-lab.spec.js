@@ -2,10 +2,15 @@ const { test, expect } = require('@playwright/test');
 
 test.beforeEach(async ({ page }) => {
   const errors = [];
-  page.on('pageerror', e => errors.push(e.message));
-  await page.goto('capture-lab.html');
-  await expect(page.getByText('RAC CAPTURE LAB', { exact: true })).toBeVisible();
   page.__errors = errors;
+  page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+  });
+  const response = await page.goto('capture-lab.html');
+  expect(response, 'Capture Lab navigation must return a response').not.toBeNull();
+  expect(response.ok(), `Capture Lab returned HTTP ${response.status()}`).toBeTruthy();
+  await expect(page.getByText('RAC CAPTURE LAB', { exact: true })).toBeVisible();
 });
 
 test.afterEach(async ({ page }) => {
