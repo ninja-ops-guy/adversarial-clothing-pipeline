@@ -1,0 +1,148 @@
+{
+  "audit_id": "RAC-G-BARRIER3-FINAL",
+  "checks": {
+    "aggregation_reference": {
+      "aggregation": "CVAR",
+      "alpha": 0.5,
+      "candidates_checked": 8,
+      "mismatches": [],
+      "reference_impl": "ruthless_pipeline/certification/numerical_verification.py",
+      "status": "PASS"
+    },
+    "committed_gate_report": {
+      "report": {
+        "artifact_integrity": "PASS",
+        "artifact_violations": [],
+        "barrier3_closed": true,
+        "deterministic_replay": "PASS",
+        "provenance": "PASS",
+        "provenance_violations": [],
+        "run_id": "RAC-BARRIER3-SYNTHETIC-001",
+        "scientific_boundaries": {
+          "d2_0004_modified": false,
+          "d2_0005_armed": false,
+          "evidence_class": "synthetic_pipeline_validation_only",
+          "held_out_models_accessed": false,
+          "physical_efficacy_claimed": false
+        }
+      },
+      "status": "PASS"
+    },
+    "committed_package_integrity": {
+      "detail": "hashes.sha256 re-verified over every pinned artifact",
+      "status": "PASS",
+      "violations": []
+    },
+    "eot_reproduction": {
+      "manifest_sha256": "04814882ede7b1b03e5de3b824413ac4533c278de00761690297a658fcd32482",
+      "recorded": "04814882ede7b1b03e5de3b824413ac4533c278de00761690297a658fcd32482",
+      "sample0_reproduced_sha256": "04af408ce43fd0e80b60b819a82cdecdc5171fee07d7e9c696990b347e7621f2",
+      "status": "PASS"
+    },
+    "fabrication_guard": {
+      "status": "PASS"
+    },
+    "finite_difference": {
+      "reason": "Barrier 3 synthetic path uses the finite-pool baseline optimizer; no gradient surface exists to differentiate. Becomes applicable when a gradient-backend generation is audited.",
+      "status": "DEFERRED"
+    },
+    "fresh_replay": {
+      "mismatched_artifacts": [],
+      "replay_verdict": "PASS",
+      "stage_seeds_equal": true,
+      "status": "PASS"
+    },
+    "fresh_vs_committed_equivalence": {
+      "mismatched_artifacts": [],
+      "projection": "all pinned files except runtime-environment.json, replay-report.json, barrier3-report.json, hashes.sha256",
+      "status": "PASS"
+    },
+    "handoff_pin": {
+      "actual_blob_sha1": "2be82bb13df62e0a3e67c789140de3848e9d2ae7",
+      "detail": "handoff bytes pinned to SOURCE_COMMIT state",
+      "expected_blob_sha1": "2be82bb13df62e0a3e67c789140de3848e9d2ae7",
+      "status": "PASS"
+    },
+    "pareto_oracle": {
+      "candidates_checked": 8,
+      "contract": "rule-based per-metric best ownership, balance_tol=0.1, ties by input order",
+      "informational_front": [
+        "b3-cand-000",
+        "b3-cand-003",
+        "b3-cand-005",
+        "b3-cand-007"
+      ],
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "promotion_attacks": {
+      "refused": [
+        true,
+        true
+      ],
+      "status": "PASS"
+    },
+    "provenance_attacks": {
+      "broken_edge_detected": true,
+      "silent_skip_detected": true,
+      "status": "PASS"
+    },
+    "release_replay_verifier": {
+      "mismatched_artifacts": [],
+      "status": "PASS",
+      "verdict": "PASS"
+    },
+    "scientific_boundaries": {
+      "assertions": {
+        "D2_0004_MODIFIED": false,
+        "D2_0005_ARMED": false,
+        "NEW_HELDOUT_ACCESS": false,
+        "PHYSICAL_EFFICACY_CLAIMED": false
+      },
+      "problems": [],
+      "status": "PASS"
+    },
+    "tamper_detection": {
+      "clean_violations": [],
+      "status": "PASS",
+      "tamper_violations_detected": 2
+    }
+  },
+  "evidence_class": "synthetic_pipeline_validation_only",
+  "findings": [],
+  "handoff": {
+    "blob_sha1": "2be82bb13df62e0a3e67c789140de3848e9d2ae7",
+    "path": "docs/BARRIER_3_COMPLETION_HANDOFF.md"
+  },
+  "nonblocking_gaps": {
+    "finite_difference": "Barrier 3 synthetic path uses the finite-pool baseline optimizer; no gradient surface exists to differentiate. Becomes applicable when a gradient-backend generation is audited."
+  },
+  "package": "artifacts/barrier3",
+  "physical_efficacy_claimed": false,
+  "refusals": {},
+  "schema_version": "1.0",
+  "source_commit": "b0e9e4a1e8a9dfd4ba4ba0a9bdc276c7b70b4b47",
+  "trust_block": {
+    "BARRIER_3_CLOSED": true,
+    "D2_0004_MODIFIED": false,
+    "D2_0005_ARMED": false,
+    "FAILURE_INJECTION_FAIL_CLOSED": true,
+    "NEW_HELDOUT_ACCESS": false,
+    "PHYSICAL_EFFICACY_CLAIMED": false,
+    "PUSH_BYTES_VERIFIED": true,
+    "REPLAY_DETERMINISTIC": true,
+    "SCIENTIFIC_THRESHOLDS_CHANGED": false,
+    "SOURCE_COMMIT": "b0e9e4a1e8a9dfd4ba4ba0a9bdc276c7b70b4b47",
+    "TESTS_GREEN": true
+  },
+  "trust_block_basis": {
+    "BARRIER_3_CLOSED": "committed barrier3-report.json re-read by this audit",
+    "FAILURE_INJECTION_FAIL_CLOSED": "tamper/provenance/fabrication/promotion attacks re-executed by this audit",
+    "PUSH_BYTES_VERIFIED": "handoff section 8 push-integrity record (per-file refetch hash comparison)",
+    "REPLAY_DETERMINISTIC": "fresh two-run replay executed by this audit, not the committed report",
+    "TESTS_GREEN": "full pytest suite re-run by the auditor at audit time (4 deterministic shards)",
+    "boundaries": "authoritative files re-read by this audit (scientific_boundaries check)"
+  },
+  "verdict": "PASS_WITH_NONBLOCKING_GAPS",
+  "verdict_rule": "FAIL if any FINDING or REFUSED; PASS_WITH_NONBLOCKING_GAPS if only DEFERRED gaps; PASS otherwise. Refusals are never silent."
+}
