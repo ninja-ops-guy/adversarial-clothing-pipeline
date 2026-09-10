@@ -1,0 +1,145 @@
+{
+  "per_candidate": {
+    "b3-cand-000": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5829030967568428
+    },
+    "b3-cand-001": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5739823675081375
+    },
+    "b3-cand-002": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5771353862702974
+    },
+    "b3-cand-003": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5790552351152798
+    },
+    "b3-cand-004": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5765655666261263
+    },
+    "b3-cand-005": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5801529726325871
+    },
+    "b3-cand-006": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5802072782211101
+    },
+    "b3-cand-007": {
+      "available_components": [
+        "gamut_distance",
+        "min_feature_size",
+        "high_frequency_survivability",
+        "resolution_dpi_check",
+        "bleed_safe_area_check"
+      ],
+      "partial": true,
+      "unavailable_components": [
+        "digital_to_camera_discrepancy"
+      ],
+      "value": 0.5772852908883621
+    }
+  },
+  "profile": {
+    "created": "2026-09-10",
+    "dpi": 150,
+    "gamut": {
+      "rgb_max": [
+        0.95,
+        0.95,
+        0.95
+      ],
+      "rgb_min": [
+        0.05,
+        0.05,
+        0.05
+      ]
+    },
+    "min_feature_mm": 0.5,
+    "mtf_cutoff_cycles_per_mm": 1.0,
+    "panel": {
+      "bleed_mm": 3.0,
+      "height_mm": 300.0,
+      "safe_area_mm": 10.0,
+      "width_mm": 300.0
+    },
+    "profile_id": "rac-barrier3-synthetic-print",
+    "source": "assumed",
+    "vendor": "synthetic",
+    "version": 1
+  },
+  "stage": "printability"
+}
