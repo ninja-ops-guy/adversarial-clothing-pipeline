@@ -29,6 +29,7 @@ SCENARIO_ASSUMPTION = "scenario_assumption"
 
 # Newly registered class (additive).
 EXPERIMENTAL_PRINT_SPECIMEN = "experimental_print_specimen"
+DERIVED_DIGITAL_MEASUREMENT = "derived_digital_measurement"
 
 EVIDENCE_CLASSES: FrozenSet[str] = frozenset(
     {
@@ -37,6 +38,7 @@ EVIDENCE_CLASSES: FrozenSet[str] = frozenset(
         LOG_ATTESTED,
         SCENARIO_ASSUMPTION,
         EXPERIMENTAL_PRINT_SPECIMEN,
+        DERIVED_DIGITAL_MEASUREMENT,
     }
 )
 
@@ -73,6 +75,11 @@ DESCRIPTIONS: Dict[str, str] = {
         "Physical print-alpha manufacturing specimen. Asserts print "
         "provenance only; physical_efficacy_claimed must remain false. "
         "Unresolved vendor fields are fail-closed as 'PENDING_USER_ACTION'."
+    ),
+    DERIVED_DIGITAL_MEASUREMENT: (
+        "Deterministic measurement derived from a digital candidate artifact. "
+        "May describe intrinsic pattern properties but never constitutes "
+        "physical-world efficacy evidence."
     ),
 }
 
