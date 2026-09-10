@@ -364,13 +364,16 @@ def check_schedule_frozen(repo_root: Path) -> dict:
     frozen = json.loads((repo_root / "physical/p1/P1_CAPTURE_SCHEDULE.json").read_text())
     schedule = ps.derive_schedule()
     problems = []
-    if frozen["schedule"] != schedule:
-        problems.append("frozen schedule differs from fresh derivation")
-    trial_ids = [e["trial_id"] for e in frozen["schedule"]]
-    if len(trial_ids) != len(set(trial_ids)):
-        problems.append("duplicate trial IDs in schedule")
-    if sorted(trial_ids) != ps.trial_ids():
-        problems.append("schedule does not cover RAC-P1-T-0001..0144 exactly once")
+    if frozen.get("schedule_sha256") != ps.schedule_sha256(schedule):
+        problems.append("pinned schedule_sha256 does not match fresh derivation from the frozen seed")
+    if frozen.get("planned_valid_trials") != ps.EXPECTED_TRIALS:
+        problems.append("planned_valid_trials mismatch")
+    if frozen.get("seed") != ps.CONTRACT_SEED or frozen.get("contract_id") != ps.CONTRACT_ID:
+        problems.append("seed/contract drift")
+    # Full coverage of RAC-P1-T-0001..0144 exactly once, from the derivation.
+    trial_ids = [e["trial_id"] for e in schedule]
+    if len(trial_ids) != len(set(trial_ids)) or sorted(trial_ids) != ps.trial_ids():
+        problems.append("derived schedule does not cover RAC-P1-T-0001..0144 exactly once")
     return _record(PASS if not problems else FINDING, problems=problems, trials=len(trial_ids))
 
 
