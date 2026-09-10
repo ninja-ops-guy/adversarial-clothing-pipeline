@@ -4,7 +4,9 @@ const $=id=>document.getElementById(id);
 const STEPS=['Experiment','Calibration','Control','Candidate','Motion','Review','Seal'];
 let stream=null,recorder=null,chunks=[],arm='control',frozen=null,sealed=false;
 const captures={control:{stills:[],videos:[]},candidate:{stills:[],videos:[]}};
-function now(){return new Date().toISOString()}\nfunction stable(v){if(Array.isArray(v))return v.map(stable);if(v&&typeof v==='object'){const out={};Object.keys(v).sort().forEach(k=>out[k]=stable(v[k]));return out;}return v}\nfunction canonical(v){return JSON.stringify(stable(v))}
+function now(){return new Date().toISOString()}
+function stable(v){if(Array.isArray(v))return v.map(stable);if(v&&typeof v==='object'){const out={};Object.keys(v).sort().forEach(k=>out[k]=stable(v[k]));return out;}return v}
+function canonical(v){return JSON.stringify(stable(v))}
 function cond(){return [+$('distance').value,+$('yaw').value,$('pose').value,$('lightingId').value].join('|')}
 function hex(buf){return crypto.subtle.digest('SHA-256',buf).then(d=>[...new Uint8Array(d)].map(x=>x.toString(16).padStart(2,'0')).join(''))}
 function renderSteps(active=0){$('sopStrip').innerHTML=STEPS.map((s,i)=>'<div class="sop-step '+(i<active?'done ':i===active?'active':'')+'">'+(i+1)+' · '+s.toUpperCase()+'</div>').join('')}
@@ -14,7 +16,8 @@ function manifest(){
 }
 async function freeze(){
  const m=manifest(); if(!m.experiment_id||!m.actor_id||!m.camera_id) return alert('Experiment, actor, and camera IDs are required.');
- if(m.candidate.sha256&&!/^[0-9a-f]{64}$/.test(m.candidate.sha256)) return alert('Candidate SHA-256 must be 64 hex characters or blank for a pre-freeze prototype.');\n if(m.generation.sha256&&!/^[0-9a-f]{64}$/.test(m.generation.sha256)) return alert('Generation SHA-256 must be 64 hex characters or blank for a prototype.');
+ if(m.candidate.sha256&&!/^[0-9a-f]{64}$/.test(m.candidate.sha256)) return alert('Candidate SHA-256 must be 64 hex characters or blank for a pre-freeze prototype.');
+ if(m.generation.sha256&&!/^[0-9a-f]{64}$/.test(m.generation.sha256)) return alert('Generation SHA-256 must be 64 hex characters or blank for a prototype.');
  const bytes=new TextEncoder().encode(canonical(m));m.freeze_sha256=await hex(bytes);frozen=m;
  ['experimentId','hypothesisId','protocolVersion','evidenceClass','generationId','generationSha','candidateId','candidateSha','controlId','actorId','cameraId','lightingId','distance','yaw','pose'].forEach(id=>$(id).disabled=true);
  $('freezeBtn').disabled=true;$('stillBtn').disabled=!stream;$('recordBtn').disabled=!stream;$('instrumentStatus').textContent='FROZEN · '+m.freeze_sha256.slice(0,16)+'…';$('conditionBanner').textContent='CONTROL · '+cond();renderSteps(1)
