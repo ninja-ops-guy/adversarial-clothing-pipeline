@@ -37,12 +37,15 @@ RESULT: synthetic_pipeline_validation_only — not RAC evidence
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # import-safe CLI entrypoint (E2)
+
 import argparse
 import hashlib
 import json
-import sys
 from dataclasses import asdict
-from pathlib import Path
 from typing import Any
 
 import numpy as np
