@@ -15,9 +15,13 @@ class IdKind(str, Enum):
     CONSTRAINT = "CST"
     OVERLAP = "OVR"
     DIAGNOSTIC = "DGN"
+    SENTINEL = "SEN"
+    BRIDGE = "BRG"
+    CALIBRATION = "CAL"
+    PIPELINE = "PIP"
 
 
-_ID_RE = re.compile(r"^RAC-(EXP|EVT|COH|SMP|CST|OVR|DGN)-([A-Z0-9][A-Z0-9._-]{2,63})$")
+_ID_RE = re.compile(r"^RAC-(EXP|EVT|COH|SMP|CST|OVR|DGN|SEN|BRG|CAL|PIP)-([A-Z0-9][A-Z0-9._-]{2,63})$")
 
 
 @dataclass(frozen=True, order=True)
