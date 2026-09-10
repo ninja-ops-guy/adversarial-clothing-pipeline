@@ -84,3 +84,27 @@ def test_uniform_candidate_is_valid(tmp_path):
     assert genome["spectral"]["high_frequency_ratio"] == 0.0
     assert genome["spectral"]["low_frequency_ratio"] == 1.0
     assert index["candidates"]["solid"]["candidate_sha256"] == sha
+
+
+def test_surrogate_selector_freezes_all_genomes_without_using_them_for_ranking(tmp_path):
+    from tests.baseline.fixtures import CANDIDATE_IDS, run_selection
+
+    pool_dir = tmp_path / "pool"
+    output_dir = tmp_path / "run"
+    report = run_selection(pool_dir, output_dir, objective="mean")
+
+    genome_dir = output_dir / "pattern-genomes"
+    assert (genome_dir / "index.json").is_file()
+    for candidate_id in CANDIDATE_IDS:
+        assert (genome_dir / f"{candidate_id}.json").is_file()
+
+    selected_ref = json.loads((output_dir / "candidate-genome-ref.json").read_text())
+    assert selected_ref["selection_influence"] == "NONE_MEASUREMENT_ONLY"
+    assert selected_ref["heldout_access"] is False
+    assert selected_ref["candidate_id"] == report["winner"]["candidate_id"]
+    assert selected_ref["genome_ref"]["candidate_sha256"] == report["winner"]["pattern_sha256"]
+
+    # V1 instrumentation is sidecar-only: the scientific selection report has
+    # no genome feature fields and therefore cannot rank on them.
+    assert "pattern_genome" not in report
+    assert "genome_ref" not in report["winner"]
