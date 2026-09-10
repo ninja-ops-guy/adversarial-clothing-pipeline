@@ -5,6 +5,16 @@
 
 The RAC paper program now contains two **foundation papers** explaining the research system itself and five **experimental papers** whose results depend on closed RAC experiment releases.
 
+## Literature Foundation — Systematic Transfer-Property Review
+
+**Manuscript:** `papers/00_SYSTEMATIC_REVIEW.md`
+
+**Core question:** Which measurable properties of physical adversarial textiles have been shown to predict transfer to architectures outside the optimization surrogate set?
+
+**Current finding:** In the reviewed 2017–2026 corpus, no study was identified that establishes a quantitative pattern-property → physically realized cross-architecture transfer relationship. CAPGen is treated as the closest partial baseline because it separates pattern structure from color and evaluates digital black-box transfer, but does not provide a parametric physical held-out transfer map.
+
+This review motivates Paper 1 and constrains its claims. Pattern Genome features are exploratory hypotheses until prospectively validated. Any discovered association must be replicated in a later frozen generation before being promoted to a durable heuristic.
+
 ## Foundation Paper 0 — RAC System Architecture
 
 **Manuscript:** `papers/00_RAC_SYSTEM_ARCHITECTURE.md`
