@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_citation_v1.schema.json",
+  "title": "RAC CTM Citation Verification Record v1 (SPEC-6; additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","citation_id","claim_id","target_ref","verification_status","load_bearing","load_bearing_reason"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-citation/1.0"},
+    "citation_id": {"type":"string","minLength":1},
+    "claim_id": {"type":"string","minLength":1},
+    "target_ref": {"type":"string","minLength":1},
+    "verification_status": {"enum":["abstract_only","full_text_verified","reproduced_internally"]},
+    "load_bearing": {"type":"boolean"},
+    "load_bearing_reason": {"type":"string"}
+  }
+}

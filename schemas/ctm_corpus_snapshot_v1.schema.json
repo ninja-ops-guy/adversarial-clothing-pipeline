@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_corpus_snapshot_v1.schema.json",
+  "title": "RAC CTM Living-Corpus Snapshot v1 (SPEC-4; content-addressed, immutable)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","snapshot_id","created_utc","entries","entry_count"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-corpus-snapshot/1.0"},
+    "snapshot_id": {"type":"string","pattern":"^RAC-CTM-CORPUS-SNAPSHOT-[0-9a-f]{16}$"},
+    "created_utc": {"type":"string","pattern":"^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "entries": {
+      "type":"array","minItems":1,
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["entry_id","entry_sha256"],
+        "properties":{
+          "entry_id":{"type":"string","pattern":"^RAC-CTM-LIT-[0-9a-f]{16}$"},
+          "entry_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "entry_count": {"type":"integer","minimum":1}
+  }
+}

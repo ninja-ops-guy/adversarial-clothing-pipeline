@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_positioning_v1.schema.json",
+  "title": "RAC CTM Manuscript Positioning Block v1 (SPEC-18; additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","primary_axis","disclaimed_axes","comparison_snapshot_ref","amendments"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-positioning/1.0"},
+    "primary_axis": {"enum":["measurement_infrastructure","attack_superiority","policy_impact","consumer_usability"]},
+    "disclaimed_axes": {
+      "type":"array","uniqueItems":true,
+      "items":{"enum":["measurement_infrastructure","attack_superiority","policy_impact","consumer_usability"]}
+    },
+    "comparison_snapshot_ref": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "amendments": {"type":"array","items":{"type":"string","minLength":1}}
+  }
+}

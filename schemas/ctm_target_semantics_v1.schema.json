@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_target_semantics_v1.schema.json",
+  "title": "RAC CTM Target Semantics v1 (SPEC-11 extension; additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","target_id","architecture","weights_ref","head_class","threshold_config_sha256","target_identity_sha256"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-target-semantics/1.0"},
+    "target_id": {"type":"string","minLength":1,"not":{"enum":["nms_based","nms_free"]}},
+    "architecture": {"type":"string"},
+    "weights_ref": {"type":"string"},
+    "head_class": {"enum":["nms_based","nms_free"]},
+    "threshold_config_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "target_identity_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+  }
+}

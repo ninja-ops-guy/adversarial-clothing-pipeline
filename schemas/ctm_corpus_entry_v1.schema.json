@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_corpus_entry_v1.schema.json",
+  "title": "RAC CTM Living-Corpus Literature Entry v1 (SPEC-4/SPEC-15; additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","entry_id","title","identifier","year","entry_class","quadrant","failure_axes","verification_status","recheck_date","survey_taxonomy","notes"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-corpus-entry/1.0"},
+    "entry_id": {"type":"string","pattern":"^RAC-CTM-LIT-[0-9a-f]{16}$"},
+    "title": {"type":"string","minLength":1},
+    "identifier": {
+      "type":"object","additionalProperties":false,
+      "required":["kind","value"],
+      "properties":{
+        "kind":{"enum":["arxiv","doi","isbn","url"]},
+        "value":{"type":"string","minLength":1}
+      }
+    },
+    "year": {"type":"integer","minimum":1900,"maximum":2100},
+    "entry_class": {"enum":["near_miss","boundary","foundational","survey","cross_domain_boundary"]},
+    "quadrant": {"enum":["quadrant_1","quadrant_2","quadrant_3","quadrant_4","not_applicable"]},
+    "failure_axes": {"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "verification_status": {"enum":["abstract_only","full_text_verified","reproduced_internally"]},
+    "recheck_date": {"type":"string","pattern":"^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "survey_taxonomy": {
+      "type":"object","additionalProperties":false,
+      "required":["survey_ref","node"],
+      "properties":{
+        "survey_ref":{"type":"string","minLength":1},
+        "node":{"type":"string","minLength":1}
+      }
+    },
+    "notes": {"type":"string"}
+  }
+}

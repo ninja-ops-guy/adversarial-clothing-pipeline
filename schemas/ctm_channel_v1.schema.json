@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_channel_v1.schema.json",
+  "title": "RAC CTM Camera/ISP Channel Record v1 (SPEC-10 extension; additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","channel_id","tier","camera_model","isp_pipeline_id","raw_available","codec","isp_descriptors","isp_proxy_refs","camera_identified","channel_class"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-channel/1.0"},
+    "channel_id": {"type":"string","minLength":1},
+    "tier": {"enum":["digital","physical"]},
+    "camera_model": {"type":"string","minLength":1},
+    "isp_pipeline_id": {"type":"string","minLength":1},
+    "raw_available": {"enum":["yes","no","unknown","inferred"]},
+    "codec": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["format","bitrate_class"],
+      "properties": {
+        "format": {"type":"string","minLength":1},
+        "bitrate_class": {"type":"string","minLength":1}
+      }
+    },
+    "isp_descriptors": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["demosaic","denoise","tone_map"],
+      "properties": {
+        "demosaic": {"type":"string","minLength":1},
+        "denoise": {"type":"string","minLength":1},
+        "tone_map": {"type":"string","minLength":1}
+      }
+    },
+    "isp_proxy_refs": {"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "camera_identified": {"type":"boolean"},
+    "channel_class": {"enum":["CHANNEL-A","CHANNEL-B","CHANNEL-C"]}
+  }
+}

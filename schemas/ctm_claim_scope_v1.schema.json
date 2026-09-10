@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_claim_scope_v1.schema.json",
+  "title": "RAC CTM Claim Pipeline-Stage Scope v1 (SPEC-13; additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","claim_id","claim_kind","pipeline_stages","multi_stage_basis"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-claim-scope/1.0"},
+    "claim_id": {"type":"string","minLength":1},
+    "claim_kind": {"enum":["efficacy","robustness","transfer","descriptive","infrastructure"]},
+    "pipeline_stages": {
+      "type":"array","minItems":1,"uniqueItems":true,
+      "items":{"enum":["person_detection","face_detection","face_recognition","reid_tracking","fusion"]}
+    },
+    "multi_stage_basis": {"type":"string"}
+  }
+}
