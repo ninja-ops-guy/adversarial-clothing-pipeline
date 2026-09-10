@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   regenerate:
@@ -24,6 +24,17 @@ jobs:
         run: PYTHONPATH=. python scripts/build_provenance_graph.py
       - name: Verify regenerated graph
         run: PYTHONPATH=. python scripts/build_provenance_graph.py --verify
+      - name: Commit verified graph when changed
+        run: |
+          git add artifacts/provenance/graph.json
+          if git diff --cached --quiet; then
+            echo "Provenance graph is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: refresh deterministic provenance graph"
+          git push
       - name: Upload regenerated graph
         uses: actions/upload-artifact@v6
         with:
