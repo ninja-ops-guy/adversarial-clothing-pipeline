@@ -188,3 +188,8 @@ No scheduling promise or new gate closure is made here. These passes do not auth
 - [ ] Obtain prospective physical evidence under the approved RAC protocol.
 
 **Recommendation:** RAC's next persuasive milestone remains a well-documented physical result, including an honest negative result. The useful research investment is making that result interpretable and independently checkable.
+
+
+## Public architecture and dataset access follow-up
+
+See [noRecognition architecture and dataset access specification](NORECOGNITION_ARCHITECTURE_AND_DATA_ACCESS.md) for the verified current-tree inventory, public publication-code behavior, dataset availability findings, and publisher information requirements. The large corpus is not established as publicly downloadable; commercial reuse permission remains unresolved. No publisher contact or dataset download has occurred.
