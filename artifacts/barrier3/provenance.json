@@ -1,0 +1,321 @@
+{
+  "edges": [
+    {
+      "from": "input-hashes.json",
+      "kind": "stage_input",
+      "to": "optimization_v3"
+    },
+    {
+      "from": "input-hashes.json",
+      "kind": "stage_input",
+      "to": "eot"
+    },
+    {
+      "from": "stage-artifacts/stage1-optimization.json",
+      "kind": "stage_input",
+      "to": "detector_science"
+    },
+    {
+      "from": "stage-artifacts/stage2-eot.json",
+      "kind": "stage_input",
+      "to": "detector_science"
+    },
+    {
+      "from": "stage-artifacts/stage1-optimization.json",
+      "kind": "stage_input",
+      "to": "pareto_style"
+    },
+    {
+      "from": "stage-artifacts/stage3-detector-science.json",
+      "kind": "stage_input",
+      "to": "pareto_style"
+    },
+    {
+      "from": "stage-artifacts/stage1-optimization.json",
+      "kind": "stage_input",
+      "to": "printability"
+    },
+    {
+      "from": "stage-artifacts/stage1-optimization.json",
+      "kind": "stage_input",
+      "to": "physical_transfer"
+    },
+    {
+      "from": "stage-artifacts/stage5-printability.json",
+      "kind": "stage_input",
+      "to": "physical_transfer"
+    }
+  ],
+  "run_id": "RAC-BARRIER3-SYNTHETIC-001",
+  "stages": [
+    {
+      "configuration": {
+        "objective": {
+          "future_generations_only": true,
+          "objective_id": "RAC-BARRIER3-SYNTHETIC-OBJECTIVE",
+          "schema_version": "1.0",
+          "seed": 1205164434,
+          "terms": {
+            "detector_loss": {
+              "aggregation": "CVAR",
+              "alpha": 0.5,
+              "log_separately": true
+            },
+            "printability_loss": {
+              "lambda_print": 0.2,
+              "log_separately": true
+            },
+            "regularization": {
+              "lambda_reg": 0.01,
+              "log_separately": true
+            },
+            "style_loss": {
+              "lambda_style": 0.2,
+              "log_separately": true
+            }
+          }
+        },
+        "optimizer": "CandidatePoolSearchOptimizer"
+      },
+      "input_sha256": "83f397e623b30330adbef8372d5e43667ed6a13b515f9e8ec26cbb5a5605ea24",
+      "input_source": "make_candidate_pool(master_seed)",
+      "output_sha256": "b37c4f24586dab5efd5cae7d2263babc9b1307e27116d43a220ff3e4dca025a8",
+      "seed": 1205164434,
+      "stage": "optimization_v3",
+      "upstream": [
+        "input-hashes.json"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "configuration": {
+        "garment": {
+          "bend": {
+            "params": {
+              "max": 0.3,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "fold": {
+            "params": {
+              "max": 0.3,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "partial_occlusion": {
+            "params": {
+              "max": 0.2,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "stretch": {
+            "params": {
+              "max": 0.15,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "wrinkle": {
+            "params": {
+              "max": 0.4,
+              "min": 0.0
+            },
+            "type": "uniform"
+          }
+        },
+        "geometry": {
+          "camera_distance": {
+            "params": {
+              "max": 3.5,
+              "min": 1.5
+            },
+            "type": "uniform"
+          },
+          "perspective": {
+            "params": {
+              "max": 0.1,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "pitch": {
+            "params": {
+              "max": 15.0,
+              "min": -15.0
+            },
+            "type": "uniform"
+          },
+          "roll": {
+            "params": {
+              "max": 10.0,
+              "min": -10.0
+            },
+            "type": "uniform"
+          },
+          "scale": {
+            "params": {
+              "max": 1.2,
+              "min": 0.8
+            },
+            "type": "uniform"
+          },
+          "translation": {
+            "params": {
+              "max": 0.15,
+              "min": -0.15
+            },
+            "type": "uniform"
+          },
+          "yaw": {
+            "params": {
+              "max": 25.0,
+              "min": -25.0
+            },
+            "type": "uniform"
+          }
+        },
+        "imaging": {
+          "blur": {
+            "params": {
+              "max": 2.0,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "compression": {
+            "params": {
+              "max": 0.4,
+              "min": 0.0
+            },
+            "type": "uniform"
+          },
+          "contrast": {
+            "params": {
+              "max": 0.15,
+              "min": -0.15
+            },
+            "type": "uniform"
+          },
+          "exposure": {
+            "params": {
+              "max": 0.2,
+              "min": -0.2
+            },
+            "type": "uniform"
+          },
+          "resize_interpolation": {
+            "params": {
+              "values": [
+                "bilinear",
+                "nearest"
+              ]
+            },
+            "type": "choice"
+          }
+        },
+        "print_capture": {
+          "gamut_mapping": {
+            "params": {
+              "values": [
+                "clip",
+                "compress"
+              ]
+            },
+            "type": "choice"
+          },
+          "resolution_loss": {
+            "params": {
+              "max": 0.3,
+              "min": 0.0
+            },
+            "type": "uniform"
+          }
+        }
+      },
+      "input_sha256": "04814882ede7b1b03e5de3b824413ac4533c278de00761690297a658fcd32482",
+      "input_source": "make_eot_spec(master_seed)",
+      "output_sha256": "971a351093a4f1e6c689cebcd4f7aaac37d7178ea25aeebf6e56ca707fb16868",
+      "seed": 1120217001,
+      "stage": "eot",
+      "upstream": [
+        "input-hashes.json"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "configuration": {
+        "detectors": [
+          "rac-synthetic-detector-0",
+          "rac-synthetic-detector-1",
+          "rac-synthetic-detector-2"
+        ]
+      },
+      "input_sha256": "2e2f516b82a288533b96425d53ab8a9eae3e89ba8a7a3b2dce3ac9f0c8b2d89d",
+      "input_source": "stage1 pool x stage2 eot samples",
+      "output_sha256": "f3cf40bb638768c8ae7bc28e7e5f0ccd63396b7b9ce56b1b923f05b643214d39",
+      "seed": 2231493550,
+      "stage": "detector_science",
+      "upstream": [
+        "stage-artifacts/stage1-optimization.json",
+        "stage-artifacts/stage2-eot.json"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "configuration": {
+        "balance_tol": 0.1,
+        "families": [
+          "signal_shadow",
+          "machine_static",
+          "ghost_hound",
+          "broken_human",
+          "error_garden"
+        ]
+      },
+      "input_sha256": "2313d8c431cd0ee2512dc1ebfe663d3dfa5d79ebc5a2f318d02b36b6b9972104",
+      "input_source": "stage1 totals + stage3 confidence + style features",
+      "output_sha256": "fb0bfdb5961da4c45f1d78a1df652da6cc6dc8ee5b002c723d4bff1098160631",
+      "seed": 4199429198,
+      "stage": "pareto_style",
+      "upstream": [
+        "stage-artifacts/stage1-optimization.json",
+        "stage-artifacts/stage3-detector-science.json"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "configuration": {
+        "profile_id": "rac-barrier3-synthetic-print",
+        "profile_version": 1
+      },
+      "input_sha256": "83f397e623b30330adbef8372d5e43667ed6a13b515f9e8ec26cbb5a5605ea24",
+      "input_source": "candidate artwork arrays",
+      "output_sha256": "6093df14edf13c534357886b7f63e82acf1b88667dfb76782264f0839838453b",
+      "seed": 3462670096,
+      "stage": "printability",
+      "upstream": [
+        "stage-artifacts/stage1-optimization.json"
+      ],
+      "version": "1.0.0"
+    },
+    {
+      "configuration": {
+        "evidence_class": "synthetic_pipeline_validation_only",
+        "synthetic_generator": true
+      },
+      "input_sha256": "d0eabe14fd488187cfeb5852cb504319a779e7d1b7709bfdda4aa1e3954218a5",
+      "input_source": "stage1 winner artwork (synthetic)",
+      "output_sha256": "aa3ef3685330d1130b709debdcb0547e2a03bc6b59b7edd71fe5a78e8bb3528a",
+      "seed": 3579209274,
+      "stage": "physical_transfer",
+      "upstream": [
+        "stage-artifacts/stage1-optimization.json",
+        "stage-artifacts/stage5-printability.json"
+      ],
+      "version": "1.0"
+    }
+  ]
+}
