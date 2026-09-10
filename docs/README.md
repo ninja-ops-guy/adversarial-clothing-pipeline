@@ -13,8 +13,9 @@ For a new technical reviewer, read in this order:
 3. **[Architecture](ARCHITECTURE.md)** — implementation planes, component responsibilities and evidence boundaries.
 4. **[Certification System](CERTIFICATION_SYSTEM.md)** — fail-closed evidence transitions and promotion/refusal logic.
 5. **[End-to-End Research SOP](END_TO_END_RESEARCH_SOP.md)** — operational design → benchmark → print → physical-validation workflow.
-6. **[Project Progress Ledger](PROJECT_PROGRESS.md)** — authoritative current completion state.
-7. **[Manuscript Workspace](papers/README.md)** — pre-results papers explaining RAC research questions and methods.
+6. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — authoritative current completion state after the September 10 CTM integration cycle.
+7. **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** — detailed Sep. 7–8 milestone and D2 closure history.
+8. **[Manuscript Workspace](papers/README.md)** — pre-results papers explaining RAC research questions and methods.
 
 ## Governance order
 
@@ -24,12 +25,14 @@ For a new technical reviewer, read in this order:
 4. **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — critical-first multi-week implementation sequence; keeps current physical/POD work ahead of lower-priority infrastructure.
 5. **[Seven Implementation Passes](experimental_governance/IMPLEMENTATION_PASSES.md)** — pass-by-pass deliverables, tests and exit gates for Governance v1.
 6. **[Production Completion Checklist](PRODUCTION_COMPLETION_CHECKLIST.md)** — execution order and Production Alpha/Beta/v1 gates.
-7. **[Project Progress Ledger](PROJECT_PROGRESS.md)** — current completion status, completed work and active tasks.
+7. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — current completion status, verified baseline and active gates.
 
 ## Current status
 
-- **[Project Progress Ledger](PROJECT_PROGRESS.md)** — recommended source for current state.
-- **[Project Status](PROJECT_STATUS.md)** — architecture/readiness narrative; historical sections may lag the ledger.
+- **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — recommended source for current RAC/CTM state.
+- **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** — detailed Sep. 7–8 milestone history; preserved rather than rewritten retroactively.
+- **[CTM B–D Integration Audit](CTM_BD_INTEGRATION_AUDIT_2026-09-10.md)** — closed PASS audit for the September 10 integration/hardening cycle.
+- **[Project Status](PROJECT_STATUS.md)** — architecture/readiness narrative; historical sections may lag the current ledger.
 - **[Production Readiness](../PRODUCTION_READINESS.md)** — fail-closed technical/product readiness gates.
 - **[Research Evidence Register](RESEARCH_EVIDENCE_REGISTER.md)** — evidence/source register.
 
@@ -74,4 +77,4 @@ For a new technical reviewer, read in this order:
 
 ## Important evidence boundary
 
-Documentation describing implemented software does not imply a physical product has been validated. The authoritative physical/product state is tracked in [PROJECT_PROGRESS.md](PROJECT_PROGRESS.md), and RAC-P/RAC-M remain unavailable until real evidence closes those gates.
+Documentation describing implemented software does not imply a physical product has been validated. The authoritative current physical/product state is tracked in [PROJECT_PROGRESS_CURRENT.md](PROJECT_PROGRESS_CURRENT.md). RAC-P/RAC-M remain unavailable until real evidence closes those gates; the older [PROJECT_PROGRESS.md](PROJECT_PROGRESS.md) is retained as historical provenance.
