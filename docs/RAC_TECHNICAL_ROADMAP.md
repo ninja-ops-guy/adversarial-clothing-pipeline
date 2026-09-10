@@ -68,3 +68,16 @@ New namespaces only.
 - [ ] Pass C: require predictor provenance and prospective evaluation when such a study is proposed; complete the physical-paper full-text review (NR-06).
 
 Preserve current physical/production priorities and frozen experiment boundaries. The review maps acceptance checks to existing components; it does not certify implementation completeness or create a new performance claim.
+
+
+### Capability research following reported winners
+
+**Status:** static capability comparison COMPLETE; research decisions PENDING. See the review's “Addendum — learning from reported winners.”
+
+- [ ] Map existing generation/optimization components to retained measured results and their actual workflow entry points.
+- [ ] Review whether the current convenience fixture covers the wearer/garment context needed for the next research question.
+- [ ] Assess retrospective predictive signal and data sufficiency before choosing a learned representation.
+- [ ] Consider context-aware prediction, learned generation, and recipe-sequence representations as distinct research hypotheses.
+- [ ] Record an explicit decision on each hypothesis; do not infer that PPO or additional hardware is required from another project's headline results.
+
+Current wiring includes real-model finite-pool selection and environment recoloring. Continuous optimization components exist separately. The inspected workflow does not establish a persistent generator or predictor trained from accumulated RAC experiments. This is a research-parity finding, not a new experiment authorization.
