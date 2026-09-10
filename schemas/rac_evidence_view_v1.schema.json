@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/rac_evidence_view_v1.schema.json",
+  "title": "RAC Versioned Evidence View v1 (NR-05; additive, fail-closed)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","view_id","source_version","eligibility_rules","cohort_id","specimen_id","measurement_medium","metric_definition","evidence_label","counts"],
+  "properties": {
+    "schema_version": {"const":"rac-evidence-view/1.0"},
+    "view_id": {"type":"string","minLength":1},
+    "source_version": {"type":"string","minLength":1},
+    "eligibility_rules": {"type":"string","minLength":1},
+    "cohort_id": {"type":"string","minLength":1},
+    "specimen_id": {"type":"string","minLength":1},
+    "measurement_medium": {"type":"string","minLength":1},
+    "metric_definition": {"type":"string","minLength":1},
+    "evidence_label": {"type":"string","minLength":1},
+    "counts": {
+      "type":"object","additionalProperties":false,
+      "required": ["n_evaluations","n_independent_participants","n_experimental_runs","n_retained_observations"],
+      "properties": {
+        "n_evaluations": {"type":"integer","minimum":0},
+        "n_independent_participants": {"type":"integer","minimum":0},
+        "n_experimental_runs": {"type":"integer","minimum":0},
+        "n_retained_observations": {"type":"integer","minimum":0}
+      }
+    }
+  }
+}

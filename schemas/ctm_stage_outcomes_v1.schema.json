@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_stage_outcomes_v1.schema.json",
+  "title": "RAC CTM Pipeline-Stage Outcome Record v1 (NR-04; additive, fail-closed)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","set_id","evidence_label","outcomes"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-stage-outcomes/1.0"},
+    "set_id": {"type":"string","minLength":1},
+    "evidence_label": {"type":"string","minLength":1},
+    "outcomes": {
+      "type":"array","minItems":1,
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["stage","outcome_kind"],
+        "properties":{
+          "stage":{"enum":["person_detection","face_detection","face_recognition","reid_tracking","fusion"]},
+          "outcome_kind":{"enum":["direct_measurement","upstream_dependent","not_evaluated"]},
+          "measured_value":{"type":"number"},
+          "discrete_outcome":{"enum":["success","failure","inconclusive"]},
+          "confidence_delta":{"type":"number"},
+          "upstream_stages":{
+            "type":"array","uniqueItems":true,
+            "items":{"enum":["person_detection","face_detection","face_recognition","reid_tracking","fusion"]}
+          },
+          "note":{"type":"string"}
+        }
+      }
+    }
+  }
+}
