@@ -2,13 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rac-sampling-manifest/1.0",
   "type": "object",
-  "required": ["schema_version", "sampling_id", "experiment_id", "seed", "target_distribution"],
   "properties": {
     "schema_version": {"const": "1.0"},
     "sampling_id": {"type": "string", "pattern": "^RAC-(SAMP|SMP)-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "experiment_id": {"type": "string", "pattern": "^RAC-EXP-[A-Z0-9][A-Z0-9._-]{2,63}$"},
+    "constraint_set_id": {"type": "string", "pattern": "^RAC-CS-[A-Z0-9][A-Z0-9._-]{2,63}$"},
     "seed": {"type": "integer", "minimum": 0},
-    "target_distribution": {"type": ["string", "object"]}
+    "sample_count": {"type": "integer", "minimum": 1},
+    "target_distribution": {"type": ["string", "object"]},
+    "sampler_version": {"type": "string", "minLength": 1}
   },
+  "required": ["schema_version", "sampling_id", "experiment_id", "seed", "target_distribution"],
+  "oneOf": [
+    {"required": ["constraint_set_id", "sample_count", "sampler_version"]},
+    {
+      "not": {
+        "anyOf": [
+          {"required": ["constraint_set_id"]},
+          {"required": ["sample_count"]},
+          {"required": ["sampler_version"]}
+        ]
+      }
+    }
+  ],
   "additionalProperties": true
 }
