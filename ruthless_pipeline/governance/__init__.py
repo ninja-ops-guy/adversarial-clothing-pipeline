@@ -35,6 +35,7 @@ from .constraints import (
     assert_frozen_d2_artifacts_unchanged,
     classify_migration,
 )
+from .migration import record_migration_decision
 from .seal import CohortSeal, SealError, seal_cohort, verify_seal
 from .bridge_overlap import (
     BridgeGovernanceError,
@@ -123,6 +124,7 @@ __all__ = [
     "classify_regime",
     "diagnose",
     "payload_sha256",
+    "record_migration_decision",
     "require_blind_re_evaluation",
     "require_confirmatory_eligible",
     "require_cross_encoding_agreement",
