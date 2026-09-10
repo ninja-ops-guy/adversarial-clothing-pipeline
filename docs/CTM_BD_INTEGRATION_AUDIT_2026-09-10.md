@@ -4,9 +4,9 @@
 
 ## Result
 
-**CTM_BD_INTEGRATION_AUDIT = PASS_WITH_FOREIGN_CI_BLOCKER**
+**CTM_BD_INTEGRATION_AUDIT = PASS**
 
-Two material semantic mismatches were found and corrected. Lane C and the SPEC-16 evidence ceiling were already consistent with the revised contract.
+Two material semantic mismatches were found and corrected. Lane C and the SPEC-16 evidence ceiling were already consistent with the revised contract. The foreign Barrier-3 CI blocker observed during the original audit was subsequently resolved by its owning/upstream work; a fresh full repository matrix now passes. This audit did not opportunistically repair that unrelated lane.
 
 ## Corrected mismatch 1 — SPEC-11 mechanism classification
 
@@ -73,7 +73,7 @@ Reviewed surfaces already conform to the revised proposal:
 
 ## Scientific boundaries
 
-This audit did **not**:
+This audit and its closure did **not**:
 
 - modify Pattern Genome v1;
 - arm D2-0005;
@@ -83,9 +83,9 @@ This audit did **not**:
 - execute P1 physical work;
 - alter P1 UA values.
 
-## CI disposition
+## Historical CI blocker — resolved
 
-Current CI is blocked before pytest by a **pre-existing foreign lint failure**:
+During the original audit, CI was blocked before pytest by a **pre-existing foreign lint failure**:
 
 ```text
 F821 Undefined name `PLACEHOLDER_TESTS`
@@ -93,10 +93,44 @@ F821 Undefined name `PLACEHOLDER_TESTS`
 1 | PLACEHOLDER_TESTS
 ```
 
-The same failure is reproduced on the pre-audit parent head `d43f9077`, so it was not introduced by this integration audit. Per seam-reconciliation rules, this audit does not opportunistically repair that unrelated Barrier-3 surface.
+The same failure reproduced on the pre-audit parent head `d43f9077`, so it was not introduced by this integration audit. Per seam-reconciliation rules, the CTM B–D audit left that Barrier-3 surface to its owning lane. This section is retained as historical provenance; it is no longer an active blocker.
 
-Build, package, dependency-audit, and Pages/deploy checks reached success on the audited head before the Python matrix stopped at the foreign Ruff gate. Pytest cannot provide a fresh repository-wide result until the upstream placeholder is restored by its owning lane.
+## CI closure and revalidation
+
+A clean full matrix was first re-established on `main` after the upstream blocker and stale provenance state were cleared. The final hardening revalidation for this audit is GitHub Actions **CI run #803** (`34508982249`) at commit `5d17bfa80b3d5ae3a3e6ff5fa4fc64333357bf34`.
+
+That run completed successfully across all six jobs:
+
+- Python 3.10 test lane — PASS;
+- Python 3.11 test lane — PASS;
+- Python 3.12 test lane — PASS;
+- package build — PASS;
+- dependency audit — PASS;
+- lightweight provenance gate — PASS.
+
+The Python 3.11 lane reported **1,621 passed, 2 skipped, 16 warnings** for the repository-wide pytest run, followed by **12/12 certification-contract tests passed**. Smoke testing also passed.
+
+### Provenance infrastructure hardening
+
+The closure pass also removed an integration inefficiency without changing scientific semantics:
+
+- `ruthless_pipeline/__init__.py` now lazily resolves the existing public convenience exports, so importing certification/provenance tooling no longer eagerly imports the ML stack;
+- `.github/workflows/regenerate-provenance-artifact.yml` now regenerates and verifies the deterministic provenance graph without installing Torch/CUDA or the project package;
+- CI includes a dedicated zero-install `lightweight-provenance` job that fails if the package root again eagerly imports `torch`, `torchvision`, `numpy`, `scipy`, or `PIL` while loading provenance tooling;
+- regression tests verify the lightweight import boundary and lazy-export compatibility in isolated interpreters.
+
+These changes affect import/runtime coupling only. They do not change CTM claim semantics, evidence classes, experiment thresholds, promotion logic, or physical-work gates.
+
+Relevant hardening commits:
+
+- `4511a37d` — refresh deterministic provenance graph after CTM schema additions;
+- `3aa65921` — lazy-load top-level ML exports while preserving the public API;
+- `069d4f5b` — make provenance regeneration dependency-minimal;
+- `b230cfcd` — enforce the lightweight provenance boundary in CI;
+- `5d17bfa8` — isolate lazy-export regression testing from pytest collection order.
 
 ## Remaining action
 
-The owning Barrier-3/governance lane should restore `tests/test_barrier3_rehearsal.py` from its substantive version or otherwise resolve the placeholder provenance. After that repair, rerun the full Python matrix and CTM tests; no CTM B–D semantic blocker remains from this audit.
+**None for CTM B–D integration closure.**
+
+Deferred research items remain governed by their existing sequencing rules. In particular, Genome v2 candidate work and defense-dual heuristic lifecycle work are not prerequisites for this audit to pass and should remain deferred until their respective upstream evidence/lifecycle gates are reached.
