@@ -39,8 +39,28 @@ from .corpus import (
     build_snapshot,
     verify_snapshot,
 )
+from .external_cohort import (
+    EXTERNAL_OBSERVATION_SCHEMA_VERSION,
+    EVIDENCE_CLASS as EXTERNAL_EVIDENCE_CLASS,
+    ExternalCohortError,
+    ExternalObservation,
+    build_analysis_pool,
+    claim_ceiling as external_claim_ceiling,
+    fabrication_delta,
+    promote_to_controlled_efficacy,
+)
 from .firewall import FirewallResult, check_provenance_firewall, require_provenance_firewall
 from .nulls import MatchedNullDesign, MatchedNullType
+from .retro_mining import (
+    DECISION_STATES,
+    RETRO_DECISION_SCHEMA_VERSION,
+    FamilyResult,
+    RetroMiningError,
+    RetroPreregistration,
+    require_reject_legal,
+    seal_decision,
+    verify_decision,
+)
 from .pipeline_stage import (
     CLAIM_SCOPE_SCHEMA_VERSION,
     PIPELINE_STAGES,
@@ -105,4 +125,10 @@ __all__ = [
     "lint_text", "require_bounded",
     "Positioning", "POSITIONING_SCHEMA_VERSION", "PositioningError",
     "serialize_positioning", "require_narrative_conformant",
+    "ExternalObservation", "EXTERNAL_OBSERVATION_SCHEMA_VERSION",
+    "EXTERNAL_EVIDENCE_CLASS", "ExternalCohortError", "build_analysis_pool",
+    "external_claim_ceiling", "fabrication_delta", "promote_to_controlled_efficacy",
+    "RetroPreregistration", "FamilyResult", "DECISION_STATES",
+    "RETRO_DECISION_SCHEMA_VERSION", "RetroMiningError",
+    "require_reject_legal", "seal_decision", "verify_decision",
 ]
