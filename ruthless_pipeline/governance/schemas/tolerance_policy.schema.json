@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "rac-tolerance-policy/1.0",
+  "type": "object",
+  "required": [
+    "constraint_family",
+    "created_at",
+    "max_population_displacement",
+    "max_cohort_change_fraction",
+    "registered_before_outcomes",
+    "version"
+  ],
+  "properties": {
+    "constraint_family": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "pattern": "Z$"},
+    "max_population_displacement": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "max_cohort_change_fraction": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+    "registered_before_outcomes": {"const": true},
+    "version": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
