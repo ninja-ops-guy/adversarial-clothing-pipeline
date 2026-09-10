@@ -12,6 +12,13 @@ test.afterEach(async ({ page }) => {
   expect(page.__errors || []).toEqual([]);
 });
 
+test('deployed smoke surface exposes session, camera placeholder, and export controls', async ({ page }) => {
+  await expect(page.getByRole('button', { name: 'Freeze Session Manifest' })).toBeVisible();
+  await expect(page.locator('#camera')).toBeVisible();
+  await expect(page.locator('#capturePrompt')).toContainText('CAMERA OFF');
+  await expect(page.getByRole('button', { name: 'Export Session Bundle' })).toBeVisible();
+});
+
 test('capture lab exposes SOP sequence and evidence classes', async ({ page }) => {
   await expect(page.locator('.sop-step')).toHaveCount(7);
   await expect(page.locator('#evidenceClass')).toHaveValue('printed_flat_prototype');
@@ -52,7 +59,6 @@ test('synthetic dry-run evidence class remains explicit', async ({ page }) => {
   expect(state.frozen.evidence_class).toBe('synthetic_pipeline_validation_only');
 });
 
-
 test('frozen ensemble includes deterministic motion sampling contract', async ({ page }) => {
   const manifest = JSON.parse(await page.locator('#modelManifest').inputValue());
   expect(manifest.motion_sampling).toEqual({
@@ -68,7 +74,6 @@ test('frozen ensemble includes deterministic motion sampling contract', async ({
   expect(heldout.motion_sampling.sequence_detection_threshold).toBe(0.5);
   expect(heldout.identity_mode).toBe('disabled');
 });
-
 
 test('session setup exposes Research OS lineage fields', async ({ page }) => {
   await expect(page.locator('#experimentId')).toHaveValue('RAC-EXP-2026-001');
