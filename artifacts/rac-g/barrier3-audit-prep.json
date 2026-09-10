@@ -1,0 +1,61 @@
+{
+  "audit_id": "RAC-G-BARRIER3-PREP",
+  "checks": {
+    "detector_response_fabrication": {
+      "status": "PREPARED_PASS"
+    },
+    "eot_sample_reproduction": {
+      "manifest_sha256": "04814882ede7b1b03e5de3b824413ac4533c278de00761690297a658fcd32482",
+      "recorded": "04814882ede7b1b03e5de3b824413ac4533c278de00761690297a658fcd32482",
+      "sample0_reproduced_sha256": "04af408ce43fd0e80b60b819a82cdecdc5171fee07d7e9c696990b347e7621f2",
+      "status": "PREPARED_PASS"
+    },
+    "finite_difference": {
+      "detail": "Barrier 3 synthetic path uses the finite-pool baseline optimizer; no gradient surface",
+      "status": "PREPARED_DEFERRED"
+    },
+    "hash_checkpoint_tamper": {
+      "clean_violations": [],
+      "status": "PREPARED_PASS",
+      "tamper_violations_detected": 2
+    },
+    "mean_cvar_reference": {
+      "aggregation": "CVAR",
+      "mismatches": [],
+      "status": "PREPARED_PASS"
+    },
+    "pareto_dominance_oracle": {
+      "front_candidates": [
+        "b3-cand-000",
+        "b3-cand-003",
+        "b3-cand-005",
+        "b3-cand-007"
+      ],
+      "front_size": 4,
+      "status": "PREPARED_PASS"
+    },
+    "provenance_attack_fixtures": {
+      "broken_edge_detected": true,
+      "silent_skip_detected": true,
+      "status": "PREPARED_PASS"
+    },
+    "release_replay_verifier": {
+      "mismatched_artifacts": [],
+      "status": "PREPARED_PASS",
+      "verdict": "PASS"
+    },
+    "seed_replay_verifier": {
+      "detail": "second run directory not supplied",
+      "status": "PREPARED_DEFERRED"
+    },
+    "synthetic_to_measured_promotion": {
+      "refused": [
+        true,
+        true
+      ],
+      "status": "PREPARED_PASS"
+    }
+  },
+  "final_verdict": "NOT_ISSUED",
+  "final_verdict_note": "final RAC-G audit begins only after BARRIER_3_COMPLETION_HANDOFF is committed, pushed, refetched, and byte-confirmed"
+}
