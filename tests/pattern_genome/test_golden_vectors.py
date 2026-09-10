@@ -39,6 +39,7 @@ class TestCheckerboard:
     def test_low_color_entropy(self): assert self.g.color.color_entropy<1.1
     def test_palette_size_two(self): assert self.g.color.palette_size==2
     def test_structured_components(self): assert self.g.topology.connected_component_count==2
+    def test_nonzero_feature_width(self): assert self.g.geometry.min_feature_width_px>0
 
 class TestGradient:
     def setup_method(self): self.g=_extract(_gradient())
