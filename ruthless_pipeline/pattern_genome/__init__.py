@@ -10,6 +10,7 @@ from .errors import (
     PatternGenomeSchemaError, PatternGenomeValidationError,
 )
 from .extractor import extract_genome
+from .integration import freeze_candidate_genome, freeze_pool_genomes, resolve_source_commit
 from .schema import (
     SCHEMA_VERSION, EXTRACTOR_VERSION, ColorGenome, GenomeProvenance,
     GenomeQuality, GenomeSource, GeometryGenome, PatternGenome,
@@ -20,7 +21,7 @@ from .validation import validate_genome
 __all__ = [
     "SCHEMA_VERSION", "EXTRACTOR_VERSION",
     "extract_genome", "validate_genome", "canonical_json", "genome_sha256", "sha256_bytes",
-    "load_config", "PatternGenomeConfig", "PatternGenome", "GenomeSource",
+    "load_config", "PatternGenomeConfig", "freeze_candidate_genome", "freeze_pool_genomes", "resolve_source_commit", "PatternGenome", "GenomeSource",
     "SpectralGenome", "TopologyGenome", "ColorGenome", "GeometryGenome",
     "GenomeQuality", "GenomeProvenance", "PatternGenomeError",
     "PatternGenomeInputError", "PatternGenomeValidationError",
