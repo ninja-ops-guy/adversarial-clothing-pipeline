@@ -31,18 +31,19 @@ These items already determine whether RAC advances from software-complete infras
 ### Week 1 — Pass 1: Governance Core
 
 **Target:** 2026-09-10 through 2026-09-16  
+**Status:** **CLOSED / PASS — 2026-09-10**, verified by CI run #821 at `d7eed338`; see `PASS1_CLOSURE_2026-09-10.md`.  
 **Effort posture:** thin foundation, no sampler research yet.
 
-- [ ] typed immutable governance IDs;
-- [ ] append-only hash-chained event ledger;
-- [ ] reversal/supersession event support;
-- [ ] governance state machine;
-- [ ] `HALTED` invariant-conflict state;
-- [ ] JSON schemas for manifests/events/constraint sets/overlap/diagnostics;
-- [ ] semantic manifest validator;
-- [ ] CI tests for Laws 1, 6, and 7.
+- [x] typed immutable governance IDs;
+- [x] append-only hash-chained event ledger;
+- [x] reversal/supersession event support;
+- [x] governance state machine;
+- [x] `HALTED` invariant-conflict state;
+- [x] JSON schemas for manifests/events/constraint sets/overlap/diagnostics;
+- [x] semantic manifest validator;
+- [x] CI tests for Laws 1, 6, and 7.
 
-**Exit:** synthetic experiment seals and completes; synthetic invariant conflict halts.
+**Exit:** **PASS** — synthetic experiment transitions `DRAFT -> PREFLIGHT -> SEALED -> RUNNING -> COMPLETE`; a separate structured invariant conflict transitions `RUNNING -> HALTED`, with every transition append-only and fail-closed.
 
 **Do not do yet:** d-DNNF, UniGen integration, treewidth routing, advanced sampler diagnostics.
 
@@ -131,6 +132,8 @@ At this point, stop and reassess whether current experiments actually need Passe
 ---
 
 ## P2/P3 — Statistical sampling: high scientific value, lower immediate urgency than P0 physical closure
+
+**Implementation note (2026-09-10):** a Pass-6 sampling/diagnostics implementation has landed on `main` ahead of this roadmap sequence. It remains **roadmap-open** until its own adopted-contract audit and exit gate are completed; presence of code is not treated as pass certification.
 
 ### Week 6 — Pass 6A: Sampler Interface + One Reliable Backend
 
@@ -234,7 +237,7 @@ This is enough to materially improve future experimental integrity. CIC routing,
 
 ## Checkpoint A — Governance skeleton
 
-- [ ] Pass 1 complete
+- [x] Pass 1 complete — CI #821 / `d7eed338`; closure record: `PASS1_CLOSURE_2026-09-10.md`
 - [ ] Pass 2 complete
 
 **Decision:** are any imminent experiments changing constraints? If no, keep P0 ahead of Pass 3.
