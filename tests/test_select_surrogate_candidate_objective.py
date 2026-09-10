@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 import torch
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -90,8 +91,10 @@ def _write_inputs(tmp_path: Path) -> tuple[Path, Path]:
     pool_dir = tmp_path / "pool"
     pool_dir.mkdir()
     candidates = []
-    for cand_id in DETECTION_TABLE:
-        (pool_dir / f"{cand_id}.png").write_bytes(f"fake-png-{cand_id}".encode())
+    for index, cand_id in enumerate(DETECTION_TABLE):
+        path = pool_dir / f"{cand_id}.png"
+        value = 64 + index * 128
+        Image.new("RGB", (64, 64), (value, value, value)).save(path, format="PNG")
         candidates.append({"candidate_id": cand_id, "png": f"{cand_id}.png"})
     pool = {
         "schema_version": "3.0",
