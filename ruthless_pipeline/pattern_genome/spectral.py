@@ -33,16 +33,26 @@ def extract_spectral(rgb, config):
         mask = (r_norm >= edges[i]) & (r_norm < edges[i + 1] if i < n_bins - 1 else r_norm <= edges[i + 1])
         bin_energy[i] = power[mask].sum()
     total = bin_energy.sum()
-    if total <= 0.0 or not np.isfinite(total):
-        raise PatternGenomeNonFiniteError("spectral power sum is zero or non-finite")
-    radial = tuple(float(e / total) for e in bin_energy)
-    low_r = float(power[r_norm < 1.0/3.0].sum() / total)
-    mid_r = float(power[(r_norm >= 1.0/3.0) & (r_norm < 2.0/3.0)].sum() / total)
-    high_r = float(power[r_norm >= 2.0/3.0].sum() / total)
-    centroid = float((r_norm * power).sum() / total)
-    p = bin_energy / total
-    p_nz = p[p > 0]
-    entropy = float(-(p_nz * np.log2(p_nz)).sum() / np.log2(n_bins))
+    if not np.isfinite(total):
+        raise PatternGenomeNonFiniteError("spectral power sum is non-finite")
+    if total <= 1e-18:
+        # A spatially uniform image has no AC energy after mean subtraction.
+        # Encode that valid limiting case deterministically instead of refusing.
+        bin_energy[:] = 0.0
+        bin_energy[0] = 1.0
+        total = 1.0
+        radial = tuple(float(v) for v in bin_energy)
+        low_r, mid_r, high_r = 1.0, 0.0, 0.0
+        centroid, entropy = 0.0, 0.0
+    else:
+        radial = tuple(float(e / total) for e in bin_energy)
+        low_r = float(power[r_norm < 1.0/3.0].sum() / total)
+        mid_r = float(power[(r_norm >= 1.0/3.0) & (r_norm < 2.0/3.0)].sum() / total)
+        high_r = float(power[r_norm >= 2.0/3.0].sum() / total)
+        centroid = float((r_norm * power).sum() / total)
+        p = bin_energy / total
+        p_nz = p[p > 0]
+        entropy = float(-(p_nz * np.log2(p_nz)).sum() / np.log2(n_bins))
     gy, gx = np.gradient(lum)
     gxx, gyy, gxy = (gx*gx).sum(), (gy*gy).sum(), (gx*gy).sum()
     theta = 0.5 * np.arctan2(2.0 * gxy, gxx - gyy)
