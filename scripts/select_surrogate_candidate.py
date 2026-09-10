@@ -8,7 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # import-safe C
 import argparse
 import hashlib
 import json
+import math
 import shutil
+import statistics
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -124,6 +126,30 @@ def _objective_ranks(entries: list[tuple[str, dict[str, float]]], keyfn) -> dict
     return {candidate_id: rank for rank, (candidate_id, _) in enumerate(order, start=1)}
 
 
+def _telemetry_mean(rates) -> float:
+    """Cross-version-stable arithmetic mean for serialized telemetry only."""
+    return statistics.fmean(float(value) for value in rates)
+
+
+def _telemetry_cvar(rates, alpha: float) -> float:
+    """CVaR telemetry value using the same worst-k rule with a stable mean."""
+    values = sorted((float(value) for value in rates), reverse=True)
+    if not values:
+        raise ValueError("rates must be non-empty")
+    k = max(1, math.ceil((1.0 - float(alpha)) * len(values)))
+    return statistics.fmean(values[:k])
+
+
+def _telemetry_disagreement(rates: dict[str, float]) -> dict[str, float]:
+    """Preserve the telemetry-contract validation while stabilizing mean math."""
+    result = cross_model_disagreement(rates)
+    values = [float(value) for value in rates.values()]
+    mean = statistics.fmean(values)
+    result["mean"] = mean
+    result["variance"] = statistics.fmean((value - mean) ** 2 for value in values)
+    return result
+
+
 def build_objective_telemetry(
     stage_b: list[dict], *, objective: ObjectiveSpec, alpha: float
 ) -> dict:
@@ -131,6 +157,9 @@ def build_objective_telemetry(
 
     Each stage-B evaluation is one optimization checkpoint. ``alpha`` is the
     worst-k analysis level (the arm's CVaR alpha; 0.5 under the mean arm).
+    Telemetry aggregation uses ``statistics.fmean`` so serialized values are
+    byte-stable across supported CPython versions; candidate ranking semantics
+    remain governed by the preregistered objective implementation above.
     """
     checkpoints: list[dict] = []
     previous_tail: tuple[str, ...] = ()
@@ -141,8 +170,8 @@ def build_objective_telemetry(
         entered = sorted(set(tail) - set(previous_tail))
         left = sorted(set(previous_tail) - set(tail)) if previous_tail else []
         evaluated.append((str(record["candidate_id"]), rates))
-        mean_ranks = _objective_ranks(evaluated, lambda r: mean_objective(list(r.values())))
-        cvar_ranks = _objective_ranks(evaluated, lambda r: cvar(list(r.values()), alpha))
+        mean_ranks = _objective_ranks(evaluated, lambda r: _telemetry_mean(r.values()))
+        cvar_ranks = _objective_ranks(evaluated, lambda r: _telemetry_cvar(r.values(), alpha))
         checkpoints.append(
             {
                 "checkpoint": index,
@@ -151,11 +180,11 @@ def build_objective_telemetry(
                 "cvar_tail": {"alpha": float(alpha), "k": len(tail), "member_ids": list(tail)},
                 "tail_turnover": {"entered": entered, "left": left},
                 "losses": {
-                    "mean": mean_objective(list(rates.values())),
-                    "cvar": cvar(list(rates.values()), alpha),
+                    "mean": _telemetry_mean(rates.values()),
+                    "cvar": _telemetry_cvar(rates.values(), alpha),
                     "worst_model": max(float(v) for v in rates.values()),
                 },
-                "dispersion": cross_model_disagreement(rates),
+                "dispersion": _telemetry_disagreement(rates),
                 "candidate_ranks": {
                     candidate_id: {
                         "mean_rank": mean_ranks[candidate_id],
