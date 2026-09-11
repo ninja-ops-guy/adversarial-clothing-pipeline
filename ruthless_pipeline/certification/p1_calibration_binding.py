@@ -27,6 +27,8 @@ from .calibration_ingest import (
 P1_EVIDENCE_CLASS = "physical_garment_p1"
 MEASURED_EVIDENCE_LABEL = "internally_measured"
 PHASES = ("pre", "post")
+EXPECTED_PATCHES = 48
+EXPECTED_FIDUCIALS = {"FID-TL", "FID-TR", "FID-BL", "FID-BR"}
 
 
 def _tuple2(value: Any, label: str) -> tuple[float, float]:
@@ -75,6 +77,15 @@ def profile_from_payload(payload: dict[str, Any]) -> PrintCameraProfile:
         )
         for item in payload.get("registrations", [])
     ]
+
+    if len(patches) != EXPECTED_PATCHES:
+        raise ValueError(f"P1 calibration requires exactly {EXPECTED_PATCHES} measured patches")
+    if len(scales) < 2:
+        raise ValueError("P1 calibration requires at least two scale measurements")
+    observed_fiducials = {item.mark_id for item in registrations}
+    if observed_fiducials != EXPECTED_FIDUCIALS or len(registrations) != len(EXPECTED_FIDUCIALS):
+        raise ValueError("P1 calibration requires exactly the four frozen fiducials")
+
     profile = PrintCameraProfile(
         profile_id=str(payload.get("profile_id", "")),
         camera_id=str(payload.get("camera_id", "")),
@@ -107,6 +118,11 @@ def evaluate_profile_payload(payload: dict[str, Any], phase: str) -> dict[str, A
         "accepted": accepted,
         "failures": failures,
         "summary": profile.summary(),
+        "measurement_completeness": {
+            "patches": len(profile.patches),
+            "scales": len(profile.scales),
+            "fiducials": sorted(item.mark_id for item in profile.registrations),
+        },
         "acceptance_thresholds": {
             "max_mean_delta_e_2000": 6.0,
             "max_scale_error_pct": 2.0,
@@ -145,6 +161,15 @@ def validate_session_calibration_binding(session: dict[str, Any]) -> dict[str, d
             raise ValueError(f"P1 calibration binding: {phase} receipt is not measured evidence")
         if not receipt.get("profile_id") or not _is_sha256(receipt.get("profile_sha256")):
             raise ValueError(f"P1 calibration binding: {phase} receipt identity/hash is invalid")
+        completeness = receipt.get("measurement_completeness")
+        if not isinstance(completeness, dict):
+            raise ValueError(f"P1 calibration binding: {phase} receipt lacks measurement completeness")
+        if completeness.get("patches") != EXPECTED_PATCHES:
+            raise ValueError(f"P1 calibration binding: {phase} receipt patch count is incomplete")
+        if int(completeness.get("scales", 0)) < 2:
+            raise ValueError(f"P1 calibration binding: {phase} receipt scale measurements are incomplete")
+        if set(completeness.get("fiducials", [])) != EXPECTED_FIDUCIALS:
+            raise ValueError(f"P1 calibration binding: {phase} receipt fiducials are incomplete")
         if receipt.get("camera_id") != session.get("camera_id"):
             raise ValueError(f"P1 calibration binding: {phase} camera_id does not match session")
         if receipt.get("lighting_id") != session.get("lighting_id"):
