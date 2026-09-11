@@ -20,14 +20,15 @@ from ruthless_pipeline.certification.trial_statistics import (
 )
 
 
-#: Only this evidence class may enter the cumulative P1 physical trial store.
 P1_EVIDENCE_CLASS = "physical_garment_p1"
 
 
 def enforce_promotion_gate(session: dict[str, Any]) -> None:
-    """Hard gate: only physical P1 garment sessions with passing calibration
-    may enter the cumulative P1 trial store. Synthetic pipeline validation
-    runs and paper/flat-print prototypes are rejected.
+    """Require the evidence/calibration prerequisites for the cumulative P1 store.
+
+    Schedule binding is a separate invariant and is enforced by the actual
+    validation/ingestion path. Keeping this predicate narrow preserves its
+    use in failure-injection and governance checks.
     """
     evidence_class = session.get("evidence_class")
     if evidence_class != P1_EVIDENCE_CLASS:
@@ -41,7 +42,6 @@ def enforce_promotion_gate(session: dict[str, Any]) -> None:
             "trial store promotion gate: calibration_pass must be true for "
             "a session to enter the P1 trial store"
         )
-    validate_session_schedule_binding(session, verify_capture_order=True)
 
 
 def trial_store_record(
@@ -51,9 +51,6 @@ def trial_store_record(
     detail: dict[str, Any],
     prev_record_sha256: str | None,
 ) -> dict[str, Any]:
-    """One cumulative trial-store line: the trial itself, its human-readable
-    record, lineage needed for release export, and a hash-chain link to the
-    previous stored record (SHA-256 over the previous canonical line)."""
     record = {
         "schema_version": "1.0",
         "trial": asdict(trial),
@@ -80,9 +77,28 @@ def trial_from_store_record(record: dict[str, Any]) -> PhysicalTrial:
     return PhysicalTrial(**raw)
 
 
+def _validate_stored_schedule(record: dict[str, Any]) -> None:
+    trial = record.get("trial") or {}
+    lineage = record.get("lineage") or {}
+    binding = lineage.get("p1_schedule")
+    if not isinstance(binding, dict):
+        raise ValueError("trial store record is missing frozen p1_schedule lineage")
+    validate_session_schedule_binding(
+        {
+            "evidence_class": P1_EVIDENCE_CLASS,
+            "trial_id": trial.get("trial_id"),
+            "distance_m": trial.get("distance_m"),
+            "yaw_deg": trial.get("yaw_deg"),
+            "pitch_deg": trial.get("pitch_deg"),
+            "pose": trial.get("pose"),
+            "lighting_variant": binding.get("lighting_variant"),
+            "p1_schedule": binding,
+        },
+        verify_capture_order=False,
+    )
+
+
 def load_trial_store(path: Path) -> list[dict[str, Any]]:
-    """Load a cumulative trial store (canonical JSONL), enforcing the
-    promotion gate on every stored record and verifying the hash chain."""
     if not path.exists():
         return []
     records: list[dict[str, Any]] = []
@@ -98,18 +114,9 @@ def load_trial_store(path: Path) -> list[dict[str, Any]]:
                 "(prev_record_sha256 does not match the previous record)"
             )
         enforce_promotion_gate(
-            {
-                "evidence_class": record.get("evidence_class"),
-                "calibration_pass": record.get("calibration_pass"),
-                "trial_id": record.get("trial", {}).get("trial_id"),
-                "distance_m": record.get("trial", {}).get("distance_m"),
-                "yaw_deg": record.get("trial", {}).get("yaw_deg"),
-                "pitch_deg": record.get("trial", {}).get("pitch_deg"),
-                "pose": record.get("trial", {}).get("pose"),
-                "lighting_variant": (record.get("lineage", {}).get("p1_schedule") or {}).get("lighting_variant"),
-                "p1_schedule": record.get("lineage", {}).get("p1_schedule"),
-            }
+            {"evidence_class": record.get("evidence_class"), "calibration_pass": record.get("calibration_pass")}
         )
+        _validate_stored_schedule(record)
         trial = trial_from_store_record(record)
         if any(trial_from_store_record(r).trial_id == trial.trial_id for r in records):
             raise ValueError(f"trial store line {line_number}: duplicate trial_id {trial.trial_id!r}")
@@ -119,7 +126,6 @@ def load_trial_store(path: Path) -> list[dict[str, Any]]:
 
 
 def append_trial_store(path: Path, record: dict[str, Any]) -> None:
-    """Append one canonical-JSON record line to the cumulative store."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(canonical(record).decode() + "\n")
@@ -283,13 +289,13 @@ def register_experiment(
         created_utc=datetime.now(timezone.utc).isoformat(),
         stages=stages,
         evidence_label="internally_measured"
-        if session["evidence_class"] == "physical_garment_p1"
+        if session["evidence_class"] == P1_EVIDENCE_CLASS
         else "scenario_assumption",
         validity_flags={
             "capture_evidence_class": session["evidence_class"],
-            "physical_evidence_eligible": session["evidence_class"] == "physical_garment_p1",
+            "physical_evidence_eligible": session["evidence_class"] == P1_EVIDENCE_CLASS,
             "calibration_pass": bool(session.get("calibration_pass")),
-            "p1_schedule_bound": session.get("evidence_class") != "physical_garment_p1"
+            "p1_schedule_bound": session.get("evidence_class") != P1_EVIDENCE_CLASS
             or isinstance(session.get("p1_schedule"), dict),
         },
     )
