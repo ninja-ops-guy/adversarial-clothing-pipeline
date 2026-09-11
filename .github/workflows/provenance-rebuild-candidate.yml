@@ -1,0 +1,29 @@
+name: Provenance Rebuild Candidate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Rebuild deterministic provenance graph
+        run: PYTHONPATH=. python scripts/build_provenance_graph.py
+      - name: Verify rebuilt graph
+        run: PYTHONPATH=. python scripts/build_provenance_graph.py --verify
+      - name: Upload rebuilt graph
+        uses: actions/upload-artifact@v4
+        with:
+          name: provenance-rebuild-candidate
+          path: artifacts/provenance/graph.json
+          if-no-files-found: error
+          retention-days: 1
