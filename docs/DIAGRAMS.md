@@ -2,9 +2,13 @@
 
 **Purpose:** provide a visual map of the Ruthless Adversarial Clothing (RAC) research platform without overstating software capability as physical efficacy.
 
-These diagrams describe the implemented and planned system boundaries. A rendered diagram may describe a pathway that crosses an open experimental gate; consult `PROJECT_PROGRESS.md` for the authoritative live state.
+These diagrams describe system boundaries and evidence flow. A diagram may show a pathway that crosses an open experimental gate; consult [`CURRENT_PROGRAM_STATE.md`](CURRENT_PROGRAM_STATE.md) for the authoritative live program state. Frozen experiment/physical contracts and hash-pinned artifacts outrank explanatory diagrams.
+
+The supplied diagram set has been normalized into maintainable SVG assets under `docs/assets/diagrams/`. The SVGs are explanatory renders; the Mermaid blocks below remain the editable topology source.
 
 ## 1. Executive system topology
+
+![RAC executive pipeline](assets/diagrams/executive-pipeline.svg)
 
 ```mermaid
 flowchart LR
@@ -20,6 +24,8 @@ flowchart LR
 The key idea is that candidate generation is upstream of evidence. No design becomes a product claim merely because it optimized well digitally.
 
 ## 2. Four-plane architecture
+
+![RAC four-plane architecture](assets/diagrams/four-plane-architecture.svg)
 
 ```mermaid
 flowchart TB
@@ -76,6 +82,8 @@ flowchart TB
 
 ## 3. Candidate-generation topology
 
+![RAC candidate-generation topology](assets/diagrams/candidate-generation.svg)
+
 ```mermaid
 flowchart TD
     A[Pattern / textile seed] --> B{Generation path}
@@ -95,6 +103,8 @@ flowchart TD
 Held-out certification models do not belong in the generation loop.
 
 ## 4. Evaluation and trust boundary
+
+![RAC evaluation trust boundary](assets/diagrams/evaluation-trust-boundary.svg)
 
 ```mermaid
 flowchart LR
@@ -128,6 +138,8 @@ The candidate must be frozen before held-out evaluation. Held-out results may in
 
 ## 5. Evidence lifecycle
 
+![RAC evidence lifecycle](assets/diagrams/evidence-lifecycle.svg)
+
 ```mermaid
 stateDiagram-v2
     [*] --> Exploratory
@@ -146,9 +158,11 @@ stateDiagram-v2
     Manufacturing --> ProductEvidence
 ```
 
-Not every generation should reach the final state. Retained failure is a valid terminal research outcome.
+Not every generation should reach the final state. Retained failure is a valid terminal research outcome. This is a **timeless lifecycle diagram**, not a current-generation status board; use `CURRENT_PROGRAM_STATE.md` for current D2/P1 state.
 
 ## 6. Fail-closed certification flow
+
+![RAC fail-closed certification flow](assets/diagrams/fail-closed-certification.svg)
 
 ```mermaid
 flowchart TD
@@ -189,9 +203,11 @@ flowchart LR
     L --> M[Physical evidence bundle]
 ```
 
-Candidate and control identities must remain distinct and traceable through the entire chain.
+Candidate and control identities must remain distinct and traceable through the entire chain. For P1 execution authority, use the frozen P1 schedule/runbook rather than this explanatory flow.
 
 ## 8. Data and provenance topology
+
+![RAC data and provenance topology](assets/diagrams/data-provenance.svg)
 
 ```mermaid
 flowchart TD
@@ -212,20 +228,24 @@ A quantitative claim should be traceable backward from the report to the release
 
 ## 9. Pattern Lab versus measured evidence
 
+![RAC Pattern Lab versus measured evidence](assets/diagrams/pattern-lab-vs-measured.svg)
+
 ```mermaid
 flowchart LR
     PL[Pattern Lab] --> H[Heuristic / visual exploration]
     PL --> E[Candidate config export]
-    H --> UI[UI display only]
+    H --> UIH[UI display: exploratory]
     E --> PY[Python research stack]
     PY --> BM[Measured benchmark]
     BM --> CE[Certified evidence import]
-    CE --> UI
+    CE --> UIM[UI display: measured]
 ```
 
 The UI may display both heuristic and measured information, but the provenance and evidence labels must make them visibly distinct.
 
 ## 10. Research feedback loop
+
+![RAC research feedback loop](assets/diagrams/research-feedback-loop.svg)
 
 ```mermaid
 flowchart LR
@@ -265,14 +285,29 @@ flowchart TB
 
 Large generated artifacts, model weights, raw datasets, credentials and sensitive environment material should remain outside normal source control and be referenced through approved manifests or retained evidence stores.
 
+## Rendered asset inventory
+
+| Asset | Purpose |
+| --- | --- |
+| `assets/diagrams/executive-pipeline.svg` | executive design-to-manufacturing flow |
+| `assets/diagrams/four-plane-architecture.svg` | exploration / research / evidence / physical planes |
+| `assets/diagrams/candidate-generation.svg` | candidate-generation topology |
+| `assets/diagrams/evaluation-trust-boundary.svg` | surrogate vs held-out trust boundary |
+| `assets/diagrams/evidence-lifecycle.svg` | generic evidence lifecycle; not live generation status |
+| `assets/diagrams/fail-closed-certification.svg` | certification refusal / promotion flow |
+| `assets/diagrams/data-provenance.svg` | backward provenance topology |
+| `assets/diagrams/pattern-lab-vs-measured.svg` | heuristic vs measured UI separation |
+| `assets/diagrams/research-feedback-loop.svg` | preregistered research feedback loop |
+
 ## Reading order
 
 For a new technical reviewer:
 
 1. `README.md` — project thesis and executive architecture.
-2. `DIAGRAMS.md` — visual system map.
-3. `ARCHITECTURE.md` — implementation boundaries and component responsibilities.
-4. `CERTIFICATION_SYSTEM.md` — evidence ladder and refusal behavior.
-5. `END_TO_END_RESEARCH_SOP.md` — operational experiment procedure.
-6. `PROJECT_PROGRESS.md` — authoritative current state.
-7. `papers/` — research questions and pre-results manuscripts.
+2. `CURRENT_PROGRAM_STATE.md` — authoritative current program-level state.
+3. `DIAGRAMS.md` — visual system map.
+4. `ARCHITECTURE.md` — implementation boundaries and component responsibilities.
+5. `CERTIFICATION_SYSTEM.md` — evidence ladder and refusal behavior.
+6. `END_TO_END_RESEARCH_SOP.md` — operational experiment procedure.
+7. `PROJECT_PROGRESS_CURRENT.md` — detailed current workstreams and verification state.
+8. `papers/` — research questions and pre-results manuscripts.
