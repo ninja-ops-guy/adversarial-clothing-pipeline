@@ -20,7 +20,7 @@ flowchart LR
 RAC is deliberately fail-closed: negative results are retained, held-out boundaries are enforced, frozen scientific surfaces are not silently rewritten, and software completion is never treated as physical-efficacy evidence.
 
 **Repository state reviewed:** 2026-09-11  
-**Scientific/production baseline reviewed:** `8114e2189a255bed3d4c07708d7380c7ade2aefc` (subsequent commits in this pass are documentation-only)  
+**Scientific/production baseline:** frozen scientific surfaces remain unchanged by the Research Workbench integration  
 **Python package version:** `3.1.0`
 
 ## Current state
@@ -29,6 +29,7 @@ RAC is deliberately fail-closed: negative results are retained, held-out boundar
 | --- | --- |
 | Engineering Barriers 0–3 | **Closed for declared scope** |
 | Core research / evidence infrastructure | **Advanced / integrated** |
+| Research Workbench | **Implemented** — browser control plane + loopback-only local runtime |
 | Pattern Genome v1 | **Frozen** |
 | D2-0003 | **Retained negative / RAC-D0**; Alpha-001 lineage remains bound here |
 | D2-0004 | **Closed negative / RAC-D0** |
@@ -78,6 +79,8 @@ flowchart TB
     P -. measured evidence .-> C
 ```
 
+The browser platform is the operator control plane. Heavy Python/PyTorch/FFmpeg work runs through the loopback-only **RAC Research Workbench** so raw physical captures can stay local while the operator remains inside the platform UI.
+
 For the implementation topology, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For visual system and evidence-flow diagrams, see [`docs/DIAGRAMS.md`](docs/DIAGRAMS.md).
 
 ## Scientific lineage status
@@ -100,9 +103,32 @@ D2-0007 was a prospective motif-screening lineage intended to earn more expensiv
 
 It did **not** pass. All 64 preregistered screening compositions were evaluated on `PERSON-SUR-v3`; no motif met the survivor rule. The generation therefore closed as `SCREENED_OUT_H0`. Per the preregistration, no body/garment anchor adapter was built, optimization did not open, no held-out data was accessed, no candidate was frozen, and no Alpha-002/P1B lineage was created. See [`evidence/d2-0007/stage1-screening-closure.json`](evidence/d2-0007/stage1-screening-closure.json).
 
+## Research Workbench
+
+The Research Console is now an execution surface when opened through the local runtime:
+
+```bash
+rac-platform --open
+```
+
+Windows users can also double-click `run-rac-platform.bat`.
+
+The Workbench serves the same web platform at `http://127.0.0.1:8765/` and exposes only named RAC jobs. It does **not** expose a general shell. Current platform-native operations include:
+
+- P1 no-spend readiness;
+- deterministic calibration-target generation;
+- sealed Capture Lab validation;
+- frozen detector inference, including motion analysis;
+- P1 ingestion, statistics, and cumulative trial-store updates;
+- repository integrity checks;
+- full software tests;
+- Research OS dashboard refresh.
+
+Raw capture files are stored under `.rac-runtime/workspace/`, which is excluded from git. See [`docs/RESEARCH_WORKBENCH.md`](docs/RESEARCH_WORKBENCH.md).
+
 ## Production Alpha / physical P1
 
-The current production target is `RAC-PRINT-ALPHA-001` using the exact recovered D2-0003 artwork source. The canonical real-production entry point is:
+The current production target is `RAC-PRINT-ALPHA-001` using the exact recovered D2-0003 artwork source. The canonical real-production entry point remains the strict release wrapper; the Research Workbench does not weaken production or spend gates.
 
 ```bash
 python tools/p1_production_release.py intake --fetch --size M --output-dir production_alpha/vendor_intake
@@ -114,13 +140,7 @@ python tools/p1_production_release.py build \
 
 The release wrapper validates live Printful product identity, required placements, raw vendor-response integrity, deterministic vendor archives, and the frozen Alpha-001 kit/pattern hashes. It does **not** place an order or authorize spend.
 
-After review, the generated UA values pass through the existing binder and readiness gates:
-
-```bash
-python tools/p1_bind_ua_values.py --values production_alpha/vendor_intake/ua-values.generated.json --check-only
-python tools/p1_bind_ua_values.py --values production_alpha/vendor_intake/ua-values.generated.json
-python tools/p1_no_spend_readiness_gate.py
-```
+After review, the generated UA values pass through the existing binder and readiness gates. The readiness gate is also available from the Research Console when the local runtime is connected.
 
 The exact operator flow is documented in [`docs/P1_PRODUCTION_RELEASE_GATE.md`](docs/P1_PRODUCTION_RELEASE_GATE.md), [`docs/P1_PRODUCTION_LAUNCH.md`](docs/P1_PRODUCTION_LAUNCH.md), and [`docs/USER_ACTION_NEXT_STEPS.md`](docs/USER_ACTION_NEXT_STEPS.md).
 
@@ -133,6 +153,10 @@ Do **not** execute the older 108-row planning sheet. The current P1 authority is
 - [`physical/p1/P1_OPERATOR_RUNBOOK.md`](physical/p1/P1_OPERATOR_RUNBOOK.md);
 - [`physical/p1/P1_READINESS_FREEZE.json`](physical/p1/P1_READINESS_FREEZE.json);
 - [`tools/p1_no_spend_readiness_gate.py`](tools/p1_no_spend_readiness_gate.py).
+
+With the Workbench connected, the physical execution path is:
+
+`Capture Lab → Seal → Local staging → Research Console → Validate → Frozen analysis → P1 ingestion/statistics`.
 
 Physical efficacy remains unestablished until admissible matched physical captures are actually collected, ingested, sealed, and analyzed under those frozen rules.
 
@@ -151,6 +175,8 @@ Start with these files:
 
 - [`docs/CURRENT_PROGRAM_STATE.md`](docs/CURRENT_PROGRAM_STATE.md) — canonical current program status.
 - [`docs/PROJECT_PROGRESS_CURRENT.md`](docs/PROJECT_PROGRESS_CURRENT.md) — detailed current workstream ledger.
+- [`docs/RESEARCH_WORKBENCH.md`](docs/RESEARCH_WORKBENCH.md) — platform-native execution/control plane.
+- [`docs/CAPTURE_LAB.md`](docs/CAPTURE_LAB.md) — physical capture and Workbench handoff.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — current four-plane architecture and scientific boundaries.
 - [`docs/DIAGRAMS.md`](docs/DIAGRAMS.md) — topology and evidence-flow diagrams.
 - [`docs/CERTIFICATION_SYSTEM.md`](docs/CERTIFICATION_SYSTEM.md) — evidence ladder and fail-closed certification model.
@@ -164,6 +190,12 @@ Historical preregistrations, closure notes, audit reports, and older planning do
 
 ```bash
 python -m pip install -e .
+rac-platform --open
+```
+
+For headless/software verification:
+
+```bash
 pytest
 python -m examples.smoke_test
 ```
@@ -183,7 +215,7 @@ Quantitative statements should remain explicitly classified as one of: **Publish
 
 ## Responsible-use boundary
 
-Evaluator and black-box interfaces are intended for systems you own or have explicit authorization to evaluate. Generated outputs, model weights, datasets, environment files, credentials, and vendor tokens should remain outside source control unless a governed artifact explicitly requires a non-secret hash or receipt.
+Evaluator and black-box interfaces are intended for systems you own or have explicit authorization to evaluate. Generated outputs, model weights, datasets, environment files, credentials, vendor tokens, and raw physical captures should remain outside source control unless a governed artifact explicitly requires a non-secret hash or receipt.
 
 See [`RESPONSIBLE_USE.md`](RESPONSIBLE_USE.md), [`SECURITY.md`](SECURITY.md), and [`PRODUCTION_READINESS.md`](PRODUCTION_READINESS.md).
 
