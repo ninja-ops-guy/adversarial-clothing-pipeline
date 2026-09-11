@@ -1,0 +1,74 @@
+{
+  "$comment": "RAC-P1-UA-VALUES intake template. Copy this file, replace every PENDING_USER_ACTION leaf with a REAL value obtained from UA-1..UA-8 (docs/USER_ACTION_REQUIRED_PRINT_ALPHA.md), then run: python3 tools/p1_bind_ua_values.py --values <your-copy>.json --check-only, then without --check-only to bind. The binder is fail-closed: any missing, pending, placeholder, malformed, or unknown field refuses the entire binding and writes nothing. Never paste API tokens here. All values become hash-pinned evidence; physical_efficacy_claimed remains false.",
+  "schema_version": "1.0",
+  "values_id": "PENDING_USER_ACTION",
+  "recorded_by": "PENDING_USER_ACTION",
+  "recorded_utc": "PENDING_USER_ACTION",
+  "template": {
+    "hoodie_archive_sha256": "PENDING_USER_ACTION",
+    "tee_archive_sha256": "PENDING_USER_ACTION",
+    "hoodie_panel_geometry": {
+      "back": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "front": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "hood": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "label_inside": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "label_panel": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "pocket": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "sleeve_left": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "sleeve_right": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"}
+    },
+    "tee_panel_geometry": {
+      "back": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "front": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "sleeve_left": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"},
+      "sleeve_right": {"width_mm": "PENDING_USER_ACTION", "height_mm": "PENDING_USER_ACTION", "dpi": "PENDING_USER_ACTION"}
+    }
+  },
+  "artwork_sha256": {
+    "candidate": {
+      "back": "PENDING_USER_ACTION",
+      "front": "PENDING_USER_ACTION",
+      "hood": "PENDING_USER_ACTION",
+      "label_inside": "PENDING_USER_ACTION",
+      "label_panel": "PENDING_USER_ACTION",
+      "pocket": "PENDING_USER_ACTION",
+      "sleeve_left": "PENDING_USER_ACTION",
+      "sleeve_right": "PENDING_USER_ACTION"
+    },
+    "control": {
+      "back": "PENDING_USER_ACTION",
+      "front": "PENDING_USER_ACTION",
+      "hood": "PENDING_USER_ACTION",
+      "label_inside": "PENDING_USER_ACTION",
+      "label_panel": "PENDING_USER_ACTION",
+      "pocket": "PENDING_USER_ACTION",
+      "sleeve_left": "PENDING_USER_ACTION",
+      "sleeve_right": "PENDING_USER_ACTION"
+    }
+  },
+  "article_artwork_sha256": {
+    "PA-HOODIE-CAND-001": "PENDING_USER_ACTION",
+    "PA-HOODIE-CTRL-001": "PENDING_USER_ACTION",
+    "PA-HOODIE-CAND-R01": "PENDING_USER_ACTION",
+    "PA-HOODIE-CTRL-R01": "PENDING_USER_ACTION",
+    "PA-TEE-CAND-R01": "PENDING_USER_ACTION",
+    "PA-TEE-CTRL-R01": "PENDING_USER_ACTION"
+  },
+  "mapping_files": {
+    "back": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "front": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "hood": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "label_inside": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "label_panel": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "pocket": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "sleeve_left": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"},
+    "sleeve_right": {"candidate_file": "PENDING_USER_ACTION", "control_file": "PENDING_USER_ACTION"}
+  },
+  "garments": {
+    "size": "PENDING_USER_ACTION",
+    "hoodie_variant_id": "PENDING_USER_ACTION",
+    "tee_variant_id": "PENDING_USER_ACTION",
+    "printer_vendor": "PENDING_USER_ACTION",
+    "print_technology": "PENDING_USER_ACTION"
+  }
+}
