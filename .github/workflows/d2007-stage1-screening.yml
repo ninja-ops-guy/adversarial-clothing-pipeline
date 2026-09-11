@@ -46,7 +46,7 @@ jobs:
           assert arm['optimization_allowed'] is False
           assert arm['candidate_freeze_allowed'] is False
           assert arm['alpha_002_promotion_allowed'] is False
-          assert arm['stage0_telemetry_sha256'] == '93bebada88426b10e3891b55a6ff1aa8e461c2295d26b58216cfb92c934324bc'
+          assert arm['stage0_gate']['stage0_telemetry_sha256'] == '93bebada88426b10e3891b55a6ff1aa8e461c2295d26b58216cfb92c934324bc'
           # The preregistered skeleton itself stays frozen/unmodified; arming is additive.
           assert gen['lock_status'] == 'PREREGISTERED'
           assert gen['armed'] is False
