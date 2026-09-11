@@ -31,12 +31,12 @@ jobs:
           PYTHONPATH=. python scripts/build_provenance_graph.py --verify
       - name: Commit reconciliation and rebuilt graph
         run: |
-          git add artifacts/provenance/graph.json
-          if git diff --cached --quiet && git diff --quiet origin/governance-pass4-6-closure..HEAD; then
-            echo "No reconciliation or provenance update required"
-            exit 0
-          fi
+          git add -f artifacts/provenance/graph.json
           if ! git diff --cached --quiet; then
             git commit -m "drift: regenerate provenance graph after governance reconciliation"
+          fi
+          if git diff --quiet origin/governance-pass4-6-closure..HEAD; then
+            echo "No reconciliation push required"
+            exit 0
           fi
           git push origin HEAD:governance-pass4-6-closure
