@@ -98,7 +98,7 @@
         "deformation_group": true,
         "statement": "The symmetrized-twin delta is defined on the canonicalized pattern and is stable under the deformation group and coarsening applied identically to both twins."
       },
-      "measured_effect": "Enforcing bilateral symmetry raised physical ASR from 65.4% to 80.7% — the strongest published evidence that a topological constraint causally affects attack success.",
+      "measured_effect": "Enforcing bilateral symmetry raised physical ASR from 65.4% to 80.7% \u2014 the strongest published evidence that a topological constraint causally affects attack success.",
       "source_paper": "GaP (bilateral-symmetry enforcement)",
       "spec7_dependence": "Deferred until SPEC-7 outcome: strongest published causal evidence among the candidates, but v2 entry still waits for the sealed decision on parent property families.",
       "spec7_family_ref": null,
@@ -108,7 +108,7 @@
       "candidate_id": "RAC-CTM-GV2-98319166790ebb05",
       "computability_cost": "medium: requires template embeddings per condition",
       "family": "template_margin_geometry",
-      "feature_definition": "Similarity-margin shift features for FR-adjacent targets: the continuous cosine-similarity margin movement, not just binary threshold crossing — the honest effect size that binary ASR hides.",
+      "feature_definition": "Similarity-margin shift features for FR-adjacent targets: the continuous cosine-similarity margin movement, not just binary threshold crossing \u2014 the honest effect size that binary ASR hides.",
       "invariance_claim": {
         "coarsening_operator": false,
         "deformation_group": true,
