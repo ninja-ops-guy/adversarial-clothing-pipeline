@@ -39,12 +39,6 @@ from .corpus import (
     build_snapshot,
     verify_snapshot,
 )
-from .evaluation_surface import (
-    GOODHART_EXPOSURE_SCHEMA_VERSION,
-    EvaluationSurface,
-    derive_evaluation_surface,
-    derive_manifest_evaluation_surface,
-)
 from .external_cohort import (
     EXTERNAL_OBSERVATION_SCHEMA_VERSION,
     EVIDENCE_CLASS as EXTERNAL_EVIDENCE_CLASS,
@@ -55,7 +49,38 @@ from .external_cohort import (
     fabrication_delta,
     promote_to_controlled_efficacy,
 )
+from .defense_axis import (
+    DEFENSE_AXIS_SCHEMA_VERSION,
+    DEFENSE_CLASSES,
+    DUAL_STATUSES,
+    NO_DEFENSE,
+    DefenseAxisError,
+    DefenseDual,
+    DefenseObservation,
+    DefenseRecord,
+    collapse_to_base,
+    compute_defended_delta,
+    heterogeneity_by_defense_class,
+    independent_replication_count,
+    paired_brittleness_deltas,
+    require_dual_evaluated_before_archival,
+    require_not_independent_architecture,
+    tensor_cell_id,
+)
 from .firewall import FirewallResult, check_provenance_firewall, require_provenance_firewall
+from .genome_v2_register import (
+    CANDIDATE_FAMILIES,
+    ENTRY_STATUSES,
+    GENOME_V2_REGISTER_SCHEMA_VERSION,
+    GenomeV2Candidate,
+    GenomeV2RegisterError,
+    apply_spec7_gate,
+    build_default_candidates,
+    promote_candidate,
+    require_promotion_legal,
+    seal_register,
+    verify_register,
+)
 from .nulls import MatchedNullDesign, MatchedNullType
 from .retro_mining import (
     DECISION_STATES,
@@ -115,8 +140,6 @@ __all__ = [
     "TypedScalar", "SCALAR_CLASSES", "ANALYSIS_ROLES",
     "OptimizerConstraints", "OPTIMIZER_CONSTRAINTS_SCHEMA_VERSION",
     "experimental_unit_id", "same_experimental_unit",
-    "EvaluationSurface", "GOODHART_EXPOSURE_SCHEMA_VERSION",
-    "derive_evaluation_surface", "derive_manifest_evaluation_surface",
     "ChannelRecord", "CHANNEL_SCHEMA_VERSION", "ChannelSemanticsError",
     "claim_ceiling", "require_digital_claim_eligible",
     "require_strong_physical_eligible", "require_physical_replicated_eligible",
@@ -139,4 +162,15 @@ __all__ = [
     "RetroPreregistration", "FamilyResult", "DECISION_STATES",
     "RETRO_DECISION_SCHEMA_VERSION", "RetroMiningError",
     "require_reject_legal", "seal_decision", "verify_decision",
+    "DefenseRecord", "DefenseObservation", "DefenseDual", "DefenseAxisError",
+    "DEFENSE_AXIS_SCHEMA_VERSION", "DEFENSE_CLASSES", "DUAL_STATUSES",
+    "NO_DEFENSE", "tensor_cell_id", "collapse_to_base",
+    "independent_replication_count", "require_not_independent_architecture",
+    "compute_defended_delta", "paired_brittleness_deltas",
+    "heterogeneity_by_defense_class", "require_dual_evaluated_before_archival",
+    "GenomeV2Candidate", "GenomeV2RegisterError",
+    "GENOME_V2_REGISTER_SCHEMA_VERSION", "CANDIDATE_FAMILIES",
+    "ENTRY_STATUSES", "build_default_candidates", "seal_register",
+    "verify_register", "apply_spec7_gate", "require_promotion_legal",
+    "promote_candidate",
 ]
