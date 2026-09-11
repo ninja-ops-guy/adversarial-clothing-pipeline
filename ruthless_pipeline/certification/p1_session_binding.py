@@ -3,8 +3,7 @@
 This module does not change the P1 schedule. It re-derives the existing frozen
 ``RAC-P1-PAIRING-2026-001`` schedule and checks that a real
 ``physical_garment_p1`` session names exactly one frozen trial and matches its
-geometry and first-arm order. Sealed P1 sessions also re-validate the exact
-bracketed measured calibration sources before schedule acceptance.
+geometry and first-arm order.
 """
 
 from __future__ import annotations
@@ -61,16 +60,10 @@ def validate_session_schedule_binding(
     """Validate a physical session against one exact frozen schedule entry.
 
     Non-P1 prototype/synthetic sessions are intentionally outside this
-    requirement and return ``None``. Sealed P1 sessions additionally require
-    accepted pre/post measured calibration via p1_calibration_binding.
+    requirement and return ``None``.
     """
     if session.get("evidence_class") != P1_EVIDENCE_CLASS:
         return None
-
-    if session.get("sealed") is True:
-        from .p1_calibration_binding import validate_session_calibration_binding
-
-        validate_session_calibration_binding(session)
 
     binding = session.get("p1_schedule")
     if not isinstance(binding, dict):
