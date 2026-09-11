@@ -25,16 +25,18 @@ function sha256(bytes){return crypto.subtle.digest('SHA-256',bytes).then(buf=>[.
 function dataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error||new Error('Unable to read candidate image'));reader.readAsDataURL(file);});}
 function imageCanvas(url){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.naturalWidth||img.width;c.height=img.naturalHeight||img.height;c.getContext('2d').drawImage(img,0,0);resolve(c);};img.onerror=()=>reject(new Error('Candidate image could not be decoded'));img.src=url;});}
 
+function renderImportedOrPlaceholder(ctx,size){
+  ctx.save();ctx.fillStyle='#777';ctx.fillRect(0,0,size,size);
+  if(importedCanvas){ctx.imageSmoothingEnabled=true;ctx.drawImage(importedCanvas,0,0,size,size);}
+  else{ctx.fillStyle='#111';ctx.fillRect(size*.08,size*.42,size*.84,size*.16);ctx.fillStyle='#eee';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 ${Math.max(12,Math.floor(size*.035))}px ui-monospace,monospace`;ctx.fillText('IMPORT GOVERNED CANDIDATE TILE',size/2,size/2);}
+  ctx.restore();
+}
 function installRenderBridge(){
+  if(typeof patternGenerators!=='undefined')for(const id of P0_IDS)if(!patternGenerators[id])patternGenerators[id]=(ctx,size)=>renderImportedOrPlaceholder(ctx,size);
   if(!window.RACPatternComposition||window.RACPatternComposition.__researchCatalogWrapped)return;
   const original=window.RACPatternComposition.renderFamilyFromSpec;
   window.RACPatternComposition.renderFamilyFromSpec=function(ctx,size,spec){
-    if(isResearchFamily(spec?.family)){
-      ctx.save();ctx.fillStyle='#777';ctx.fillRect(0,0,size,size);
-      if(importedCanvas){ctx.imageSmoothingEnabled=true;ctx.drawImage(importedCanvas,0,0,size,size);}
-      else{ctx.fillStyle='#111';ctx.fillRect(size*.08,size*.42,size*.84,size*.16);ctx.fillStyle='#eee';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 ${Math.max(12,Math.floor(size*.035))}px ui-monospace,monospace`;ctx.fillText('IMPORT GOVERNED CANDIDATE TILE',size/2,size/2);}
-      ctx.restore();return;
-    }
+    if(isResearchFamily(spec?.family)){renderImportedOrPlaceholder(ctx,size);return;}
     return original(ctx,size,spec);
   };
   window.RACPatternComposition.__researchCatalogWrapped=true;
