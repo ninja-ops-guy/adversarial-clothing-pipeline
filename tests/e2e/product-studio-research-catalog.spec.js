@@ -12,7 +12,7 @@ const P0 = [
 ];
 const CANONICAL = ['signal_shadow', 'machine_static', 'ghost_hound', 'broken_human', 'error_garden'];
 const TINY_PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2ZNsAAAAASUVORK5CYII=',
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGMUUHBgYGBgYmBgYGBgAAAFOgB0XtSh0QAAAABJRU5ErkJggg==',
   'base64'
 );
 
