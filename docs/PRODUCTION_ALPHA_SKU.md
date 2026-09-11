@@ -1,6 +1,6 @@
 # Production Alpha SKU Manifest / Decision
 
-**Version:** 1.1.0  
+**Version:** 1.1.1  
 **Updated:** 2026-09-11  
 **Status:** CURRENT PRODUCTION DECISION — live vendor values remain runtime-bound until intake/binding completes.  
 **Scope:** identifies the first matched physical Production Alpha test article. It makes no efficacy claim.
@@ -120,7 +120,15 @@ The final bound production record must identify at minimum:
 
 The repository's actual manifests/binder schemas remain authoritative; this example communicates the identity that must be preserved, not a competing schema.
 
-## 7. Matched-pair ordering rule
+## 7. Open Items (external)
+
+1. Choose the actual garment size for the first Printful product-388 matched pair.
+2. Use a local Printful API token to retrieve and preserve the current product, variant, printfile, placement, and template responses through `tools/p1_production_release.py intake`.
+3. Review and bind the live Printful variant ID, placement geometry, print-technique details, and generated artwork/archive hashes through the governed binder/readiness path.
+4. Make a separate human budget/spend decision and place the matched candidate/control order.
+5. Record fulfillment/manufacturing region, vendor substitutions, and received-specimen QA facts when they become available.
+
+## 8. Matched-pair ordering rule
 
 Candidate and control must match on every practical production variable:
 
@@ -144,7 +152,7 @@ Minimum first order:
 
 Prefer the two arms in the same order to reduce avoidable manufacturing variation.
 
-## 8. Pre-order authority
+## 9. Pre-order authority
 
 Before purchase:
 
@@ -158,7 +166,7 @@ Before purchase:
 
 A software PASS never authorizes purchase by itself.
 
-## 9. Receipt QA and physical handoff
+## 10. Receipt QA and physical handoff
 
 When the matched garments arrive:
 
@@ -179,17 +187,6 @@ physical/p1/P1_READINESS_FREEZE.json
 ```
 
 The older 108-row planning sheet is not execution authority.
-
-## 10. Open external items
-
-The remaining unresolved production facts are intentionally runtime/physical rather than guessed in this document:
-
-- actual chosen size;
-- live Printful variant ID and current placement geometry;
-- current vendor print-technique details as returned by the governed intake;
-- fulfillment/manufacturing region when known;
-- order/payment details;
-- received-specimen QA measurements.
 
 ## 11. Evidence boundary and precedence
 
