@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/program_state_v1.schema.json",
+  "title": "RAC Canonical Program State v1 (SW-01; additive, generated)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","schema_id","generator","evidence_class","experiments","releases","sources","boundaries","program_state_sha256"],
+  "properties": {
+    "schema_version": {"const":"rac-program-state/1.0"},
+    "schema_id": {"const":"https://rac.local/schemas/program_state_v1.schema.json"},
+    "generator": {"type":"string","minLength":1},
+    "evidence_class": {"const":"synthetic_pipeline_validation_only"},
+    "program_state_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "experiments": {
+      "type":"array",
+      "items": {
+        "type":"object",
+        "additionalProperties": false,
+        "required": ["generation_id","record_path","record_sha256","lock_status","lifecycle_state","heldout_feedback_allowed","lock_inference_performed"],
+        "properties": {
+          "generation_id": {"type":"string","minLength":1},
+          "record_path": {"type":"string","minLength":1},
+          "record_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+          "lock_status": {"type":["string","null"]},
+          "armed": {"type":["boolean","null"]},
+          "lifecycle_state": {"enum":["DRAFT","PREREGISTERED","ARMED","RUNNING","EVIDENCE_SEALED","CLOSED","PUBLISHED"]},
+          "heldout_feedback_allowed": {"type":"boolean"},
+          "lock_inference_performed": {"type":"boolean"},
+          "sealed_decision": {"type":"string","minLength":1}
+        }
+      }
+    },
+    "d2_0004_result": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["candidate_id","decision","bundle_verified","heldout","status_sha256"],
+      "properties": {
+        "candidate_id": {"type":["string","null"]},
+        "decision": {"type":["string","null"]},
+        "evidence_state": {"type":["string","null"]},
+        "bundle_verified": {"type":"boolean"},
+        "heldout": {
+          "type":"object",
+          "additionalProperties": false,
+          "required": ["baseline_detection_rate","candidate_detection_rate","mean_delta","n","valid_n"],
+          "properties": {
+            "baseline_detection_rate": {"type":["number","null"]},
+            "candidate_detection_rate": {"type":["number","null"]},
+            "mean_delta": {"type":["number","null"]},
+            "n": {"type":["integer","null"]},
+            "valid_n": {"type":["integer","null"]}
+          }
+        },
+        "status_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+      }
+    },
+    "d2_0005_arming": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["generation_id","armed","freeze_candidate_sha256"],
+      "properties": {
+        "generation_id": {"const":"RAC-PER-D2-0005"},
+        "armed": {"type":"boolean"},
+        "freeze_candidate_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+      }
+    },
+    "releases": {
+      "type":"array",
+      "items": {
+        "type":"object",
+        "additionalProperties": false,
+        "required": ["release_id","path","verified","tampered","missing","extra","manifest_sha256"],
+        "properties": {
+          "release_id": {"type":"string","minLength":1},
+          "path": {"type":"string","minLength":1},
+          "verified": {"type":"boolean"},
+          "tampered": {"type":"array","items":{"type":"string"}},
+          "missing": {"type":"array","items":{"type":"string"}},
+          "extra": {"type":"array","items":{"type":"string"}},
+          "content_hash": {"type":["string","null"]},
+          "manifest_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "barrier3": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["run_id","closed","report_sha256","boundaries"],
+      "properties": {
+        "run_id": {"type":["string","null"]},
+        "closed": {"type":"boolean"},
+        "deterministic_replay": {"type":["string","null"]},
+        "provenance": {"type":["string","null"]},
+        "audit_verdict": {"type":["string","null"]},
+        "report_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "audit_sha256": {"type":["string","null"],"pattern":"^[0-9a-f]{64}$"},
+        "boundaries": {
+          "type":"object",
+          "additionalProperties": false,
+          "required": ["d2_0004_modified","d2_0005_armed","held_out_models_accessed","physical_efficacy_claimed"],
+          "properties": {
+            "d2_0004_modified": {"const":false},
+            "d2_0005_armed": {"const":false},
+            "held_out_models_accessed": {"const":false},
+            "physical_efficacy_claimed": {"const":false}
+          }
+        }
+      }
+    },
+    "p1_readiness": {
+      "type":"object",
+      "additionalProperties": false,
+      "properties": {
+        "release_id": {"type":["string","null"]},
+        "verdict": {"type":["string","null"]},
+        "software_ready": {"type":"boolean"},
+        "physical_efficacy_claimed": {"const":false},
+        "readiness_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "readiness_freeze_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+      }
+    },
+    "ctm": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["literature_entry_count","literature_entry_sha256","genome_v2_register_sha256"],
+      "properties": {
+        "literature_entry_count": {"type":"integer","minimum":0},
+        "literature_entry_sha256": {
+          "type":"object",
+          "additionalProperties": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+        },
+        "genome_v2_register_sha256": {"type":["string","null"],"pattern":"^[0-9a-f]{64}$"}
+      }
+    },
+    "frozen_surface": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["manifest_sha256","files_checked","verified","drifted","missing"],
+      "properties": {
+        "manifest_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+        "runtime_lock_sha256": {"type":["string","null"],"pattern":"^[0-9a-f]{64}$"},
+        "files_checked": {"type":"integer","minimum":0},
+        "verified": {"type":"boolean"},
+        "drifted": {"type":"array","items":{"type":"string"}},
+        "missing": {"type":"array","items":{"type":"string"}}
+      }
+    },
+    "sources": {
+      "type":"object",
+      "additionalProperties": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+    },
+    "boundaries": {
+      "type":"object",
+      "additionalProperties": false,
+      "required": ["held_out_models_accessed","physical_efficacy_claimed","experiments_armed","frozen_surfaces_modified"],
+      "properties": {
+        "held_out_models_accessed": {"const":false},
+        "physical_efficacy_claimed": {"const":false},
+        "experiments_armed": {"const":false},
+        "frozen_surfaces_modified": {"const":false}
+      }
+    }
+  }
+}
