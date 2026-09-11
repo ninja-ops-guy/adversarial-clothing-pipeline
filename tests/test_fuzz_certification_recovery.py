@@ -209,7 +209,7 @@ def test_trial_store_fuzzed_corruptions_rejected(seed: int, tmp_path: Path):
         else:  # garbage_line
             text = "\n".join(lines) + "\n" + "not-json{" + "\n"
         store.write_text(text)
-        with pytest.raises(ValueError, match=""):
+        with pytest.raises(ValueError):
             load_trial_store(store)
 
 
