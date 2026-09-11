@@ -56,6 +56,9 @@ From the GitHub Actions API (public, queried 2026-09-11T05:0xZ) and repo receipt
 
 ## 4. GOVERNANCE DISPOSITION — **REQUIRES_USER_RATIFICATION**
 
+<!-- doclint:allow check="broken-path" reason="backticked references in this section carry :line,col source-location suffixes (e.g. docs/D2-0005_ARMING_PACKET.md:7,271-283, docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md:12,348); the target files exist in the repo — only the citation suffixes make the literal tokens unresolvable" -->
+<!-- doclint:allow check="stale-d2-0005-armed" reason="this section describes the D2-0007 Stage-1 arming overlay (evidence/d2-0007/stage1-arming.json) and cites D2-0005 arming-governance precedent; it does not describe D2-0005 itself as armed" -->
+
 Facts: `evidence/d2-0007/stage1-arming.json` (`armed:true`, additive, parent untouched) armed Stage 1 and the workflow ran real surrogate inference, with **no recorded user sign-off**. Precedent: `docs/D2-0005_ARMING_PACKET.md:7,271-283` and `docs/PREREGISTRATION_D2-0005_AMENDMENT_A5.md:12,348` establish that arming "requires explicit user sign-off regardless of all other gates" — the READY_TO_ARM packet is a *request*, the user decision is the gate. The foreign lane broke that discipline.
 
 Balancing factors: (a) the user's D2-0007 plan explicitly endorses cheap surrogate screening as hypothesis screening and allows surrogate/development results to influence selection (held-out may not); (b) the armed scope is exactly the frozen 64-composition PERSON-SUR-v3 screen — inside the endorsed plan; (c) the arming was executed as an additive overlay preserving the frozen parent (armed:false), with pre-execution CI verification and declared Stage-0 telemetry exposure; (d) everything executed is **reversible/repeatable** (surrogate inference on public fixtures; no held-out access — the irreversible boundary — occurred; no anchor/optimization/freeze/promotion state advanced).
