@@ -37,6 +37,8 @@ CHECK_BROKEN_PATH = "broken-path"
 CHECK_SCHEMA_DRIFT = "schema-version-drift"
 CHECK_STALE_CI_RUN = "stale-ci-run"
 CHECK_QUANT_CLAIM = "untraceable-quantitative-claim"
+CHECK_PROGRAM_STATE_STALE = "program-state-stale"
+CHECK_UNARMED_ARMED_CLAIM = "unarmed-generation-armed-claim"
 
 ALL_CHECKS = (
     CHECK_STALE_D2_0004,
@@ -45,6 +47,8 @@ ALL_CHECKS = (
     CHECK_SCHEMA_DRIFT,
     CHECK_STALE_CI_RUN,
     CHECK_QUANT_CLAIM,
+    CHECK_PROGRAM_STATE_STALE,
+    CHECK_UNARMED_ARMED_CLAIM,
 )
 
 ALLOWLIST_FILENAME = ".doclint-allow.json"
@@ -455,11 +459,142 @@ def _check_quant_claim(rel: str, lineno: int, line: str, truth: dict) -> Finding
     )
 
 
+GENERATION_RECORD_ID_RE = re.compile(r"\bRAC-PER-D2-\d{4}\b")
+
+
+def _derived_experiments(root: Path) -> dict[str, dict] | None:
+    """Lifecycle/armed truth per generation record, derived (read-only).
+
+    Returns None when derivation is impossible (e.g. no generations
+    directory); contradictions are surfaced by the program-state surface
+    check, not here.
+    """
+    try:
+        from ruthless_pipeline.program_state.compile import derive_state
+
+        state = derive_state(root)
+    except Exception:
+        return None
+    return {e["generation_id"]: e for e in state.get("experiments", [])}
+
+
+def _check_unarmed_armed_claim(
+    rel: str, lineno: int, line: str, experiments: dict[str, dict] | None
+) -> Finding | None:
+    """Flag docs describing a NOT-armed generation as armed.
+
+    Generalizes the D2-0005 check to every generation record via the
+    canonical program state. D2-0005 itself is skipped here because the
+    dedicated ``stale-d2-0005-armed`` check already covers it.
+    """
+    if not experiments:
+        return None
+    if not D2_0005_ARMED_RE.search(line):
+        return None
+    for gen_id in GENERATION_RECORD_ID_RE.findall(line):
+        if gen_id == "RAC-PER-D2-0005":
+            continue
+        exp = experiments.get(gen_id)
+        if exp is None or exp.get("armed") is True:
+            continue
+        if D2_0005_NEGATION_RE.search(line):
+            continue
+        return Finding(
+            check=CHECK_UNARMED_ARMED_CLAIM,
+            path=rel,
+            line=lineno,
+            message=(
+                f"{gen_id} described as armed, but the canonical program "
+                f"state derives lifecycle_state={exp.get('lifecycle_state')} "
+                f"armed={exp.get('armed')} from its generation record"
+            ),
+            excerpt=line.strip(),
+        )
+    return None
+
+
+def _check_program_state_surface(root: Path) -> list[Finding]:
+    """Re-derive the canonical program state and compare byte-for-byte.
+
+    Fail closed: a derivation contradiction or a committed artifact whose
+    bytes differ from a fresh derivation is a finding. A missing
+    ``program_state/`` tree is only a finding when the directory exists but
+    the artifacts are absent (the hard gate for bootstrap is the compiler's
+    own ``--check`` mode).
+    """
+    try:
+        from ruthless_pipeline.program_state.compile import (
+            STATE_PATH,
+            SUMMARY_PATH,
+            canonical_state_bytes,
+            derive_state,
+            render_summary_markdown,
+        )
+    except ImportError:
+        return []
+    # Repos (or synthetic fixtures) that never adopted SW-01 program state
+    # are out of scope for this surface entirely.
+    if not (root / "program_state").is_dir():
+        return []
+    try:
+        state = derive_state(root)
+    except Exception as exc:
+        return [
+            Finding(
+                check=CHECK_PROGRAM_STATE_STALE,
+                path=STATE_PATH,
+                line=1,
+                message=f"program-state derivation failed (fail closed): {exc}",
+            )
+        ]
+    findings: list[Finding] = []
+    committed = root / STATE_PATH
+    if committed.is_file() and committed.read_bytes() != canonical_state_bytes(state):
+        findings.append(
+            Finding(
+                check=CHECK_PROGRAM_STATE_STALE,
+                path=STATE_PATH,
+                line=1,
+                message=(
+                    "committed program state is stale; regenerate with "
+                    "`python -m ruthless_pipeline.program_state.compile`"
+                ),
+            )
+        )
+    summary = root / SUMMARY_PATH
+    if summary.is_file() and summary.read_bytes() != render_summary_markdown(
+        state
+    ).encode("utf-8"):
+        findings.append(
+            Finding(
+                check=CHECK_PROGRAM_STATE_STALE,
+                path=SUMMARY_PATH,
+                line=1,
+                message=(
+                    "generated summary is stale relative to canonical "
+                    "sources; regenerate with `python -m "
+                    "ruthless_pipeline.program_state.compile`"
+                ),
+            )
+        )
+    if not committed.is_file():
+        findings.append(
+            Finding(
+                check=CHECK_PROGRAM_STATE_STALE,
+                path=STATE_PATH,
+                line=1,
+                message="program_state/ exists but program_state.json is missing",
+            )
+        )
+    return findings
+
+
 def lint_repo(root: Path | str) -> LintResult:
     root = Path(root)
     truth = _truth(root)
     allow_entries = _load_allowlist(root)
     result = LintResult()
+    experiments = _derived_experiments(root)
 
     for doc in _doc_files(root):
         rel = doc.relative_to(root).as_posix()
@@ -475,6 +610,7 @@ def lint_repo(root: Path | str) -> LintResult:
                 _check_schema_drift(rel, lineno, line, truth),
                 _check_stale_ci_run(rel, lineno, line),
                 _check_quant_claim(rel, lineno, line, truth),
+                _check_unarmed_armed_claim(rel, lineno, line, experiments),
             ):
                 if finding is not None:
                     file_findings.append(finding)
@@ -487,6 +623,12 @@ def lint_repo(root: Path | str) -> LintResult:
                 result.allowed.append(finding)
             else:
                 result.findings.append(finding)
+
+    for finding in _check_program_state_surface(root):
+        if any(entry.covers(finding) for entry in allow_entries):
+            result.allowed.append(finding)
+        else:
+            result.findings.append(finding)
     return result
 
 
