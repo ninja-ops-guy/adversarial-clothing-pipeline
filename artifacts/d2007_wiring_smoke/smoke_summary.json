@@ -1,0 +1,603 @@
+{
+  "boundaries": {
+    "claim_state": "EXPLORATORY",
+    "d2_0004_rerun": false,
+    "d2_0005_armed": false,
+    "d2_0005_touched": false,
+    "efficacy_claimed": false,
+    "heldout_accessed": false,
+    "heldout_reference": "PERSON-HO-v3 hash-reference only (benchmarks/frozen_surface_sha256.json)",
+    "physical_efficacy_claimed": false,
+    "synthetic_evidence_class": "synthetic_pipeline_validation_only",
+    "thresholds_changed": false
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "candidate_id": "RAC-PAT-CAND-95317b06c74e3057",
+        "claim_state": "EXPLORATORY",
+        "evidence_class": "digital_candidate",
+        "generation_id": "RAC-PER-D2-0007",
+        "generator": "saliency_eye_attack",
+        "generator_version": "1.0.0",
+        "landmark_free": true,
+        "params": {
+          "color_space": "RGB",
+          "mask_geometry": {},
+          "output_size": [
+            256,
+            256
+          ],
+          "params": {},
+          "seed": 70000001
+        },
+        "pattern_sha256": "95317b06c74e305741117964146257e8094fa62b63c0faadd7c74fd1e00c4975",
+        "physical_efficacy_claimed": false,
+        "provenance_hash": "91fc20005251e4b90eb7332119eb8f5cb6ac1e49cdb45fd9d55becff9d424075",
+        "seed": 70000001,
+        "stage": "stage0_landmark_free_wiring_smoke"
+      },
+      "evaluation": {
+        "detector_response": {
+          "best_box": {
+            "score": 0.9849888790226012,
+            "xyxy": [
+              99.92914643305147,
+              22.880268815846676,
+              126.12322057729769,
+              60.79455653305609
+            ]
+          },
+          "box_count": 1,
+          "class_score": null,
+          "condition_id": "stage0_landmark_free_wiring_smoke",
+          "confidence": 0.9849888790226012,
+          "evaluator_adapter": {
+            "adapter_id": "rac-synthetic-detection-adapter",
+            "adapter_version": "1.0.0"
+          },
+          "invalid_condition": false,
+          "localization_metrics": null,
+          "model_family": "synthetic_development_fixture",
+          "model_id": "SMOKE-DEV-FIXTURE-v0",
+          "objectness": null,
+          "person_detected": true,
+          "raw_provenance_ref": "RAC-PAT-CAND-95317b06c74e3057",
+          "schema_version": "1.0",
+          "segmentation_metrics": null
+        },
+        "detector_response_sha256": "d3b55fec323a8effa0b0e5652740e33c3ded4c4feb750c3dbbffa18c3fab2242",
+        "efficacy_measured": false,
+        "model_family": "synthetic_development_fixture",
+        "model_id": "SMOKE-DEV-FIXTURE-v0",
+        "surface": "development_synthetic_fixture",
+        "surface_role": "hypothesis_screening_infrastructure_not_evidence"
+      },
+      "exposure_event": {
+        "cohort_id": "RAC-COHORT-D2007-SMOKE",
+        "decision_id": "RAC-PER-D2-0007-stage0-wiring-smoke-gate",
+        "decision_influenced": false,
+        "event_id": "RAC-GOV-EVT-D2007-SMOKE-0001",
+        "output_class": "surrogate_evaluation",
+        "output_hash": "d3b55fec323a8effa0b0e5652740e33c3ded4c4feb750c3dbbffa18c3fab2242",
+        "schema_version": "rac-evaluation-exposure/1.0"
+      },
+      "observation_medium": {
+        "additive_only": true,
+        "annotation_id": "oma-184f17245fa388e0",
+        "annotation_sha256": "1ac57a277e389cc8f3bc3af67e28ad3ca1ec9c64fcac88d8193c29f80283cdfb",
+        "annotation_type": "observation_medium",
+        "basis": "Pattern image rendered in memory by the pattern library; no physical substrate, display, or garment was observed.",
+        "ext_schema_version": "1.0",
+        "modifies_subject": false,
+        "observation_medium": "image_composite",
+        "physical_efficacy_claimed": false,
+        "subject_ref": "RAC-PAT-CAND-95317b06c74e3057",
+        "subject_sha256": "95317b06c74e305741117964146257e8094fa62b63c0faadd7c74fd1e00c4975"
+      },
+      "transfer_record": {
+        "artwork_sha256": "95317b06c74e305741117964146257e8094fa62b63c0faadd7c74fd1e00c4975",
+        "camera": "none-synthetic",
+        "capture_id": "d2007-smoke-saliency_eye_attack-70000001",
+        "captured_frame_sha256": "95317b06c74e305741117964146257e8094fa62b63c0faadd7c74fd1e00c4975",
+        "detector_response_refs": [
+          "d3b55fec323a8effa0b0e5652740e33c3ded4c4feb750c3dbbffa18c3fab2242"
+        ],
+        "evidence_class": "synthetic_pipeline_validation_only",
+        "fabric": "none-synthetic",
+        "garment_sku": "SMOKE-NO-GARMENT",
+        "lighting": "none-synthetic",
+        "mapping_sha256": "47e98b7e30472f8afcfe5a228860907cf85ac70d240c134f081a1bc8a9efda94",
+        "physical_efficacy_claimed": false,
+        "pose": "none",
+        "print_process": "none-synthetic",
+        "record_id": "ptr-d2007-smoke-saliency_eye_attack-70000001",
+        "schema_version": "1.0",
+        "template_sha256": "7f13c8dd27890f6b3bdaed88bce03fdd5507c4d066f78c115783c2b347044d05",
+        "view": "none"
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "RAC-PAT-CAND-b0988b32fa157111",
+        "claim_state": "EXPLORATORY",
+        "evidence_class": "digital_candidate",
+        "generation_id": "RAC-PER-D2-0007",
+        "generator": "saliency_eye_attack",
+        "generator_version": "1.0.0",
+        "landmark_free": true,
+        "params": {
+          "color_space": "RGB",
+          "mask_geometry": {},
+          "output_size": [
+            256,
+            256
+          ],
+          "params": {},
+          "seed": 70000002
+        },
+        "pattern_sha256": "b0988b32fa157111d7f90017ab2caba03733d93aba83431ca8b23e0fde6ccb3a",
+        "physical_efficacy_claimed": false,
+        "provenance_hash": "7f9d6c0e7d56201c756fed4d437bbace0f86ff0a62cd726ad310fd9d38daa174",
+        "seed": 70000002,
+        "stage": "stage0_landmark_free_wiring_smoke"
+      },
+      "evaluation": {
+        "detector_response": {
+          "best_box": {
+            "score": 0.696613971852976,
+            "xyxy": [
+              52.79588590523511,
+              19.84550087585677,
+              123.41116171338498,
+              55.860983129017924
+            ]
+          },
+          "box_count": 2,
+          "class_score": null,
+          "condition_id": "stage0_landmark_free_wiring_smoke",
+          "confidence": 0.696613971852976,
+          "evaluator_adapter": {
+            "adapter_id": "rac-synthetic-detection-adapter",
+            "adapter_version": "1.0.0"
+          },
+          "invalid_condition": false,
+          "localization_metrics": null,
+          "model_family": "synthetic_development_fixture",
+          "model_id": "SMOKE-DEV-FIXTURE-v0",
+          "objectness": null,
+          "person_detected": true,
+          "raw_provenance_ref": "RAC-PAT-CAND-b0988b32fa157111",
+          "schema_version": "1.0",
+          "segmentation_metrics": null
+        },
+        "detector_response_sha256": "afcfd7278c09a8099fe84c224d1c100d668f1e6378b3949f2ba75280e216554b",
+        "efficacy_measured": false,
+        "model_family": "synthetic_development_fixture",
+        "model_id": "SMOKE-DEV-FIXTURE-v0",
+        "surface": "development_synthetic_fixture",
+        "surface_role": "hypothesis_screening_infrastructure_not_evidence"
+      },
+      "exposure_event": {
+        "cohort_id": "RAC-COHORT-D2007-SMOKE",
+        "decision_id": "RAC-PER-D2-0007-stage0-wiring-smoke-gate",
+        "decision_influenced": false,
+        "event_id": "RAC-GOV-EVT-D2007-SMOKE-0002",
+        "output_class": "surrogate_evaluation",
+        "output_hash": "afcfd7278c09a8099fe84c224d1c100d668f1e6378b3949f2ba75280e216554b",
+        "schema_version": "rac-evaluation-exposure/1.0"
+      },
+      "observation_medium": {
+        "additive_only": true,
+        "annotation_id": "oma-a2945355d6e7cb17",
+        "annotation_sha256": "d54ccfd9d07e96ed4cd5b1701a5316da22dc9dd2b51b6f0da98d838cea94bb76",
+        "annotation_type": "observation_medium",
+        "basis": "Pattern image rendered in memory by the pattern library; no physical substrate, display, or garment was observed.",
+        "ext_schema_version": "1.0",
+        "modifies_subject": false,
+        "observation_medium": "image_composite",
+        "physical_efficacy_claimed": false,
+        "subject_ref": "RAC-PAT-CAND-b0988b32fa157111",
+        "subject_sha256": "b0988b32fa157111d7f90017ab2caba03733d93aba83431ca8b23e0fde6ccb3a"
+      },
+      "transfer_record": {
+        "artwork_sha256": "b0988b32fa157111d7f90017ab2caba03733d93aba83431ca8b23e0fde6ccb3a",
+        "camera": "none-synthetic",
+        "capture_id": "d2007-smoke-saliency_eye_attack-70000002",
+        "captured_frame_sha256": "b0988b32fa157111d7f90017ab2caba03733d93aba83431ca8b23e0fde6ccb3a",
+        "detector_response_refs": [
+          "afcfd7278c09a8099fe84c224d1c100d668f1e6378b3949f2ba75280e216554b"
+        ],
+        "evidence_class": "synthetic_pipeline_validation_only",
+        "fabric": "none-synthetic",
+        "garment_sku": "SMOKE-NO-GARMENT",
+        "lighting": "none-synthetic",
+        "mapping_sha256": "47e98b7e30472f8afcfe5a228860907cf85ac70d240c134f081a1bc8a9efda94",
+        "physical_efficacy_claimed": false,
+        "pose": "none",
+        "print_process": "none-synthetic",
+        "record_id": "ptr-d2007-smoke-saliency_eye_attack-70000002",
+        "schema_version": "1.0",
+        "template_sha256": "7f13c8dd27890f6b3bdaed88bce03fdd5507c4d066f78c115783c2b347044d05",
+        "view": "none"
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "RAC-PAT-CAND-2e1319168238f844",
+        "claim_state": "EXPLORATORY",
+        "evidence_class": "digital_candidate",
+        "generation_id": "RAC-PER-D2-0007",
+        "generator": "feature_collage",
+        "generator_version": "1.0.0",
+        "landmark_free": true,
+        "params": {
+          "color_space": "RGB",
+          "mask_geometry": {},
+          "output_size": [
+            256,
+            256
+          ],
+          "params": {},
+          "seed": 70000001
+        },
+        "pattern_sha256": "2e1319168238f84411a15af79e9d7c59cdd931a1bd84b46f19b8d1b0984469af",
+        "physical_efficacy_claimed": false,
+        "provenance_hash": "4577c5337a31f11b27ee6385b70614818a8e016ccc8220adb085aa7ddfee0fef",
+        "seed": 70000001,
+        "stage": "stage0_landmark_free_wiring_smoke"
+      },
+      "evaluation": {
+        "detector_response": {
+          "best_box": {
+            "score": 0.6178899000667618,
+            "xyxy": [
+              78.60940267641338,
+              56.643030816806984,
+              185.01596118712575,
+              147.25647812825366
+            ]
+          },
+          "box_count": 2,
+          "class_score": null,
+          "condition_id": "stage0_landmark_free_wiring_smoke",
+          "confidence": 0.6178899000667618,
+          "evaluator_adapter": {
+            "adapter_id": "rac-synthetic-detection-adapter",
+            "adapter_version": "1.0.0"
+          },
+          "invalid_condition": false,
+          "localization_metrics": null,
+          "model_family": "synthetic_development_fixture",
+          "model_id": "SMOKE-DEV-FIXTURE-v0",
+          "objectness": null,
+          "person_detected": true,
+          "raw_provenance_ref": "RAC-PAT-CAND-2e1319168238f844",
+          "schema_version": "1.0",
+          "segmentation_metrics": null
+        },
+        "detector_response_sha256": "72999c4fea0bbf9ba279b09e4c99841203069845b031d840ae4b65f333e77662",
+        "efficacy_measured": false,
+        "model_family": "synthetic_development_fixture",
+        "model_id": "SMOKE-DEV-FIXTURE-v0",
+        "surface": "development_synthetic_fixture",
+        "surface_role": "hypothesis_screening_infrastructure_not_evidence"
+      },
+      "exposure_event": {
+        "cohort_id": "RAC-COHORT-D2007-SMOKE",
+        "decision_id": "RAC-PER-D2-0007-stage0-wiring-smoke-gate",
+        "decision_influenced": false,
+        "event_id": "RAC-GOV-EVT-D2007-SMOKE-0003",
+        "output_class": "surrogate_evaluation",
+        "output_hash": "72999c4fea0bbf9ba279b09e4c99841203069845b031d840ae4b65f333e77662",
+        "schema_version": "rac-evaluation-exposure/1.0"
+      },
+      "observation_medium": {
+        "additive_only": true,
+        "annotation_id": "oma-27e76694cac0508b",
+        "annotation_sha256": "1985dd00033565352b327c702995fa821d40023d5bc747aca155e3c8bb145f85",
+        "annotation_type": "observation_medium",
+        "basis": "Pattern image rendered in memory by the pattern library; no physical substrate, display, or garment was observed.",
+        "ext_schema_version": "1.0",
+        "modifies_subject": false,
+        "observation_medium": "image_composite",
+        "physical_efficacy_claimed": false,
+        "subject_ref": "RAC-PAT-CAND-2e1319168238f844",
+        "subject_sha256": "2e1319168238f84411a15af79e9d7c59cdd931a1bd84b46f19b8d1b0984469af"
+      },
+      "transfer_record": {
+        "artwork_sha256": "2e1319168238f84411a15af79e9d7c59cdd931a1bd84b46f19b8d1b0984469af",
+        "camera": "none-synthetic",
+        "capture_id": "d2007-smoke-feature_collage-70000001",
+        "captured_frame_sha256": "2e1319168238f84411a15af79e9d7c59cdd931a1bd84b46f19b8d1b0984469af",
+        "detector_response_refs": [
+          "72999c4fea0bbf9ba279b09e4c99841203069845b031d840ae4b65f333e77662"
+        ],
+        "evidence_class": "synthetic_pipeline_validation_only",
+        "fabric": "none-synthetic",
+        "garment_sku": "SMOKE-NO-GARMENT",
+        "lighting": "none-synthetic",
+        "mapping_sha256": "47e98b7e30472f8afcfe5a228860907cf85ac70d240c134f081a1bc8a9efda94",
+        "physical_efficacy_claimed": false,
+        "pose": "none",
+        "print_process": "none-synthetic",
+        "record_id": "ptr-d2007-smoke-feature_collage-70000001",
+        "schema_version": "1.0",
+        "template_sha256": "7f13c8dd27890f6b3bdaed88bce03fdd5507c4d066f78c115783c2b347044d05",
+        "view": "none"
+      }
+    },
+    {
+      "candidate": {
+        "candidate_id": "RAC-PAT-CAND-2f12f1dddf6d0137",
+        "claim_state": "EXPLORATORY",
+        "evidence_class": "digital_candidate",
+        "generation_id": "RAC-PER-D2-0007",
+        "generator": "feature_collage",
+        "generator_version": "1.0.0",
+        "landmark_free": true,
+        "params": {
+          "color_space": "RGB",
+          "mask_geometry": {},
+          "output_size": [
+            256,
+            256
+          ],
+          "params": {},
+          "seed": 70000002
+        },
+        "pattern_sha256": "2f12f1dddf6d0137e0abedece699ab5ecc0a546096004f670a3dbe4b81ec4f86",
+        "physical_efficacy_claimed": false,
+        "provenance_hash": "05d40c351e46d12198f6a0db07917396130ee1ad88cc76ed9fecddb0f4354b45",
+        "seed": 70000002,
+        "stage": "stage0_landmark_free_wiring_smoke"
+      },
+      "evaluation": {
+        "detector_response": {
+          "best_box": null,
+          "box_count": 0,
+          "class_score": null,
+          "condition_id": "stage0_landmark_free_wiring_smoke",
+          "confidence": 0.0,
+          "evaluator_adapter": {
+            "adapter_id": "rac-synthetic-detection-adapter",
+            "adapter_version": "1.0.0"
+          },
+          "invalid_condition": false,
+          "localization_metrics": null,
+          "model_family": "synthetic_development_fixture",
+          "model_id": "SMOKE-DEV-FIXTURE-v0",
+          "objectness": null,
+          "person_detected": false,
+          "raw_provenance_ref": "RAC-PAT-CAND-2f12f1dddf6d0137",
+          "schema_version": "1.0",
+          "segmentation_metrics": null
+        },
+        "detector_response_sha256": "16df001c0dd1ce575acc70be2f520a3dc18b9e2f7f5122a183b4d58776bded17",
+        "efficacy_measured": false,
+        "model_family": "synthetic_development_fixture",
+        "model_id": "SMOKE-DEV-FIXTURE-v0",
+        "surface": "development_synthetic_fixture",
+        "surface_role": "hypothesis_screening_infrastructure_not_evidence"
+      },
+      "exposure_event": {
+        "cohort_id": "RAC-COHORT-D2007-SMOKE",
+        "decision_id": "RAC-PER-D2-0007-stage0-wiring-smoke-gate",
+        "decision_influenced": false,
+        "event_id": "RAC-GOV-EVT-D2007-SMOKE-0004",
+        "output_class": "surrogate_evaluation",
+        "output_hash": "16df001c0dd1ce575acc70be2f520a3dc18b9e2f7f5122a183b4d58776bded17",
+        "schema_version": "rac-evaluation-exposure/1.0"
+      },
+      "observation_medium": {
+        "additive_only": true,
+        "annotation_id": "oma-4994437430d4a4f2",
+        "annotation_sha256": "c3fc398a8464668c0a1611dbe03d8a360c89b48ea96af32c01ed1946945639ed",
+        "annotation_type": "observation_medium",
+        "basis": "Pattern image rendered in memory by the pattern library; no physical substrate, display, or garment was observed.",
+        "ext_schema_version": "1.0",
+        "modifies_subject": false,
+        "observation_medium": "image_composite",
+        "physical_efficacy_claimed": false,
+        "subject_ref": "RAC-PAT-CAND-2f12f1dddf6d0137",
+        "subject_sha256": "2f12f1dddf6d0137e0abedece699ab5ecc0a546096004f670a3dbe4b81ec4f86"
+      },
+      "transfer_record": {
+        "artwork_sha256": "2f12f1dddf6d0137e0abedece699ab5ecc0a546096004f670a3dbe4b81ec4f86",
+        "camera": "none-synthetic",
+        "capture_id": "d2007-smoke-feature_collage-70000002",
+        "captured_frame_sha256": "2f12f1dddf6d0137e0abedece699ab5ecc0a546096004f670a3dbe4b81ec4f86",
+        "detector_response_refs": [
+          "16df001c0dd1ce575acc70be2f520a3dc18b9e2f7f5122a183b4d58776bded17"
+        ],
+        "evidence_class": "synthetic_pipeline_validation_only",
+        "fabric": "none-synthetic",
+        "garment_sku": "SMOKE-NO-GARMENT",
+        "lighting": "none-synthetic",
+        "mapping_sha256": "47e98b7e30472f8afcfe5a228860907cf85ac70d240c134f081a1bc8a9efda94",
+        "physical_efficacy_claimed": false,
+        "pose": "none",
+        "print_process": "none-synthetic",
+        "record_id": "ptr-d2007-smoke-feature_collage-70000002",
+        "schema_version": "1.0",
+        "template_sha256": "7f13c8dd27890f6b3bdaed88bce03fdd5507c4d066f78c115783c2b347044d05",
+        "view": "none"
+      }
+    }
+  ],
+  "exposure_ledger_sha256": "59235b06df03ebe1b3f0519f3c3a00ead70b194850ffc4965ffb91bc04e787ab",
+  "generation_id": "RAC-PER-D2-0007",
+  "generators": [
+    {
+      "name": "saliency_eye_attack",
+      "source": "P0_GENERATORS via GeneratorRegistry",
+      "version": "1.0.0"
+    },
+    {
+      "name": "feature_collage",
+      "source": "P0_GENERATORS via GeneratorRegistry",
+      "version": "1.0.0"
+    }
+  ],
+  "landmark_free": true,
+  "output_size": [
+    256,
+    256
+  ],
+  "provenance": {
+    "edges": [
+      {
+        "edge_type": "evaluated_on",
+        "expected_sha256": "d3b55fec323a8effa0b0e5652740e33c3ded4c4feb750c3dbbffa18c3fab2242",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-95317b06c74e3057 -> inference:RAC-PAT-CAND-95317b06c74e3057.fixture_response [evaluated_on]",
+        "source": "candidate:RAC-PAT-CAND-95317b06c74e3057",
+        "target": "inference:RAC-PAT-CAND-95317b06c74e3057.fixture_response",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "annotated_by",
+        "expected_sha256": "1ac57a277e389cc8f3bc3af67e28ad3ca1ec9c64fcac88d8193c29f80283cdfb",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-95317b06c74e3057 -> document:RAC-PAT-CAND-95317b06c74e3057.medium_annotation [annotated_by]",
+        "source": "candidate:RAC-PAT-CAND-95317b06c74e3057",
+        "target": "document:RAC-PAT-CAND-95317b06c74e3057.medium_annotation",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "evaluated_on",
+        "expected_sha256": "afcfd7278c09a8099fe84c224d1c100d668f1e6378b3949f2ba75280e216554b",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-b0988b32fa157111 -> inference:RAC-PAT-CAND-b0988b32fa157111.fixture_response [evaluated_on]",
+        "source": "candidate:RAC-PAT-CAND-b0988b32fa157111",
+        "target": "inference:RAC-PAT-CAND-b0988b32fa157111.fixture_response",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "annotated_by",
+        "expected_sha256": "d54ccfd9d07e96ed4cd5b1701a5316da22dc9dd2b51b6f0da98d838cea94bb76",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-b0988b32fa157111 -> document:RAC-PAT-CAND-b0988b32fa157111.medium_annotation [annotated_by]",
+        "source": "candidate:RAC-PAT-CAND-b0988b32fa157111",
+        "target": "document:RAC-PAT-CAND-b0988b32fa157111.medium_annotation",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "evaluated_on",
+        "expected_sha256": "72999c4fea0bbf9ba279b09e4c99841203069845b031d840ae4b65f333e77662",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-2e1319168238f844 -> inference:RAC-PAT-CAND-2e1319168238f844.fixture_response [evaluated_on]",
+        "source": "candidate:RAC-PAT-CAND-2e1319168238f844",
+        "target": "inference:RAC-PAT-CAND-2e1319168238f844.fixture_response",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "annotated_by",
+        "expected_sha256": "1985dd00033565352b327c702995fa821d40023d5bc747aca155e3c8bb145f85",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-2e1319168238f844 -> document:RAC-PAT-CAND-2e1319168238f844.medium_annotation [annotated_by]",
+        "source": "candidate:RAC-PAT-CAND-2e1319168238f844",
+        "target": "document:RAC-PAT-CAND-2e1319168238f844.medium_annotation",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "evaluated_on",
+        "expected_sha256": "16df001c0dd1ce575acc70be2f520a3dc18b9e2f7f5122a183b4d58776bded17",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-2f12f1dddf6d0137 -> inference:RAC-PAT-CAND-2f12f1dddf6d0137.fixture_response [evaluated_on]",
+        "source": "candidate:RAC-PAT-CAND-2f12f1dddf6d0137",
+        "target": "inference:RAC-PAT-CAND-2f12f1dddf6d0137.fixture_response",
+        "verify_mode": "content_hash"
+      },
+      {
+        "edge_type": "annotated_by",
+        "expected_sha256": "c3fc398a8464668c0a1611dbe03d8a360c89b48ea96af32c01ed1946945639ed",
+        "hash_pin_expected": true,
+        "id": "candidate:RAC-PAT-CAND-2f12f1dddf6d0137 -> document:RAC-PAT-CAND-2f12f1dddf6d0137.medium_annotation [annotated_by]",
+        "source": "candidate:RAC-PAT-CAND-2f12f1dddf6d0137",
+        "target": "document:RAC-PAT-CAND-2f12f1dddf6d0137.medium_annotation",
+        "verify_mode": "content_hash"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "candidate:RAC-PAT-CAND-95317b06c74e3057",
+        "label": "D2-0007 smoke candidate (saliency_eye_attack, seed 70000001)",
+        "sha256": "95317b06c74e305741117964146257e8094fa62b63c0faadd7c74fd1e00c4975",
+        "type": "candidate"
+      },
+      {
+        "id": "inference:RAC-PAT-CAND-95317b06c74e3057.fixture_response",
+        "label": "synthetic development-fixture response (not evidence)",
+        "sha256": "d3b55fec323a8effa0b0e5652740e33c3ded4c4feb750c3dbbffa18c3fab2242",
+        "type": "inference_record"
+      },
+      {
+        "id": "document:RAC-PAT-CAND-95317b06c74e3057.medium_annotation",
+        "sha256": "1ac57a277e389cc8f3bc3af67e28ad3ca1ec9c64fcac88d8193c29f80283cdfb",
+        "type": "document"
+      },
+      {
+        "id": "candidate:RAC-PAT-CAND-b0988b32fa157111",
+        "label": "D2-0007 smoke candidate (saliency_eye_attack, seed 70000002)",
+        "sha256": "b0988b32fa157111d7f90017ab2caba03733d93aba83431ca8b23e0fde6ccb3a",
+        "type": "candidate"
+      },
+      {
+        "id": "inference:RAC-PAT-CAND-b0988b32fa157111.fixture_response",
+        "label": "synthetic development-fixture response (not evidence)",
+        "sha256": "afcfd7278c09a8099fe84c224d1c100d668f1e6378b3949f2ba75280e216554b",
+        "type": "inference_record"
+      },
+      {
+        "id": "document:RAC-PAT-CAND-b0988b32fa157111.medium_annotation",
+        "sha256": "d54ccfd9d07e96ed4cd5b1701a5316da22dc9dd2b51b6f0da98d838cea94bb76",
+        "type": "document"
+      },
+      {
+        "id": "candidate:RAC-PAT-CAND-2e1319168238f844",
+        "label": "D2-0007 smoke candidate (feature_collage, seed 70000001)",
+        "sha256": "2e1319168238f84411a15af79e9d7c59cdd931a1bd84b46f19b8d1b0984469af",
+        "type": "candidate"
+      },
+      {
+        "id": "inference:RAC-PAT-CAND-2e1319168238f844.fixture_response",
+        "label": "synthetic development-fixture response (not evidence)",
+        "sha256": "72999c4fea0bbf9ba279b09e4c99841203069845b031d840ae4b65f333e77662",
+        "type": "inference_record"
+      },
+      {
+        "id": "document:RAC-PAT-CAND-2e1319168238f844.medium_annotation",
+        "sha256": "1985dd00033565352b327c702995fa821d40023d5bc747aca155e3c8bb145f85",
+        "type": "document"
+      },
+      {
+        "id": "candidate:RAC-PAT-CAND-2f12f1dddf6d0137",
+        "label": "D2-0007 smoke candidate (feature_collage, seed 70000002)",
+        "sha256": "2f12f1dddf6d0137e0abedece699ab5ecc0a546096004f670a3dbe4b81ec4f86",
+        "type": "candidate"
+      },
+      {
+        "id": "inference:RAC-PAT-CAND-2f12f1dddf6d0137.fixture_response",
+        "label": "synthetic development-fixture response (not evidence)",
+        "sha256": "16df001c0dd1ce575acc70be2f520a3dc18b9e2f7f5122a183b4d58776bded17",
+        "type": "inference_record"
+      },
+      {
+        "id": "document:RAC-PAT-CAND-2f12f1dddf6d0137.medium_annotation",
+        "sha256": "c3fc398a8464668c0a1611dbe03d8a360c89b48ea96af32c01ed1946945639ed",
+        "type": "document"
+      }
+    ]
+  },
+  "purpose": "wiring/provenance gate only: prove PATTERNS outputs become governed RAC candidates with complete provenance; no efficacy, no transfer, no held-out anything",
+  "schema_version": "rac-d2007-wiring-smoke/1.0",
+  "seeds": [
+    70000001,
+    70000002
+  ],
+  "smoke_id": "RAC-D2007-WIRING-SMOKE",
+  "stage": "stage0_landmark_free_wiring_smoke",
+  "summary_sha256": "999f5a576af505459d21f980574301788886d4dd6a96fb7fe4ed25f8f684a77e",
+  "verdict": "PASS"
+}
