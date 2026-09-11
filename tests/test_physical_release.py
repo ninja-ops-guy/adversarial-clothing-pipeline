@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -10,6 +11,7 @@ import pytest
 
 from scripts import ingest_capture_inference as ingest
 from scripts.export_physical_release import build_release
+from ruthless_pipeline.certification import p1_pairing_schedule as ps
 from ruthless_pipeline.certification.release_format import (
     ReleaseManifest,
     compute_content_hash,
@@ -18,10 +20,44 @@ from ruthless_pipeline.certification.release_format import (
 
 UTC = "2026-02-01T00:00:00Z"
 STOPPING_RULE = Path(__file__).resolve().parent.parent / "physical" / "p1" / "STOPPING_RULE.json"
+SCHEDULE = ps.derive_schedule()
+SCHEDULE_SHA256 = ps.schedule_sha256(SCHEDULE)
 
 
-def _session(session_id: str, *, evidence_class: str = "physical_garment_p1",
-             calibration_pass: bool = True, distance_m: float = 3.0) -> dict:
+def _schedule_entry(session_id: str) -> dict:
+    digits = re.findall(r"\d+", session_id)
+    ordinal = int(digits[-1]) if digits else 0
+    index = ordinal % len(SCHEDULE)
+    return SCHEDULE[index]
+
+
+def _schedule_binding(entry: dict) -> dict:
+    return {
+        "contract_id": ps.CONTRACT_ID,
+        "schedule_sha256": SCHEDULE_SHA256,
+        "trial_id": entry["trial_id"],
+        "execution_position": entry["execution_position"],
+        "cell_id": entry["cell_id"],
+        "repetition": entry["repetition"],
+        "first_arm": entry["first_arm"],
+        "arms": entry["arms"],
+        "distance_m": entry["distance_m"],
+        "yaw_deg": entry["yaw_deg"],
+        "pitch_deg": entry["pitch_deg"],
+        "lighting_variant": entry["lighting_variant"],
+        "pose": entry["pose"],
+    }
+
+
+def _session(
+    session_id: str,
+    *,
+    evidence_class: str = "physical_garment_p1",
+    calibration_pass: bool = True,
+    distance_m: float = 3.0,
+) -> dict:
+    del distance_m  # physical fixtures use the frozen schedule geometry
+    entry = _schedule_entry(session_id)
     return {
         "session_id": session_id,
         "experiment_id": "RAC-EXP-2026-001",
@@ -29,11 +65,14 @@ def _session(session_id: str, *, evidence_class: str = "physical_garment_p1",
         "evidence_class": evidence_class,
         "calibration_pass": calibration_pass,
         "sealed": True,
+        "trial_id": entry["trial_id"],
+        "p1_schedule": _schedule_binding(entry),
         "camera_id": "RAC-CAM-01",
-        "distance_m": distance_m,
-        "yaw_deg": 0,
-        "pitch_deg": 0,
-        "pose": "standing-front",
+        "distance_m": entry["distance_m"],
+        "yaw_deg": entry["yaw_deg"],
+        "pitch_deg": entry["pitch_deg"],
+        "pose": entry["pose"],
+        "lighting_variant": entry["lighting_variant"],
         "lighting_id": "RAC-LIGHT-01",
         "wash_state": "W0",
         "captures": {"still": [f"{session_id}/control.cr3", f"{session_id}/candidate.cr3"]},
@@ -43,8 +82,13 @@ def _session(session_id: str, *, evidence_class: str = "physical_garment_p1",
     }
 
 
-def _inference(session_id: str, *, control: bool = True, candidate: bool = False,
-               salt: str = "a") -> dict:
+def _inference(
+    session_id: str,
+    *,
+    control: bool = True,
+    candidate: bool = False,
+    salt: str = "a",
+) -> dict:
     return {
         "session_id": session_id,
         "experiment_id": "RAC-EXP-2026-001",
@@ -57,17 +101,25 @@ def _inference(session_id: str, *, control: bool = True, candidate: bool = False
     }
 
 
-def _run_ingest(tmp_path: Path, session: dict, inference: dict,
-                trial_store: Path | None = None) -> dict:
+def _run_ingest(
+    tmp_path: Path,
+    session: dict,
+    inference: dict,
+    trial_store: Path | None = None,
+) -> dict:
     session_path = tmp_path / f"{session['session_id']}-session.json"
     inference_path = tmp_path / f"{session['session_id']}-inference.json"
     session_path.write_text(json.dumps(session))
     inference_path.write_text(json.dumps(inference))
     out_dir = tmp_path / f"out-{session['session_id']}"
     argv = [
-        "ingest", str(session_path), str(inference_path),
-        "--stopping-rule", str(STOPPING_RULE),
-        "--output-dir", str(out_dir),
+        "ingest",
+        str(session_path),
+        str(inference_path),
+        "--stopping-rule",
+        str(STOPPING_RULE),
+        "--output-dir",
+        str(out_dir),
     ]
     if trial_store is not None:
         argv += ["--trial-store", str(trial_store)]
@@ -85,7 +137,6 @@ def _store_records(store: Path) -> list[dict]:
 
 
 def _make_store(tmp_path: Path, n: int, *, candidate: bool = False) -> Path:
-    """Build a cumulative store of n valid physical P1 trials via the CLI."""
     store = tmp_path / "trial-store.jsonl"
     for i in range(n):
         _run_ingest(
@@ -148,14 +199,16 @@ def test_cli_store_rejects_paper_prototype_session(tmp_path: Path) -> None:
 
 def test_trial_store_accumulates_and_recomputes(tmp_path: Path) -> None:
     store = tmp_path / "store.jsonl"
-    first = _run_ingest(tmp_path, _session("S1"), _inference("S1"), trial_store=store)
+    first_session = _session("S1")
+    second_session = _session("S2")
+    first = _run_ingest(tmp_path, first_session, _inference("S1"), trial_store=store)
     assert first["cumulative_trial_count"] == 1
-    second = _run_ingest(tmp_path, _session("S2"), _inference("S2", salt="b"), trial_store=store)
+    second = _run_ingest(tmp_path, second_session, _inference("S2", salt="b"), trial_store=store)
     assert second["cumulative_trial_count"] == 2
     assert second["valid_trial_count"] == 2
     assert second["statistics"]["valid_trials"] == 2
     records = _store_records(store)
-    assert [r["trial"]["trial_id"] for r in records] == ["S1:still", "S2:still"]
+    assert [r["trial"]["trial_id"] for r in records] == [first_session["trial_id"], second_session["trial_id"]]
 
 
 def test_trial_store_counts_invalid_trials_truthfully(tmp_path: Path) -> None:
@@ -203,7 +256,6 @@ def test_backward_compatible_without_trial_store(tmp_path: Path) -> None:
     assert stats["cumulative_trial_count"] == 1
     assert "trial_store" not in stats
     assert "stored_trial_count" not in stats
-    # Non-P1 sessions remain allowed outside the store path.
     stats = _run_ingest(
         tmp_path,
         _session("SYN", evidence_class="synthetic_pipeline_validation_only", calibration_pass=False),
@@ -224,15 +276,25 @@ def _calibration_profile(tmp_path: Path) -> Path:
 def test_export_fails_closed_below_minimum_trials(tmp_path: Path) -> None:
     store = _make_store(tmp_path, 3)
     with pytest.raises(ValueError, match="stopping rule"):
-        build_release(store, _calibration_profile(tmp_path), "RAC-EXP-2026-001",
-                      tmp_path / "releases", UTC, STOPPING_RULE)
+        build_release(
+            store,
+            _calibration_profile(tmp_path),
+            "RAC-EXP-2026-001",
+            tmp_path / "releases",
+            UTC,
+            STOPPING_RULE,
+        )
 
 
 def test_export_seals_release_and_verifies(tmp_path: Path) -> None:
     store = _make_store(tmp_path, 93)
     release_dir, manifest = build_release(
-        store, _calibration_profile(tmp_path), "RAC-EXP-2026-001",
-        tmp_path / "releases", UTC, STOPPING_RULE,
+        store,
+        _calibration_profile(tmp_path),
+        "RAC-EXP-2026-001",
+        tmp_path / "releases",
+        UTC,
+        STOPPING_RULE,
     )
     assert release_dir.name == "RAC-EXP-2026-001"
     expected = {
@@ -275,10 +337,12 @@ def test_export_seals_release_and_verifies(tmp_path: Path) -> None:
 def test_export_is_deterministic_given_created_utc(tmp_path: Path) -> None:
     store = _make_store(tmp_path, 93)
     calibration = _calibration_profile(tmp_path)
-    dir_a, manifest_a = build_release(store, calibration, "RAC-EXP-2026-001",
-                                      tmp_path / "a", UTC, STOPPING_RULE)
-    dir_b, manifest_b = build_release(store, calibration, "RAC-EXP-2026-001",
-                                      tmp_path / "b", UTC, STOPPING_RULE)
+    dir_a, manifest_a = build_release(
+        store, calibration, "RAC-EXP-2026-001", tmp_path / "a", UTC, STOPPING_RULE
+    )
+    dir_b, manifest_b = build_release(
+        store, calibration, "RAC-EXP-2026-001", tmp_path / "b", UTC, STOPPING_RULE
+    )
     assert manifest_a.entries == manifest_b.entries
     assert compute_content_hash(manifest_a) == compute_content_hash(manifest_b)
     assert (dir_a / "MANIFEST.json").read_bytes() == (dir_b / "MANIFEST.json").read_bytes()
@@ -286,8 +350,14 @@ def test_export_is_deterministic_given_created_utc(tmp_path: Path) -> None:
 
 def test_export_tamper_detection_round_trip(tmp_path: Path) -> None:
     store = _make_store(tmp_path, 93)
-    release_dir, _ = build_release(store, _calibration_profile(tmp_path), "RAC-EXP-2026-001",
-                                   tmp_path / "releases", UTC, STOPPING_RULE)
+    release_dir, _ = build_release(
+        store,
+        _calibration_profile(tmp_path),
+        "RAC-EXP-2026-001",
+        tmp_path / "releases",
+        UTC,
+        STOPPING_RULE,
+    )
     (release_dir / "statistics.json").write_text("{}\n")
     result = verify_release(release_dir)
     assert not result.ok
@@ -297,11 +367,23 @@ def test_export_tamper_detection_round_trip(tmp_path: Path) -> None:
 def test_export_rejects_mismatched_release_id(tmp_path: Path) -> None:
     store = _make_store(tmp_path, 2)
     with pytest.raises(ValueError, match="does not match"):
-        build_release(store, _calibration_profile(tmp_path), "RAC-EXP-2026-099",
-                      tmp_path / "releases", UTC, STOPPING_RULE)
+        build_release(
+            store,
+            _calibration_profile(tmp_path),
+            "RAC-EXP-2026-099",
+            tmp_path / "releases",
+            UTC,
+            STOPPING_RULE,
+        )
 
 
 def test_export_rejects_empty_store(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="empty"):
-        build_release(tmp_path / "missing.jsonl", _calibration_profile(tmp_path),
-                      "RAC-EXP-2026-001", tmp_path / "releases", UTC, STOPPING_RULE)
+        build_release(
+            tmp_path / "missing.jsonl",
+            _calibration_profile(tmp_path),
+            "RAC-EXP-2026-001",
+            tmp_path / "releases",
+            UTC,
+            STOPPING_RULE,
+        )
