@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+      - name: Reject malformed or placeholder JSON
+        run: python scripts/check_json_integrity.py
       - name: Enforce dependency-light package boundary
         run: |
           PYTHONPATH=. python - <<'PY'
