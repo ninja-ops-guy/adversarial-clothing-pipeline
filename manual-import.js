@@ -1,3 +1,5 @@
+let manualMeasuredOverrideActive = false;
+
 async function importMeasuredResults(file) {
     if (!file) return;
     const evidence = document.getElementById('measuredEvidence');
@@ -8,6 +10,7 @@ async function importMeasuredResults(file) {
         if (!measuredStatuses.has(result.status) || !result.models) {
             throw new Error('Expected a measured_locked or measured_unlocked benchmark-results.json payload');
         }
+        manualMeasuredOverrideActive = true;
         renderMeasuredBenchmark(result);
         if (evidence) {
             const commit = String(result.source_commit || 'unknown').slice(0, 8);
@@ -21,8 +24,11 @@ async function importMeasuredResults(file) {
 }
 
 // Keep the browser's automatic benchmark loader on the same locked schema
-// enforced by the measured-benchmark workflow and manual import path.
+// enforced by the measured-benchmark workflow and manual import path. Once a
+// user accepts a manual measured result, a slower automatic fetch must never
+// overwrite that explicit evidence with an older benchmark payload.
 async function loadMeasuredBenchmark() {
+    if (manualMeasuredOverrideActive) return window.__racMeasuredBenchmark || null;
     try {
         const response = await fetch(`benchmark-results.json?cache=${Date.now()}`, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -31,10 +37,12 @@ async function loadMeasuredBenchmark() {
         if (!measuredStatuses.has(result.status) || !result.models) {
             throw new Error('benchmark payload is not a locked/unlocked measured result');
         }
+        if (manualMeasuredOverrideActive) return window.__racMeasuredBenchmark || result;
         renderMeasuredBenchmark(result);
         log('Loaded measured detector benchmark', 'success');
         return result;
     } catch (error) {
+        if (manualMeasuredOverrideActive) return window.__racMeasuredBenchmark || null;
         resetMeasuredDisplay('Measured detector benchmark is not available yet. The CI benchmark workflow must complete successfully.');
         log(`Measured benchmark unavailable: ${error.message}`, 'warning');
         return null;
