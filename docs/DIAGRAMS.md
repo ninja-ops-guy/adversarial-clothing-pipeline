@@ -1,313 +1,281 @@
 # RAC System Diagrams
 
-**Purpose:** provide a visual map of the Ruthless Adversarial Clothing (RAC) research platform without overstating software capability as physical efficacy.
+**Reviewed:** 2026-09-11  
+**Purpose:** visual map of the current Ruthless Adversarial Clothing research and production system without overstating software capability as physical efficacy.
 
-These diagrams describe system boundaries and evidence flow. A diagram may show a pathway that crosses an open experimental gate; consult [`CURRENT_PROGRAM_STATE.md`](CURRENT_PROGRAM_STATE.md) for the authoritative live program state. Frozen experiment/physical contracts and hash-pinned artifacts outrank explanatory diagrams.
-
-The supplied diagram set has been normalized into maintainable SVG assets under `docs/assets/diagrams/`. The SVGs are explanatory renders; the Mermaid blocks below remain the editable topology source.
+These diagrams are explanatory. Frozen contracts, preregistrations, closure artifacts, and physical execution surfaces outrank them. Consult [`CURRENT_PROGRAM_STATE.md`](CURRENT_PROGRAM_STATE.md) for the canonical live program state.
 
 ## 1. Executive system topology
 
-![RAC executive pipeline](assets/diagrams/executive-pipeline.svg)
-
 ```mermaid
 flowchart LR
-    A[Design] --> B[Optimization]
-    B --> C[Simulation]
-    C --> D[Benchmark]
-    D --> E[Certification]
-    E --> F[Print]
-    F --> G[Physical Trial]
-    G --> H[Manufacturing Conformity]
+    A[Design / hypothesis] --> B[Surrogate screening / optimization]
+    B --> C[Simulation / EOT]
+    C --> D[Digital evaluation]
+    D --> E[Evidence gate]
+    E --> F[Production release]
+    F --> G[Matched physical trial]
+    G --> H[Durability / manufacturing conformity]
 ```
 
-The key idea is that candidate generation is upstream of evidence. No design becomes a product claim merely because it optimized well digitally.
+Candidate generation is upstream of evidence. No design becomes a physical claim because it looks adversarial or scores well digitally.
 
 ## 2. Four-plane architecture
-
-![RAC four-plane architecture](assets/diagrams/four-plane-architecture.svg)
 
 ```mermaid
 flowchart TB
     subgraph EP[Exploration Plane]
-      PL[Pattern Lab]
+      PL[Pattern Lab / Product Studio]
       PG[Procedural generators]
       VH[Visual / heuristic analysis]
-      EX[PNG / JSON / configuration export]
-      PL --> PG
+      EX[Artwork / config export]
+      PL --> PG --> EX
       PL --> VH
-      PG --> EX
     end
 
     subgraph RP[Research Plane]
-      TP[Texture prior / NAP]
-      EA[Environment-adaptive optimizer]
-      ND[Neural deformation]
-      PC[Differentiable cloth physics]
-      SC[Garment scene composition]
+      SC[Surrogate screening]
+      OP[Bounded optimization]
+      DF[Deformation]
+      PH[Physics / EOT]
       EV[Evaluator adapters]
-      TP --> ND
-      EA --> ND
-      ND --> PC
-      PC --> SC
-      SC --> EV
+      SC --> OP --> DF --> PH --> EV
     end
 
     subgraph CP[Certification & Evidence Plane]
-      FM[Frozen manifests / contracts]
-      SH[Surrogate-held-out separation]
-      NV[Independent numerical verification]
+      FM[Frozen contracts]
+      HB[Surrogate / held-out boundary]
+      NV[Numerical verification]
       PI[Provenance + integrity]
-      SA[Sealed artifacts]
-      PR[Promotion / refusal gates]
-      FM --> SH --> NV --> PI --> SA --> PR
+      SE[Sealed evidence]
+      PR[Promotion / refusal]
+      FM --> HB --> NV --> PI --> SE --> PR
     end
 
     subgraph PP[Physical Validation Plane]
+      VI[Live vendor intake]
+      PB[Exact panel build]
       MC[Matched candidate + control]
-      CAL[Production / color calibration]
-      CAP[Preregistered capture]
-      MEAS[Measured detector outputs]
+      CAL[Calibration]
+      CAP[Frozen P1 capture]
       STAT[Statistics + uncertainty]
-      REP[Replication / durability]
+      DUR[Durability]
       MFG[Manufacturing conformity]
-      MC --> CAL --> CAP --> MEAS --> STAT --> REP --> MFG
+      VI --> PB --> MC --> CAL --> CAP --> STAT --> DUR --> MFG
     end
 
-    EP --> RP
-    RP --> CP
-    CP --> PP
-    PP -. measured evidence returns .-> CP
+    EP --> RP --> CP --> PP
+    PP -. measured evidence .-> CP
 ```
 
-## 3. Candidate-generation topology
+## 3. Earned-complexity research path
 
-![RAC candidate-generation topology](assets/diagrams/candidate-generation.svg)
+RAC supports early scientific screening so expensive downstream machinery is built only when a hypothesis earns it.
 
 ```mermaid
 flowchart TD
-    A[Pattern / textile seed] --> B{Generation path}
-    B -->|NAP| C[Texture prior / optimizer]
-    B -->|Environment adaptive| D[Palette extraction]
-    D --> E[Pattern-color decomposition]
-    E --> F[Palette-constrained allocation]
-    C --> G[EOT / transforms]
-    F --> G
-    G --> H[Surrogate-only scoring]
-    H --> I[CandidateArtifact]
-    I --> J[Deformation]
-    J --> K[Cloth simulation]
-    K --> L[Scene composition]
+    H[Preregistered hypothesis] --> S0[Wiring / execution smoke]
+    S0 --> S1[Surrogate-only screening]
+    S1 --> G{Preregistered survivor rule passes?}
+    G -- no --> N[Close screened-out / retained negative]
+    G -- yes --> A[Minimum necessary representation / anchors]
+    A --> O[Bounded optimization / EOT]
+    O --> SEL[Governed selection]
+    SEL --> F[Immutable candidate freeze]
+    F --> HO[Held-out evaluation]
+    HO --> P{Promotion criteria?}
+    P -- no --> R[Retain negative]
+    P -- yes --> PH[Physical-lineage candidate]
 ```
 
-Held-out certification models do not belong in the generation loop.
+D2-0007 followed this topology and stopped at the Stage-1 screen with zero survivors.
 
-## 4. Evaluation and trust boundary
-
-![RAC evaluation trust boundary](assets/diagrams/evaluation-trust-boundary.svg)
+## 4. D2-0007 actual closure
 
 ```mermaid
 flowchart LR
-    subgraph TRAIN[Optimization boundary]
-      S[Surrogate model set]
-      O[Optimizer]
-      C[Candidate]
-      S --> O --> C
-      S --> O
+    A[Stage 0 landmark-free smoke PASS] --> B[Stage 1: 8 families × 8 compositions]
+    B --> C[64 / 64 observed on PERSON-SUR-v3]
+    C --> D{Need ≥0.15 mean reduction + ≥4/6 improved + invalid ≤0.10}
+    D -- no motif passes all rules --> E[CLOSED_SCREENED_OUT_H0]
+    E --> F[No anchors]
+    E --> G[No optimization]
+    E --> H[No candidate freeze]
+    E --> I[No held-out access]
+    E --> J[No Alpha-002]
+```
+
+This is a terminal scientific result for that preregistered generation, not an unfinished pipeline.
+
+## 5. Surrogate / held-out trust boundary
+
+```mermaid
+flowchart LR
+    subgraph DEV[Development boundary]
+      S[Surrogate model set] --> O[Screen / optimize]
+      O --> C[Candidate]
     end
 
     C --> F[Freeze candidate + provenance]
 
-    subgraph CERT[Certification boundary]
-      H[Held-out model set]
-      T[Frozen transforms]
-      B[Benchmark]
-      V[Verification]
-      H --> B
-      T --> B
+    subgraph CERT[Held-out boundary]
+      H[Held-out model set] --> B[Benchmark]
+      T[Frozen transforms / thresholds] --> B
       F --> B
-      B --> V
+      B --> V[Verification]
     end
 
-    V --> R{Gate}
-    R -->|pass| P[Promotable evidence]
-    R -->|fail| X[Retained negative / refusal]
+    V --> G{Gate}
+    G -- pass --> P[Promotable digital evidence]
+    G -- fail --> N[Retained negative]
 ```
 
-The candidate must be frozen before held-out evaluation. Held-out results may inform a later generation, but not retroactively modify the candidate whose transfer they measure.
+Held-out feedback does not flow backward into the same candidate.
 
-## 5. Evidence lifecycle
+## 6. Alpha-001 identity and recovery
 
-![RAC evidence lifecycle](assets/diagrams/evidence-lifecycle.svg)
+```mermaid
+flowchart TD
+    D3[RAC-PER-D2-0003 retained negative] --> A1[RAC-PRINT-ALPHA-001]
+    W[Historical workflow run 34078238095] --> ART[GitHub Actions artifact]
+    ART --> KIT[Exact print-test-kit.zip]
+    KIT --> H1[SHA-256 b22b022f…f0548]
+    KIT --> PAT[4096×4096 pattern]
+    PAT --> H2[SHA-256 b07b617f…c261546]
+    H1 --> A1
+    H2 --> A1
+    A1 --> P1[Physical P1 production path]
+```
+
+Alpha-001 remains bound to D2-0003. The recovered source was not regenerated or retuned.
+
+## 7. Production release flow
+
+```mermaid
+flowchart TD
+    V[Live Printful API responses] --> I[p1_production_release.py intake]
+    I --> V1{Product / placement / raw-byte integrity valid?}
+    V1 -- no --> X[REFUSE]
+    V1 -- yes --> R[Vendor-intake receipt + deterministic archives]
+    K[Exact recovered Alpha-001 kit] --> B[p1_production_release.py build]
+    R --> B
+    B --> V2{Kit hash + vendor evidence valid?}
+    V2 -- no --> X
+    V2 -- yes --> P[Exact candidate/control panels + UA values]
+    P --> C[Binder --check-only]
+    C --> D[Controlled bind]
+    D --> G[P1 no-spend readiness]
+    G --> H{Human spend authorization}
+    H -- no --> STOP[Stop]
+    H -- yes --> O[Matched garment order]
+```
+
+The production release wrapper never places an order by itself.
+
+## 8. Physical P1 flow
+
+```mermaid
+flowchart TD
+    O[Matched garments arrive] --> Q[Receipt QA + custody]
+    T[RAC-CALT-P1-0001] --> C[Calibration acceptance]
+    Q --> C
+    C --> S[Authoritative 144-trial schedule]
+    S --> M[Raw captures + metadata + hashes]
+    M --> I[Validated ingestion]
+    I --> E[Sealed physical evidence]
+    E --> A[Preregistered physical analysis]
+    A --> R{P1 result}
+    R -->|fail / negative / inconclusive| N[Retain result]
+    R -->|pass| P[Eligible for later replication / durability gates]
+```
+
+Older 108-row planning material is not execution authority.
+
+## 9. P1 authority stack
+
+```mermaid
+flowchart TB
+    R[P1_OPERATOR_RUNBOOK.md] --> X[Physical execution]
+    S[P1_CAPTURE_SCHEDULE.json — 144 trials] --> X
+    P[PAIRING_RANDOMIZATION_CONTRACT.json] --> X
+    F[P1_READINESS_FREEZE.json] --> X
+    G[p1_no_spend_readiness_gate.py] --> X
+    B[p1_bind_ua_values.py] --> X
+```
+
+All explanatory docs are subordinate to this frozen execution surface.
+
+## 10. Fail-closed evidence flow
+
+```mermaid
+flowchart TD
+    A[Incoming artifact / receipt] --> B{Schema + semantics valid?}
+    B -- no --> X[REFUSE]
+    B -- yes --> C{Hashes / source pins valid?}
+    C -- no --> X
+    C -- yes --> D{Numerical outputs finite / reproducible?}
+    D -- no --> X
+    D -- yes --> E{Scientific boundary valid?}
+    E -- no --> X
+    E -- yes --> F{Candidate/control or generation identity valid?}
+    F -- no --> X
+    F -- yes --> G[Seal / retain evidence]
+    G --> H{Promotion criteria met?}
+    H -- no --> N[Retained negative]
+    H -- yes --> P[Promote to next evidence level]
+```
+
+## 11. Evidence lifecycle
 
 ```mermaid
 stateDiagram-v2
     [*] --> Exploratory
-    Exploratory --> Candidate: candidate selected
-    Candidate --> Frozen: hashes + manifests sealed
-    Frozen --> D2: held-out benchmark executed
-    D2 --> RetainedFail: gate fails
-    D2 --> DigitalQualified: digital gate passes
-    DigitalQualified --> ProductionAlpha: matched print package
-    ProductionAlpha --> P1: physical trial executed
-    P1 --> RetainedFail: physical gate fails
-    P1 --> PhysicalQualified: physical gate passes
-    PhysicalQualified --> Replication
-    Replication --> Durability
+    Exploratory --> Screened
+    Screened --> ScreenedOut: early gate fails
+    Screened --> Candidate: early gate passes
+    Candidate --> Frozen: provenance sealed
+    Frozen --> DigitalEvaluated: authorized held-out run
+    DigitalEvaluated --> RetainedFail: digital gate fails
+    DigitalEvaluated --> ProductionReady: digital / governance path allows physical production
+    ProductionReady --> PhysicalEvaluated: matched P1 executed
+    PhysicalEvaluated --> RetainedFail: physical gate fails
+    PhysicalEvaluated --> PhysicalQualified: physical gate passes
+    PhysicalQualified --> Durability
     Durability --> Manufacturing
-    Manufacturing --> ProductEvidence
+    Manufacturing --> BoundedClaim
 ```
 
-Not every generation should reach the final state. Retained failure is a valid terminal research outcome. This is a **timeless lifecycle diagram**, not a current-generation status board; use `CURRENT_PROGRAM_STATE.md` for current D2/P1 state.
+Retained failure and screened-out states are valid terminal research outcomes.
 
-## 6. Fail-closed certification flow
-
-![RAC fail-closed certification flow](assets/diagrams/fail-closed-certification.svg)
+## 12. Claim-to-source provenance
 
 ```mermaid
 flowchart TD
-    A[Incoming experiment artifact] --> B{Schema valid?}
-    B -- no --> X[REFUSE]
-    B -- yes --> C{Hashes / source pins valid?}
-    C -- no --> X
-    C -- yes --> D{Finite numerical outputs?}
-    D -- no --> X
-    D -- yes --> E{Candidate-control relationship valid?}
-    E -- no --> X
-    E -- yes --> F{Model membership / split valid?}
-    F -- no --> X
-    F -- yes --> G{Replay / seed / integrity checks pass?}
-    G -- no --> X
-    G -- yes --> H[Seal evidence bundle]
-    H --> I{Promotion criteria met?}
-    I -- no --> J[Retain measured failure]
-    I -- yes --> K[Promote to next evidence stage]
+    CLAIM[Claim] --> REL[Sealed release / closure]
+    REL --> MET[Metric / decision]
+    MET --> RAW[Raw outputs]
+    RAW --> RUN[Run manifest]
+    RUN --> MOD[Model-set / threshold / transform contract]
+    RUN --> ART[Candidate / artwork hash]
+    ART --> SRC[Source commit / exact source bytes]
+    PHYS[Physical artifact IDs] --> CLAIM
+    CAL[Calibration evidence] --> CLAIM
+    VEN[Vendor source bytes / production mapping] --> PHYS
 ```
 
-## 7. Digital-to-physical translation flow
+A physical claim adds manufacturing, custody, calibration, and raw-media provenance to the digital chain.
+
+## 13. Current terminal/open states
 
 ```mermaid
 flowchart LR
-    A[Frozen digital artwork] --> B[Provider template / placement map]
-    B --> C[Candidate production file]
-    A --> D[Matched control construction]
-    D --> E[Control production file]
-    C --> F[Order / manufacture]
-    E --> F
-    F --> G[Physical artifact IDs]
-    G --> H[Calibration]
-    H --> I[Capture sessions]
-    I --> J[Raw camera media]
-    J --> K[Measured inference]
-    K --> L[Session-level statistics]
-    L --> M[Physical evidence bundle]
+    D3[D2-0003: negative] --> A1[Alpha-001 production path OPEN]
+    D4[D2-0004: negative]
+    D5[D2-0005: preregistered / not armed]
+    D7[D2-0007: screened out H0]
+    A1 --> P1[P1 physical evidence OPEN]
+    P1 --> P2[P2 durability OPEN]
+    P2 --> M[M1/M2 manufacturing OPEN]
 ```
 
-Candidate and control identities must remain distinct and traceable through the entire chain. For P1 execution authority, use the frozen P1 schedule/runbook rather than this explanatory flow.
-
-## 8. Data and provenance topology
-
-![RAC data and provenance topology](assets/diagrams/data-provenance.svg)
-
-```mermaid
-flowchart TD
-    CODE[Source commit] --> RUN[Run manifest]
-    MODELS[Model manifests] --> RUN
-    CFG[Seeds / thresholds / transforms] --> RUN
-    ART[Candidate artifact hash] --> RUN
-    RUN --> RAW[Raw outputs]
-    RAW --> MET[Metrics]
-    MET --> REL[Sealed RAC experiment release]
-    RUN --> REL
-    CAL[Calibration artifacts] --> REL
-    MEDIA[Physical media / session manifests] --> REL
-    REL --> CLAIM[Claim review]
-```
-
-A quantitative claim should be traceable backward from the report to the release, raw outputs, run manifest, candidate identity, model manifest, and source commit.
-
-## 9. Pattern Lab versus measured evidence
-
-![RAC Pattern Lab versus measured evidence](assets/diagrams/pattern-lab-vs-measured.svg)
-
-```mermaid
-flowchart LR
-    PL[Pattern Lab] --> H[Heuristic / visual exploration]
-    PL --> E[Candidate config export]
-    H --> UIH[UI display: exploratory]
-    E --> PY[Python research stack]
-    PY --> BM[Measured benchmark]
-    BM --> CE[Certified evidence import]
-    CE --> UIM[UI display: measured]
-```
-
-The UI may display both heuristic and measured information, but the provenance and evidence labels must make them visibly distinct.
-
-## 10. Research feedback loop
-
-![RAC research feedback loop](assets/diagrams/research-feedback-loop.svg)
-
-```mermaid
-flowchart LR
-    Q[Research question] --> P[Preregister protocol]
-    P --> G[Generate candidate]
-    G --> E[Evaluate]
-    E --> C[Certify / retain]
-    C --> A[Analyze]
-    A --> R[Research release / manuscript]
-    R --> N[Next hypothesis]
-    N --> Q
-```
-
-The loop is intentionally experimental rather than self-validating: a new hypothesis begins a new frozen generation instead of changing old evidence.
-
-## 11. Deployment / repository topology
-
-```mermaid
-flowchart TB
-    REPO[GitHub repository]
-    REPO --> WEB[Static Pattern Lab / GitHub Pages]
-    REPO --> PY[Python package]
-    REPO --> CI[CI / certification checks]
-    REPO --> DOC[Docs + preregistrations + manuscripts]
-    REPO --> REL[Sealed release metadata]
-
-    EXT[External evidence inputs]
-    EXT -->|model weights / approved evaluators| PY
-    EXT -->|print provider / physical artifacts| PHYS[Physical program]
-    EXT -->|camera media / calibration| PHYS
-
-    PY --> CI
-    PHYS --> REL
-    CI --> REL
-    REL --> DOC
-```
-
-Large generated artifacts, model weights, raw datasets, credentials and sensitive environment material should remain outside normal source control and be referenced through approved manifests or retained evidence stores.
-
-## Rendered asset inventory
-
-| Asset | Purpose |
-| --- | --- |
-| `assets/diagrams/executive-pipeline.svg` | executive design-to-manufacturing flow |
-| `assets/diagrams/four-plane-architecture.svg` | exploration / research / evidence / physical planes |
-| `assets/diagrams/candidate-generation.svg` | candidate-generation topology |
-| `assets/diagrams/evaluation-trust-boundary.svg` | surrogate vs held-out trust boundary |
-| `assets/diagrams/evidence-lifecycle.svg` | generic evidence lifecycle; not live generation status |
-| `assets/diagrams/fail-closed-certification.svg` | certification refusal / promotion flow |
-| `assets/diagrams/data-provenance.svg` | backward provenance topology |
-| `assets/diagrams/pattern-lab-vs-measured.svg` | heuristic vs measured UI separation |
-| `assets/diagrams/research-feedback-loop.svg` | preregistered research feedback loop |
-
-## Reading order
-
-For a new technical reviewer:
-
-1. `README.md` — project thesis and executive architecture.
-2. `CURRENT_PROGRAM_STATE.md` — authoritative current program-level state.
-3. `DIAGRAMS.md` — visual system map.
-4. `ARCHITECTURE.md` — implementation boundaries and component responsibilities.
-5. `CERTIFICATION_SYSTEM.md` — evidence ladder and refusal behavior.
-6. `END_TO_END_RESEARCH_SOP.md` — operational experiment procedure.
-7. `PROJECT_PROGRESS_CURRENT.md` — detailed current workstreams and verification state.
-8. `papers/` — research questions and pre-results manuscripts.
+The next program-defining milestone is admissible P1 physical evidence.
