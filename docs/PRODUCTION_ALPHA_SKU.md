@@ -1,195 +1,205 @@
-# Production Alpha SKU Manifest (v1.0.0 draft)
+# Production Alpha SKU Manifest / Decision
 
-Status: DRAFT — pending external inputs marked OPEN / PENDING-API-FETCH below.
-Scope: defines the first physical production decision ("Production Alpha") for the RAC
-(Ruthless Adversarial Clothing) research repo. This document specifies what is ordered,
-from whom, and how its identity is recorded. It makes no efficacy claims (see §8 Precedence).
+**Version:** 1.1.0  
+**Updated:** 2026-09-11  
+**Status:** CURRENT PRODUCTION DECISION — live vendor values remain runtime-bound until intake/binding completes.  
+**Scope:** identifies the first matched physical Production Alpha test article. It makes no efficacy claim.
 
 ## 1. Decision summary
 
-Production Alpha commits to ordering a matched pair of garments from Printful: the
-candidate and the control are both the All-Over Print Unisex Crew Neck T-Shirt (AOP
-cut-and-sew category), white-base 100% polyester sublimation knit, size M, produced via
-cut-and-sew dye sublimation (Printful API technique key `SUBLIMATION`). The candidate
-carries the frozen adversarial tile mapped through the vendor's per-panel template; the
-control is the identical variant printed with a solid-fill template, placed in the same
-order under identical order conditions. Provider, garment, color, size, and print method
-are fixed by this document; integer `product_id` / `variant_id` values are
-PENDING-API-FETCH and must be resolved live against the Printful API before any order.
+Production Alpha is `RAC-PRINT-ALPHA-001`, scientifically bound to the retained `RAC-PER-D2-0003` lineage.
 
-## 2. Vendor comparison outcome
+Primary garment:
 
-Hard requirements (all five must hold):
+- provider: Printful;
+- product ID: `388`;
+- product: **All-Over Print Recycled Unisex Hoodie**;
+- color/base: exact White variant resolved from live vendor data;
+- size: selected by the operator from live supported variants rather than frozen blindly in this document;
+- process/placements: accepted only from the exact live Printful product/printfile/template relationships validated by the production release gate;
+- candidate/control: matched on every practical production variable except experimental artwork.
 
-1. Downloadable per-product PSD template ZIPs with guide layers, bleed, and safe zones.
-2. 150–300 DPI, sRGB artwork pipeline.
-3. True cut-and-sew sublimation all-over print (not cut-from-printed-roll approximations).
-4. Single-unit ordering (no MOQ) for iteration.
-5. Stable integer product_id/variant_id exposed via a public REST API for manifest binding.
+Fallback/reserve metadata surface:
 
-| Vendor | Req 1 templates | Req 2 DPI/sRGB | Req 3 cut-and-sew sub | Req 4 MOQ=1 | Req 5 API IDs | Outcome |
-|---|---|---|---|---|---|---|
-| Printful | Yes (per-product PSD ZIPs) | Yes (150–300 DPI sRGB) | Yes | Yes | Yes (developers.printful.com) | **SELECTED** |
-| Subliminator | Best-in-class per-panel templates | Yes | Yes | Yes | No public API for stable manifest IDs | Runner-up |
-| Printify | Varies by print provider; not uniform | Varies | Varies by provider | Yes | API exists, but garment/provider geometry not stable per-SKU | Rejected |
-| Others (AOP dropship printers surveyed) | Incomplete or no guide-layer PSDs | Unverified | Unverified | Mixed | No | Rejected |
+- Printful product `257`, All-Over Print Men's Crew Neck T-Shirt.
 
-Printful is the only vendor satisfying all five hard requirements simultaneously.
-Subliminator is retained as runner-up solely on template quality; its lack of a public
-API for stable manifest IDs is disqualifying under evidence governance.
+Product 257 remains useful to the current vendor/binder contract but is not the primary first-order SKU unless a separately reviewed change promotes it.
 
-Garment rationale: tee over hoodie — fewer panels/seams, flatter under the camera capture
-rig, cheaper per iteration. Polyester sublimation over cotton DTG — dye-in-fiber, matte
-finish, holds high-frequency pattern detail.
+## 2. Frozen candidate identity
 
-## 3. The golden digital SKU manifest
+The exact Alpha-001 digital source was recovered from historical GitHub Actions run `34078238095` and verified against the frozen pins.
 
-Example (values shown are illustrative placeholders; hash and ID fields are populated at
-freeze time):
+```text
+print-test-kit.zip
+b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548
+
+print-test-kit/design/pattern_tile_4096.png
+b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546
+```
+
+Recovery provenance is recorded in `evidence/p1/alpha001-source-recovery.json`.
+
+This source must not be regenerated, retuned, or rebound to D2-0007 or another lineage while retaining the Alpha-001 identity.
+
+## 3. Why the hoodie is the current primary SKU
+
+The original planning document selected a crew-neck tee to simplify early production. Subsequent repository work resolved and productionized Printful product `388` as the primary Alpha-001 surface, with exact live intake/build support and product `257` retained as fallback/reserve metadata.
+
+The current decision therefore follows the implemented and governed production path rather than preserving the earlier planning choice solely for convenience.
+
+## 4. Live vendor identity is runtime-bound
+
+Do not hard-code a stale variant ID or size in this document.
+
+The actual order identity must be derived by:
+
+```bash
+python tools/p1_production_release.py intake \
+  --fetch \
+  --size <chosen-size> \
+  --output-dir production_alpha/vendor_intake
+```
+
+The release gate must confirm:
+
+- product `388` identity/title;
+- exact White variant for the chosen size;
+- required production placements;
+- no unreviewed unexpected production placement;
+- valid product/printfile/template relationships;
+- untouched vendor response hashes;
+- deterministic vendor-source archive hashes.
+
+If Printful's live catalog no longer satisfies the contract, stop and review the SKU decision rather than inventing IDs or geometry.
+
+## 5. Exact production artwork
+
+After successful intake:
+
+```bash
+python tools/p1_production_release.py build \
+  --intake production_alpha/vendor_intake/vendor-intake.json \
+  --print-test-kit /secure/path/print-test-kit.zip \
+  --recorded-by '<operator>'
+```
+
+This build:
+
+- verifies the live vendor intake before rendering;
+- verifies the exact Alpha-001 source hashes;
+- derives exact-size candidate/control panel artwork from the validated vendor geometry;
+- creates deterministic artwork archives;
+- produces binder-ready real-value inputs;
+- re-verifies vendor evidence after rendering.
+
+No spend is authorized by this process.
+
+## 6. Golden digital SKU record
+
+The final bound production record must identify at minimum:
 
 ```json
 {
-  "manifest_version": "1.0.0",
-  "generation_id": "RAC-PER-D2-0004",
-  "provider": {
-    "name": "Printful",
-    "product_id": "PENDING-API-FETCH",
-    "variant_id": "PENDING-API-FETCH",
-    "technique": "SUBLIMATION",
-    "fulfillment_region": "OPEN"
-  },
-  "garment": {
-    "model": "All-Over Print Unisex Crew Neck T-Shirt",
-    "color": "white-base",
-    "material": "100% polyester sublimation knit",
-    "size": "M"
-  },
-  "artwork": {
-    "candidate_sha256": "<computed at freeze time>",
-    "frozen_tile_sha256": "<computed at freeze time>"
-  },
-  "template": {
-    "source_url": "<product page > File guidelines tab > template ZIP URL>",
-    "template_version_or_date": "<download date or vendor version string>",
-    "template_zip_sha256": "<computed at download>",
-    "panel_geometry": {
-      "front":  { "dims_px": [0, 0], "bleed_mm": 0, "safe_area_mm": 0, "dpi": 0 },
-      "back":   { "dims_px": [0, 0], "bleed_mm": 0, "safe_area_mm": 0, "dpi": 0 },
-      "sleeve_l": { "dims_px": [0, 0], "bleed_mm": 0, "safe_area_mm": 0, "dpi": 0 },
-      "sleeve_r": { "dims_px": [0, 0], "bleed_mm": 0, "safe_area_mm": 0, "dpi": 0 }
-    }
-  },
-  "mapping": {
-    "mapper_version": "<Production Mapper version tag>",
-    "mapping_sha256": "<computed at freeze time>",
-    "panel_hashes": ["<per-panel output sha256>"]
-  },
-  "order": {
-    "order_ids": ["<candidate order id>", "<control order id>"],
-    "pair": { "candidate": true, "control": true },
-    "order_conditions": "<date, shipping speed, fulfillment region, account>"
-  },
-  "timestamps": {
-    "manifest_created_utc": "<ISO-8601>",
-    "artwork_frozen_utc": "<ISO-8601>",
-    "order_placed_utc": "<ISO-8601>"
-  },
-  "manifest_sha256": "<computed at freeze time>"
+  "release_id": "RAC-PRINT-ALPHA-001",
+  "generation_id": "RAC-PER-D2-0003",
+  "provider": "Printful",
+  "product_id": 388,
+  "variant_id": "<resolved-live>",
+  "size": "<operator-selected>",
+  "color": "White",
+  "print_technique": "<resolved-and-validated-live>",
+  "frozen_pattern_sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
+  "sealed_kit_sha256": "b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548",
+  "vendor_intake_sha256": "<generated>",
+  "panel_artwork_sha256": "<generated-per-placement>",
+  "candidate_control_pairing": "MATCHED_EXCEPT_ARTWORK",
+  "order_id": "<record-after-human-purchase>",
+  "fulfillment_region": "<record-when-known>"
 }
 ```
 
-Field definitions:
+The repository's actual manifests/binder schemas remain authoritative; this example communicates the identity that must be preserved, not a competing schema.
 
-| Field | Meaning |
-|---|---|
-| manifest_version | Schema version of this manifest (semver). |
-| generation_id | Pattern generation lineage ID. D2-0004 closed FAIL / RAC-D0 on 2026-09-08 (log-attested; `docs/D2-0004_CLOSURE_NOTE.md`); the operative Production Alpha manifest (`production_alpha/SKU_MANIFEST.json`) uses the sealed RAC-PER-D2-0003 print-kit candidate. |
-| provider.name | Vendor legal/display name. |
-| provider.product_id | Printful integer product ID. PENDING-API-FETCH; fetch live via `GET /products`. Do not invent. |
-| provider.variant_id | Printful integer variant ID for the size-M white-base tee. PENDING-API-FETCH. |
-| provider.technique | Printful technique key; fixed `SUBLIMATION`. |
-| provider.fulfillment_region | Region the order is pinned to for batch consistency; OPEN pending vendor answer. |
-| garment.* | Physical garment identity: model, color, material, size. |
-| artwork.candidate_sha256 | SHA-256 of the final mapped candidate artwork package, at freeze time. |
-| artwork.frozen_tile_sha256 | SHA-256 of the frozen adversarial tile pre-mapping, at freeze time. |
-| template.source_url | URL from which the template ZIP was downloaded (product page → "File guidelines" tab). |
-| template.template_version_or_date | Vendor version string if present, else download date (ISO-8601). |
-| template.template_zip_sha256 | SHA-256 of the downloaded template ZIP, recorded at download. |
-| template.panel_geometry | Per-panel geometry extracted from the template: pixel dims, bleed, safe area, DPI. |
-| mapping.mapper_version | Version tag of the repo Production Mapper used for the panel pack. |
-| mapping.mapping_sha256 | Hash over the mapper profile + inputs, binding geometry to this run. |
-| mapping.panel_hashes | SHA-256 of each exported per-panel print file. |
-| order.order_ids | Printful order IDs for the candidate/control pair. |
-| order.pair | Flags identifying the candidate and control members of the matched pair. |
-| order.order_conditions | Free-text record of date, shipping speed, region, account used. |
-| timestamps.* | UTC ISO-8601 timestamps for manifest creation, artwork freeze, order placement. |
-| manifest_sha256 | SHA-256 over the serialized manifest with this field empty; seals the record. |
+## 7. Matched-pair ordering rule
 
-All hash fields are computed at freeze time and are immutable thereafter. Any change
-requires a new manifest_version.
+Candidate and control must match on every practical production variable:
 
-## 4. Template-to-Production-Mapper integration plan
+- provider;
+- product `388`;
+- live variant;
+- size;
+- substrate/material;
+- print technique;
+- order window;
+- intended fulfillment/manufacturing conditions when controllable.
 
-The repo contains Production Mapper code (see `product-studio.js` / production mapper
-modules) that currently operates on generic panel geometry. For this SKU, generic
-geometry is retired in favor of real vendor template geometry. Data flow:
+Only the experimental artwork differs intentionally.
 
-1. Download the Printful template ZIP for the AOP tee (product page → "File guidelines"
-   tab). Record URL, download date, and template ZIP SHA-256 (manifest §3).
-2. Extract per-panel geometry from the PSD guide layers: pixel dimensions, bleed, safe
-   area, DPI for front, back, left/right sleeves, collar if present.
-3. Emit a geometry JSON profile in the mapper's profile format.
-4. Register the profile as the mapper profile for this SKU; remove/fence generic
-   geometry so it cannot be selected for this manifest.
-5. Run the frozen adversarial tile through the mapper → per-panel pack export
-   (print-ready files at template DPI, sRGB).
-6. Hash binding: compute per-panel SHA-256, mapping_sha256, and write all hashes into
-   the manifest. The manifest, not the files in flight, is the source of truth.
+Minimum first order:
 
-## 5. Ordering plan — matched pair protocol
+```text
+1 × PA-HOODIE-CAND-001
+1 × PA-HOODIE-CTRL-001
+```
 
-- Same provider (Printful), same garment model/color/material/size, same print process
-  (cut-and-sew sublimation), same order conditions, placed in a single order where the
-  API permits.
-- Candidate: per-panel pack from §4. Control: identical variant printed with a
-  solid-fill template (single flat color), same order.
-- Record fulfillment region for both items; if the vendor cannot guarantee same-region
-  fulfillment, record actual regions and flag for batch-consistency risk.
-- Record order IDs, timestamps, and conditions in the manifest.
+Prefer the two arms in the same order to reduce avoidable manufacturing variation.
 
-## 6. Manufacturing QA on arrival (pre-efficacy)
+## 8. Pre-order authority
 
-Tolerances are OPEN pending vendor answers (§7). Each check must produce a recorded
-measurement before any efficacy testing.
+Before purchase:
 
-| Check | Measurement method | Acceptance note |
-|---|---|---|
-| Color shift vs digital twin | Photograph under the calibrated capture rig; compare against digital twin swatches in sRGB; report ΔE per region | Tolerance OPEN |
-| Scale error | Measure known tile features on fabric vs template dims with calibrated ruler/photogrammetry; report % deviation | Tolerance OPEN |
-| Placement | Measure anchor-point offsets per panel against template coordinates (mm) | Tolerance OPEN |
-| Registration | Measure cross-panel alignment at seams; report max misregistration (mm) | Tolerance OPEN (vendor numeric tolerance requested) |
-| Seam continuity | Visual + photographic check of pattern continuity across each seam | Documented pass/fail with photos |
-| Fabric distortion | Lay flat; measure panel dimensions vs template; note stretch/warp | Tolerance OPEN |
+1. review generated product/variant/size/placement geometry;
+2. verify candidate/control artwork and archive hashes;
+3. run `tools/p1_bind_ua_values.py --check-only`;
+4. bind only after the dry check passes;
+5. run `tools/p1_no_spend_readiness_gate.py`;
+6. require readiness PASS;
+7. make a separate human spend decision.
 
-QA applies to both candidate and control. Failures trigger re-order or vendor escalation,
-not silent acceptance.
+A software PASS never authorizes purchase by itself.
 
-## 7. Open Items (external)
+## 9. Receipt QA and physical handoff
 
-1. Printful account creation + API key provisioning.
-2. Template ZIP download for the AOP tee; record URL + download date + SHA-256.
-3. Live fetch of integer `product_id` / `variant_id` via `GET /products` (PENDING-API-FETCH).
-4. Vendor questions outstanding:
-   a. Effective on-fabric print resolution.
-   b. Numeric panel-registration tolerance.
-   c. Template versioning policy.
-   d. Fulfillment-region pinning for batch consistency.
-   e. Whether unprinted blanks of the identical garment are sold (useful for rig calibration).
-5. Shipping address and budget approval.
+When the matched garments arrive:
 
-## 8. Precedence
+- reconcile SKU/order/variant identity;
+- verify candidate/control pairing;
+- record material and manufacturing/fulfillment facts where available;
+- inspect registration, placement, seams, continuity and defects;
+- preserve chain of custody;
+- block P1 if the pair is materially mismatched or outside acceptance rules.
 
-This document defers to PRODUCT_THESIS: no efficacy claim is made or implied here; this
-is a production identity and QA specification only. It also defers to the Production
-Completion Checklist for what constitutes "done" for a production run. Where any
-statement in this document conflicts with those documents, those documents win.
+After receipt QA and calibration acceptance, execute the authoritative frozen P1 package:
+
+```text
+physical/p1/P1_OPERATOR_RUNBOOK.md
+physical/p1/P1_CAPTURE_SCHEDULE.json        # 144 frozen trials
+physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json
+physical/p1/P1_READINESS_FREEZE.json
+```
+
+The older 108-row planning sheet is not execution authority.
+
+## 10. Open external items
+
+The remaining unresolved production facts are intentionally runtime/physical rather than guessed in this document:
+
+- actual chosen size;
+- live Printful variant ID and current placement geometry;
+- current vendor print-technique details as returned by the governed intake;
+- fulfillment/manufacturing region when known;
+- order/payment details;
+- received-specimen QA measurements.
+
+## 11. Evidence boundary and precedence
+
+This is a production identity specification, not an efficacy claim. Alpha-001 derives from a retained negative D2-0003 result and is being manufactured to measure the digital-to-physical behavior under a controlled matched trial.
+
+Precedence:
+
+1. frozen/hash-pinned scientific and P1 execution contracts;
+2. generated/verified production intake and binding receipts;
+3. `docs/CURRENT_PROGRAM_STATE.md`;
+4. this SKU narrative.
+
+If this narrative conflicts with the live fail-closed production release/binder or a frozen P1 contract, the stricter artifact wins and production stops for review.
