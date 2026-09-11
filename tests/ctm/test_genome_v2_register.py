@@ -51,6 +51,8 @@ def _result(family, **overrides):
         heterogeneity=0.2,
         incremental_signal=False,
         min_effect_excluded=True,
+        channel_metadata_adequate=True,
+        provenance_adequate=True,
     )
     kwargs.update(overrides)
     return FamilyResult(**kwargs)
