@@ -1,13 +1,9 @@
 """Measured P1 calibration parsing, acceptance, and session binding.
 
-This module turns a measured PrintCameraProfile payload into a hash-bound
-acceptance receipt and enforces the bracketing rule for real P1 sessions:
-accepted pre-capture calibration before garment capture and accepted
-post-capture calibration before the session may be sealed/ingested.
-
-It does not estimate measurements from browser heuristics. The payload must
-contain measured Lab/scale/registration values produced under the frozen P1
-calibration procedure.
+Capture Lab may preview calibration acceptance for operator guidance, but the
+browser is not the evidence authority. A sealed P1 session carries the exact
+pre/post calibration JSON source text and SHA-256. Validation and ingestion
+re-parse and re-evaluate those exact bytes with PrintCameraProfile here.
 """
 
 from __future__ import annotations
@@ -100,12 +96,14 @@ def profile_from_payload(payload: dict[str, Any]) -> PrintCameraProfile:
     return profile
 
 
-def evaluate_profile_payload(payload: dict[str, Any], phase: str) -> dict[str, Any]:
+def evaluate_profile_payload(
+    payload: dict[str, Any], phase: str, *, source_bytes: bytes | None = None
+) -> dict[str, Any]:
     if phase not in PHASES:
         raise ValueError(f"calibration phase must be one of {PHASES}")
     profile = profile_from_payload(payload)
     accepted, failures = profile.acceptance()
-    canonical_profile = profile.to_profile_json().encode("utf-8")
+    hashed_bytes = source_bytes if source_bytes is not None else profile.to_profile_json().encode("utf-8")
     return {
         "schema_version": "1.0",
         "phase": phase,
@@ -113,7 +111,7 @@ def evaluate_profile_payload(payload: dict[str, Any], phase: str) -> dict[str, A
         "camera_id": profile.camera_id,
         "lighting_id": profile.lighting_id,
         "created_utc": profile.created_utc,
-        "profile_sha256": hashlib.sha256(canonical_profile).hexdigest(),
+        "profile_sha256": hashlib.sha256(hashed_bytes).hexdigest(),
         "evidence_label": MEASURED_EVIDENCE_LABEL,
         "accepted": accepted,
         "failures": failures,
@@ -141,46 +139,48 @@ def _is_sha256(value: Any) -> bool:
     return True
 
 
-def validate_session_calibration_binding(session: dict[str, Any]) -> dict[str, dict[str, Any]] | None:
-    """Require accepted pre/post measured calibration for physical P1 only."""
-    if session.get("evidence_class") != P1_EVIDENCE_CLASS:
-        return None
+def _evaluate_session_phase(session: dict[str, Any], phase: str) -> dict[str, Any]:
     calibration = session.get("calibration")
     if not isinstance(calibration, dict):
         raise ValueError("P1 calibration binding: physical session is missing calibration")
-    receipts: dict[str, dict[str, Any]] = {}
-    for phase in PHASES:
-        receipt = calibration.get(phase)
-        if not isinstance(receipt, dict):
-            raise ValueError(f"P1 calibration binding: missing {phase}-capture calibration receipt")
-        if receipt.get("phase") != phase:
-            raise ValueError(f"P1 calibration binding: {phase} receipt phase mismatch")
-        if receipt.get("accepted") is not True:
-            raise ValueError(f"P1 calibration binding: {phase}-capture calibration was not accepted")
-        if receipt.get("evidence_label") != MEASURED_EVIDENCE_LABEL:
-            raise ValueError(f"P1 calibration binding: {phase} receipt is not measured evidence")
-        if not receipt.get("profile_id") or not _is_sha256(receipt.get("profile_sha256")):
-            raise ValueError(f"P1 calibration binding: {phase} receipt identity/hash is invalid")
-        completeness = receipt.get("measurement_completeness")
-        if not isinstance(completeness, dict):
-            raise ValueError(f"P1 calibration binding: {phase} receipt lacks measurement completeness")
-        if completeness.get("patches") != EXPECTED_PATCHES:
-            raise ValueError(f"P1 calibration binding: {phase} receipt patch count is incomplete")
-        if int(completeness.get("scales", 0)) < 2:
-            raise ValueError(f"P1 calibration binding: {phase} receipt scale measurements are incomplete")
-        if set(completeness.get("fiducials", [])) != EXPECTED_FIDUCIALS:
-            raise ValueError(f"P1 calibration binding: {phase} receipt fiducials are incomplete")
-        if receipt.get("camera_id") != session.get("camera_id"):
-            raise ValueError(f"P1 calibration binding: {phase} camera_id does not match session")
-        if receipt.get("lighting_id") != session.get("lighting_id"):
-            raise ValueError(f"P1 calibration binding: {phase} lighting_id does not match session")
-        receipts[phase] = receipt
+    source = calibration.get(phase)
+    if not isinstance(source, dict):
+        raise ValueError(f"P1 calibration binding: missing {phase}-capture calibration source")
+    source_text = source.get("source_text")
+    source_sha256 = source.get("source_sha256")
+    if not isinstance(source_text, str) or not source_text.strip():
+        raise ValueError(f"P1 calibration binding: {phase} source_text is missing")
+    if not _is_sha256(source_sha256):
+        raise ValueError(f"P1 calibration binding: {phase} source_sha256 is invalid")
+    actual_sha = hashlib.sha256(source_text.encode("utf-8")).hexdigest()
+    if actual_sha != source_sha256:
+        raise ValueError(f"P1 calibration binding: {phase} calibration source hash mismatch")
+    try:
+        payload = json.loads(source_text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"P1 calibration binding: {phase} calibration JSON is invalid") from exc
+    receipt = evaluate_profile_payload(payload, phase, source_bytes=source_text.encode("utf-8"))
+    if receipt["accepted"] is not True:
+        detail = "; ".join(receipt["failures"]) or "unknown acceptance failure"
+        raise ValueError(f"P1 calibration binding: {phase}-capture calibration failed: {detail}")
+    if receipt["camera_id"] != session.get("camera_id"):
+        raise ValueError(f"P1 calibration binding: {phase} camera_id does not match session")
+    if receipt["lighting_id"] != session.get("lighting_id"):
+        raise ValueError(f"P1 calibration binding: {phase} lighting_id does not match session")
+    return receipt
+
+
+def validate_session_calibration_binding(session: dict[str, Any]) -> dict[str, dict[str, Any]] | None:
+    """Recompute and require accepted pre/post calibration for physical P1."""
+    if session.get("evidence_class") != P1_EVIDENCE_CLASS:
+        return None
+    receipts = {phase: _evaluate_session_phase(session, phase) for phase in PHASES}
     if session.get("calibration_pass") is not True:
         raise ValueError("P1 calibration binding: calibration_pass must reflect accepted bracketing profiles")
     if session.get("calibration_profile_id") != receipts["pre"]["profile_id"]:
         raise ValueError("P1 calibration binding: calibration_profile_id must bind the pre-capture profile")
     if session.get("calibration_profile_sha256") != receipts["pre"]["profile_sha256"]:
-        raise ValueError("P1 calibration binding: calibration_profile_sha256 must bind the pre-capture profile")
+        raise ValueError("P1 calibration binding: calibration_profile_sha256 must bind the exact pre-capture source")
     return receipts
 
 
