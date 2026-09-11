@@ -4,10 +4,10 @@
 
 The repository has two linked apparel surfaces:
 
-- `product-studio.html` — deterministic procedural apparel design and technical mockups.
+- `product-studio.html` — deterministic procedural apparel design, governed research-candidate preview, and technical mockups.
 - `production-studio.html` — vendor-template ingestion, seam-aware panel mapping, artifact hashing, panel-pack export, and batch seed ranking.
 
-The end-to-end flow is:
+The normal canonical-family flow is:
 
 1. select a deterministic design family and seed;
 2. render a repeat tile and technical garment mockup;
@@ -19,9 +19,52 @@ The end-to-end flow is:
 8. export exact-size panel PNGs, a ZIP panel pack, mapping JSON, and a hash-bound manifest;
 9. optionally generate and rank a batch of candidate seeds for collection development.
 
+The P0 research-family flow is deliberately different: the governed Python pattern pipeline remains the source of truth. Product Studio and Production Mapper expose the family inventory and accept an exact PNG candidate artifact for preview/mapping rather than reimplementing the research generators in browser JavaScript.
+
+## Family availability contract
+
+Product Studio now exposes every currently implemented family without promoting deferred work as if it were usable.
+
+### Native Product Studio families — 5
+
+These are deterministic browser-native art-direction families:
+
+- **Signal Shadow** — signal layering, fragmented familiar cues, eyes/portrait fragments, blue/yellow wedges, technical noise.
+- **Machine Static** — dark ground, grayscale block interference, micro-grain, vertical channels, restrained signal accents.
+- **Ghost Hound** — oversized eye/canine cues layered into the technical grammar.
+- **Broken Human** — displaced eye and rib-like anatomy over distressed block structure.
+- **Error Garden** — floral/leaf forms, muted greens/pinks, eye fragments, digital artifacts and signal accents.
+
+Changing the seed creates a deterministic variation inside the same family. No external image-generation API is used.
+
+### Implemented P0 research families — 8
+
+The runtime `P0_GENERATORS` inventory is surfaced in both Studio family selectors and as a dedicated Product Studio card set:
+
+- `hyperface_like` — `HyperfaceLikeGenerator`
+- `dazzle_surgical_lines` — `DazzleSurgicalLinesGenerator`
+- `key_feature_blackout` — `KeyFeatureBlackoutGenerator`
+- `saliency_eye_attack` — `SaliencyEyeAttackGenerator`
+- `adversarial_patch` — `AdversarialPatchGenerator`
+- `swapped_landmarks` — `SwappedLandmarksGenerator`
+- `landmark_noise` — `LandmarkNoiseGenerator`
+- `feature_collage` — `FeatureCollageGenerator`
+
+For these eight entries, the browser is an **artifact consumer**, not a second scientific generator implementation. Selecting one reveals a governed-candidate import control. The imported PNG is SHA-256 hashed, associated with the selected family/generator, and used as the exact mockup/mapping tile.
+
+The catalog records `PATTERNS_CANONICAL_128_V1` as the corresponding governed local-geometry contract, but browser code does not reproduce that generator logic. Imported research candidates are explicitly labeled `imported_governed_candidate_preview_not_physical_efficacy`.
+
+### Deferred / refused entries
+
+- P1: 5 registered generator stubs remain unavailable in Studio.
+- P2: 23 registered generator stubs remain unavailable in Studio.
+- P3-refused entries such as `bad_words` and `web_attack_strings` are not surfaced as usable families.
+
+A cross-language contract test compares the browser P0 catalog directly with `ruthless_pipeline.patterns.P0_GENERATORS`, so adding or removing a runtime P0 family now fails tests until Studio exposure is updated too.
+
 ## Canonical launch capsule v1
 
-The supplied product-board direction is now the visual target for Product Studio rather than a generic distressed-camouflage look.
+The supplied product-board direction is the visual target for canonical Product Studio generation rather than a generic distressed-camouflage look.
 
 | Product | Default family | Art-direction target |
 | --- | --- | --- |
@@ -33,19 +76,32 @@ The supplied product-board direction is now the visual target for Product Studio
 
 The hoodie remains available as a **Machine Static** extension product but is not part of the five-piece canonical launch capsule.
 
-## Implemented design families
+## Product Studio feature inventory
 
-- **Signal Shadow** — signal layering, fragmented familiar cues, eyes/portrait fragments, blue/yellow wedges, technical noise.
-- **Machine Static** — dark ground, grayscale block interference, micro-grain, vertical channels, restrained signal accents.
-- **Ghost Hound** — oversized eye/canine cues layered into the technical grammar.
-- **Broken Human** — displaced eye and rib-like anatomy over distressed block structure.
-- **Error Garden** — floral/leaf forms, muted greens/pinks, eye fragments, digital artifacts and signal accents.
+The visible Product Studio controls now map to real capabilities. The earlier Generate / Refine / Batch / Export mode tabs were removed because they were mostly non-functional chrome; batch ranking and panel-pack export are real Production Mapper capabilities and remain there.
 
-Changing the seed creates a deterministic variation inside the same family. No external image-generation API is used.
+Implemented Product Studio features include:
 
-Variation presets are now applied with deterministic pixel transforms rather than browser-dependent canvas filters. This keeps high-contrast, desaturated, alternate-palette, and scale variations reproducible across Chromium and WebKit/iPhone-class browsers.
+- 5 native canonical families;
+- 8 governed P0 research-family catalog entries;
+- governed candidate PNG import with SHA-256 binding;
+- six garment mockup types;
+- deterministic seed, scale, density, and distress controls;
+- selectable feature motifs for canonical families;
+- deterministic variation presets;
+- reference-image conditioning;
+- reference-fidelity scoring and **Find Best Match** for canonical art-direction families only;
+- frozen candidate override for exact imported research artifacts;
+- 4096×4096 tile export;
+- 4096×5119 reference-board export;
+- product manifest export;
+- handoff to Production Mapper.
 
-The obsolete low-resolution showcase image path has been fully removed from Product Studio: no showcase DOM controls, source script, rendering state, compositing path, or showcase-specific CSS remain.
+Reference-fidelity search is intentionally disabled for P0 research imports because those families do not have canonical art-direction reference profiles. In Production Mapper, a P0 family automatically disables reference-fidelity batch ranking and uses the visual/printability proxy instead.
+
+Variation presets use deterministic pixel transforms rather than browser-dependent canvas filters. This keeps high-contrast, desaturated, alternate-palette, and scale variations reproducible across Chromium and WebKit/iPhone-class browsers.
+
+The obsolete low-resolution showcase image path remains fully removed from Product Studio: no showcase DOM controls, source script, rendering state, compositing path, or showcase-specific CSS remain.
 
 ## Implemented Product Studio mockups
 
@@ -66,7 +122,8 @@ The browser preview uses a 1122×1402 logical board for interactive performance.
 
 - PNG
 - 4096×4096
-- deterministic from family + seed + controls
+- deterministic from family + seed + controls for canonical families
+- exact imported frozen artifact for governed P0 research previews
 - master repeat artwork
 
 ### Reference board
@@ -80,7 +137,7 @@ The browser preview uses a 1122×1402 logical board for interactive performance.
 
 ### Product manifest
 
-- JSON schema version 1.3
+- JSON schema version 1.4
 - `art_direction_profile: canonical_launch_capsule_v1`
 - product and family identity
 - seed, scale, density, distress, variation preset, and selected motif features
@@ -88,8 +145,13 @@ The browser preview uses a 1122×1402 logical board for interactive performance.
 - `outputs.preview_board_px: [1122, 1402]`
 - `outputs.production_tile_px: [4096, 4096]`
 - explicit digital-design/POD-template status
+- imported frozen-tile metadata when a governed research candidate is active
+
+Product Studio itself does **not** create the panel-pack ZIP. Its output list now labels `panel_pack.zip` as a downstream **Production Mapper** output rather than implying that Product Studio creates it directly.
 
 ## Production Mapper
+
+Production Mapper exposes the same P0 catalog. Selecting a P0 family requires the governed candidate PNG import; the mapper consumes the imported pixels instead of falling back to one of the five canonical families.
 
 ### Vendor-template contract
 
@@ -127,20 +189,25 @@ The production manifest binds the exact 4096×4096 design artifact, imported tem
 
 This is the bridge for future RAC-D records to attach to the exact commercial design artifact rather than to a visual concept alone.
 
-Measured detector results remain scoped to their recorded evidence domain. A digital CI convenience fixture is not a physical-garment claim and does not establish broad surveillance resistance.
+Measured detector results remain scoped to their recorded evidence domain. A digital CI convenience fixture or a Studio preview is not a physical-garment claim and does not establish broad surveillance resistance.
 
 ## Batch design factory
 
-The Production Mapper can generate up to 100 deterministic seed candidates for the active family, rank them with the repository's local entropy/complexity/printability-style proxy, retain a shortlist and load a selected candidate back into mapping.
+For canonical families, the Production Mapper can generate up to 100 deterministic seed candidates, rank them with reference fidelity or the local entropy/complexity/printability-style proxy, retain a shortlist and load a selected candidate back into mapping.
 
-The local score is **not detector efficacy and not RAC certification evidence**. The reference-inspired candidate-pool exporter now includes Signal Shadow alongside the other Product Studio families.
+For imported P0 research candidates, reference-fidelity ranking is disabled because no canonical art-direction profile exists. The visual/printability proxy remains available, but it is **not detector efficacy and not RAC certification evidence**.
 
 ## Browser regression coverage
 
 Frontend E2E now covers:
 
 - all six garment mockups;
-- all five design families;
+- all five native design families;
+- exposure of all eight implemented P0 research families;
+- exact P0/deferred/refused catalog behavior;
+- governed research-candidate PNG import and SHA-256 metadata;
+- Product Studio frozen-tile binding;
+- Production Mapper P0 selection and ranking-mode guard;
 - live seed / scale / density / distress updates;
 - motif selection;
 - deterministic variation presets;
@@ -148,18 +215,21 @@ Frontend E2E now covers:
 - 4096×4096 tile export;
 - 4096×5119 reference-board PNG dimensions;
 - manifest output dimensions;
-- continued absence of the obsolete low-resolution showcase source.
+- continued absence of the obsolete low-resolution showcase source;
+- removal of inert mode tabs and correct downstream panel-pack labeling.
 
 ## Remaining production work
 
 1. Acquire real provider templates and convert them into the adapter format without guessing dimensions.
 2. Add provider-specific template-version libraries only after source material is obtained and recorded.
 3. Add vendor-generated mockup comparison for scale/crop/seam validation.
-4. Connect selected batch candidates to the measured RAC digital evaluation workflow.
+4. Connect selected governed research candidates to the measured RAC digital evaluation workflow through their exact artifact hashes.
 5. Bind RAC-D result records to the production manifest's exact design artifact hash.
 6. Order the first POD sample and start the physical feedback loop.
 7. Add RAC-P physical evidence only after measured garment testing exists.
 
 ## Status
 
-The repository now covers **canonical capsule art direction → deterministic design factory → high-resolution reference-board export → template adapter → panel mapper → panel-pack export → artifact evidence binding**. The remaining blocker to a true vendor-ready POD upload remains obtaining and ingesting actual provider template specifications for the chosen products.
+The Studio surfaces now cover **5 canonical native generators + 8 implemented P0 research families via governed artifact import → high-resolution mockup/export → template adapter → panel mapper → panel-pack export → artifact evidence binding**. Deferred generator stubs remain fail-closed rather than appearing as functional Studio options.
+
+The remaining blocker to a true vendor-ready POD upload remains obtaining and ingesting actual provider template specifications for the chosen products.
