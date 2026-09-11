@@ -11,10 +11,14 @@ Guards:
    / MISSING edges; the known D2-0004 unattested gap
    (``surrogate_detection_rate``) is MISSING-by-design, never BROKEN.
 5. The committed ``artifacts/provenance/graph.json`` re-derives exactly.
+6. The lightweight CLI verifier refuses a corrupt committed graph artifact
+   rather than only verifying a freshly rebuilt in-memory graph.
 """
 
 import json
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -144,3 +148,23 @@ def test_committed_graph_rederives_exactly():
     committed = json.loads(COMMITTED_GRAPH.read_text())
     rebuilt = pg.build_graph(REPO_ROOT)
     assert pg.graph_sha256(rebuilt) == pg.graph_sha256(committed)
+
+
+def test_cli_verify_rejects_corrupt_committed_graph(tmp_path):
+    corrupt = tmp_path / "graph.json"
+    corrupt.write_text("__CONTENT_0__\n")
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "scripts" / "build_provenance_graph.py"),
+            "--verify",
+            "--out",
+            str(corrupt),
+        ],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 1
+    assert "COMMITTED_GRAPH_MISMATCH" in proc.stdout
