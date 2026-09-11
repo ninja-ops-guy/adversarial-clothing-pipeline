@@ -39,6 +39,23 @@
     "dependency_audit": "PASS",
     "lightweight_provenance": "PASS"
   },
+  "execution_attempts": [
+    {
+      "attempt": 1,
+      "workflow_run_id": 34561891542,
+      "head_commit": "5efd79a1a5029152b707b218906214f5fe6e1c18",
+      "status": "ABORTED_PRE_INFERENCE",
+      "observations_produced": 0,
+      "failure": "Workflow guard read stage0_telemetry_sha256 at the arming-record root instead of stage0_gate.stage0_telemetry_sha256.",
+      "scientific_inputs_changed": false
+    },
+    {
+      "attempt": 2,
+      "trigger_revision": 2,
+      "workflow_fix_commit": "c2f22822c18ee99a537bb660dc642a12853eb521",
+      "status": "TRIGGERED_FROM_IDENTICAL_FROZEN_SCIENTIFIC_INPUTS"
+    }
+  ],
   "heldout_access_allowed": false,
   "body_garment_anchor_support_allowed": false,
   "optimization_allowed": false,
