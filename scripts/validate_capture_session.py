@@ -21,6 +21,12 @@ def sha256_file(path: Path) -> str:
 
 
 def load_session(path: Path) -> dict[str, Any]:
+    """Parse and schema-check a Capture Lab session without promoting it.
+
+    Scientific P1 gates live in ``main`` so callers that only need the
+    schema/parser primitive (including schema-version tests and migration
+    tooling) do not accidentally perform evidence admission.
+    """
     payload = json.loads(path.read_text())
     require_schema_version(payload, "1.0", label=f"capture session {path}")
     required = {"session_id", "experiment_id", "evidence_class", "actor_id", "camera_id", "captures"}
@@ -29,8 +35,6 @@ def load_session(path: Path) -> dict[str, Any]:
         raise ValueError(f"session missing required fields: {missing}")
     if payload.get("evidence_class") == "synthetic_pipeline_validation_only":
         payload["physical_evidence_eligible"] = False
-    validate_session_calibration_binding(payload)
-    validate_session_schedule_binding(payload, verify_capture_order=True)
     return payload
 
 
@@ -93,9 +97,16 @@ def main() -> int:
     path = Path(args.session_json)
     try:
         payload = load_session(path)
+        is_p1 = payload.get("evidence_class") == "physical_garment_p1"
+        if is_p1:
+            if payload.get("sealed") is not True:
+                raise ValueError("P1 validation requires a sealed Capture Lab session")
+            validate_session_calibration_binding(payload)
+            validate_session_schedule_binding(payload, verify_capture_order=True)
     except (ValueError, json.JSONDecodeError) as exc:
         print(json.dumps({"hash_verification": "FAIL", "failures": [str(exc)]}, indent=2, sort_keys=True))
         return 2
+
     failures = verify_capture_hashes(path, payload) if args.verify_files else []
     is_p1 = payload.get("evidence_class") == "physical_garment_p1"
     result = {
