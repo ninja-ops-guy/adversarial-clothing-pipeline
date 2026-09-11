@@ -1,494 +1,304 @@
 # RAC End-to-End Research SOP
 
-**Version:** 1.0.0  
-**Last updated:** 2026-09-07  
-**Purpose:** Pick-up-and-run operating procedure from experiment selection through digital generation, textile production, physical capture, statistics, immutable release, and manuscript update.
+**Version:** 1.1.0  
+**Last updated:** 2026-09-11  
+**Purpose:** pick-up-and-run procedure from research hypothesis through digital closure, exact production release, matched physical P1, sealed evidence, and later durability/manufacturing work.
 
-> **Critical boundary:** The browser pages are design, configuration, visualization, mapping, and result-view surfaces. They are not a substitute for the Python research/evidence pipeline. A browser score is never detector evidence unless it is explicitly imported from a measured, provenance-bearing benchmark result.
+> **Authority:** frozen preregistrations, closure artifacts, model/protocol contracts, and physical execution surfaces outrank this SOP. For current status, start with `docs/CURRENT_PROGRAM_STATE.md`.
 
-## 0. What each page is for
+> **Critical boundary:** browser design/heuristic surfaces are not measured evidence. Software completion is not physical efficacy. Negative and screened-out results are retained rather than rewritten.
 
-### Pattern Lab — `index.html`
+## 0. Identify the current state before doing work
 
-Use for:
+Read:
 
-- procedural candidate exploration;
-- seed/parameter capture;
-- simulation previews;
-- gallery/history;
-- PNG/JSON export;
-- viewing/importing measured benchmark results with provenance.
+```text
+docs/CURRENT_PROGRAM_STATE.md
+docs/PROJECT_PROGRESS_CURRENT.md
+```
 
-Do **not** treat local heuristic/proxy values as measured detector results.
+Then identify whether the task is:
 
-### RAC Textile Generator / Product Studio — `product-studio.html`
+- a new prospective digital generation;
+- a closed-generation evidence/reporting task;
+- Production Alpha / P1 physical work;
+- post-P1 durability/manufacturing work.
 
-Use for:
+Do not reopen a closed generation merely because its result was negative.
 
-- selecting canonical RAC product/family;
-- Reference Match / Creative generation;
-- motif selection;
-- deterministic seed/scale/density/distress controls;
-- reference-fidelity search;
-- 4096×4096 tile export;
-- technical garment/reference-board export;
-- production manifest generation.
+## 1. New digital research generation
 
-This is the primary creative surface for producing the textile candidate that later enters the research pipeline.
+Before outcome-bearing held-out access, preregister at minimum:
 
-### Production Mapper — `production-studio.html`
-
-Use after a design is frozen:
-
-- import exact vendor template JSON;
-- map artwork to real panels;
-- inspect bleed/safe areas;
-- tune panel offset/scale/rotation;
-- validate continuity groups;
-- export panel PNGs;
-- export mapping JSON;
-- export hash-bound panel-pack ZIP;
-- create production manifest.
-
-A generic preview template remains draft-only. Vendor-ready status requires the exact provider template and source provenance.
-
-## 1. Choose the experiment before generating results
-
-Start from `docs/PAPER_SERIES.md`, `docs/papers/`, the PIM, or an approved preregistration.
-
-For every experiment define before held-out access:
-
-- experiment ID;
-- hypothesis ID;
-- directional hypothesis;
-- primary endpoint;
-- secondary endpoints;
-- surrogate set;
-- fresh held-out set;
+- generation / hypothesis identity;
+- directional hypothesis and endpoints;
+- surrogate and fresh held-out sets;
 - model/weight/preprocessing/threshold manifests;
 - candidate-generation policy;
-- optimization objective;
-- candidate count;
-- seeds;
-- EOT/transformation policy;
+- screening/optimization objective;
+- candidate/search budget and stopping rule;
+- seeds and EOT/transformation policy;
 - invalid-condition rule;
-- statistical unit;
-- stopping rule;
-- practical effect threshold;
+- statistical unit and practical effect threshold;
 - PASS / FAIL / INCONCLUSIVE regions;
-- allowed post-freeze appends;
+- allowed post-freeze amendments/appends;
 - evidence label.
 
-Do not open a fresh held-out generation until this contract is frozen.
+A generation may use early surrogate-only screening to decide whether more expensive machinery is scientifically earned.
 
-## 2. Generate candidate textiles
+### Current examples
 
-Use Product Studio for canonical RAC visual-language candidates or the Python candidate-generation path for computational experiments.
+- D2-0005 is separately preregistered and **NOT armed**.
+- D2-0007 is **closed `SCREENED_OUT_H0`** after 64/64 Stage-1 compositions produced zero survivors. It authorizes no Stage-2 anchors, optimization, held-out run, or Alpha-002.
 
-Canonical families:
+## 2. Candidate generation / screening
 
-- Signal Shadow — canonical hat;
-- Machine Static — canonical mask; hoodie extension;
-- Error Garden — canonical oversized shirt;
-- Broken Human — canonical cargo;
-- Ghost Hound — canonical beanie.
-
-Freeze:
+Use the declared creative/computational path while preserving deterministic provenance:
 
 - candidate ID;
-- family/product;
-- seed;
-- scale/density/distress;
-- motifs;
-- generation mode;
-- reference-fidelity score/subscores when used;
-- 4096 master tile;
-- production/reference board;
-- manifest;
-- SHA-256 of every artifact;
-- source commit.
-- Pattern Genome v1 sidecar for every candidate entering surrogate screening;
-- genome index SHA-256 and selected-winner genome reference.
+- generation ID;
+- family/motif/product;
+- seed and configuration;
+- source commit;
+- exported artifact hashes;
+- Pattern Genome sidecar where the governed path requires it;
+- surrogate-only measurements and telemetry.
 
-Pattern Genome extraction is automatic in the candidate-selection path. It is
-an intrinsic digital measurement only (`derived_digital_measurement`): genome
-features are frozen before surrogate evaluation, are not read by the v1
-ranking function, and can never satisfy a physical evidence state.
+Held-out models are forbidden during generation/ranking/mutation unless a new frozen contract explicitly says otherwise.
 
-### D2 generation rule
+## 3. Earned downstream complexity
 
-Candidate generation/ranking may use only the declared surrogate set. Fresh held-out models are forbidden during generation, ranking, mutation, fidelity selection, adaptive recoloring, or candidate freeze.
+If an early preregistered screen fails, close the generation and retain the result.
 
-## 3. Surrogate research
+If it passes, only then implement/use the minimum downstream machinery authorized by the protocol, such as:
 
-For hypothesis-driven digital experiments, record pre-held-out telemetry using the telemetry contract:
+- body/garment anchor abstraction;
+- bounded optimization;
+- EOT/deformation integration;
+- governed selection;
+- immutable candidate freeze.
 
-- surrogate mean;
-- surrogate worst case;
-- per-model rates;
-- cross-model disagreement;
-- transformation mean/worst/variance;
-- spectral-band telemetry;
-- fidelity;
-- printability;
-- coverage/topology;
-- objective trajectory;
-- optimizer configuration;
-- calibration-profile reference when applicable;
-- candidate SHA-256.
+Infrastructure existing in the repository does not by itself authorize its use in a generation.
 
-Freeze the telemetry hash **before** held-out access.
-
-### D2-0005 and later
-
-The next planned objective study is equal-budget mean vs worst-case/min-max/CVaR. Only the objective changes; model sets, candidate budget, seeds, transformation policy, thresholds, and held-out rules remain frozen according to the preregistration.
-
-## 4. Freeze candidate
+## 4. Candidate freeze before held-out access
 
 Before held-out evaluation:
 
-1. verify candidate SHA-256;
-2. verify source commit;
-3. verify surrogate/held-out manifests;
-4. verify held-out models have not been loaded by the candidate-selection process;
-5. freeze telemetry;
-6. freeze preregistration;
-7. record generation marker;
-8. prohibit candidate mutation.
+1. verify candidate/artifact hashes;
+2. verify source commit and frozen configuration;
+3. verify surrogate/held-out model-set identities;
+4. verify held-out feedback has not entered selection;
+5. seal required telemetry/provenance;
+6. prohibit candidate mutation.
 
-If the candidate changes by one byte, it is a new artifact/generation.
+Any scientific candidate-byte change after freeze creates a new artifact/generation.
 
-## 5. Run held-out digital evaluation
+## 5. Held-out digital evaluation
 
-Use the Python benchmark/workflow, not browser heuristics.
+Use the governed Python benchmark/workflow rather than browser heuristics.
 
 Rules:
 
-- one-shot fresh held-out generation;
-- no threshold changes after seeing candidate outcomes;
-- no candidate regeneration;
-- retain raw rows;
-- retain model manifests;
-- retain transformation conditions;
-- retain failures;
-- append held-out outcome to the frozen telemetry record;
-- permanently retire the generation from being described as unseen.
-
-PASS, FAIL, and INCONCLUSIVE are all publishable research outcomes.
-
-## 6. Close and ingest the generation
-
-After closure:
-
-1. verify benchmark candidate hash matches frozen candidate;
-2. verify model-lock hashes;
-3. verify protocol/model-set identity;
-4. verify held-out feedback boundary;
-5. verify bundle integrity;
-6. run closed-generation ingestion;
-7. create/update the ExperimentRegistry entry;
-8. append held-out outcome without changing frozen telemetry hash;
-9. classify failure if verdict is FAIL;
-10. mint `RAC-EXP-YYYY-NNN/`;
-11. verify release content hash;
-12. compile automated report;
-13. append manuscript-ready rows/figures;
-14. update `docs/PROJECT_PROGRESS.md`.
+- use the frozen held-out set exactly as authorized;
+- do not change thresholds after observing outcomes;
+- do not regenerate the candidate;
+- retain raw rows, manifests, transformation conditions and failures;
+- append results without rewriting pre-held-out history;
+- permanently treat the evaluated held-out set as observed for that generation.
 
-Legacy generations with unavailable telemetry fields use explicit null/unavailable values. Never reconstruct missing pre-held-out telemetry from post-held-out knowledge.
+PASS, FAIL, INCONCLUSIVE, and screened-out/null outcomes are all valid research results.
 
-## 7. Move frozen textile into Production Alpha
+## 6. Close and retain the generation
 
-Do not wait for every digital research question to finish before starting the manufacturing clock.
+At closure:
 
-Current first-SKU decision:
+- verify candidate/protocol/model hashes;
+- verify held-out boundary;
+- verify bundle/receipt integrity;
+- classify the result under the frozen rule;
+- retain negative/null evidence;
+- mint/update governed evidence/release artifacts where applicable;
+- update `docs/PROJECT_PROGRESS_CURRENT.md` and `docs/CURRENT_PROGRAM_STATE.md` rather than rewriting historical preregistrations.
 
-- provider: Printful;
-- category: all-over-print unisex crew-neck tee;
-- substrate: white-base 100% polyester;
-- size: M;
-- process: cut-and-sew dye sublimation;
-- candidate: frozen RAC artwork;
-- control: matched solid-fill/control artwork;
-- same provider/product/variant/size/substrate/process/order where practical.
+Do not reconstruct unavailable pre-outcome telemetry from post-outcome knowledge.
 
-Before ordering, resolve and freeze:
+## 7. Production Alpha identity
 
-- Printful account/API access;
-- exact `product_id`;
-- exact `variant_id`;
-- exact downloadable vendor template ZIP;
-- original template ZIP SHA-256;
-- template version/source URL/date;
-- panel geometry;
-- artwork hash;
-- mapping hash;
-- panel-pack hash;
-- SKU manifest.
+The current physical test article is **not D2-0007** and not a newly regenerated candidate.
 
-Open vendor questions remain: effective on-fabric resolution, numeric registration tolerance, template-version policy, and fulfillment-region consistency.
+Production target:
 
-## 8. Printful ordering procedure
+```text
+Release: RAC-PRINT-ALPHA-001
+Candidate lineage: RAC-PER-D2-0003
+Primary product: Printful 388 — All-Over Print Recycled Unisex Hoodie
+Size: operator-selected from live supported variants
+Control: matched flat/control artwork on the same production configuration
+```
 
-See `PRINTFUL_PRODUCTION_SOP.md` for the full provider workflow.
+The exact Alpha-001 source was recovered from the original historical Actions artifact.
 
-Minimum rule: candidate and control must be as identical as practical except for the experimental artwork.
+```text
+sealed print-test-kit.zip SHA-256:
+b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548
 
-Order enough material to support:
+pattern_tile_4096.png SHA-256:
+b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546
+```
 
-- matched control;
-- candidate;
-- calibration/durability reserve;
-- replacement/failure reserve when budget permits.
+Recovery provenance: `evidence/p1/alpha001-source-recovery.json`.
 
-Do not serially discover after delivery that another identical article was needed.
+Do not regenerate or retune Alpha-001.
 
-## 9. Prepare calibration before garments arrive
+## 8. Live Printful intake
 
-Use `CALIBRATION_TARGET_SPEC.md` and `PHYSICAL_TEST_INFRASTRUCTURE.md`.
+Use the strict release wrapper:
 
-Calibration target includes:
+```bash
+export PF_TOKEN='<secret>'
+python tools/p1_production_release.py intake \
+  --fetch \
+  --size M \
+  --output-dir production_alpha/vendor_intake
+```
 
-- ≥24 color patches;
-- 11-step neutral ramp;
-- horizontal/vertical line pairs;
-- 2/4/8/16/32/64 px checkerboards;
-- frequency wedges;
-- registration marks;
-- 100 mm / 200 mm rulers;
-- RAC motif fragments;
-- high-frequency random region;
-- low-frequency control;
-- target ID/version/hash prefix.
+Replace `M` with the actual chosen size.
 
-Freeze target bytes and manufacturing metadata before printing.
+The wrapper must validate live product identity, variant, required placements, raw vendor bytes and deterministic vendor archives. Unexpected or conflicting vendor state is a stop condition, not permission to guess.
 
-## 10. Prepare P1 rig before garments arrive
+The fallback/reserve product-257 tee metadata may still be required by the current binder contract; it is not the primary first-order SKU.
 
-Use `P1_CAPTURE_RIG_SPEC.md`.
+## 9. Exact production-art build
 
-Mark:
+```bash
+python tools/p1_production_release.py build \
+  --intake production_alpha/vendor_intake/vendor-intake.json \
+  --print-test-kit /secure/path/print-test-kit.zip \
+  --recorded-by '<operator>'
+```
 
-- camera position/height;
-- 1 m, 3 m, 5 m, optional 8 m distances;
-- actor center;
-- yaw 0°, ±45°, ±90° or preregistered subset;
-- repeatable movement path;
-- named lighting states;
-- background;
-- camera/lens/settings;
-- exposure/white-balance behavior.
+The build verifies vendor evidence and the frozen Alpha-001 source, creates exact-size candidate/control panel artwork, deterministic archives, and binder-ready UA values. It does not authorize spend or place an order.
 
-Primary statistical unit:
+## 10. Bind and readiness transition
 
-**garment × actor × session**
+Review live variant/geometry/artwork/hash information first.
 
-Frames are nested observations, not independent trials.
+Then:
 
-## 11. Synthetic dry run
+```bash
+python tools/p1_bind_ua_values.py \
+  --values production_alpha/vendor_intake/ua-values.generated.json \
+  --check-only
 
-Before real garments arrive, run the entire P1 data path with synthetic inputs labeled:
+python tools/p1_bind_ua_values.py \
+  --values production_alpha/vendor_intake/ua-values.generated.json
 
-`synthetic_pipeline_validation_only`
+python tools/p1_no_spend_readiness_gate.py
+```
 
-Exercise:
+Require clean binding/readiness receipts. Successful software readiness remains separate from human procurement authorization.
 
-capture manifest → ingestion → validity → statistics → report → evidence bundle → refusal/non-physical status.
+## 11. Matched procurement
 
-Synthetic observations must never become RAC-P evidence.
+Minimum first order:
 
-## 12. Receive and QA physical articles
+```text
+1 × PA-HOODIE-CAND-001
+1 × PA-HOODIE-CTRL-001
+```
 
-Before efficacy capture:
+Candidate/control must be matched on every practical production variable except artwork: product, live variant, size, substrate, technique, order window, and intended fulfillment conditions.
 
-- photograph package/product labels;
-- verify SKU/variant/size/substrate;
-- verify obvious manufacturing defects;
-- verify control/candidate are matched;
-- photograph front/back/detail under fixed lighting;
-- record receipt date;
-- assign immutable physical artifact IDs;
-- hash all digital records/photos;
-- record deviations.
+Record order IDs, uploaded artwork hashes, live product/variant information, date, and manufacturing/fulfillment region when available.
 
-If the articles are not matched, stop and document the manufacturing deviation before testing.
+## 12. Calibration target and rig
 
-## 13. Calibration capture
+While garments are in transit:
 
-Capture calibration target under frozen conditions.
+- generate/use `RAC-CALT-P1-0001`;
+- print/fabricate at 100% scale / 300 DPI;
+- physically verify the 100 mm scale bar;
+- stage camera/lighting/background/marks and storage;
+- prepare custody and raw-media retention.
 
-At minimum:
+Do not collect efficacy outcomes early.
 
-- perpendicular close capture;
-- 1 m / 3 m / 5 m frequency-survival captures;
-- ≥2 controlled lighting states;
-- rawest practical output plus normal processed camera output.
+## 13. Receipt QA
 
-Ingest with calibration software and produce a versioned `print_camera_profile.json`.
+Before P1:
 
-Measure:
+- reconcile order/SKU/variant identity;
+- verify candidate/control pairing;
+- record material and fulfillment/manufacturing facts;
+- inspect placement, registration, seams and defects;
+- preserve chain of custody;
+- stop/reorder/escalate if the pair is not QA-admissible.
 
-- RGB/color response;
-- CIEDE2000/color error where applicable;
-- geometric scale;
-- placement/registration;
-- frequency attenuation;
-- distance attenuation;
-- repeatability.
+Manufacturing defects are not candidate successes.
 
-Do not use the profile for measured-EOT until its acceptance gate passes on held-out calibration regions.
+## 14. P1 execution authority
 
-## 14. Run P1 matched physical experiment
+Use only the frozen execution package:
 
-For each preregistered condition:
+```text
+physical/p1/P1_OPERATOR_RUNBOOK.md
+physical/p1/P1_CAPTURE_SCHEDULE.json        # 144 trials
+physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json
+physical/p1/P1_READINESS_FREEZE.json
+```
 
-1. capture control;
-2. capture candidate;
-3. retain complete sequence;
-4. run detector telemetry;
-5. determine control validity;
-6. mark control-undetected condition INVALID;
-7. never count an invalid control condition as candidate success;
-8. aggregate at session level;
-9. retain frame telemetry beneath session;
-10. run paired statistics.
+The historical 108-row planning sheet is not execution authority.
 
-No threshold changes after candidate results are observed.
+Run calibration acceptance first. Then execute the frozen 144-trial schedule exactly, preserving raw captures, filenames, metadata, hashes and invalid-condition dispositions.
 
-## 15. Statistics
+Never alter thresholds after seeing candidate outcomes.
 
-Use `trial_statistics.py`.
+## 15. Physical evidence ingestion / analysis
 
-Report:
+After capture:
 
-- valid/invalid trial counts;
-- control detection rate;
-- candidate detection rate;
-- paired risk difference;
-- Wilson intervals;
-- deterministic bootstrap interval;
-- odds ratio where specified;
-- stopping-rule decision;
-- per-condition invalid accounting.
+1. validate expected media and hashes;
+2. preserve raw captures and invalid-condition records;
+3. complete ingestion/session records;
+4. seal the physical evidence package;
+5. run preregistered paired/statistical analysis;
+6. retain PASS / FAIL / negative / inconclusive outcome exactly as produced.
 
-Do not rely on point estimates alone.
+Do not promote rehearsal/synthetic data into RAC-P evidence.
 
-## 16. Physical evidence release
+## 16. Durability / manufacturing
 
-If P1 data are complete:
+Only after a valid P1 baseline:
 
-- attach calibration-profile hash;
-- attach physical artifact IDs;
-- attach capture metadata;
-- attach raw-data index;
-- attach statistical outputs;
-- attach invalid conditions;
-- seal experiment release;
-- run certificate/evidence-state logic.
+- execute preregistered wash/durability conditions;
+- retain the same evidence/provenance discipline;
+- establish a golden physical sample if warranted;
+- measure lot conformity rather than assuming repeatability;
+- bound any product/public claims to the actually supported evidence state.
 
-A digital PASS cannot substitute for P1. A P1 result is valid only for the tested artifact and conditions.
+## 17. Reporting / publication
 
-## 17. Durability program
+Every report should distinguish:
 
-Preserve the same garments.
+- exploratory observation;
+- internally measured digital result;
+- physical result;
+- manufacturing result;
+- negative/null result;
+- open/speculative hypothesis.
 
-Planned states:
+Publication tooling must consume verified evidence; it must not promote claims from a mutable status flag.
 
-- W0;
-- W1;
-- W5;
-- W10;
-- later states if preregistered.
+## Non-negotiable invariants
 
-Record laundering process, detergent, temperature, drying method, color shift, registration, frequency attenuation, and detector outcomes.
+Never:
 
-Never replace a degraded garment merely because it performs worse.
-
-## 18. Technological aging
-
-Keep the physical artifact fixed while later detector generations change.
-
-Do not reprint/re-optimize the garment for model-aging analysis.
-
-This creates two independent longitudinal axes:
-
-- physical aging;
-- model aging.
-
-## 19. Manufacturing evidence
-
-After a repeatable physical design exists:
-
-- freeze golden sample;
-- define color/scale/placement/registration tolerances;
-- measure production samples;
-- run lot-conformity logic;
-- retain failures;
-- progress M1/M2 only with real manufacturing evidence.
-
-## 20. Paper update procedure
-
-The manuscripts live under `docs/papers/`.
-
-When an experiment closes:
-
-1. cite its immutable RAC-EXP release;
-2. insert Results only from released data;
-3. generate tables/figures from the report compiler;
-4. update Discussion;
-5. preserve preregistered hypotheses;
-6. discuss failures and alternative explanations;
-7. update limitations;
-8. never rewrite Methods to make results appear expected.
-
-Priority:
-
-- Paper 1: prospective transfer prediction;
-- Paper 5: objective/CVaR ablation;
-- Paper 2: manufacturing-calibrated optimization;
-- Paper 3: geometry/coverage/deformation;
-- Paper 4: physical + technological aging.
-
-## 21. Production gates
-
-### Alpha
-
-- frozen design;
-- exact vendor template;
-- validated panel pack;
-- complete SKU manifest;
-- matched order placed.
-
-### Beta
-
-- garments received;
-- calibration complete;
-- P1 complete;
-- uncertainty report complete;
-- evidence release verifies.
-
-### v1
-
-- repeatable SKU;
-- physical evidence;
-- durability evidence;
-- golden sample;
-- lot tolerances;
-- reviewed, condition-specific claims;
-- reproducible public evidence package.
-
-## 22. Stop conditions
-
-Stop and document rather than improvise when:
-
-- held-out contamination occurs;
-- candidate hash changes;
-- model manifest changes;
-- threshold changes after result access;
-- control garment fails validity;
-- control/candidate manufacturing differs materially;
-- calibration profile fails acceptance;
-- physical metadata are incomplete;
-- evidence bundle verification fails.
-
-A stopped experiment is preferable to contaminated evidence.
+- rewrite a frozen preregistration to make history look current;
+- inject a new pool into D2-0005;
+- reopen D2-0007 after its screened-out closure under the same identity;
+- silently replace/rebind Alpha-001;
+- access held-out data early;
+- change thresholds after outcome observation;
+- guess missing vendor values;
+- treat software readiness as physical efficacy;
+- delete negative results.
