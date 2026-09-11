@@ -45,7 +45,7 @@ The numbered engineering barriers are no longer the main bottleneck. The current
 | **CTM contracts / governance** | **INTEGRATED** | `PROJECT_PROGRESS_CURRENT.md`, `CTM_BD_INTEGRATION_AUDIT_2026-09-10.md`, CTM handoff appendices | Continue only evidence-justified extensions; do not mutate Pattern Genome v1 |
 | **P1 no-spend readiness** | **CLOSED / PASS** | `docs/handoffs/P1_NO_SPEND_HANDOFF.md`, `physical/p1/P1_READINESS_FREEZE.json`, readiness gate | No additional software work required unless a real defect is found |
 | **UA binding machinery** | **READY / REAL VALUES UNBOUND** | `tools/p1_bind_ua_values.py`, `physical/p1/UA_VALUES_TEMPLATE.json`, `tests/test_p1_ua_binding.py` | Obtain real UA-1–UA-8 values; `6b36dfe5` is the machinery-complete/unbound checkpoint |
-| **Vendor / Production Alpha transition** | **BLOCKED ON EXTERNAL INPUT + HUMAN AUTHORIZATION** | Friday playbook in `docs/handoffs/P1_NO_SPEND_HANDOFF.md`; `docs/USER_ACTION_REQUIRED_PRINT_ALPHA.md` | Resolve vendor/template/SKU/order/calibration/arrival inputs; successful binding does not itself authorize spend |
+| **Vendor / Production Alpha transition** | **BLOCKED ON EXTERNAL INPUT + HUMAN AUTHORIZATION** | `docs/USER_ACTION_NEXT_STEPS.md`; Friday playbook in `docs/handoffs/P1_NO_SPEND_HANDOFF.md`; historical hash-pinned `docs/USER_ACTION_REQUIRED_PRINT_ALPHA.md` | Follow the current operator checklist to resolve vendor/template/SKU/artwork values, bind them, preserve readiness PASS, then separately authorize spend |
 | **Physical P1 capture** | **OPEN — NOT EXECUTED** | Frozen `P1_OPERATOR_RUNBOOK.md` and 144-trial `P1_CAPTURE_SCHEDULE.json` | QA-admissible physical specimens, accepted calibration, then execute the frozen 144-trial schedule |
 | **P2 durability** | **OPEN — EXTERNAL** | durability / physical-program contracts | Requires valid physical baseline evidence first |
 | **M1/M2 manufacturing evidence** | **OPEN — EXTERNAL** | manufacturing evidence contracts | Golden-sample and lot-conformity measurements |
@@ -77,6 +77,8 @@ Do not execute an older 108-row planning sheet as the P1 protocol.
 
 ## Immediate critical path
 
+For the human operator, follow **`docs/USER_ACTION_NEXT_STEPS.md`**. It is the current dependency-ordered checklist and preserves the frozen P1 authority described above.
+
 `Verified UA-1–UA-8 values → binder --check-only → atomic bind + receipt → readiness gate PASS → separate human spend authorization → procurement → specimen receipt/QA → calibration acceptance → frozen 144-trial P1 execution → validated ingestion → sealed evidence → preregistered analysis`
 
 Stop if a real UA value is unknown, the binder refuses, the readiness gate fails, provenance cannot be reproduced, or a protected scientific boundary changes unexpectedly.
@@ -90,6 +92,7 @@ The noRecognition review is no longer wholly pending: NR-01, NR-02/03, and NR-04
 ## Reading map
 
 - **Current state:** this file.
+- **What Mike needs to do next:** `USER_ACTION_NEXT_STEPS.md` — authoritative current operator checklist from vendor inputs through physical P1.
 - **Detailed current workstreams / CI / governance:** `PROJECT_PROGRESS_CURRENT.md`.
 - **Barrier 0–2 history and CTM hardening appendices:** `RAC_PARALLEL_SWARM_HANDOFF.md`.
 - **Barrier 3 closure:** `BARRIER_3_COMPLETION_HANDOFF.md`.
