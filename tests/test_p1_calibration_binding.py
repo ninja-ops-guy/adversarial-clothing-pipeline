@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import copy
+import hashlib
+import json
 
 import pytest
 
@@ -36,6 +38,11 @@ def _profile(profile_id: str = "RAC-PCP-1-001") -> dict:
     }
 
 
+def _source(payload: dict) -> dict:
+    text = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    return {"source_text": text, "source_sha256": hashlib.sha256(text.encode()).hexdigest()}
+
+
 def test_complete_measured_profile_accepts() -> None:
     receipt = evaluate_profile_payload(_profile(), "pre")
     assert receipt["accepted"] is True
@@ -52,37 +59,65 @@ def test_incomplete_profile_refuses() -> None:
 
 
 def test_bracketed_session_binding_requires_pre_and_post() -> None:
-    pre = evaluate_profile_payload(_profile("RAC-PCP-1-001"), "pre")
+    pre_payload = _profile("RAC-PCP-1-001")
     post_payload = _profile("RAC-PCP-1-002")
     post_payload["created_utc"] = "2026-09-11T13:00:00Z"
-    post = evaluate_profile_payload(post_payload, "post")
+    pre_source = _source(pre_payload)
+    post_source = _source(post_payload)
+    pre_receipt = evaluate_profile_payload(pre_payload, "pre", source_bytes=pre_source["source_text"].encode())
     session = {
         "evidence_class": "physical_garment_p1",
         "camera_id": "CAM-01",
         "lighting_id": "LIGHT-01",
         "calibration_pass": True,
-        "calibration_profile_id": pre["profile_id"],
-        "calibration_profile_sha256": pre["profile_sha256"],
-        "calibration": {"pre": pre, "post": post},
+        "calibration_profile_id": pre_receipt["profile_id"],
+        "calibration_profile_sha256": pre_source["source_sha256"],
+        "calibration": {"pre": pre_source, "post": post_source},
     }
-    assert validate_session_calibration_binding(session) == {"pre": pre, "post": post}
+    receipts = validate_session_calibration_binding(session)
+    assert receipts is not None
+    assert receipts["pre"]["profile_id"] == "RAC-PCP-1-001"
+    assert receipts["post"]["profile_id"] == "RAC-PCP-1-002"
     broken = copy.deepcopy(session)
     del broken["calibration"]["post"]
     with pytest.raises(ValueError, match="post-capture"):
         validate_session_calibration_binding(broken)
 
 
+def test_calibration_binding_rejects_source_tamper() -> None:
+    pre_payload = _profile("RAC-PCP-1-001")
+    post_payload = _profile("RAC-PCP-1-002")
+    pre_source = _source(pre_payload)
+    post_source = _source(post_payload)
+    pre_receipt = evaluate_profile_payload(pre_payload, "pre", source_bytes=pre_source["source_text"].encode())
+    session = {
+        "evidence_class": "physical_garment_p1",
+        "camera_id": "CAM-01",
+        "lighting_id": "LIGHT-01",
+        "calibration_pass": True,
+        "calibration_profile_id": pre_receipt["profile_id"],
+        "calibration_profile_sha256": pre_source["source_sha256"],
+        "calibration": {"pre": pre_source, "post": post_source},
+    }
+    session["calibration"]["pre"]["source_text"] += " "
+    with pytest.raises(ValueError, match="hash mismatch"):
+        validate_session_calibration_binding(session)
+
+
 def test_calibration_binding_rejects_camera_drift() -> None:
-    pre = evaluate_profile_payload(_profile("RAC-PCP-1-001"), "pre")
-    post = evaluate_profile_payload(_profile("RAC-PCP-1-002"), "post")
+    pre_payload = _profile("RAC-PCP-1-001")
+    post_payload = _profile("RAC-PCP-1-002")
+    pre_source = _source(pre_payload)
+    post_source = _source(post_payload)
+    pre_receipt = evaluate_profile_payload(pre_payload, "pre", source_bytes=pre_source["source_text"].encode())
     session = {
         "evidence_class": "physical_garment_p1",
         "camera_id": "OTHER-CAM",
         "lighting_id": "LIGHT-01",
         "calibration_pass": True,
-        "calibration_profile_id": pre["profile_id"],
-        "calibration_profile_sha256": pre["profile_sha256"],
-        "calibration": {"pre": pre, "post": post},
+        "calibration_profile_id": pre_receipt["profile_id"],
+        "calibration_profile_sha256": pre_source["source_sha256"],
+        "calibration": {"pre": pre_source, "post": post_source},
     }
     with pytest.raises(ValueError, match="camera_id"):
         validate_session_calibration_binding(session)
