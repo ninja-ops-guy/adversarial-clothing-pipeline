@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0",
+  "generation_id": "RAC-PER-D2-0007",
+  "status": "PREREGISTERED",
+  "armed": false,
+  "protocol": "protocols/RAC-PERSON-DETECT-1.2.json",
+  "surrogate_model_set": "PERSON-SUR-v3",
+  "heldout_model_set": "PERSON-HO-v3",
+  "heldout_models": [
+    "fasterrcnn_resnet50_fpn_v2",
+    "maskrcnn_resnet50_fpn_v2"
+  ],
+  "heldout_feedback_allowed": false,
+  "lock_status": "PREREGISTERED",
+  "lock_source_commit": null,
+  "lock_inference_performed": false,
+  "preregistration": "docs/PREREGISTRATION_D2-0007.md",
+  "lineage": {
+    "type": "FRESH_PROSPECTIVE",
+    "immutable_inputs": ["RAC-PER-D2-0003", "RAC-PER-D2-0004"],
+    "untouched": ["RAC-PER-D2-0005"],
+    "interpretation_policy_only": ["D2-0006"],
+    "print_alpha_001_binding": "RAC-PRINT-ALPHA-001 remains the D2-0003 specimen permanently"
+  },
+  "motif_screening": {
+    "stage": "hypothesis_screening_not_evidence_promotion",
+    "surfaces": "development/surrogate only (PERSON-SUR-v3); held-out referenced by hash only",
+    "generator_set": [
+      "HyperfaceLikeGenerator",
+      "DazzleSurgicalLinesGenerator",
+      "KeyFeatureBlackoutGenerator",
+      "SaliencyEyeAttackGenerator",
+      "AdversarialPatchGenerator",
+      "SwappedLandmarksGenerator",
+      "LandmarkNoiseGenerator",
+      "FeatureCollageGenerator"
+    ],
+    "generator_set_source": "ruthless_pipeline/patterns/__init__.py::P0_GENERATORS at freeze",
+    "external_generators": "Any generator not present in the repo at freeze is EXTERNAL_NOT_YET_PRESENT and gated behind a reviewed adapter + pre-execution amendment.",
+    "stopping_rule": {
+      "compositions_per_generator": 8,
+      "seeds": [20270110, 20270111, 20270112],
+      "max_candidates_admitted_to_optimization": 4,
+      "optional_stopping": false,
+      "budget_extension": "forbidden post-hoc; early termination only on documented infrastructure failure with one amendment-governed re-run from frozen inputs"
+    },
+    "decision_rule": "A motif family shows useful signal iff its best composition reduces the mean per-surrogate detection rate over PERSON-SUR-v3 by >= 0.15 absolute vs matched control, present on >= 4 of 6 surrogates, with invalid_condition_fraction <= 0.10. No surviving motif => no adapter built; generation closes as screened-out null."
+  },
+  "anchor_abstraction": {
+    "built_only_for": "surviving motifs from motif_screening",
+    "capability_vocabulary": [
+      "torso_region",
+      "shoulder_axis",
+      "silhouette_mask",
+      "panel_region",
+      "bounding_region"
+    ],
+    "vocabulary_note": "Small declared vocabulary; NOT a pose framework. Extensions require a pre-execution amendment.",
+    "provider_schema": "schemas/d2007_anchor_provider_v1.schema.json",
+    "provider_governance": [
+      "provider_identity",
+      "version_hash",
+      "configuration",
+      "coordinate_convention",
+      "confidence_handling",
+      "permitted_data_exposure"
+    ],
+    "provenance_classes": ["template_derived", "model_derived"],
+    "implementation_in_this_change": "none (schema + validation tests only)"
+  },
+  "optimization": {
+    "objective": "cvar",
+    "cvar_alpha": 0.5,
+    "objective_scope": "surrogate ensemble PERSON-SUR-v3 only; reuses D2-0005 Arm-C objective semantics without touching D2-0005",
+    "eot_transform_grid": "RAC-PERSON-DETECT-1.2 grid: brightness {0.7,1.0,1.3} x blur {0,0.8} x rotation {-20,0,20} plus garment deformation dimensions from schemas/transformation_distribution.schema.json defaults",
+    "printability_constraints": "printable gamut (perceptual), resolution loss <= 0.2, pattern energy bounded to declared panel_region/silhouette_mask anchors; violators ineligible, not repaired",
+    "selection": "single winner: minimum CVaR_0.5 surrogate detection rate among eligible admitted candidates; tie-break worst-surrogate rate, then ensemble mean, then seed index",
+    "selection_boundary": "SURROGATE_ONLY"
+  },
+  "heldout_evaluation": {
+    "protocol": "single-shot: exactly one held-out evaluation of the frozen winner on PERSON-HO-v3",
+    "no_iterative_replacement": true,
+    "outcome_retention": "PASS or FAIL retained either way and published as closed-generation datapoint"
+  },
+  "print_alpha_002_promotion_condition": "RAC-PRINT-ALPHA-002 may be proposed only if the single held-out evaluation returns PASS; otherwise no print article is created.",
+  "telemetry_contract": "ruthless_pipeline/certification/telemetry_contract.py (CONTRACT_VERSION 1.0)",
+  "selection_boundary": "SURROGATE_ONLY",
+  "notes": [
+    "Fresh prospective lineage: D2-0003/D2-0004 are immutable negative-result inputs; D2-0005 is untouched (stays PREREGISTERED/unarmed under its frozen amendment A5); D2-0006 stays interpretation-policy only.",
+    "Sequencing gate: landmark-free wiring smoke test (separately owned) must PASS before motif screening opens.",
+    "Motif screening is hypothesis screening, never evidence promotion; screening results are surrogate-only and are never reported as transfer or effectiveness evidence.",
+    "Held-out set PERSON-HO-v3 is referenced by hash only (benchmarks/frozen_surface_sha256.json); no held-out access before the single Stage-6 evaluation.",
+    "Trigger fields are present but NOT armed: trigger_revision is unchanged and no workflow targets this generation, so committing this file cannot fire CI.",
+    "lock_source_commit and required_commits are intentionally null/empty; they are filled ONLY at the D2-0007 model-lock freeze after all preregistered gates close.",
+    "This change declares only: no surrogate runs, no held-out runs, no anchor provider implementation, no arming."
+  ],
+  "trigger_revision": 4,
+  "trigger_reason": "NOT ARMED. Retained only for schema parity with RAC-PER-D2-0004/RAC-PER-D2-0005. Arming D2-0007 requires a separate reviewed change after the smoke-test gate and a fresh model-lock freeze.",
+  "required_commits": []
+}

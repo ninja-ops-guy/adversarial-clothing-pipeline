@@ -1,0 +1,157 @@
+{
+  "$id": "https://rac.example/schemas/d2007_anchor_provider_v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC D2-0007 Anchor Provider Declaration",
+  "description": "Additive preregistration contract for RAC-PER-D2-0007 anchor providers. Captures provider identity, version/hash, configuration, coordinate convention, confidence handling, and permitted data exposure, plus the mandatory provenance class (template_derived vs model_derived). Declaration/validation surface only: no provider implementation is defined or implied by this schema. Declares only; nothing is armed or executed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "declaration_id",
+    "generation_id",
+    "provider",
+    "anchor_capabilities",
+    "provenance_class",
+    "coordinate_convention",
+    "confidence_handling",
+    "permitted_data_exposure"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "declaration_id": {
+      "type": "string",
+      "pattern": "^RAC-D2007-ANCHOR-[0-9]{3}$",
+      "description": "Unique declaration identifier, e.g. RAC-D2007-ANCHOR-001."
+    },
+    "generation_id": {
+      "type": "string",
+      "const": "RAC-PER-D2-0007"
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity", "version", "artifact_sha256", "configuration"],
+      "properties": {
+        "identity": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Provider name, e.g. 'fixed-torso-template-v1' or a named segmentation model."
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact provider version string."
+        },
+        "artifact_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the provider artifact (template file or model weights) pinned at declaration time."
+        },
+        "configuration": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Complete provider parameter set; must be sufficient to reproduce the provider's outputs."
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "anchor_capabilities": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "torso_region",
+          "shoulder_axis",
+          "silhouette_mask",
+          "panel_region",
+          "bounding_region"
+        ]
+      },
+      "description": "Closed D2-0007 anchor capability vocabulary (docs/PREREGISTRATION_D2-0007.md section 3.1). Not a pose framework."
+    },
+    "provenance_class": {
+      "enum": ["template_derived", "model_derived"],
+      "description": "Mandatory provenance class. template_derived: deterministic declared template, reproducible from the freeze record. model_derived: learned model; weights hash and confidence handling are governed surrogate-side dependencies."
+    },
+    "coordinate_convention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "axis_directions", "normalization", "units"],
+      "properties": {
+        "origin": {
+          "enum": ["top_left", "bottom_left", "center", "crop_top_left"],
+          "description": "Fixed coordinate origin for all anchor outputs."
+        },
+        "axis_directions": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Axis direction convention, e.g. 'x right, y down'."
+        },
+        "normalization": {
+          "enum": ["pixel", "normalized_0_1"],
+          "description": "Whether coordinates are absolute pixels or normalized to the crop extent."
+        },
+        "units": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unit label, e.g. 'px' or 'fraction_of_crop'."
+        }
+      }
+    },
+    "confidence_handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confidence_exposed_downstream", "low_confidence_fallback"],
+      "properties": {
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fixed confidence threshold; required for model_derived providers, optional for template_derived."
+        },
+        "low_confidence_fallback": {
+          "enum": ["reject_candidate", "fixed_template_default", "flag_and_continue"],
+          "description": "Fixed fallback behavior when provider confidence is below threshold."
+        },
+        "confidence_exposed_downstream": {
+          "type": "boolean",
+          "description": "Whether confidence values may cross stage boundaries; exposure is declared, not implicit."
+        }
+      }
+    },
+    "permitted_data_exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["crosses_stage_boundary", "exposed_fields", "source_imagery_exposed", "heldout_derived_statistics_exposed"],
+      "properties": {
+        "crosses_stage_boundary": {
+          "type": "boolean",
+          "description": "Whether any provider output may cross a stage boundary (screening -> optimization -> freeze)."
+        },
+        "exposed_fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["coordinates", "mask", "orientation", "confidence", "provenance_class"]
+          },
+          "description": "Exactly which anchor output fields may be exposed. Coordinates/masks only in the default configuration."
+        },
+        "source_imagery_exposed": {
+          "const": false,
+          "description": "Source imagery never crosses stage boundaries; must remain false."
+        },
+        "heldout_derived_statistics_exposed": {
+          "const": false,
+          "description": "No held-out-derived statistic may ever be exposed by a provider; must remain false."
+        }
+      }
+    }
+  }
+}
