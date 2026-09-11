@@ -148,3 +148,29 @@ Source of truth: CTM_Lessons_and_Repo_Spec_Proposals_REVISED.md; execution contr
 
 ## Assertions (re-affirmed)
 D2_0004_MODIFIED=false D2_0005_ARMED=false NEW_HELDOUT_ACCESS=false SCIENTIFIC_THRESHOLDS_CHANGED=false PHYSICAL_EFFICACY_CLAIMED=false
+
+## Appendix 4 — PUSH_INTEGRITY incident record + HEAD verification (2026-09-11)
+
+### Incident: literal placeholder blobs committed as file content
+Three derived artifacts were clobbered by literal `__CONTENT_N__` tokens in history:
+- physical/p1/P1_READINESS_FREEZE.json → bad blob b17b181a (13 bytes, `__CONTENT_2__`); implicated commit 459b7503 (disguised as a freeze re-pin). Effect: gate REFUSED all freeze checks (fail-closed held).
+- artifacts/provenance/graph.json → bad blob 57fd5f3a; artifacts/dashboard/experiments.json → bad blob 7edf039f; implicated commits b26de2e7, 9e9719d2 ("corrects placeholder" commits that themselves pushed placeholders).
+Detection path: directory-listing size anomaly + code search for `__CONTENT_`.
+
+### Repair (dual-lane, cross-validated)
+- cd51d38b (agent lane): freeze re-pinned via --write-freeze (d9c63e12), dashboard export regenerated (6d6510d6), genome-v2 register test fixture fixed (FamilyResult adequacy fields; bdfb78e9). All refetch byte-verified.
+- 2511f6c3 / 350fbe1d (main lane): independent regeneration of the same artifacts; blob-identical results (two independent derivations, same bytes).
+- cd34bd45 + 68fe6b04: CI-audited provenance artifact repair; 4dcba5cf/5ee2da13: committed-graph bytes now verified fail-closed in CLI; c79793c6/c3b49554/3ec7d32d: zero-dependency JSON integrity gate (scripts/check_json_integrity.py) now fails CI on malformed/placeholder JSON — the incident class is now mechanically blocked.
+- c97db25c (agent lane): two stale e2e specs reconciled with intentional UI changes — research-console strict-mode regex anchored (^Pattern Lab; home-link added in e79e1533 made the unanchored regex ambiguous from birth in df738e75) and pattern-lab export test dropped the header Export Config action removed deliberately in 9fb3db9c (sidebar JSON export coverage retained). Pushed blobs byte-verified: cb2efe1b, 6bb279c0.
+
+### Independent verification at HEAD c97db25c (fresh tarball extraction, no local state carried)
+- Placeholder scan: zero `__CONTENT_` occurrences outside the integrity gate and its tests.
+- scripts/check_json_integrity.py: PASS (161 JSON files, 0 findings).
+- scripts/build_provenance_graph.py --verify: committed bytes VERIFIED (sha256 734e2012…d82581); edges 53 VERIFIED / 0 BROKEN / 1 MISSING-by-design / 0 MUTABLE.
+- Freeze re-derivation: byte-stable (no drift).
+- P1 no-spend readiness gate: PASS; 208 UA fields pending, none defaulted; spend_authorized=false.
+- pytest: 1897 passed, 0 failed, 0 errors, 2 skipped, 0 xfail, 0 xpass (1899 collected).
+- Playwright (separate counts, per project): chromium-desktop 57 passed / 0 failed / 0 skipped; webkit-mobile 56 passed / 0 failed / 1 skipped (pre-existing BASE_URL-only skip). Combined: 113 passed, 0 failed, 1 skipped of 114. An earlier combined-run showing 114 failures was environmental only (missing browser binaries after sandbox wipe, then static-server death under dual-browser load); per-project reruns isolated the two genuine stale-spec defects fixed in c97db25c.
+
+### Assertions (re-affirmed)
+D2_0004_MODIFIED=false D2_0005_ARMED=false NEW_HELDOUT_ACCESS=false SCIENTIFIC_THRESHOLDS_CHANGED=false PHYSICAL_EFFICACY_CLAIMED=false
