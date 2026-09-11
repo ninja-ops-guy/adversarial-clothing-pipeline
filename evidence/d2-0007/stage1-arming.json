@@ -1,0 +1,53 @@
+{
+  "schema_version": "rac-d2007-stage-arming/1.0",
+  "generation_id": "RAC-PER-D2-0007",
+  "armed_stage": "STAGE_1_MOTIF_SCREENING",
+  "armed": true,
+  "authorization_scope": "Exactly the frozen 64-composition, eight-generator PERSON-SUR-v3 motif screen defined by configs/d2007_stage1_screening_v1.json. This arming does not authorize any later D2-0007 stage.",
+  "parent_preregistration": {
+    "path": "docs/PREREGISTRATION_D2-0007.md",
+    "sha256": "38b955d5b60e3428cce84a8c6b849fbcb61b153a4b3fb3a3040aa730d6e1564f"
+  },
+  "frozen_generation_record": {
+    "path": "generations/RAC-PER-D2-0007.json",
+    "sha256": "3efd0ddd6ca00c9a9f4ee15ef233eac2d8733cf235ef669927dc8665d072efef",
+    "note": "The frozen parent remains PREREGISTERED/armed=false; this additive overlay authorizes Stage 1 only."
+  },
+  "stage1_execution_freeze": {
+    "path": "configs/d2007_stage1_screening_v1.json",
+    "introduced_commit": "71cb0f6101d0939fcd88460696d1d016ad5a8016",
+    "implementation_ready_commit": "c7fa80b1c3a8fbb891dca22f901f0d956ced97d0"
+  },
+  "amendment": {
+    "path": "docs/PREREGISTRATION_D2-0007_AMENDMENT_A1.md",
+    "status": "PRE_STAGE1_POST_REHEARSAL_EXECUTION_CLARIFICATION",
+    "stage0_telemetry_exposure_declared": true
+  },
+  "stage0_gate": {
+    "path": "evidence/d2-0007/stage0-landmark-free-smoke-closure.json",
+    "decision": "PASS",
+    "workflow_run_id": 34561027145,
+    "stage0_telemetry_sha256": "93bebada88426b10e3891b55a6ff1aa8e461c2295d26b58216cfb92c934324bc"
+  },
+  "pre_execution_verification": {
+    "ci_run_id": 34561631754,
+    "head_commit": "c7fa80b1c3a8fbb891dca22f901f0d956ced97d0",
+    "python_3_10": "PASS",
+    "python_3_11": "PASS",
+    "python_3_12": "PASS",
+    "package": "PASS",
+    "dependency_audit": "PASS",
+    "lightweight_provenance": "PASS"
+  },
+  "heldout_access_allowed": false,
+  "body_garment_anchor_support_allowed": false,
+  "optimization_allowed": false,
+  "candidate_freeze_allowed": false,
+  "alpha_002_promotion_allowed": false,
+  "d2_0005_mutation_allowed": false,
+  "alpha_001_rebinding_allowed": false,
+  "optional_stopping_allowed": false,
+  "budget_extension_allowed": false,
+  "infrastructure_retry_policy": "A failed run may be retried only from identical frozen scientific inputs. Any code/config change after Stage-1 observations requires an explicit documented amendment or invalidation; no silent scientific rerun is permitted.",
+  "interpretation": "Stage-1 outcomes are surrogate-only hypothesis-screening observations and cannot support held-out transfer, physical efficacy, or product claims."
+}
