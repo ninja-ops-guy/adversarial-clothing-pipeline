@@ -1,0 +1,61 @@
+name: P1 Release Qualification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "ruthless_pipeline/**"
+      - "tools/p1_*.py"
+      - "physical/p1/**"
+      - "production_alpha/**"
+      - "print-alpha/**"
+      - "benchmarks/**"
+      - "generations/**"
+      - "evidence/d2-0007/**"
+      - "evidence/p1/**"
+      - "tests/**"
+      - ".github/workflows/p1-release-qualification.yml"
+  push:
+    branches: [main]
+    paths:
+      - "ruthless_pipeline/**"
+      - "tools/p1_*.py"
+      - "physical/p1/**"
+      - "production_alpha/**"
+      - "print-alpha/**"
+      - "benchmarks/**"
+      - "generations/**"
+      - "evidence/d2-0007/**"
+      - "evidence/p1/**"
+      - "tests/**"
+      - ".github/workflows/p1-release-qualification.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install CPU runtime and project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "torch>=2.1" "torchvision>=0.16" --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -e '.[dev]'
+          python -c "import torch; assert torch.version.cuda is None, torch.version.cuda"
+      - name: Run exact-revision P1 qualification
+        run: python tools/p1_release_qualification.py
+      - name: Upload qualification receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: p1-release-qualification-${{ github.sha }}
+          path: artifacts/p1-release-qualification/qualification-receipt.json
+          if-no-files-found: error
