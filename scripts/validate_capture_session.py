@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from ruthless_pipeline.certification.p1_calibration_binding import validate_session_calibration_binding
 from ruthless_pipeline.certification.p1_session_binding import validate_session_schedule_binding
 from ruthless_pipeline.certification.physical import PhysicalTrial
 from ruthless_pipeline.certification.schema_version import require_schema_version
@@ -28,6 +29,7 @@ def load_session(path: Path) -> dict[str, Any]:
         raise ValueError(f"session missing required fields: {missing}")
     if payload.get("evidence_class") == "synthetic_pipeline_validation_only":
         payload["physical_evidence_eligible"] = False
+    validate_session_calibration_binding(payload)
     validate_session_schedule_binding(payload, verify_capture_order=True)
     return payload
 
@@ -95,13 +97,15 @@ def main() -> int:
         print(json.dumps({"hash_verification": "FAIL", "failures": [str(exc)]}, indent=2, sort_keys=True))
         return 2
     failures = verify_capture_hashes(path, payload) if args.verify_files else []
+    is_p1 = payload.get("evidence_class") == "physical_garment_p1"
     result = {
         "session_id": payload["session_id"],
         "experiment_id": payload["experiment_id"],
         "trial_id": payload.get("trial_id"),
         "evidence_class": payload["evidence_class"],
-        "physical_evidence_eligible": payload.get("evidence_class") == "physical_garment_p1",
-        "schedule_binding": "PASS" if payload.get("evidence_class") == "physical_garment_p1" else "NOT_APPLICABLE",
+        "physical_evidence_eligible": is_p1,
+        "calibration_binding": "PASS" if is_p1 else "NOT_APPLICABLE",
+        "schedule_binding": "PASS" if is_p1 else "NOT_APPLICABLE",
         "hash_verification": "PASS" if not failures else "FAIL",
         "failures": failures,
         "analysis_contract": payload.get("analysis_contract"),
