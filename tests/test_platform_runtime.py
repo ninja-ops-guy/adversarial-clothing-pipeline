@@ -74,3 +74,18 @@ def test_unknown_job_refuses_execution() -> None:
 
 def test_catalog_exposes_physical_research_path() -> None:
     assert {"p1_readiness", "validate_capture", "analyze_capture", "ingest_capture"}.issubset(runtime.JOB_CATALOG)
+
+
+def test_workspace_listing_stays_local_and_returns_results(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(runtime, "WORKSPACE_ROOT", tmp_path / "workspace")
+    result = runtime.WORKSPACE_ROOT / "sessions" / "one" / "p1-output" / "statistics.json"
+    result.parent.mkdir(parents=True)
+    result.write_text('{"status":"PASS"}\n')
+    files = runtime.list_workspace("sessions/one")
+    assert len(files) == 1
+    assert files[0]["path"] == "sessions/one/p1-output/statistics.json"
+    assert files[0]["bytes"] == result.stat().st_size
+    with pytest.raises(ValueError, match="within the runtime workspace"):
+        runtime.list_workspace("../outside")
