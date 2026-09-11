@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/rac_negative_outcome_v1.schema.json",
+  "title": "RAC Negative Result / Failure Index Entry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "outcome_kind",
+    "failure_category",
+    "experiment_id",
+    "generation_id",
+    "candidate_id",
+    "generator_family",
+    "conditions",
+    "evidence_class",
+    "evidence_refs",
+    "root_cause",
+    "root_cause_established",
+    "uncertainty",
+    "lessons",
+    "created_utc"
+  ],
+  "properties": {
+    "record_id": {"type": "string", "pattern": "^RAC-NR-[0-9a-f]{16}$"},
+    "outcome_kind": {
+      "enum": ["negative", "null", "inconclusive", "refused", "invalid"]
+    },
+    "failure_category": {
+      "anyOf": [
+        {
+          "enum": [
+            "optimization_failure",
+            "surrogate_overfit",
+            "cross_architecture_transfer_failure",
+            "transformation_fragility",
+            "manufacturing_loss",
+            "camera_isp_loss",
+            "deformation_failure",
+            "coverage_failure",
+            "statistical_inconclusive",
+            "unclassified"
+          ]
+        },
+        {"type": "null"}
+      ]
+    },
+    "experiment_id": {"type": "string", "minLength": 1},
+    "generation_id": {"type": "string"},
+    "candidate_id": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+    "generator_family": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+    "conditions": {"type": "object"},
+    "evidence_class": {"type": "string", "minLength": 1},
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "root_cause": {"anyOf": [{"type": "string"}, {"type": "null"}]},
+    "root_cause_established": {"type": "boolean"},
+    "uncertainty": {"enum": ["high", "medium", "low"]},
+    "lessons": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "created_utc": {"type": "string"}
+  }
+}
