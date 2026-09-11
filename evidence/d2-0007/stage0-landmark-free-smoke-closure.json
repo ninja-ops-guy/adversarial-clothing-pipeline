@@ -1,0 +1,47 @@
+{
+  "schema_version": "rac-d2007-stage0-closure/1.0",
+  "generation_id": "RAC-PER-D2-0007",
+  "stage": "STAGE_0_LANDMARK_FREE_SMOKE",
+  "decision": "PASS",
+  "evidence_scope": "development/surrogate wiring rehearsal only; not transfer or efficacy evidence",
+  "source_commit": "59143b127a7a6570036e9ce18e3f1058ec2e4309",
+  "workflow_run_id": 34561027145,
+  "workflow_artifact": {
+    "artifact_id": 10184338219,
+    "name": "d2-0007-stage0-landmark-free-34561027145",
+    "digest": "sha256:8ad004fdc51c054a9bf6c345ae902b67a1f5dbd0058b2bca378f8b2d39643af8"
+  },
+  "receipt": {
+    "alpha_002_promoted": false,
+    "candidate_freeze_created": false,
+    "candidate_id": "RAC-PAT-CAND-8bc4a6e503972f24",
+    "generation_id": "RAC-PER-D2-0007",
+    "generator": "feature_collage",
+    "generator_version": "1.0.0",
+    "heldout_access": false,
+    "inputs": {
+      "manifest": "benchmarks/model_manifest.json",
+      "model_set": "model_sets/PERSON-SUR-v3.json"
+    },
+    "invalid_condition_fraction": 0.0,
+    "landmark_free": true,
+    "model_set_id": "PERSON-SUR-v3",
+    "optimization_opened": false,
+    "pattern_sha256": "8bc4a6e503972f24a6aab872afa7c877a10bbfafb7e675ee9d5f932f6d311215",
+    "per_surrogate_detection_rates": {
+      "detr_resnet50": 1.0,
+      "fasterrcnn_mobilenet_v3_320": 1.0,
+      "fcos_resnet50_fpn": 1.0,
+      "retinanet_resnet50_fpn_v2": 1.0,
+      "ssdlite320_mobilenet_v3": 1.0,
+      "yolov8n": 1.0
+    },
+    "provenance_hash": "bd107cebc17ba1885da539cb163c4f2d70d0e98a6703d9cdeaf67f436e836496",
+    "schema_version": "rac-d2007-stage0-smoke/1.0",
+    "screening_opened": false,
+    "stage": "STAGE_0_LANDMARK_FREE_SMOKE",
+    "status": "PASS",
+    "surrogate_only": true,
+    "telemetry_sha256": "93bebada88426b10e3891b55a6ff1aa8e461c2295d26b58216cfb92c934324bc"
+  }
+}
