@@ -22,9 +22,13 @@ test('Product Studio exposes complete implemented family inventory without promo
   await page.goto('product-studio.html');
   await expect(page.locator('.family-card.p0-research')).toHaveCount(8);
 
-  const catalog = await page.evaluate(() => window.RACStudioResearchCatalog);
+  const catalog = await page.evaluate(() => ({
+    implementedFamilyIds: RACStudioResearchCatalog.implementedFamilyIds,
+    p0Ids: RACStudioResearchCatalog.p0Families.map(x => x.id),
+    deferred: RACStudioResearchCatalog.deferred,
+  }));
   expect(catalog.implementedFamilyIds).toEqual([...CANONICAL, ...P0]);
-  expect(catalog.p0Families.map(x => x.id)).toEqual(P0);
+  expect(catalog.p0Ids).toEqual(P0);
   expect(catalog.deferred).toEqual({ p1: 5, p2: 23, p3_refused: ['bad_words', 'web_attack_strings'] });
 
   const options = await page.locator('#designFamily option').evaluateAll(nodes => nodes.map(node => node.value));
