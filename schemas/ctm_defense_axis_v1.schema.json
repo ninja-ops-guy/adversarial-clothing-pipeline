@@ -1,1 +1,17 @@
-{}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rac.local/schemas/ctm_defense_axis_v1.schema.json",
+  "title": "RAC CTM SPEC-17 Defense-Intervention Record v1 (additive)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","base_target_ref","defense_id","defense_class","config_sha256","version","record_id"],
+  "properties": {
+    "schema_version": {"const":"rac-ctm-defense-axis/1.0"},
+    "base_target_ref": {"type":"string","minLength":1},
+    "defense_id": {"type":"string","minLength":1},
+    "defense_class": {"enum":["patch_detector","adversarial_training","preprocessing","other"]},
+    "config_sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "version": {"type":"string","minLength":1},
+    "record_id": {"type":"string","pattern":"^RAC-CTM-DEF-[0-9a-f]{16}$"}
+  }
+}
