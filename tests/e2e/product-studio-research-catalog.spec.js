@@ -48,6 +48,9 @@ test('P0 selection requires a governed candidate import and preserves its proven
   await expect(page.locator('#researchCandidateImport')).toBeVisible();
   await expect(page.locator('#findBestMatchBtn')).toBeDisabled();
   await expect(page.locator('#referenceProfileStatus')).toContainText('GOVERNED CANDIDATE REQUIRED');
+  await expect(page.locator('button[onclick*="RACStudio.exportTile"]')).toBeDisabled();
+  await expect(page.locator('button[onclick*="RACStudio.exportMockup"]')).toBeDisabled();
+  await expect(page.locator('button[onclick*="RACStudio.exportManifest"]')).toBeDisabled();
 
   await page.locator('#researchCandidateFile').setInputFiles({
     name: 'governed-candidate.png',
@@ -56,12 +59,92 @@ test('P0 selection requires a governed candidate import and preserves its proven
   });
   await expect(page.locator('#researchCandidateStatus')).toContainText('LOADED');
   await expect(page.locator('#mockupCanvas')).toHaveAttribute('data-frozen-tile', 'true');
+  await expect(page.locator('button[onclick*="RACStudio.exportTile"]')).toBeEnabled();
+  await expect(page.locator('button[onclick*="RACStudio.exportMockup"]')).toBeEnabled();
+  await expect(page.locator('button[onclick*="RACStudio.exportManifest"]')).toBeEnabled();
 
   const metadata = await page.evaluate(() => RACStudio.getFrozenTileMetadata());
   expect(metadata.research_family).toBe('hyperface_like');
   expect(metadata.generator).toBe('HyperfaceLikeGenerator');
   expect(metadata.sha256).toMatch(/^[0-9a-f]{64}$/);
   expect(metadata.evidence_scope).toBe('imported_governed_candidate_preview_not_physical_efficacy');
+  expect(await page.evaluate(() => RACStudio.getReferenceFidelity())).toBeNull();
+  expect(errors).toEqual([]);
+});
+
+test('P0 candidate imports are family-bound and invalidate on family changes', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('product-studio.html');
+  await expect(page.locator('.family-card.p0-research')).toHaveCount(8);
+
+  await page.selectOption('#designFamily', 'hyperface_like');
+  await page.locator('#researchCandidateFile').setInputFiles({
+    name: 'hyperface-candidate.png',
+    mimeType: 'image/png',
+    buffer: TINY_PNG,
+  });
+  await expect(page.locator('#researchCandidateStatus')).toContainText('LOADED');
+  expect((await page.evaluate(() => RACStudioResearchCatalog.getImportedMetadata())).research_family).toBe('hyperface_like');
+
+  await page.selectOption('#designFamily', 'feature_collage');
+  await expect(page.locator('#researchCandidateStatus')).toContainText('FAMILY CHANGED');
+  expect(await page.evaluate(() => RACStudioResearchCatalog.getImportedMetadata())).toBeNull();
+  expect(await page.evaluate(() => RACStudio.getFrozenTileMetadata())).toBeNull();
+  await expect(page.locator('#mockupCanvas')).toHaveAttribute('data-frozen-tile', 'false');
+  await expect(page.locator('button[onclick*="RACStudio.exportManifest"]')).toBeDisabled();
+
+  await page.selectOption('#designFamily', 'signal_shadow');
+  await expect(page.locator('#researchCandidateImport')).toBeHidden();
+  await expect(page.locator('#findBestMatchBtn')).toBeEnabled();
+  await expect(page.locator('button[onclick*="RACStudio.exportManifest"]')).toBeEnabled();
+  expect(errors).toEqual([]);
+});
+
+test('P0 manifest export strips canonical reference-fidelity claims and preserves candidate binding', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('product-studio.html');
+  await expect(page.locator('.family-card.p0-research')).toHaveCount(8);
+
+  await page.selectOption('#designFamily', 'swapped_landmarks');
+  await page.locator('#researchCandidateFile').setInputFiles({
+    name: 'swapped-landmarks.png',
+    mimeType: 'image/png',
+    buffer: TINY_PNG,
+  });
+  await expect(page.locator('#researchCandidateStatus')).toContainText('LOADED');
+
+  const exported = await page.evaluate(async () => {
+    let captured = null;
+    const originalCreate = URL.createObjectURL;
+    const originalClick = HTMLAnchorElement.prototype.click;
+    URL.createObjectURL = blob => { captured = blob; return 'blob:rac-test'; };
+    HTMLAnchorElement.prototype.click = function () {};
+    try {
+      RACStudio.exportManifest();
+      if (!captured) throw new Error('manifest blob was not captured');
+      return JSON.parse(await captured.text());
+    } finally {
+      URL.createObjectURL = originalCreate;
+      HTMLAnchorElement.prototype.click = originalClick;
+    }
+  });
+
+  expect(exported.design.family).toBe('swapped_landmarks');
+  expect(exported.frozen_tile_override.research_family).toBe('swapped_landmarks');
+  expect(exported.frozen_tile_override.sha256).toMatch(/^[0-9a-f]{64}$/);
+  expect(exported.art_direction_profile).toBe('p0_governed_candidate_import_v1');
+  expect(exported.generation_mode).toBe('governed_candidate_import');
+  expect(exported.reference_profile).toBeNull();
+  expect(exported.reference_target).toBeNull();
+  expect(exported.reference_fidelity).toEqual({
+    score: null,
+    subscores: null,
+    penalties: [],
+    scorer_version: null,
+    evidence_scope: 'not_applicable_to_p0_governed_candidate_import',
+  });
   expect(errors).toEqual([]);
 });
 
