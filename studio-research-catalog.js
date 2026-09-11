@@ -21,22 +21,23 @@ let importedCanvas=null,importedMetadata=null;
 function isResearchFamily(id){return P0_SET.has(id);}
 function familyTitle(id){return P0_META.find(x=>x.id===id)?.title||String(id||'').replaceAll('_',' ').toUpperCase();}
 function activeFamily(){return document.getElementById('designFamily')?.value||document.getElementById('family')?.value||null;}
+function candidateMatchesFamily(family){return Boolean(importedCanvas&&importedMetadata?.research_family===family);}
 function sha256(bytes){return crypto.subtle.digest('SHA-256',bytes).then(buf=>[...new Uint8Array(buf)].map(v=>v.toString(16).padStart(2,'0')).join(''));}
 function dataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error||new Error('Unable to read candidate image'));reader.readAsDataURL(file);});}
 function imageCanvas(url){return new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.naturalWidth||img.width;c.height=img.naturalHeight||img.height;c.getContext('2d').drawImage(img,0,0);resolve(c);};img.onerror=()=>reject(new Error('Candidate image could not be decoded'));img.src=url;});}
 
-function renderImportedOrPlaceholder(ctx,size){
+function renderImportedOrPlaceholder(ctx,size,family){
   ctx.save();ctx.fillStyle='#777';ctx.fillRect(0,0,size,size);
-  if(importedCanvas){ctx.imageSmoothingEnabled=true;ctx.drawImage(importedCanvas,0,0,size,size);}
+  if(candidateMatchesFamily(family)){ctx.imageSmoothingEnabled=true;ctx.drawImage(importedCanvas,0,0,size,size);}
   else{ctx.fillStyle='#111';ctx.fillRect(size*.08,size*.42,size*.84,size*.16);ctx.fillStyle='#eee';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`700 ${Math.max(12,Math.floor(size*.035))}px ui-monospace,monospace`;ctx.fillText('IMPORT GOVERNED CANDIDATE TILE',size/2,size/2);}
   ctx.restore();
 }
 function installRenderBridge(){
-  if(typeof patternGenerators!=='undefined')for(const id of P0_IDS)if(!patternGenerators[id])patternGenerators[id]=(ctx,size)=>renderImportedOrPlaceholder(ctx,size);
+  if(typeof patternGenerators!=='undefined')for(const id of P0_IDS)if(!patternGenerators[id])patternGenerators[id]=(ctx,size)=>renderImportedOrPlaceholder(ctx,size,id);
   if(!window.RACPatternComposition||window.RACPatternComposition.__researchCatalogWrapped)return;
   const original=window.RACPatternComposition.renderFamilyFromSpec;
   window.RACPatternComposition.renderFamilyFromSpec=function(ctx,size,spec){
-    if(isResearchFamily(spec?.family)){renderImportedOrPlaceholder(ctx,size);return;}
+    if(isResearchFamily(spec?.family)){renderImportedOrPlaceholder(ctx,size,spec.family);return;}
     return original(ctx,size,spec);
   };
   window.RACPatternComposition.__researchCatalogWrapped=true;
@@ -68,8 +69,20 @@ function installStyles(){if(document.getElementById('researchCatalogStyles'))ret
 .research-import{margin:12px 0;padding:12px;border:1px solid rgba(255,255,255,.2);display:grid;gap:8px}.research-import[hidden]{display:none}.research-import-copy{display:grid;gap:3px}.research-import-copy small,.research-import-status{font-size:10px;opacity:.72}.research-import-button{display:inline-block;padding:8px 10px;border:1px solid currentColor;cursor:pointer;font-weight:700;text-transform:uppercase}.research-import-status{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}#findBestMatchBtn[disabled]{opacity:.45;cursor:not-allowed}
 `;document.head.appendChild(s);}
 
+function resetCandidateState(statusText='NO CANDIDATE LOADED'){
+  importedCanvas=null;importedMetadata=null;
+  if(window.RACStudio?.clearFrozenTile)window.RACStudio.clearFrozenTile();
+  if(window.RACProduction?.renderAll)window.RACProduction.renderAll();
+  const input=document.getElementById('researchCandidateFile');if(input)input.value='';
+  const status=document.getElementById('researchCandidateStatus');if(status)status.textContent=statusText;
+}
+function invalidateCandidateForFamily(family){
+  if(importedMetadata&&!candidateMatchesFamily(family))resetCandidateState('CANDIDATE CLEARED · FAMILY CHANGED · REIMPORT REQUIRED');
+}
+
 function syncProductUi(){
   const select=document.getElementById('designFamily');if(!select)return;const research=isResearchFamily(select.value),box=document.getElementById('researchCandidateImport'),family=document.getElementById('researchCandidateFamily'),find=document.getElementById('findBestMatchBtn'),profile=document.getElementById('referenceProfileStatus');
+  if(research)invalidateCandidateForFamily(select.value);else if(importedMetadata)resetCandidateState();
   if(box)box.hidden=!research;if(family)family.textContent=research?familyTitle(select.value):'—';
   if(find){find.disabled=research;find.textContent=research?'Reference Match N/A':'Find Best Match';find.title=research?'Reference-fidelity search is defined for canonical art-direction families only.':'';}
   if(profile&&research){const msg=`P0 RESEARCH IMPORT · ${familyTitle(select.value)} · GOVERNED CANDIDATE REQUIRED`;if(profile.textContent!==msg)profile.textContent=msg;}
@@ -77,9 +90,9 @@ function syncProductUi(){
 }
 function syncProductionUi(){
   const select=document.getElementById('family');if(!select)return;const research=isResearchFamily(select.value),box=document.getElementById('researchCandidateImport'),family=document.getElementById('researchCandidateFamily'),ranking=document.getElementById('batchRankingMode');
+  if(research)invalidateCandidateForFamily(select.value);else if(importedMetadata)resetCandidateState();
   if(box)box.hidden=!research;if(family)family.textContent=research?familyTitle(select.value):'—';
   if(ranking){const ref=ranking.querySelector('option[value="reference_fidelity"]');if(ref)ref.disabled=research;if(research&&ranking.value==='reference_fidelity')ranking.value='visual_proxy';ranking.title=research?'P0 imports use visual/printability ranking only; reference fidelity is not defined for research families.':'';}
-  if(!research){importedCanvas=null;importedMetadata=null;}
 }
 function syncAll(){syncProductUi();syncProductionUi();}
 
@@ -88,15 +101,15 @@ async function importCandidate(file){
   const status=document.getElementById('researchCandidateStatus');if(status)status.textContent='READING CANDIDATE…';
   try{
     const bytes=await file.arrayBuffer(),hash=await sha256(bytes),url=await dataUrl(file),canvas=await imageCanvas(url);
+    if(activeFamily()!==family){const input=document.getElementById('researchCandidateFile');if(input)input.value='';if(status)status.textContent='IMPORT DISCARDED · FAMILY CHANGED · REIMPORT REQUIRED';return;}
     importedCanvas=canvas;importedMetadata={research_family:family,generator:P0_META.find(x=>x.id===family)?.generator||null,sha256:hash,filename:file.name,width:canvas.width,height:canvas.height,evidence_scope:'imported_governed_candidate_preview_not_physical_efficacy',catalog_version:CATALOG_VERSION};
     if(window.RACStudio?.loadFrozenTile)await window.RACStudio.loadFrozenTile(url,importedMetadata);
+    if(activeFamily()!==family){resetCandidateState('IMPORT DISCARDED · FAMILY CHANGED · REIMPORT REQUIRED');return;}
     if(window.RACProduction?.renderAll)window.RACProduction.renderAll();
     if(status)status.textContent=`LOADED · ${file.name} · SHA-256 ${hash.slice(0,12)}…`;
   }catch(err){if(status)status.textContent='IMPORT ERROR · '+err.message;}
 }
-function clearCandidate(){
-  importedCanvas=null;importedMetadata=null;if(window.RACStudio?.clearFrozenTile)window.RACStudio.clearFrozenTile();if(window.RACProduction?.renderAll)window.RACProduction.renderAll();const input=document.getElementById('researchCandidateFile');if(input)input.value='';const status=document.getElementById('researchCandidateStatus');if(status)status.textContent='NO CANDIDATE LOADED';
-}
+function clearCandidate(){resetCandidateState();}
 
 function bind(){
   installStyles();installRenderBridge();addOptions();addCatalogCards();ensureImportUi();
