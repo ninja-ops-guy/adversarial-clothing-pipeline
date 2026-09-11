@@ -20,7 +20,7 @@ flowchart LR
 RAC is deliberately fail-closed: negative results are retained, held-out boundaries are enforced, frozen scientific surfaces are not silently rewritten, and software completion is never treated as physical-efficacy evidence.
 
 **Repository state reviewed:** 2026-09-11  
-**Current documented head:** `8114e2189a255bed3d4c07708d7380c7ade2aefc`  
+**Scientific/production baseline reviewed:** `8114e2189a255bed3d4c07708d7380c7ade2aefc` (subsequent commits in this pass are documentation-only)  
 **Python package version:** `3.1.0`
 
 ## Current state
