@@ -98,6 +98,28 @@ D2-0005 remains preregistered and unarmed; held-out evidence untouched; no thres
 2. **Vendor-dependent execution track (blocked on user action):** UA-1–UA-8 → bind real vendor/material/garment/measurement values → regenerate and validate the Print Alpha package → authorize spend → manufacture → physical P1 capture per `P1_OPERATOR_RUNBOOK.md`.
 3. Pattern Genome v1 is owned outside this workstream and was not touched.
 
-## 9. Readiness statement
+## 9. Friday playbook — UA binding and vendor-track transition
+
+**Reference machinery state:** commit `6b36dfe5` (`RAC-P1-UA-BINDER-001`). This is the machinery-complete, real-UA-values-unbound checkpoint.
+
+Friday's vendor-track procedure is:
+
+1. Collect and independently verify the real UA-1–UA-8 outputs. Do not infer, default, or substitute unresolved vendor/operator values.
+2. Copy `physical/p1/UA_VALUES_TEMPLATE.json` and populate the copy only with verified real values.
+3. Run `tools/p1_bind_ua_values.py --check-only` against the completed values file. Require exactly **208 planned bindings**, zero writes, zero leftover `PENDING_*` markers in the proposed bound state, and no refusal.
+4. Resolve any binder refusal at the source. Missing/unknown fields, placeholder-shaped strings, malformed hashes, invalid geometry/dates, unsupported size combinations, candidate/control artwork collisions, or unexpected pre-bound values are stop conditions — never bypass them by editing frozen experimental surfaces.
+5. Once the dry-run is clean, execute the real bind. The binder may update only the six UA-bearing manifests, `physical/p1/P1_READINESS_FREEZE.json`, and the hash-bound binding receipt. Preserve the pairing schedule, pairing contract, stopping rule, thresholds, calibration manifest, and all D2 surfaces unchanged.
+6. Archive the binding receipt and resulting readiness-freeze hash as the provenance record for the pending→bound transition.
+7. Re-run `tools/p1_no_spend_readiness_gate.py`. Continue only on `P1_NO_SPEND_READINESS=PASS` with findings `[]` and refusals `{}`.
+8. Confirm the five scientific-boundary assertions remain false: `D2_0004_MODIFIED`, `D2_0005_ARMED`, `NEW_HELDOUT_ACCESS`, `SCIENTIFIC_THRESHOLDS_CHANGED`, and `PHYSICAL_EFFICACY_CLAIMED`.
+9. Treat UA-5 spend authorization as a separate human decision. Successful binding or gate PASS must **not** automatically authorize spend.
+10. After authorization and procurement, reconcile received specimens/materials against the bound manifests before physical capture. Any mismatch returns to reconciliation; it must not be silently normalized into the evidence record.
+11. Execute physical P1 only from `physical/p1/P1_OPERATOR_RUNBOOK.md`, then seal the resulting evidence before analysis or claim evaluation.
+
+**Friday stop rule:** if any real UA value remains unknown, the binder refuses, the readiness gate fails, provenance cannot be reproduced, or a scientific-boundary assertion changes unexpectedly, stop the vendor transition and preserve the last verified state. Readiness machinery and software-test success are not physical-efficacy evidence.
+
+Binder verification at `6b36dfe5`: 19/19 binder tests pass; full pytest baseline **1268 collected / 1266 passed / 0 failed / 0 errors / 2 skipped / 0 xfail / 0 xpass**; Playwright remains **95 passed / 0 failed / 3 skipped**.
+
+## 10. Readiness statement
 
 The complete no-spend P1 workflow — specimen arrival → reconciliation → calibration → session initialization → 144-trial execution per the frozen schedule → stopping-rule evaluation → validation → sealed evidence packaging — is frozen, machine-readable, provenance-linked, rehearsed deterministically, and executable from the operator runbook without inventing any procedure on the spot.
