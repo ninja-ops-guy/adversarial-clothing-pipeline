@@ -9,6 +9,7 @@ hash-bound telemetry receipt.  Held-out evaluators are never constructed.
 """
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -35,6 +36,11 @@ from scripts.select_surrogate_candidate import (  # noqa: E402
 
 def _load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _canonical_sha256(value: dict) -> str:
+    encoded = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _surrogate_ids(model_set: dict) -> tuple[str, ...]:
@@ -130,6 +136,12 @@ def main() -> int:
         "manifest": str(manifest_path),
         "model_set": str(model_set_path),
     }
+    # Re-bind the receipt hash after adding CLI input identity.  The hash field
+    # itself is excluded from the digest to avoid self-reference.
+    telemetry_without_hash = dict(telemetry)
+    telemetry_without_hash.pop("telemetry_sha256", None)
+    telemetry["telemetry_sha256"] = _canonical_sha256(telemetry_without_hash)
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(telemetry, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({
