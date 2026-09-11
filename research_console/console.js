@@ -50,7 +50,7 @@
   }
 
   function setRuntimeControls(enabled) {
-    document.querySelectorAll('[data-job], #stageSessionBtn, #validateSessionBtn, #analyzeSessionBtn, #ingestSessionBtn')
+    document.querySelectorAll('[data-job], #stageSessionBtn, #validateSessionBtn, #analyzeSessionBtn, #ingestSessionBtn, #refreshWorkspaceBtn')
       .forEach((node) => { node.disabled = !enabled; });
   }
 
@@ -69,12 +69,14 @@
       detail.textContent = `Python ${status.python} · workspace ${status.workspace} · ${status.running} active job(s)`;
       setRuntimeControls(true);
       restoreLastSession();
+      await loadWorkspace();
     } catch (error) {
       runtimeConnected = false;
       light.classList.remove('connected');
       title.textContent = 'STATIC / READ-ONLY MODE';
       detail.innerHTML = 'Open this page through <code>rac-platform</code> or <code>run-rac-platform.bat</code> to execute research locally. GitHub Pages cannot safely run the Python/FFmpeg/model stack.';
       setRuntimeControls(false);
+      if ($('workspaceFiles')) $('workspaceFiles').innerHTML = '<span class="muted">No local runtime connected.</span>';
     }
   }
 
@@ -86,6 +88,51 @@
     return payload;
   }
 
+  function normalizeUploadPath(path) {
+    return String(path || '').replaceAll('\\', '/').split('/').filter(Boolean).map(encodeURIComponent).join('/');
+  }
+
+  function workspaceFileUrl(path) {
+    return `/api/runtime/workspace/${normalizeUploadPath(path)}`;
+  }
+
+  function humanBytes(bytes) {
+    const value = Number(bytes || 0);
+    if (value < 1024) return `${value} B`;
+    if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KiB`;
+    if (value < 1024 * 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(1)} MiB`;
+    return `${(value / (1024 * 1024 * 1024)).toFixed(1)} GiB`;
+  }
+
+  async function loadWorkspace() {
+    const target = $('workspaceFiles');
+    if (!target) return;
+    if (!runtimeConnected) {
+      target.innerHTML = '<span class="muted">No local runtime connected.</span>';
+      return;
+    }
+    try {
+      const payload = await runtimeJson('/api/runtime/workspace');
+      const files = [...(payload.files || [])]
+        .sort((a, b) => Number(b.modified || 0) - Number(a.modified || 0))
+        .slice(0, 200);
+      if (!files.length) {
+        target.innerHTML = '<span class="muted">Local workspace is empty.</span>';
+        return;
+      }
+      target.innerHTML = files.map((file) => {
+        const safePath = escapeHtml(file.path);
+        const when = file.modified ? new Date(file.modified * 1000).toLocaleString() : 'unknown time';
+        return `<div class="workspace-file">
+          <a href="${workspaceFileUrl(file.path)}" target="_blank" rel="noopener">${safePath}</a>
+          <small>${escapeHtml(humanBytes(file.bytes))} · ${escapeHtml(when)}</small>
+        </div>`;
+      }).join('');
+    } catch (error) {
+      target.innerHTML = `<span class="error">Workspace listing failed: ${escapeHtml(error.message)}</span>`;
+    }
+  }
+
   function renderRun(run) {
     activeRunId = run.run_id;
     $('runSummary').textContent = `${run.title || run.job_id} · ${String(run.status).toUpperCase()} · ${run.run_id}`;
@@ -94,6 +141,8 @@
     if (['queued', 'running'].includes(run.status)) {
       clearTimeout(pollTimer);
       pollTimer = setTimeout(() => pollRun(run.run_id), 1200);
+    } else if (run.status === 'succeeded') {
+      loadWorkspace();
     }
   }
 
@@ -126,10 +175,6 @@
     }
   }
 
-  function normalizeUploadPath(path) {
-    return String(path || '').replaceAll('\\', '/').split('/').filter(Boolean).map(encodeURIComponent).join('/');
-  }
-
   async function uploadWorkspaceFile(relPath, blob) {
     const safeUrlPath = normalizeUploadPath(relPath);
     return runtimeJson(`/api/runtime/workspace/${safeUrlPath}`, { method: 'PUT', body: blob });
@@ -156,6 +201,7 @@
     }
     if (!sessionRel) {
       $('stageStatus').textContent = 'Files staged, but no *-session.json was found.';
+      await loadWorkspace();
       return;
     }
     const base = sessionRel.slice(0, sessionRel.lastIndexOf('/') + 1);
@@ -165,6 +211,7 @@
     $('trialStorePath').value = 'research/p1/trials.jsonl';
     rememberSession();
     $('stageStatus').textContent = `STAGED · ${sessionRel}`;
+    await loadWorkspace();
   }
 
   function sessionParams() {
@@ -223,6 +270,7 @@
         trial_store: p.trial_store,
       });
     });
+    $('refreshWorkspaceBtn').addEventListener('click', loadWorkspace);
     ['sessionPath', 'inferencePath', 'p1OutputDir', 'trialStorePath'].forEach((id) => {
       $(id).addEventListener('change', rememberSession);
     });
