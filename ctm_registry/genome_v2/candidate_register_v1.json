@@ -1,1 +1,128 @@
-{}
+{
+  "entries": [
+    {
+      "candidate_id": "RAC-CTM-GV2-8c3a1835d1c1b307",
+      "computability_cost": "low: single pass of a fixed compressor / dictionary model",
+      "family": "description_length_proxies",
+      "feature_definition": "Algorithmic-complexity proxies (compressed length under a fixed codec, dictionary-model codelength) of the canonical pattern representation.",
+      "invariance_claim": {
+        "coarsening_operator": true,
+        "deformation_group": false,
+        "statement": "Description-length proxies are stable under resolution coarsening when computed on the canonicalized representation; deformation-group invariance is NOT claimed (compression is sensitive to local warps)."
+      },
+      "spec7_dependence": "Gated by SPEC-7: if the description_length predictor family is legally rejected by the sealed kill-gate, this candidate is dropped from the v2 register.",
+      "spec7_family_ref": "description_length",
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-b89ceb0d67733c8a",
+      "computability_cost": "low: one polar FFT per pattern; linearithmic in pixel count",
+      "family": "harmonic_order_energy_curves",
+      "feature_definition": "Energy of the pattern's angular Fourier decomposition as a function of harmonic order, describing rotational structure that v1's quadrant energies cannot express.",
+      "invariance_claim": {
+        "coarsening_operator": false,
+        "deformation_group": true,
+        "statement": "Harmonic-order curves are stable under the deformation group's mild warps; coarsening invariance is NOT claimed beyond the Nyquist order of the coarsest grid."
+      },
+      "spec7_dependence": "Gated by SPEC-7: if the harmonic_energy_curve predictor family is legally rejected by the sealed kill-gate, this candidate is dropped from the v2 register.",
+      "spec7_family_ref": "harmonic_energy_curve",
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-22b436dcfdc4cecb",
+      "computability_cost": "low: a masked energy ratio; directly testable in the digital tier",
+      "family": "landmark_region_density_targeting",
+      "feature_definition": "Adversarial energy density within anatomical landmark masks versus outside them (a masked energy ratio), capturing deliberate subtle targeting of high-density landmark regions.",
+      "invariance_claim": {
+        "coarsening_operator": true,
+        "deformation_group": true,
+        "statement": "The masked energy ratio is stable under the deformation group and coarsening when the landmark mask is transformed identically."
+      },
+      "measured_effect": "Subtle darkening of high-density landmark regions produces measured physical recognition degradation.",
+      "source_paper": "DiffAM / PeopleTec",
+      "spec7_dependence": "Deferred until SPEC-7 outcome: no direct SPEC-7 family binding; digital-tier testable after the sealed decision.",
+      "spec7_family_ref": null,
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-1e18f00af1e845e0",
+      "computability_cost": "high: persistent homology over a deformation sweep; superlinear in pixel count per deformation sample",
+      "family": "persistence_landscape_norms",
+      "feature_definition": "Norms of persistence landscapes computed over the pattern's intensity/gradient filtration, summarizing multiscale topological structure that Genome v1's scalar summaries cannot express.",
+      "invariance_claim": {
+        "coarsening_operator": true,
+        "deformation_group": true,
+        "statement": "Persistence-landscape norms are stable under the print/capture deformation group and under resolution coarsening, up to the landscape stability bound."
+      },
+      "spec7_dependence": "Gated by SPEC-7: if the persistence_summary predictor family is legally rejected by the sealed kill-gate, this candidate is dropped from the v2 register.",
+      "spec7_family_ref": "persistence_summary",
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-5d60b4306ad3d8db",
+      "computability_cost": "medium: landmark detector plus masked moment computation",
+      "family": "region_placement_descriptors",
+      "feature_definition": "Placement-relative-to-landmark features: distance of adversarial mass to anatomical landmarks (eyes, nose bridge, brow, jaw for faces; shoulders/hem for garments), normalized by garment geometry. v1's center_of_mass / quadrant_energy are garment-relative, not landmark-relative.",
+      "invariance_claim": {
+        "coarsening_operator": false,
+        "deformation_group": true,
+        "statement": "Landmark-relative placement is stable under the deformation group when landmarks are re-estimated post-deformation; coarsening invariance is limited by landmark localization accuracy."
+      },
+      "measured_effect": "Patch position/size dominate physical success: an adversarial accessory is really adversarial region placement.",
+      "source_paper": "Sharif et al. 2016 (AdvHat)",
+      "spec7_dependence": "Deferred until SPEC-7 outcome: enters the v2 implementation path only after the sealed decision clarifies which parent property families survive; no direct SPEC-7 family binding.",
+      "spec7_family_ref": null,
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-7534750a64acfaf0",
+      "computability_cost": "low: log-log regression on octave-aggregated spectral energy",
+      "family": "self_similarity_criticality",
+      "feature_definition": "Multi-scale energy decay exponents (self-similarity / criticality estimators) of the pattern's spatial power spectrum across octaves.",
+      "invariance_claim": {
+        "coarsening_operator": true,
+        "deformation_group": true,
+        "statement": "Decay exponents are defined across scales and are invariant to coarsening by construction; deformation invariance is claimed only for the exponent, not the per-scale energies."
+      },
+      "spec7_dependence": "Indirect: no dedicated SPEC-7 family. Continuation depends on the SPEC-7 decision not rejecting the parent invariance-research families; entry remains registered (not promotable) until a preregistered family binds it.",
+      "spec7_family_ref": null,
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-2d31c8ed0c9395c1",
+      "computability_cost": "low: one symmetrization plus a differential v1 genome pass",
+      "family": "symmetry_enforcement_deltas",
+      "feature_definition": "Symmetry-enforcement deltas: the genome of a pattern versus its symmetrized twin, making the symmetry constraint itself a first-class experimental factor (and a natural matched-property null axis for SPEC-1).",
+      "invariance_claim": {
+        "coarsening_operator": true,
+        "deformation_group": true,
+        "statement": "The symmetrized-twin delta is defined on the canonicalized pattern and is stable under the deformation group and coarsening applied identically to both twins."
+      },
+      "measured_effect": "Enforcing bilateral symmetry raised physical ASR from 65.4% to 80.7% — the strongest published evidence that a topological constraint causally affects attack success.",
+      "source_paper": "GaP (bilateral-symmetry enforcement)",
+      "spec7_dependence": "Deferred until SPEC-7 outcome: strongest published causal evidence among the candidates, but v2 entry still waits for the sealed decision on parent property families.",
+      "spec7_family_ref": null,
+      "status": "registered"
+    },
+    {
+      "candidate_id": "RAC-CTM-GV2-98319166790ebb05",
+      "computability_cost": "medium: requires template embeddings per condition",
+      "family": "template_margin_geometry",
+      "feature_definition": "Similarity-margin shift features for FR-adjacent targets: the continuous cosine-similarity margin movement, not just binary threshold crossing — the honest effect size that binary ASR hides.",
+      "invariance_claim": {
+        "coarsening_operator": false,
+        "deformation_group": true,
+        "statement": "Margin shift is a property of the (pattern, template) pair under deformation; coarsening invariance is NOT claimed (resolution affects the embedding itself)."
+      },
+      "measured_effect": "Attacks shift the median similarity toward the threshold without always crossing it; binary ASR hides exactly the partial effects that predict robustness.",
+      "source_paper": "FR margin-attack reframing (anti-surveillance corpus)",
+      "spec7_dependence": "Deferred until SPEC-7 outcome: reframes the outcome cell (margin shift, not binary crossing) rather than adding a pattern property; enters the v2 discussion only after the sealed decision.",
+      "spec7_family_ref": null,
+      "status": "registered"
+    }
+  ],
+  "genome_v1_frozen": true,
+  "register_id": "RAC-CTM-GV2-REGISTER-6da91ed0492299b0",
+  "register_sha256": "6da91ed0492299b0282e95de3f7fa5004fb6019c9176db34dfad8312003948a0",
+  "schema_version": "rac-ctm-genome-v2-register/1.0"
+}
