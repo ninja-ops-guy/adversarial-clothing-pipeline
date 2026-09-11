@@ -11,9 +11,13 @@
 
 The frozen preregistration correctly fixed the Stage-1 generator set, 8 compositions per generator, the three root seeds `[20270110, 20270111, 20270112]`, the 64-composition upper bound, the survivor rule, the four-candidate optimization cap, and the prohibition on optional stopping. It also says the root seed is composed deterministically with generator index and that the full schedule is recorded in the freeze manifest.
 
-Before any Stage-1 scoring was performed, the implementation audit found that the repository had not serialized the final generator-index/composition-index seed expansion or the generator-local geometry needed by PATTERNS generators that syntactically require landmarks/bboxes. Guessing those details after seeing screening outcomes would weaken the prospective design. A1 closes that implementation gap **before outcome access** without editing the frozen parent preregistration.
+Before any Stage-1 screening was performed, the implementation audit found that the repository had not serialized the final generator-index/composition-index seed expansion or the generator-local geometry needed by PATTERNS generators that syntactically require landmarks/bboxes. Guessing those details after seeing Stage-1 screening outcomes would weaken the prospective design. A1 closes that implementation gap before Stage-1 execution without editing the frozen parent preregistration.
 
-Stage 0 does not count as Stage-1 outcome access: it used one `FeatureCollageGenerator` wiring candidate solely to prove fixture → PATTERNS → PERSON-SUR-v3 → telemetry plumbing, produced no motif-family comparison, opened no screening/optimization state, and touched no held-out model.
+### Declared prior exposure: Stage-0 wiring telemetry
+
+A1 is **post-rehearsal, not telemetry-blind**. Stage 0 necessarily ran first because the frozen parent makes it the prerequisite gate. That rehearsal exposed one nominal-condition `FeatureCollageGenerator` wiring candidate on `PERSON-SUR-v3`; its persisted receipt reports candidate detection rate `1.0` on each of the six surrogates and `invalid_condition_fraction = 0.0`. This exposure is declared rather than hidden.
+
+That Stage-0 candidate is **not part of the Stage-1 pool**: Stage 0 used seed `20270110`, while A1 serializes 64 distinct derived Stage-1 seeds using the frozen root seeds plus generator/composition indices. Stage 0 produced no eight-composition family screen, no family ranking, no survivor decision, no anchor eligibility, and no optimization or held-out access. The parent preregistration's numerical screening thresholds, 8×8 budget, six-surrogate requirement, and four-candidate cap were all frozen before Stage 0 and are unchanged by A1. The A1 implementation choices are therefore classified as **pre-Stage-1, post-rehearsal execution details**, not as blind preregistration choices.
 
 ## Frozen clarifications
 
