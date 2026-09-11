@@ -451,6 +451,17 @@
     {
       "edge_type": "pins_hash",
       "evidence_class": "file_pinned",
+      "expected_sha256": "3efd0ddd6ca00c9a9f4ee15ef233eac2d8733cf235ef669927dc8665d072efef",
+      "hash_pin_expected": true,
+      "id": "frozen_surface -> generation:RAC-PER-D2-0007 [pins_hash]",
+      "note": "frozen-surface hash pin",
+      "source": "frozen_surface",
+      "target": "generation:RAC-PER-D2-0007",
+      "verify_mode": "file_hash"
+    },
+    {
+      "edge_type": "pins_hash",
+      "evidence_class": "file_pinned",
       "expected_sha256": "d85b74b605d64fca59d26b2dc26bf3890fad08640a20520401d378e4f6c519cd",
       "hash_pin_expected": true,
       "id": "frozen_surface -> model_set:PERSON-HO-v1 [pins_hash]",
@@ -804,7 +815,7 @@
     {
       "id": "frozen_surface",
       "path": "benchmarks/frozen_surface_sha256.json",
-      "sha256": "ed9f2d23a4caaa39427597ffb24adcc6f2b865de84dcca7a77772358a1c80113",
+      "sha256": "e9c5181e531dd1ea4e8bf4e66f6b3122e08e4d3cfe69916b7fb2bc1c9df9b718",
       "type": "frozen_config"
     },
     {
@@ -817,6 +828,12 @@
       "id": "generation:RAC-PER-D2-0005",
       "path": "generations/RAC-PER-D2-0005.json",
       "sha256": "d54e1d7d49acef53d1ce20c2b09a4592af83b5a8e70d7e7ad7ca4754d03d0e8d",
+      "type": "frozen_config"
+    },
+    {
+      "id": "generation:RAC-PER-D2-0007",
+      "path": "generations/RAC-PER-D2-0007.json",
+      "sha256": "3efd0ddd6ca00c9a9f4ee15ef233eac2d8733cf235ef669927dc8665d072efef",
       "type": "frozen_config"
     },
     {
@@ -979,6 +996,12 @@
       "id": "schema:ctm_target_semantics_v1.schema.json",
       "path": "schemas/ctm_target_semantics_v1.schema.json",
       "sha256": "9c6fc60e361b6d63da8c7eea994de916503dd7a763db19cadf5e42b021d11902",
+      "type": "document"
+    },
+    {
+      "id": "schema:d2007_anchor_provider_v1.schema.json",
+      "path": "schemas/d2007_anchor_provider_v1.schema.json",
+      "sha256": "9157a677ac1c157549d3b8d942547e9bd75ecbab19f3d4fcf9e926552c4ae41d",
       "type": "document"
     },
     {
