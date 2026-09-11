@@ -1,83 +1,178 @@
 # RAC Technical Roadmap
 
-**Swarm:** RAC Parallel Expansion Swarm
-**Basis:** RAC_WORLD_CLASS_GAP_ANALYSIS.md @ HEAD `b50f6b0` (2026-09-09)
-**Ordering:** P0 print readiness → P1 optimization infrastructure → P2 physical-transfer infrastructure → P3 science tooling. Merge barriers per charter §20.
+**Swarm:** RAC Parallel Expansion Swarm  
+**Original basis:** `RAC_WORLD_CLASS_GAP_ANALYSIS.md` @ HEAD `b50f6b0` (2026-09-09)  
+**Current status overlay:** 2026-09-10 America/New_York (2026-09-11 UTC)  
+**Canonical current program state:** [`CURRENT_PROGRAM_STATE.md`](CURRENT_PROGRAM_STATE.md)
+
+This document began as the dependency-ordered implementation plan produced at Barrier 0. It is now maintained as a **historical roadmap plus forward plan**. Completed items remain here so the original intent can be compared with what actually landed; they are not rewritten as if they were still future work.
+
+> Frozen contracts, barrier handoffs, independent audits, and the frozen P1 readiness package outrank this roadmap if wording conflicts.
 
 ---
 
-## Barrier 0 — Inventory (THIS WAVE)
-- [x] World-class inventory vs charter (gap analysis, acceptance matrix, inventory JSON, handoff).
-- Exit: this document + acceptance matrix + handoff committed. **DONE.**
+## Program status summary
 
-## Barrier 1 — Schema/interface freeze (next wave)
-New files only; no shared-core edits. Deliver:
-1. `schemas/physical_transfer_record.schema.json` — charter §13 hash fields; `evidence_class` enum incl. `synthetic_pipeline_validation_only` and `experimental_print_specimen`.
-2. `schemas/transformation_distribution.schema.json` — distribution_id, parameter manifest, seed, sample index; geometry/imaging/garment/print-capture dimensions.
-3. `schemas/detector_response.schema.json` — charter §8 fields; adapters emit only legitimately exposed fields.
-4. `schemas/optimization_objective.schema.json` — composable J terms, MEAN/CVAR/WORST_CASE aggregation, λ vector.
-5. `schemas/print_alpha_manifest.schema.json` — with `physical_efficacy_claimed` (must be false) and `evidence_class = experimental_print_specimen`.
-6. Evidence-taxonomy addition: register `experimental_print_specimen` class (new file; do NOT edit certification/evidence.py — propose via additive module + note in handoff for governance swarm).
-7. RAC-R3 consolidated manifest schema (12 charter fields incl. source commit, seed manifest, optimizer config, transformation manifest, candidate hash, analysis hash).
-- Exit: schemas + contract tests (`tests/schemas/`) green.
+| Program unit | Current status | Notes |
+| --- | --- | --- |
+| Barrier 0 — Inventory | **CLOSED / DONE** | Original gap analysis and dependency map complete |
+| Barrier 1 — Schema/interface freeze | **CLOSED / PASS** | 7 contracts + evidence-class registry; contract and independent negative-case verification complete |
+| Barrier 2 — Parallel subsystem implementation | **CLOSED FOR DECLARED SOFTWARE SCOPE / INTEGRATED** | RAC-A/B/C/D/E implementation landed; later CTM hardening strengthened the interfaces |
+| Barrier 3 — End-to-end integration | **CLOSED — PASS_WITH_NONBLOCKING_GAPS** | Six-stage deterministic integration + RAC-G audit; finite-difference check conditional on future gradient-backed path |
+| P1 no-spend readiness | **CLOSED / PASS** | Frozen 144-trial execution package, rehearsal, readiness gate and operator runbook |
+| UA binding | **READY / REAL VALUES UNBOUND** | `RAC-P1-UA-BINDER-001`; 208 fields await real UA-1–UA-8 values |
+| Physical evidence | **OPEN** | Real vendor/garment/calibration/capture evidence remains the critical path |
 
-## Wave 2 — P0 PRINT ALPHA (RAC-A)
-Depends: Barrier 1 (schema 5). Blocked inputs: UA-1/UA-2.
-1. Create `print-alpha/` charter tree: CONTROL/, CANDIDATE/, CALIBRATION/, MANIFESTS/, CAPTURE/, QA/.
-2. Author charter-named files by reference (not duplication) to existing docs: capture-protocol.md, camera-lighting-sheet.md, invalid-condition-rules.json, trial-sheet.csv (generate CSV from `physical_protocol.py::capture_rows` deterministic export).
-3. New QA docs: garment-pairing-checklist.md, chain-of-custody.md.
-4. MANIFESTS: artwork/template/mapping/sku/print-alpha manifests; unresolved vendor fields explicitly `PENDING_USER_ACTION` (fail-closed, never fabricated).
-5. User-action packet consolidating UA-1..UA-4.
-- Acceptance: manifests validate against schema 5; `physical_efficacy_claimed=false` enforced by test.
+---
 
-## Wave 3 — P1 OPT + EOT + DET + PARETO + STYLE (RAC-B/C/D, parallel)
-New namespaces only.
-1. `ruthless_pipeline/optimization/`: objective_registry, optimizer, gradient_backend, blackbox_backend, trajectory, constraints, pareto, schemas. Validation: deterministic seeds, objective decomposition, NaN/divergence refusal, checkpoint hashing, resume integrity, finite-difference gradient checks, trajectory provenance, **candidate-pool parity test vs current finite-selection baseline** (baseline preserved, never replaced).
-2. `ruthless_pipeline/transformations/` + `tests/transformations/`: 4-dimension distribution sampler; reproducible from (distribution_id, manifest, seed, index); robustness-surface outputs (not scalar averages).
-3. `ruthless_pipeline/detector_science/`: response.py, family_registry.py, transfer_matrix.py; family annotations for the 8 model manifests (additive sidecar file, manifests untouched); surrogate diversity report; leave-one-family-out; concentration warning.
-4. Pareto search over: detector objective, cross-model transfer, transformation robustness, printability, style. Candidate classes DIGITAL_BEST / TRANSFER_BEST / PHYSICAL_ROBUSTNESS_BEST / STYLE_BEST / BALANCED. No certification from this infra.
-5. Style-constrained optimization: port deterministic style scorer to Python (five families from `design_profiles/ruthless_reference_v1.json` as priors); track initial/final style/detector/printability + optimization path; style-vs-objective Pareto curves. Style score is never RAC efficacy evidence.
+## Barrier 0 — Inventory
 
-## Wave 4 — P2 PHYSICAL-TRANSFER STACK (RAC-E)
-1. Deformation tiers T0–T3 behind a common interface (wrap existing `deformation.py`/`physics.py`; T0 explicit affine/projective; T3 = SCAFFOLD until measured calibration exists). Cross-tier benchmark → `artifacts/deformation_benchmark/` (synthetic only) + `docs/DEFORMATION_VALIDATION.md`. Goal: cheapest model that predicts physical observations, not max complexity.
-2. `printability_loss(candidate, production_profile)`: gamut distance, min feature size, high-freq survivability (build on calibration_ingest MTF/ΔE00), resolution/DPI/bleed/safe-area/panel geometry, digital-to-camera discrepancy. Versioned vendor measurement store; no assumed vendor behavior (UA-4 gates measured values).
-3. `physical_transfer_record` emission/validation tooling; synthetic records flagged `synthetic_pipeline_validation_only`.
-4. Calibration feedback model: estimation digital→print→fabric→camera→observed with uncertainty reporting; `status = SCAFFOLD_ONLY` until measured captures (UA-3); eventual consumer interface for transformations stack.
+**Status: CLOSED / DONE.**
 
-## Wave 5 — P3 SCIENCE TOOLING (RAC-F)
-1. Ablation lab: generalize rehearsal machinery into an experiment registry covering all 9 charter comparisons with synthetic fixtures. Harness may NOT run held-out experiments.
-2. Mechanism analysis: metrics for confidence displacement, detection stability, localization change, threshold-crossing frequency, architecture-specific response, transformation sensitivity; competing-hypotheses comparison tooling. No mechanism preregistered or asserted in advance.
+Original deliverables:
 
-## Wave 6 — RAC-R3 consolidation + independent verification (RAC-G)
-1. Consolidated RAC-R3 release manifest generator (source commit, dependency lock, model/fixture hashes, seed manifest, optimizer config, transformation manifest, candidate/analysis hashes, environment manifest, journal, release manifest).
-2. RAC-G independent numerical verification of Waves 3–5 (RAC-G authors nothing it verifies).
-3. Repo-hygiene (additive): pyproject.toml + root requirements for reproducible install; direct tests for `common.py`, `evaluators.py`, `physical_protocol.py` — staged last to minimize collision with governance swarm.
+- [x] World-class inventory vs charter.
+- [x] Gap analysis.
+- [x] Acceptance matrix.
+- [x] Machine-readable inventory JSON.
+- [x] Swarm handoff and dependency order.
 
-## Dependency notes
-- UA-1..UA-4 (user actions) gate Wave 2 completion and Wave 4 measured-data promotion only; all synthetic work proceeds independently.
-- Nothing in Waves 2–6 touches D2-0004/D2-0005 surfaces; crossing Barrier 5 does not authorize D2-0005 execution.
+Exit evidence: `RAC_WORLD_CLASS_GAP_ANALYSIS.md`, `RAC_WORLD_CLASS_ACCEPTANCE_MATRIX.md`, `RAC_PARALLEL_SWARM_HANDOFF.md`, and `artifacts/rac_deliverable_inventory.json`.
 
+## Barrier 1 — Schema/interface freeze
 
-## External research integration — noRecognition (2026-09-10)
+**Status: CLOSED / PASS.**
 
-**Status:** REVIEW COMPLETE; runtime audit and implementation PENDING.  
-**Review:** [noRecognition review and RAC integration](research/NORECOGNITION_REVIEW_2026-09-10.md).
+Delivered:
 
-- [ ] Pass A: audit evaluation-exposure provenance, stage accounting, and report consistency (NR-01/04/05); implement only confirmed gaps.
-- [ ] Pass B: reconcile observation-medium labels and control estimands with existing physical readiness (NR-02/03).
-- [ ] Pass C: require predictor provenance and prospective evaluation when such a study is proposed; complete the physical-paper full-text review (NR-06).
+1. [x] `schemas/physical_transfer_record.schema.json` — physical-transfer hash/evidence fields.
+2. [x] `schemas/transformation_distribution.schema.json` — distribution identity, parameters, seed/sample semantics.
+3. [x] `schemas/detector_response.schema.json` — detector-response contract.
+4. [x] `schemas/optimization_objective.schema.json` — composable objective terms and aggregation semantics.
+5. [x] `schemas/print_alpha_manifest.schema.json` — Print Alpha evidence boundary with `physical_efficacy_claimed=false`.
+6. [x] additive `experimental_print_specimen` evidence taxonomy surface.
+7. [x] RAC-R3 consolidated-manifest contract.
 
-Preserve current physical/production priorities and frozen experiment boundaries. The review maps acceptance checks to existing components; it does not certify implementation completeness or create a new performance claim.
+Closure record: Barrier 1 landed at `bb3dad5` with 69 contract tests; independent RAC-G negative-case verification reported 21/21 PASS in the swarm handoff.
 
+## Original Wave 2 — P0 Print Alpha / RAC-A
+
+**Current status: SOFTWARE-READY; EXTERNAL INPUTS / HUMAN AUTHORIZATION REMAIN.**
+
+Original plan and current disposition:
+
+1. [x] `print-alpha/` charter tree: CONTROL/, CANDIDATE/, CALIBRATION/, MANIFESTS/, CAPTURE/, QA/.
+2. [x] capture/lighting/invalid-condition documents and deterministic planning exports.
+3. [x] garment-pairing and chain-of-custody QA surfaces.
+4. [x] Print Alpha manifests with unresolved real-world values kept fail-closed rather than fabricated.
+5. [x] consolidated UA packet.
+6. [x] P1 no-spend readiness layer subsequently froze pairing/randomization, a 144-trial schedule, operator runbook, readiness freeze and deterministic gate.
+7. [x] UA binder subsequently added an atomic path for binding the 208 pending values once UA-1–UA-8 are real.
+8. [ ] Obtain real vendor/operator values and perform the external production transition.
+
+**Important update:** the old 108-row Print Alpha trial sheet is planning history. P1 execution now follows `physical/p1/P1_CAPTURE_SCHEDULE.json` and `physical/p1/P1_OPERATOR_RUNBOOK.md`, which define the frozen **144-trial** workflow.
+
+## Original Wave 3 — Optimization + EOT + Detector Science + Pareto/Style (RAC-B/C/D)
+
+**Current status: IMPLEMENTED / INTEGRATED for the declared software scope.**
+
+Delivered and later hardened:
+
+1. [x] `ruthless_pipeline/optimization/` objective/optimizer/backends/trajectory/constraint/Pareto stack with deterministic behavior, refusal semantics, checkpoint integrity and finite-pool baseline parity.
+2. [x] `ruthless_pipeline/transformations/` reproducible transformation-distribution and robustness-surface infrastructure.
+3. [x] `ruthless_pipeline/detector_science/` response/family/transfer/LOFO/concentration infrastructure.
+4. [x] Pareto candidate classes across detector/transfer/robustness/printability/style dimensions.
+5. [x] deterministic style-scoring/Pareto infrastructure without promoting style score to efficacy evidence.
+6. [x] CTM hardening added factor-swap validity, scalar epistemic typing, optimizer-constraint provenance, channel/target semantics, citations/claim scope, retrospective mining, external-cohort handling and defense-axis controls.
+
+This software completion does not imply a physical result.
+
+## Original Wave 4 — Physical-transfer stack / RAC-E
+
+**Current status: SOFTWARE IMPLEMENTED; MEASURED PHYSICAL PROMOTION OPEN.**
+
+Delivered:
+
+1. [x] deformation tiers T0–T3 behind a common interface; higher-fidelity tiers remain evidence-gated where calibration is absent.
+2. [x] printability-loss infrastructure with versioned vendor/production profile semantics.
+3. [x] physical-transfer record emission/validation tooling with synthetic records explicitly labeled synthetic.
+4. [x] calibration/channel feedback scaffolding and measured-evidence refusal rules.
+5. [ ] ingest real calibrated physical observations and validate the digital→print→fabric→camera channel empirically.
+
+Measured promotion is gated by the physical program, not by additional synthetic implementation.
+
+## Original Wave 5 — Science tooling / RAC-F
+
+**Current status: PARTIAL / ACTIVE RESEARCH TOOLING.**
+
+Original goals:
+
+1. Ablation/experiment registry covering the declared comparison families without granting held-out execution authority.
+2. Mechanism-analysis metrics and competing-hypotheses tooling.
+
+Substantial governance, CTM, reporting, evidence-view and experimental-integrity infrastructure now exists around these goals, but this roadmap does **not** declare the entire science-tooling research program closed merely because modules exist. Pass-specific and research-question-specific exit evidence still controls completion.
+
+## Original Wave 6 — RAC-R3 consolidation + independent verification / RAC-G
+
+**Current status: BARRIER-3 SYNTHETIC INTEGRATION VERIFICATION COMPLETE; FUTURE MEASURED-RELEASE VERIFICATION REMAINS EVIDENCE-DEPENDENT.**
+
+Completed:
+
+1. [x] Barrier 3 consolidated integration package with manifests, hashes, seeds, telemetry, provenance and replay artifacts.
+2. [x] RAC-G independent audit of the Barrier 3 package.
+3. [x] independent checks for aggregation, Pareto front, EOT reproduction, replay, provenance attacks, tamper detection, fabrication guard and promotion attacks.
+4. [x] Barrier 3 verdict: `PASS_WITH_NONBLOCKING_GAPS`.
+5. [ ] finite-difference verification only if a gradient-backed generation becomes part of the audited path.
+6. [ ] future measured RAC-R3 release verification when real physical evidence exists; the synthetic Barrier-3 audit does not pre-certify future measured releases.
+
+## Current physical critical path
+
+The program is now constrained more by evidence acquisition than by software construction:
+
+1. Obtain and independently verify all real UA-1–UA-8 values.
+2. Populate a copy of `physical/p1/UA_VALUES_TEMPLATE.json`.
+3. Run `tools/p1_bind_ua_values.py --check-only`; require exactly 208 planned bindings and zero writes/refusals.
+4. Perform the atomic bind and retain its hash-bound receipt.
+5. Re-run `tools/p1_no_spend_readiness_gate.py`; require PASS and unchanged scientific boundaries.
+6. Make the separate human spend-authorization decision.
+7. Produce/order the matched physical specimens and calibration material.
+8. Perform arrival reconciliation and receipt QA.
+9. Accept session calibration under the frozen limits.
+10. Execute the frozen **144-trial** P1 schedule from `physical/p1/P1_OPERATOR_RUNBOOK.md`.
+11. Validate ingestion, seal the evidence, then run preregistered analysis.
+12. Only after a valid physical baseline: proceed to P2 durability and M1/M2 manufacturing evidence.
+
+## Governance dependency notes
+
+- Engineering Barriers 0–3 being closed does **not** authorize D2-0005.
+- D2-0005 remains preregistered / not armed unless its own governance surface changes through the authorized process.
+- Pattern Genome v1 remains frozen; successor representation work is additive/versioned and evidence-gated.
+- Physical-efficacy claims remain unsupported until the physical evidence ladder is actually closed.
+- Software work may proceed independently only where it does not cross held-out, frozen-threshold, or measured-evidence boundaries.
+
+## External research integration — noRecognition
+
+**Current status: review complete; NR-01 through NR-05 confirmed-gap work substantially implemented; NR-06 remains prospective.**
+
+- [x] **NR-01:** evaluation-exposure provenance, independent-confirmation gate and feature-provenance review.
+- [x] **NR-02/03:** observation-medium labeling and physical/control-estimand reconciliation.
+- [x] **NR-04/05:** stage-outcome integrity and one-snapshot report consistency.
+- [ ] **NR-06:** predictor provenance / prospective evaluation requirements when a concrete study is proposed; close only with explicit evidence and acceptance criteria.
+
+These controls improve research integrity; they do not certify physical performance.
 
 ### Capability research following reported winners
 
-**Status:** static capability comparison COMPLETE; research decisions PENDING. See the review's “Addendum — learning from reported winners.”
+**Status: static capability comparison complete; research decisions remain evidence-dependent.**
 
-- [ ] Map existing generation/optimization components to retained measured results and their actual workflow entry points.
-- [ ] Review whether the current convenience fixture covers the wearer/garment context needed for the next research question.
-- [ ] Assess retrospective predictive signal and data sufficiency before choosing a learned representation.
-- [ ] Consider context-aware prediction, learned generation, and recipe-sequence representations as distinct research hypotheses.
-- [ ] Record an explicit decision on each hypothesis; do not infer that PPO or additional hardware is required from another project's headline results.
+- [ ] Map generation/optimization components to retained measured results once sufficient measured results exist.
+- [ ] Verify that any future experimental fixture represents the wearer/garment context required by the question being asked.
+- [ ] Assess retrospective predictive signal and data sufficiency before selecting a learned representation.
+- [ ] Treat context-aware prediction, learned generation and recipe-sequence representations as separate research hypotheses rather than assumed upgrades.
+- [ ] Record explicit decisions and rejection criteria for each hypothesis.
 
-Current wiring includes real-model finite-pool selection and environment recoloring. Continuous optimization components exist separately. The inspected workflow does not establish a persistent generator or predictor trained from accumulated RAC experiments. This is a research-parity finding, not a new experiment authorization.
+## Roadmap rule
+
+**Prioritize closed evidence loops over additional feature count.**
+
+The next program-defining milestone is not another software barrier. It is a valid, provenance-preserving transition from vendor-bound physical specimens to measured P1 evidence under the frozen protocol.
