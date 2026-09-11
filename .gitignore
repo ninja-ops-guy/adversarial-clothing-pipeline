@@ -17,6 +17,9 @@ env/
 .env.*
 !.env.example
 
+# Local Research Workbench runtime (may contain raw physical captures)
+.rac-runtime/
+
 # Generated research artifacts
 outputs/
 artifacts/
