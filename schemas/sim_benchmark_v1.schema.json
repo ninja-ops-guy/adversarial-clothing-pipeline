@@ -1,0 +1,70 @@
+{
+  "$id": "https://rac.local/schemas/sim_benchmark_v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Simulator Benchmark v1 (SW-15)",
+  "description": "Deterministic simulator benchmark table (computational quality ONLY; never ranked by physical fidelity). measured_predictive_validity is RESERVED for a future measured channel and must be null today; its future object shape is pre-declared so a measured metric plugs in without schema redesign.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {"const": "rac-sim-benchmark/1.0"},
+        "row_id": {"type": "string", "pattern": "^RAC-SBEN-[0-9a-f]{16}$"},
+        "config_id": {"type": "string", "minLength": 1},
+        "family": {"enum": ["transformation", "deformation", "physics"]},
+        "parameters": {"type": "object"},
+        "seed": {"type": "integer"},
+        "deterministic": {"type": "boolean"},
+        "output_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "runtime_units": {"type": "integer", "minimum": 0},
+        "memory_bytes": {"type": "integer", "minimum": 0},
+        "numerically_stable": {"type": "boolean"},
+        "output_sensitivity": {"type": "object", "additionalProperties": {"type": ["number", "null"]}},
+        "max_output_sensitivity": {"type": ["number", "null"]},
+        "unstable_parameters": {"type": "array", "items": {"type": "string"}},
+        "measured_predictive_validity": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "description": "RESERVED future shape; populating it is refused by the harness until a measured channel exists.",
+              "required": ["metric_name", "value", "measured_evidence_ref", "evidence_class"],
+              "properties": {
+                "metric_name": {"type": "string"},
+                "value": {"type": "number"},
+                "measured_evidence_ref": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                "evidence_class": {"const": "measured_physical_capture"}
+              }
+            }
+          ]
+        },
+        "empirical_validity": {"const": "unassessed_no_measured_channel"},
+        "evidence_class": {"const": "synthetic_pipeline_validation_only"}
+      },
+      "required": [
+        "schema_version", "row_id", "config_id", "family", "parameters", "seed",
+        "deterministic", "output_sha256", "runtime_units", "memory_bytes",
+        "numerically_stable", "output_sensitivity", "max_output_sensitivity",
+        "unstable_parameters", "measured_predictive_validity",
+        "empirical_validity", "evidence_class"
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "rac-sim-benchmark/1.0"},
+    "table_id": {"type": "string", "pattern": "^RAC-SBTB-[0-9a-f]{16}$"},
+    "rows": {"type": "array", "items": {"$ref": "#/$defs/row"}},
+    "n_configs": {"type": "integer", "minimum": 0},
+    "ranks_physical_fidelity": {"const": false},
+    "ranking_basis": {"const": "computational_quality_only"},
+    "unstable_config_ids": {"type": "array", "items": {"type": "string"}},
+    "evidence_class": {"const": "synthetic_pipeline_validation_only"}
+  },
+  "required": [
+    "schema_version", "table_id", "rows", "n_configs",
+    "ranks_physical_fidelity", "ranking_basis", "unstable_config_ids",
+    "evidence_class"
+  ]
+}

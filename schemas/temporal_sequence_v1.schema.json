@@ -1,0 +1,28 @@
+{
+  "$id": "https://rac.local/schemas/temporal_sequence_v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Temporal Sequence Aggregate v1 (SW-14)",
+  "description": "Sequence-oriented temporal evaluation aggregate. Always synthetic-only; retains sequence identity; unordered/duplicate frames are refused by the evaluator. Independent of frozen P1.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "rac-temporal-sequence/1.0"},
+    "aggregate_id": {"type": "string", "pattern": "^RAC-TAGG-[0-9a-f]{16}$"},
+    "sequence_id": {"type": "string", "minLength": 1},
+    "observation_unit": {"type": "string", "minLength": 1},
+    "n_frames": {"type": "integer", "minimum": 2},
+    "n_valid_frames": {"type": "integer", "minimum": 0},
+    "persistence": {"type": "number", "minimum": 0, "maximum": 1},
+    "reacquisition_count": {"type": "integer", "minimum": 0},
+    "time_to_failure": {"type": ["number", "null"]},
+    "detected_run_lengths": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+    "within_sequence_variance": {"type": "number", "minimum": 0},
+    "evidence_class": {"const": "synthetic_pipeline_validation_only"}
+  },
+  "required": [
+    "schema_version", "aggregate_id", "sequence_id", "observation_unit",
+    "n_frames", "n_valid_frames", "persistence", "reacquisition_count",
+    "time_to_failure", "detected_run_lengths", "within_sequence_variance",
+    "evidence_class"
+  ]
+}

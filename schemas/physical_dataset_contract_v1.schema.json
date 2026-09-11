@@ -1,0 +1,41 @@
+{
+  "$id": "https://rac.local/schemas/physical_dataset_contract_v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RAC Physical Dataset Contract v1 (SW-12)",
+  "description": "Contract for a FUTURE physical observation dataset. Synthetic-only today: measured must be an explicit boolean (absent is refused by the validator), and measured=true requires evidence_class measured_physical_capture plus outcome_ref. This schema version is frozen once released (frozen_once_released must be true).",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256hex": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "properties": {
+    "schema_version": {"const": "rac-physical-dataset/1.0"},
+    "observation_id": {"type": "string", "pattern": "^RAC-PHYDS-[0-9a-f]{16}$"},
+    "dataset_id": {"type": "string", "minLength": 1},
+    "dataset_version": {"type": "string", "minLength": 1},
+    "trial_id": {"type": "string", "minLength": 1},
+    "arm": {"enum": ["candidate", "control"]},
+    "paired_trial_id": {"type": "string", "minLength": 1},
+    "capture_condition": {"type": "string", "minLength": 1},
+    "camera": {"type": "object", "minProperties": 1},
+    "environment": {"type": "object", "minProperties": 1},
+    "specimen": {"type": "object", "minProperties": 1},
+    "calibration_refs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "observation_medium": {"type": "string", "minLength": 1},
+    "invalidity_reason": {"type": ["string", "null"]},
+    "evaluation_role": {"enum": ["calibration", "evaluation"]},
+    "measured": {"type": "boolean"},
+    "evidence_class": {"type": "string", "minLength": 1},
+    "specimen_sha256": {"$ref": "#/$defs/sha256hex"},
+    "provenance_ref": {"type": "string", "minLength": 1},
+    "outcome_ref": {"type": ["string", "null"]},
+    "frozen_once_released": {"const": true}
+  },
+  "required": [
+    "schema_version", "observation_id", "dataset_id", "dataset_version",
+    "trial_id", "arm", "paired_trial_id", "capture_condition", "camera",
+    "environment", "specimen", "calibration_refs", "observation_medium",
+    "invalidity_reason", "evaluation_role", "measured", "evidence_class",
+    "specimen_sha256", "provenance_ref", "outcome_ref", "frozen_once_released"
+  ]
+}
