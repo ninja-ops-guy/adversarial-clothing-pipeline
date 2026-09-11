@@ -58,7 +58,7 @@
         <div class="workbench-grid">
           <div>
             <h3>Stage sealed Capture Lab bundle</h3>
-            <p class="muted">Select the exported session folder. Files remain in <code>.rac-runtime/workspace</code> on this machine.</p>
+            <p class="muted">Normally Capture Lab stages the bundle automatically when connected. This importer is the fallback for an existing exported session folder.</p>
             <input id="sessionFolder" type="file" webkitdirectory multiple>
             <button id="stageSessionBtn" class="action">Stage selected folder</button>
             <div id="stageStatus" class="inline-status">No session staged.</div>
@@ -85,6 +85,14 @@
       <div class="card activity-card">
         <div id="runSummary" class="inline-status">No runtime job selected.</div>
         <pre id="runLog" class="run-log">Connect the local runtime to launch research jobs from this page.</pre>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Workspace results</h2><span>LOCAL ARTIFACTS</span></div>
+      <div class="card workspace-card">
+        <div class="button-row"><button id="refreshWorkspaceBtn" class="action">Refresh results</button></div>
+        <div id="workspaceFiles" class="workspace-files"><span class="muted">No local runtime connected.</span></div>
       </div>
     </section>
 
