@@ -22,8 +22,9 @@ def main() -> int:
     profile_path = Path(args.profile_json)
     output_path = Path(args.output)
     try:
-        payload = json.loads(profile_path.read_text())
-        receipt = evaluate_profile_payload(payload, args.phase)
+        source_bytes = profile_path.read_bytes()
+        payload = json.loads(source_bytes)
+        receipt = evaluate_profile_payload(payload, args.phase, source_bytes=source_bytes)
     except (ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
         print(json.dumps({"accepted": False, "error": str(exc)}, indent=2, sort_keys=True))
         return 2
