@@ -4,6 +4,7 @@
   "design_profiles/ruthless_reference_v1.json": "10b70ad3b4becccee0befdd435a2c2b747fd5f88b33dd1227aa85f6135f4568f",
   "generations/RAC-PER-D2-0004.json": "f1abcf77bf746d536f95089c415c0ae9b6352a63ebb46ba988ddc48e87937dc7",
   "generations/RAC-PER-D2-0005.json": "d54e1d7d49acef53d1ce20c2b09a4592af83b5a8e70d7e7ad7ca4754d03d0e8d",
+  "generations/RAC-PER-D2-0007.json": "3efd0ddd6ca00c9a9f4ee15ef233eac2d8733cf235ef669927dc8665d072efef",
   "model_manifests/README.md": "14a1e3fda182509e820b22fe94959bf248afa079a1ee0c4aa0b2a390c92e7468",
   "model_manifests/detr_resnet50.json": "931a1753458810ad091395cec1916060846d49889dba311deaf13077edf55b79",
   "model_manifests/fasterrcnn_mobilenet_v3_320.json": "4409b426c9a5b27619a75332192d53af0754cf52f68fcf4948c20bd9475080ff",
