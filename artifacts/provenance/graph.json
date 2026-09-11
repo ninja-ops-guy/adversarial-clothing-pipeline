@@ -1065,9 +1065,21 @@
       "type": "document"
     },
     {
+      "id": "schema:rac_negative_outcome_v1.schema.json",
+      "path": "schemas/rac_negative_outcome_v1.schema.json",
+      "sha256": "99ca4f10bad83c2981343bddfc3216b1a1cf2e762537568802eeb9224b2fdfaa",
+      "type": "document"
+    },
+    {
       "id": "schema:rac_r3_manifest.schema.json",
       "path": "schemas/rac_r3_manifest.schema.json",
       "sha256": "47d5fa6ad9a69527db785945328ed7286b9cfa6f756d06adb84996dfa6594dc9",
+      "type": "document"
+    },
+    {
+      "id": "schema:rac_validity_risk_v1.schema.json",
+      "path": "schemas/rac_validity_risk_v1.schema.json",
+      "sha256": "8811112b17f2c3e2da8de700aab118481c61489b0164ef3d200e5f7719cce303",
       "type": "document"
     },
     {
