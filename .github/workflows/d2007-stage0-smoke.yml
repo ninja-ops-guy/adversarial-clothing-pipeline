@@ -86,7 +86,12 @@ jobs:
 
       - name: Install pipeline and pinned surrogate adapters
         run: |
-          python -m pip install -e . --no-deps
+          # Stage-0 imports the PATTERNS package, so install the package's declared
+          # runtime dependencies (notably jsonschema/scipy) instead of the
+          # detector-only --no-deps installation used by older benchmark jobs.
+          # The already-installed runtime-lock torch/torchvision satisfy the
+          # package constraints without changing their pinned versions.
+          python -m pip install -e .
           python -m pip install -r benchmarks/requirements.txt
           ULTRALYTICS=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['ultralytics'])")
           TRANSFORMERS=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['transformers'])")
