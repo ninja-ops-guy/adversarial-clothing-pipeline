@@ -2,104 +2,163 @@
 
 **Document ID:** RAC-CURRENT-STATE-001  
 **Status:** CANONICAL CURRENT-STATE NAVIGATION LAYER  
-**Updated:** 2026-09-10 America/New_York (2026-09-11 UTC)  
+**Updated:** 2026-09-11 America/New_York  
+**Reviewed head:** `8114e2189a255bed3d4c07708d7380c7ade2aefc`
 
-This document is the fastest authoritative answer to **where the RAC program is now**. It does not replace frozen contracts, experiment records, barrier handoffs, or audit artifacts. Instead, it points to them and states the current program-level status without rewriting historical records.
+This document is the fastest authoritative answer to **where the RAC program is now**. It does not replace frozen contracts, preregistrations, closure artifacts, independent audits, or hash-pinned evidence. It states current program-level status and points to those authorities.
 
-> **Core rule:** engineering completion is not efficacy evidence. A software barrier may be closed while the corresponding physical evidence level remains open.
+> **Core rule:** engineering completion is not efficacy evidence. A software barrier can be closed while physical evidence remains open.
 
 ## Authority order
 
-When documents appear to disagree, use this order:
+When documentation disagrees, use this order:
 
 1. Frozen experiment / physical contracts and hash-pinned artifacts.
-2. Barrier-specific completion handoffs and independent audit reports.
-3. This current-state ledger.
+2. Immutable generation closure evidence and barrier-specific audit/handoff records.
+3. This current-state navigation layer.
 4. `PROJECT_PROGRESS_CURRENT.md` for detailed current workstream context.
-5. `RAC_TECHNICAL_ROADMAP.md` for implementation history and forward roadmap.
-6. Older project-progress, inventory, and planning documents as historical provenance.
+5. Architecture / roadmap / operator guidance.
+6. Older project-progress and planning documents as historical provenance.
 
-For P1 execution specifically, `physical/p1/P1_OPERATOR_RUNBOOK.md`, `physical/p1/P1_CAPTURE_SCHEDULE.json`, `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`, and `physical/p1/P1_READINESS_FREEZE.json` outrank older Print Alpha planning documents.
+For physical P1 execution, `physical/p1/P1_OPERATOR_RUNBOOK.md`, `physical/p1/P1_CAPTURE_SCHEDULE.json`, `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`, and `physical/p1/P1_READINESS_FREEZE.json` outrank older Print Alpha planning material.
 
-## Barrier status
+## Program snapshot
 
-| Barrier | Purpose | Status | Exit evidence | Closing / reference state | Remaining blocker |
-| --- | --- | --- | --- | --- | --- |
-| **Barrier 0 — Inventory** | Establish gap analysis, acceptance matrix, ownership boundaries and dependency order before implementation | **CLOSED / DONE** | `RAC_WORLD_CLASS_GAP_ANALYSIS.md`, `RAC_TECHNICAL_ROADMAP.md`, `RAC_WORLD_CLASS_ACCEPTANCE_MATRIX.md`, `RAC_PARALLEL_SWARM_HANDOFF.md`, `artifacts/rac_deliverable_inventory.json` | Barrier-0 section of `RAC_PARALLEL_SWARM_HANDOFF.md` | None; retained as historical baseline |
-| **Barrier 1 — Schema/interface freeze** | Freeze contracts so later lanes can evolve without silently redefining evidence or interfaces | **CLOSED / PASS** | 7 frozen contracts, additive evidence-class registry, 69 contract tests; independent RAC-G negative-case verification 21/21 | `bb3dad5` | None for declared Barrier-1 scope |
-| **Barrier 2 — Parallel subsystem implementation** | Build Print Alpha, optimization, EOT, detector-science, Pareto/style and physical-transfer infrastructure | **CLOSED FOR DECLARED SOFTWARE SCOPE / INTEGRATED** | Barrier-2 appendix in `RAC_PARALLEL_SWARM_HANDOFF.md`; later CTM integration/hardening audit PASS | Original Barrier-2 lane series; later CTM hardening recorded in the same handoff | Real vendor/physical inputs still gate measured promotion; research extensions may continue additively |
-| **Barrier 3 — End-to-end integration** | Prove the six-stage pipeline composes deterministically, preserves provenance, and fails closed | **CLOSED — PASS_WITH_NONBLOCKING_GAPS** | `BARRIER_3_COMPLETION_HANDOFF.md`, `artifacts/barrier3/`, `audits/RAC_G_BARRIER_3_AUDIT.md` | completion handoff at `b0e9e4a1…`; RAC-G final audit | Finite-difference audit remains conditional/deferred until a gradient-backed generation is actually in scope |
+| Surface | Current state | Meaning |
+| --- | --- | --- |
+| Engineering Barriers 0–3 | **CLOSED FOR DECLARED SCOPE** | Inventory, interface freeze, subsystem implementation, and synthetic end-to-end integration have documented exits |
+| CTM / governance | **INTEGRATED / PASS FOR CLOSED PASSES** | Later research extensions remain audit-gated and additive |
+| Pattern Genome v1 | **FROZEN** | No in-place scientific mutation permitted |
+| D2-0003 | **CLOSED NEGATIVE / RAC-D0** | Retained result; Alpha-001 remains bound to this lineage |
+| D2-0004 | **CLOSED NEGATIVE / RAC-D0** | Retained and immutable |
+| D2-0005 | **PREREGISTERED / NOT ARMED** | No arming from P1 or D2-0007 work |
+| D2-0007 | **CLOSED — SCREENED_OUT_H0** | 64/64 Stage-1 compositions evaluated, 0 survivors; downstream stages never opened |
+| Alpha-001 frozen source | **EXACT SOURCE RECOVERED + HASH VERIFIED** | Historical sealed kit and 4096×4096 pattern recovered without regeneration |
+| P1 production release software | **READY** | Live Printful intake, exact panel build, evidence-integrity verification, and UA-value generation exist |
+| P1 no-spend readiness | **SOFTWARE-READY / FAIL-CLOSED** | Readiness/binding paths exist; real vendor values still need to be collected and bound |
+| P1 physical capture | **OPEN — NOT EXECUTED** | No RAC-P physical efficacy evidence yet |
+| P2 durability | **OPEN — EXTERNAL** | Requires a valid physical baseline first |
+| M1/M2 manufacturing evidence | **OPEN — EXTERNAL** | Requires golden-sample and lot-conformity measurements |
+| Product physical-efficacy claim | **NOT SUPPORTED** | Physical evidence ladder is not closed |
 
-### Barrier 3 integrated path
+## Scientific lineage state
 
-`Optimization V3 → EOT → Detector Science → Pareto/Style → Printability → Physical Transfer`
+### D2-0003 / Alpha-001
 
-Barrier 3 is a **synthetic integration proof**, not physical-efficacy evidence. RAC-G independently verified the package and issued `PASS_WITH_NONBLOCKING_GAPS`; the sole declared deferred check is finite-difference verification for a future gradient-backed path.
+`RAC-PER-D2-0003` remains a retained negative digital result. Its physical-production descendant, `RAC-PRINT-ALPHA-001`, remains bound to that lineage; no later generation replaces it.
 
-## Post-barrier execution state
+The exact Alpha-001 source was recovered from successful historical GitHub Actions run `34078238095`. The recovery receipt is `evidence/p1/alpha001-source-recovery.json` and records:
 
-The numbered engineering barriers are no longer the main bottleneck. The current critical path is the transition from software readiness to real physical evidence.
+- artifact ID `10003083548`;
+- artifact digest `sha256:cfde12ec97ceafcf2d51eef989dee83d774e18be53e3f411c9502ed6a2e0e558`;
+- sealed `print-test-kit.zip` SHA-256 `b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548`;
+- frozen 4096×4096 pattern SHA-256 `b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546`;
+- `source_regenerated=false` and `source_retuned=false`;
+- no new held-out access, no Alpha-001 rebinding, and no physical-efficacy claim.
 
-| Stage | Current status | Authority / evidence | What is still required |
-| --- | --- | --- | --- |
-| **CTM contracts / governance** | **INTEGRATED** | `PROJECT_PROGRESS_CURRENT.md`, `CTM_BD_INTEGRATION_AUDIT_2026-09-10.md`, CTM handoff appendices | Continue only evidence-justified extensions; do not mutate Pattern Genome v1 |
-| **P1 no-spend readiness** | **CLOSED / PASS** | `docs/handoffs/P1_NO_SPEND_HANDOFF.md`, `physical/p1/P1_READINESS_FREEZE.json`, readiness gate | No additional software work required unless a real defect is found |
-| **UA binding machinery** | **READY / REAL VALUES UNBOUND** | `tools/p1_bind_ua_values.py`, `physical/p1/UA_VALUES_TEMPLATE.json`, `tests/test_p1_ua_binding.py` | Obtain real UA-1–UA-8 values; `6b36dfe5` is the machinery-complete/unbound checkpoint |
-| **Vendor / Production Alpha transition** | **BLOCKED ON EXTERNAL INPUT + HUMAN AUTHORIZATION** | `docs/USER_ACTION_NEXT_STEPS.md`; Friday playbook in `docs/handoffs/P1_NO_SPEND_HANDOFF.md`; historical hash-pinned `docs/USER_ACTION_REQUIRED_PRINT_ALPHA.md` | Follow the current operator checklist to resolve vendor/template/SKU/artwork values, bind them, preserve readiness PASS, then separately authorize spend |
-| **Physical P1 capture** | **OPEN — NOT EXECUTED** | Frozen `P1_OPERATOR_RUNBOOK.md` and 144-trial `P1_CAPTURE_SCHEDULE.json` | QA-admissible physical specimens, accepted calibration, then execute the frozen 144-trial schedule |
-| **P2 durability** | **OPEN — EXTERNAL** | durability / physical-program contracts | Requires valid physical baseline evidence first |
-| **M1/M2 manufacturing evidence** | **OPEN — EXTERNAL** | manufacturing evidence contracts | Golden-sample and lot-conformity measurements |
-| **Product physical-efficacy claim** | **NOT SUPPORTED** | certification/evidence rules | Requires the physical evidence ladder to close under preregistered rules |
+### D2-0007
 
-## Current scientific state
+`RAC-PER-D2-0007` is closed at Stage 1. The authoritative closure is `evidence/d2-0007/stage1-screening-closure.json`.
 
-| Surface | State |
-| --- | --- |
-| **Pattern Genome v1** | FROZEN; additive/versioned successors only |
-| **D2-0004** | CLOSED — NEGATIVE / RAC-D0; retained and immutable |
-| **D2-0005** | PREREGISTERED / NOT ARMED |
-| **New held-out access** | NONE authorized by barrier, CTM, P1-readiness, or UA-binding work |
-| **Scientific thresholds** | UNCHANGED by the barrier/readiness work described here |
-| **Physical efficacy** | NOT ESTABLISHED |
+The preregistered Stage-1 screen evaluated all 64 planned compositions across the frozen eight-family motif pool on `PERSON-SUR-v3`. The survivor rule required at least 0.15 mean absolute detection-rate reduction, improvement on at least 4 of 6 surrogates, and invalid-condition fraction no greater than 0.10. No family met the full rule.
+
+Consequences are therefore frozen and explicit:
+
+- survivor count: **0**;
+- admitted count: **0**;
+- held-out access: **false**;
+- body/garment anchor support built: **false**;
+- optimization opened: **false**;
+- candidate freeze created: **false**;
+- Alpha-002 promoted: **false**;
+- D2-0005 touched: **false**;
+- Alpha-001 rebound: **false**.
+
+The generation terminates as a useful screened-out null datapoint. Stage 2+ work is not authorized under D2-0007.
+
+## Production Alpha transition
+
+The current manufacturing target remains `RAC-PRINT-ALPHA-001`, using the exact recovered D2-0003 source.
+
+The preferred real-production entry point is `tools/p1_production_release.py`. It wraps the lower-level preparation helper and fail-closes on:
+
+- wrong Printful product identity;
+- missing or unexpected production placements;
+- malformed/error vendor responses;
+- tampered raw-response bytes;
+- mismatched deterministic vendor archives;
+- mutated vendor-intake receipts;
+- incorrect Alpha-001 sealed-kit or pattern hashes.
+
+The current primary garment is Printful product `388` (All-Over Print Recycled Unisex Hoodie). Product `257` remains the fallback/reserve tee metadata surface where required by the production/binder contract.
+
+The release gate does **not** authorize spend or place an order.
 
 ## Current P1 execution authority
 
-Older Print Alpha planning material contained a 108-row capture plan. That is **superseded for P1 execution** by the frozen readiness package. The authoritative P1 execution surface is now:
+Older Print Alpha planning material contains a 108-row capture plan. That is superseded for P1 execution.
 
-- `physical/p1/P1_CAPTURE_SCHEDULE.json` — **144 frozen trials** derived from the frozen pairing/randomization seed and pinned by `schedule_sha256`.
-- `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json` — pairing/randomization authority.
-- `physical/p1/P1_OPERATOR_RUNBOOK.md` — specimen-arrival through sealed-evidence procedure.
-- `physical/p1/P1_READINESS_FREEZE.json` — hash-pinned readiness surface.
-- `tools/p1_no_spend_readiness_gate.py` — fail-closed readiness verifier.
-- `tools/p1_bind_ua_values.py` — fail-closed pending→real-value transition; it does not authorize spend.
+The authoritative P1 execution package is:
+
+- `physical/p1/P1_CAPTURE_SCHEDULE.json` — **144 frozen trials**;
+- `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json` — pairing/randomization authority;
+- `physical/p1/P1_OPERATOR_RUNBOOK.md` — specimen-arrival through sealed-evidence procedure;
+- `physical/p1/P1_READINESS_FREEZE.json` — hash-pinned readiness surface;
+- `tools/p1_no_spend_readiness_gate.py` — readiness verifier;
+- `tools/p1_bind_ua_values.py` — fail-closed pending→real-value binder.
 
 Do not execute an older 108-row planning sheet as the P1 protocol.
 
+## CI / repository integrity state
+
+At reviewed head `8114e2189a255bed3d4c07708d7380c7ade2aefc`, the current GitHub Actions checks completed successfully, including:
+
+- Python 3.10 tests / smoke / certification-contract tests — PASS;
+- Python 3.11 tests / smoke / certification-contract tests — PASS;
+- Python 3.12 tests / smoke / certification-contract tests — PASS;
+- package build — PASS;
+- dependency audit — PASS;
+- lightweight provenance — PASS;
+- site build/deployment checks — PASS.
+
+The immediately preceding production-release hardening run reported 2,132 passing tests, 2 skipped, before the documentation-only lint correction; the corrected cross-version run then completed green.
+
 ## Immediate critical path
 
-For the human operator, follow **`docs/USER_ACTION_NEXT_STEPS.md`**. It is the current dependency-ordered checklist and preserves the frozen P1 authority described above.
+The primary bottleneck is no longer missing software. It is real vendor and physical execution:
 
-`Verified UA-1–UA-8 values → binder --check-only → atomic bind + receipt → readiness gate PASS → separate human spend authorization → procurement → specimen receipt/QA → calibration acceptance → frozen 144-trial P1 execution → validated ingestion → sealed evidence → preregistered analysis`
+```text
+Printful token + chosen size
+  -> live vendor intake
+  -> exact Alpha-001 panel build from recovered sealed source
+  -> binder --check-only
+  -> controlled UA bind
+  -> no-spend readiness PASS
+  -> separate human spend authorization
+  -> matched candidate/control order
+  -> calibration-target fabrication
+  -> receipt QA + custody
+  -> calibration acceptance
+  -> frozen 144-trial P1 execution
+  -> validated ingestion + sealed evidence
+  -> preregistered analysis
+```
 
-Stop if a real UA value is unknown, the binder refuses, the readiness gate fails, provenance cannot be reproduced, or a protected scientific boundary changes unexpectedly.
+Stop before spend or outcome collection if a required vendor value is unknown, the release gate or binder refuses, a hash mismatch appears, the readiness gate fails, candidate/control matching is broken, or a protected scientific surface changes unexpectedly.
 
-## Governance and research extensions
+## Current operator documentation
 
-Governance Passes 1–2 are formally closed/verified in the current progress ledger. Later governance modules may exist, but their adopted-contract completion remains pass-specific and audit-gated unless a closure record says otherwise.
+Use these in order:
 
-The noRecognition review is no longer wholly pending: NR-01, NR-02/03, and NR-04/05 implementation/audit work has landed as additive evidence-integrity and observation/reporting controls. NR-06 / predictor-provenance and any further research hypotheses remain prospective until their own evidence and exit criteria are satisfied.
+1. `docs/P1_PRODUCTION_RELEASE_GATE.md` — strict production intake/build entry point.
+2. `docs/P1_PRODUCTION_LAUNCH.md` — production launch handoff and recovery details.
+3. `docs/USER_ACTION_NEXT_STEPS.md` — concise current operator path.
+4. `physical/p1/P1_OPERATOR_RUNBOOK.md` — authoritative physical execution procedure after specimens exist.
 
-## Reading map
+## Historical-document policy
 
-- **Current state:** this file.
-- **What Mike needs to do next:** `USER_ACTION_NEXT_STEPS.md` — authoritative current operator checklist from vendor inputs through physical P1.
-- **Detailed current workstreams / CI / governance:** `PROJECT_PROGRESS_CURRENT.md`.
-- **Barrier 0–2 history and CTM hardening appendices:** `RAC_PARALLEL_SWARM_HANDOFF.md`.
-- **Barrier 3 closure:** `BARRIER_3_COMPLETION_HANDOFF.md`.
-- **Independent Barrier 3 audit:** `audits/RAC_G_BARRIER_3_AUDIT.md`.
-- **P1 no-spend + Friday transition:** `handoffs/P1_NO_SPEND_HANDOFF.md`.
-- **Implementation history / forward roadmap:** `RAC_TECHNICAL_ROADMAP.md`.
+Historical preregistrations, closure notes, barrier handoffs, older project ledgers, and older Print Alpha plans are intentionally retained. Do not rewrite them to make history look cleaner. Current navigation documents should instead point to the newer authority and explicitly label superseded execution material.
 
 ## One-line program status
 
-**Engineering Barriers 0–3 are closed for their declared scope; P1 no-spend readiness and UA-binding machinery are ready; the next program-defining milestone is valid measured physical evidence, not more software completion.**
+**RAC is software-ready to move Alpha-001 into controlled physical P1 production; D2-0007 closed as a screened-out null with no Alpha-002; the next program-defining milestone is admissible matched physical evidence, not additional ungated feature work.**
