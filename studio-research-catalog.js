@@ -105,6 +105,6 @@ function bind(){
   requestAnimationFrame(syncAll);
 }
 
-document.addEventListener('DOMContentLoaded',bind);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 window.RACStudioResearchCatalog={catalogVersion:CATALOG_VERSION,canonicalGeometryId:CANONICAL_GEOMETRY_ID,canonicalFamilies:[...CANONICAL_FAMILIES],p0Families:P0_META.map(x=>({...x,priority:'P0',studio_mode:'governed_candidate_import'})),implementedFamilyIds:[...CANONICAL_FAMILIES,...P0_IDS],deferred:{p1:5,p2:23,p3_refused:['bad_words','web_attack_strings']},isResearchFamily,getImportedMetadata:()=>importedMetadata,clearCandidate};
 })();
