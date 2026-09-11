@@ -5,6 +5,8 @@
   let runtimeConnected = false;
   let activeRunId = null;
   let pollTimer = null;
+  let validationPassedFor = null;
+  let analysisPassedFor = null;
 
   const escapeHtml = (value) => String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -49,9 +51,28 @@
     }
   }
 
+  function sessionPath() { return $('sessionPath')?.value.trim() || ''; }
+  function inferencePath() { return $('inferencePath')?.value.trim() || ''; }
+
+  function resetWorkflowGate() {
+    validationPassedFor = null;
+    analysisPassedFor = null;
+    updateWorkflowControls();
+  }
+
+  function updateWorkflowControls() {
+    if (!$('validateSessionBtn')) return;
+    const session = sessionPath();
+    const inference = inferencePath();
+    $('validateSessionBtn').disabled = !runtimeConnected || !session;
+    $('analyzeSessionBtn').disabled = !runtimeConnected || !session || validationPassedFor !== session;
+    $('ingestSessionBtn').disabled = !runtimeConnected || !session || !inference || validationPassedFor !== session || analysisPassedFor !== inference;
+  }
+
   function setRuntimeControls(enabled) {
-    document.querySelectorAll('[data-job], #stageSessionBtn, #validateSessionBtn, #analyzeSessionBtn, #ingestSessionBtn, #refreshWorkspaceBtn')
+    document.querySelectorAll('[data-job], #stageSessionBtn, #refreshWorkspaceBtn')
       .forEach((node) => { node.disabled = !enabled; });
+    updateWorkflowControls();
   }
 
   async function checkRuntime() {
@@ -67,8 +88,8 @@
       light.classList.add('connected');
       title.textContent = 'LOCAL RESEARCH RUNTIME CONNECTED';
       detail.textContent = `Python ${status.python} · workspace ${status.workspace} · ${status.running} active job(s)`;
-      setRuntimeControls(true);
       restoreLastSession();
+      setRuntimeControls(true);
       await loadWorkspace();
     } catch (error) {
       runtimeConnected = false;
@@ -175,6 +196,17 @@
     }
   }
 
+  async function runJobAndWait(jobId, params = {}) {
+    const launched = await runJob(jobId, params);
+    let current = launched;
+    while (['queued', 'running'].includes(current.status)) {
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      current = await runtimeJson(`/api/runtime/runs/${encodeURIComponent(launched.run_id)}`);
+      renderRun(current);
+    }
+    return current;
+  }
+
   async function uploadWorkspaceFile(relPath, blob) {
     const safeUrlPath = normalizeUploadPath(relPath);
     return runtimeJson(`/api/runtime/workspace/${safeUrlPath}`, { method: 'PUT', body: blob });
@@ -209,15 +241,16 @@
     $('inferencePath').value = `${base}inference.json`;
     $('p1OutputDir').value = `${base}p1-output`;
     $('trialStorePath').value = 'research/p1/trials.jsonl';
+    resetWorkflowGate();
     rememberSession();
-    $('stageStatus').textContent = `STAGED · ${sessionRel}`;
+    $('stageStatus').textContent = `STAGED · ${sessionRel} · VALIDATION REQUIRED`;
     await loadWorkspace();
   }
 
   function sessionParams() {
     return {
-      session: $('sessionPath').value.trim(),
-      inference: $('inferencePath').value.trim(),
+      session: sessionPath(),
+      inference: inferencePath(),
       output_dir: $('p1OutputDir').value.trim(),
       trial_store: $('trialStorePath').value.trim(),
     };
@@ -233,12 +266,56 @@
       const raw = localStorage.getItem('racLastStagedSession');
       if (!raw) return;
       const state = JSON.parse(raw);
-      if (state.session) $('sessionPath').value = state.session;
-      if (state.inference) $('inferencePath').value = state.inference;
-      if (state.output_dir) $('p1OutputDir').value = state.output_dir;
-      if (state.trial_store) $('trialStorePath').value = state.trial_store;
-      if (state.session) $('stageStatus').textContent = `LAST STAGED · ${state.session}`;
+      if (state.session && !$('sessionPath').value) $('sessionPath').value = state.session;
+      if (state.inference && !$('inferencePath').value) $('inferencePath').value = state.inference;
+      if (state.output_dir && !$('p1OutputDir').value) $('p1OutputDir').value = state.output_dir;
+      if (state.trial_store && !$('trialStorePath').value) $('trialStorePath').value = state.trial_store;
+      if (state.session) $('stageStatus').textContent = `LAST STAGED · ${state.session} · VALIDATION REQUIRED`;
     } catch (_) { /* ignore stale local UI state */ }
+  }
+
+  async function validateCurrentSession() {
+    rememberSession();
+    const session = sessionPath();
+    validationPassedFor = null;
+    analysisPassedFor = null;
+    updateWorkflowControls();
+    const run = await runJobAndWait('validate_capture', { session });
+    if (run.status === 'succeeded') {
+      validationPassedFor = session;
+      $('stageStatus').textContent = `VALIDATED · ${session} · calibration/schedule/hashes PASS`;
+    } else {
+      $('stageStatus').textContent = `VALIDATION FAILED · ${session}`;
+    }
+    updateWorkflowControls();
+    return run;
+  }
+
+  async function analyzeCurrentSession() {
+    rememberSession();
+    const session = sessionPath();
+    const output = inferencePath();
+    if (validationPassedFor !== session) throw new Error('session validation must pass before analysis');
+    analysisPassedFor = null;
+    updateWorkflowControls();
+    const run = await runJobAndWait('analyze_capture', { session, output, include_motion: true });
+    if (run.status === 'succeeded') analysisPassedFor = output;
+    updateWorkflowControls();
+    return run;
+  }
+
+  async function ingestCurrentSession() {
+    rememberSession();
+    const p = sessionParams();
+    if (validationPassedFor !== p.session) throw new Error('session validation must pass before ingestion');
+    if (analysisPassedFor !== p.inference) throw new Error('frozen analysis must succeed before ingestion');
+    return runJobAndWait('ingest_capture', {
+      session: p.session,
+      inference: p.inference,
+      source: 'motion',
+      output_dir: p.output_dir,
+      trial_store: p.trial_store,
+    });
   }
 
   function bindRuntimeUi() {
@@ -247,32 +324,24 @@
       button.addEventListener('click', () => runJob(button.dataset.job, {}));
     });
     $('stageSessionBtn').addEventListener('click', stageSelectedSession);
-    $('validateSessionBtn').addEventListener('click', () => {
-      rememberSession();
-      return runJob('validate_capture', { session: $('sessionPath').value.trim() });
-    });
-    $('analyzeSessionBtn').addEventListener('click', () => {
-      rememberSession();
-      return runJob('analyze_capture', {
-        session: $('sessionPath').value.trim(),
-        output: $('inferencePath').value.trim(),
-        include_motion: true,
-      });
-    });
-    $('ingestSessionBtn').addEventListener('click', () => {
-      rememberSession();
-      const p = sessionParams();
-      return runJob('ingest_capture', {
-        session: p.session,
-        inference: p.inference,
-        source: 'motion',
-        output_dir: p.output_dir,
-        trial_store: p.trial_store,
-      });
-    });
+    $('validateSessionBtn').addEventListener('click', () => validateCurrentSession().catch((error) => {
+      $('stageStatus').textContent = `VALIDATION REFUSED · ${error.message}`;
+    }));
+    $('analyzeSessionBtn').addEventListener('click', () => analyzeCurrentSession().catch((error) => {
+      $('runSummary').textContent = `Analysis refused: ${error.message}`;
+      $('runSummary').className = 'inline-status run-failed';
+    }));
+    $('ingestSessionBtn').addEventListener('click', () => ingestCurrentSession().catch((error) => {
+      $('runSummary').textContent = `Ingestion refused: ${error.message}`;
+      $('runSummary').className = 'inline-status run-failed';
+    }));
     $('refreshWorkspaceBtn').addEventListener('click', loadWorkspace);
     ['sessionPath', 'inferencePath', 'p1OutputDir', 'trialStorePath'].forEach((id) => {
-      $(id).addEventListener('change', rememberSession);
+      $(id).addEventListener('change', () => {
+        rememberSession();
+        if (id === 'sessionPath' || id === 'inferencePath') resetWorkflowGate();
+        else updateWorkflowControls();
+      });
     });
   }
 
