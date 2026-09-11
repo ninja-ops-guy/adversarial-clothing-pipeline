@@ -1029,6 +1029,12 @@
       "type": "document"
     },
     {
+      "id": "schema:physical_dataset_contract_v1.schema.json",
+      "path": "schemas/physical_dataset_contract_v1.schema.json",
+      "sha256": "721d210be8ded48965a3889726b0c905eb9d92ddf1bd9a3f6265295e21fbfd94",
+      "type": "document"
+    },
+    {
       "id": "schema:physical_transfer_record.schema.json",
       "path": "schemas/physical_transfer_record.schema.json",
       "sha256": "3a8aa94d2ea80be635c46a54d234d5da60e205639f6028916f5e8e8271542c18",
@@ -1059,9 +1065,27 @@
       "type": "document"
     },
     {
+      "id": "schema:sim_benchmark_v1.schema.json",
+      "path": "schemas/sim_benchmark_v1.schema.json",
+      "sha256": "c14e97567684e55205991e9cf221ee6f2e85cd9f5d8f65ea5633c269c180caa8",
+      "type": "document"
+    },
+    {
+      "id": "schema:sim_measure_discrepancy_v1.schema.json",
+      "path": "schemas/sim_measure_discrepancy_v1.schema.json",
+      "sha256": "4081287c0d487e313bb1799590b7118beab1379cdd9bcf679e2fe6a44a58d146",
+      "type": "document"
+    },
+    {
       "id": "schema:telemetry_contract.schema.json",
       "path": "schemas/telemetry_contract.schema.json",
       "sha256": "6fa8062bfd79c31b12b09c1c13a9634e76c8883a55031009299ae56530884a0b",
+      "type": "document"
+    },
+    {
+      "id": "schema:temporal_sequence_v1.schema.json",
+      "path": "schemas/temporal_sequence_v1.schema.json",
+      "sha256": "0cb1b415cb5b962a9e24a613ac712e234ba28feff9e49cb4a6c7b0069ba21e48",
       "type": "document"
     },
     {
