@@ -420,6 +420,7 @@ FROZEN_D2_ARTIFACT_IDS = frozenset(
         "RAC-PER-D2-0003",
         "RAC-PER-D2-0004",
         "RAC-PER-D2-0005-PREREGISTRATION",
+        "RAC-PER-D2-0007-PREREGISTRATION",
     }
 )
 
