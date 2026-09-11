@@ -34,7 +34,7 @@
         <a class="card app-card" href="../index.html"><strong>Pattern Lab</strong><span>Generate, simulate, analyze, export.</span></a>
         <a class="card app-card" href="../product-studio.html"><strong>Product Studio</strong><span>Reference-conditioned textile generation and mockups.</span></a>
         <a class="card app-card" href="../production-studio.html"><strong>Production Mapper</strong><span>Seam-aware mapping and evidence-bound exports.</span></a>
-        <a class="card app-card" href="../capture-lab.html"><strong>Capture Lab</strong><span>Preregistered control/candidate capture and session sealing.</span></a>
+        <a class="card app-card" href="../capture-lab.html"><strong>Capture Lab</strong><span>Frozen-schedule capture with measured calibration brackets.</span></a>
       </div>
     </section>
 
@@ -66,9 +66,9 @@
           <div>
             <h3>Bound paths</h3>
             <label>Session JSON<input id="sessionPath" type="text" placeholder="sessions/.../RAC-CAP-...-session.json"></label>
-            <label>Inference output<input id="inferencePath" type="text" value="results/inference.json"></label>
-            <label>P1 output directory<input id="p1OutputDir" type="text" value="results/p1"></label>
-            <label>Trial store<input id="trialStorePath" type="text" value="research/p1/trials.jsonl"></label>
+            <label>Inference output<input id="inferencePath" type="text" placeholder="staged automatically from Capture Lab"></label>
+            <label>P1 output directory<input id="p1OutputDir" type="text" placeholder="staged automatically from Capture Lab"></label>
+            <label>Trial store<input id="trialStorePath" type="text" placeholder="research/p1/trials.jsonl"></label>
           </div>
         </div>
         <div class="button-row">
@@ -76,7 +76,7 @@
           <button id="analyzeSessionBtn" class="action">Run frozen analysis</button>
           <button id="ingestSessionBtn" class="danger-action">Ingest into P1 trial store</button>
         </div>
-        <p class="boundary-note">Ingestion remains fail-closed: only sealed <code>physical_garment_p1</code> sessions with accepted calibration can enter the cumulative P1 store.</p>
+        <p class="boundary-note">The platform enforces the order: validation must pass before analysis; analysis must pass before ingestion. Physical validation includes measured pre/post calibration, frozen P1 schedule binding, first-arm order, and capture hashes.</p>
       </div>
     </section>
 
