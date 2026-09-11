@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>RAC Research Console</title>
+  <title>RAC Research Workbench</title>
   <link rel="stylesheet" href="console.css">
 </head>
 <body>
@@ -11,19 +11,80 @@
     <div>
       <div class="eyebrow">RUTHLESS // RESEARCH OPERATIONS</div>
       <h1>RAC Research Console</h1>
-      <p>Read-only view of browser tools, experimental state, governance, evidence, and releases.</p>
+      <p>One control plane for design, production, capture, analysis, statistics, evidence, and releases.</p>
     </div>
     <a class="home-link" href="../index.html">← Pattern Lab</a>
   </header>
 
   <main>
     <section>
-      <div class="section-heading"><h2>Applications</h2><span>FRIDAY TEST SURFACE</span></div>
+      <div class="section-heading"><h2>Research runtime</h2><span>LOCAL EXECUTION</span></div>
+      <div id="runtimeStatus" class="card runtime-card" aria-live="polite">
+        <div class="runtime-light" id="runtimeLight"></div>
+        <div>
+          <strong id="runtimeTitle">Checking local research runtime…</strong>
+          <p id="runtimeDetail">The public GitHub Pages surface stays read-only unless a loopback runtime is connected.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Applications</h2><span>INTERACTIVE RESEARCH SURFACES</span></div>
       <div class="card-grid app-grid">
         <a class="card app-card" href="../index.html"><strong>Pattern Lab</strong><span>Generate, simulate, analyze, export.</span></a>
         <a class="card app-card" href="../product-studio.html"><strong>Product Studio</strong><span>Reference-conditioned textile generation and mockups.</span></a>
         <a class="card app-card" href="../production-studio.html"><strong>Production Mapper</strong><span>Seam-aware mapping and evidence-bound exports.</span></a>
-        <a class="card app-card" href="../capture-lab.html"><strong>Capture Lab</strong><span>Preregistered control/candidate capture and session export.</span></a>
+        <a class="card app-card" href="../capture-lab.html"><strong>Capture Lab</strong><span>Preregistered control/candidate capture and session sealing.</span></a>
+      </div>
+    </section>
+
+    <section id="operationsSection">
+      <div class="section-heading"><h2>Research operations</h2><span>ALLOWLISTED JOBS</span></div>
+      <div class="card-grid operation-grid">
+        <button class="card operation-card" data-job="p1_readiness"><strong>P1 readiness</strong><span>Run the fail-closed no-spend readiness gate.</span></button>
+        <button class="card operation-card" data-job="generate_calibration_target"><strong>Calibration target</strong><span>Generate RAC-CALT-P1-0001 into the local workspace.</span></button>
+        <button class="card operation-card" data-job="repo_integrity"><strong>Repository integrity</strong><span>Check deterministic generated artifacts and drift.</span></button>
+        <button class="card operation-card" data-job="repo_tests"><strong>Full software tests</strong><span>Run the complete pytest suite from the platform.</span></button>
+        <button class="card operation-card" data-job="refresh_dashboard"><strong>Refresh dashboard</strong><span>Regenerate Research OS dashboard data.</span></button>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Physical P1 workbench</h2><span>GARMENT → EVIDENCE</span></div>
+      <div class="card p1-workbench">
+        <div class="workflow-strip">
+          <span>1 · Capture</span><span>2 · Stage</span><span>3 · Validate</span><span>4 · Analyze</span><span>5 · Ingest</span><span>6 · Continue / Stop</span>
+        </div>
+        <div class="workbench-grid">
+          <div>
+            <h3>Stage sealed Capture Lab bundle</h3>
+            <p class="muted">Select the exported session folder. Files remain in <code>.rac-runtime/workspace</code> on this machine.</p>
+            <input id="sessionFolder" type="file" webkitdirectory multiple>
+            <button id="stageSessionBtn" class="action">Stage selected folder</button>
+            <div id="stageStatus" class="inline-status">No session staged.</div>
+          </div>
+          <div>
+            <h3>Bound paths</h3>
+            <label>Session JSON<input id="sessionPath" type="text" placeholder="sessions/.../RAC-CAP-...-session.json"></label>
+            <label>Inference output<input id="inferencePath" type="text" value="results/inference.json"></label>
+            <label>P1 output directory<input id="p1OutputDir" type="text" value="results/p1"></label>
+            <label>Trial store<input id="trialStorePath" type="text" value="research/p1/trials.jsonl"></label>
+          </div>
+        </div>
+        <div class="button-row">
+          <button id="validateSessionBtn" class="action">Validate session</button>
+          <button id="analyzeSessionBtn" class="action">Run frozen analysis</button>
+          <button id="ingestSessionBtn" class="danger-action">Ingest into P1 trial store</button>
+        </div>
+        <p class="boundary-note">Ingestion remains fail-closed: only sealed <code>physical_garment_p1</code> sessions with accepted calibration can enter the cumulative P1 store.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-heading"><h2>Runtime activity</h2><span>LIVE LOCAL LOG</span></div>
+      <div class="card activity-card">
+        <div id="runSummary" class="inline-status">No runtime job selected.</div>
+        <pre id="runLog" class="run-log">Connect the local runtime to launch research jobs from this page.</pre>
       </div>
     </section>
 
@@ -35,7 +96,7 @@
     </section>
 
     <section>
-      <div class="section-heading"><h2>Governance</h2><span>READ ONLY</span></div>
+      <div class="section-heading"><h2>Governance</h2><span>SCIENTIFIC STATE</span></div>
       <div class="card table-card">
         <table>
           <thead><tr><th>Surface</th><th>State</th><th>Evidence</th></tr></thead>
@@ -61,6 +122,7 @@
           <tbody>
             <tr><td>D2</td><td>RAC-PER-D2-0003 · FAIL / RAC-D0</td><td><span class="badge closed">CLOSED</span></td></tr>
             <tr><td>D2</td><td>RAC-PER-D2-0004 · FAIL / RAC-D0</td><td><span class="badge closed">CLOSED</span></td></tr>
+            <tr><td>D2</td><td>RAC-PER-D2-0007 · SCREENED_OUT_H0</td><td><span class="badge closed">CLOSED</span></td></tr>
             <tr><td>P1</td><td>Physical garment validation</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
             <tr><td>P2</td><td>Durability / repeated physical validation</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
             <tr><td>M1</td><td>Manufacturing conformity</td><td><span class="badge external">OPEN — EXTERNAL</span></td></tr>
@@ -78,7 +140,7 @@
       </div>
     </section>
 
-    <footer>Research Console is intentionally read-only. It does not arm experiments, mutate governance state, or promote evidence.</footer>
+    <footer>On GitHub Pages this console is observational. Open it through the loopback RAC Research Runtime to execute allowlisted research locally without exposing raw capture data.</footer>
   </main>
   <script src="console.js"></script>
 </body>
