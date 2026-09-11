@@ -49,7 +49,7 @@ JOB_CATALOG: dict[str, dict[str, Any]] = {
     },
     "validate_capture": {
         "title": "Validate sealed Capture Lab session",
-        "description": "Verify the exported session schema, hashes, and local capture files.",
+        "description": "Verify the exported session schema, frozen schedule binding, hashes, and local capture files.",
         "params": {"session": {"type": "path", "required": True}},
     },
     "analyze_capture": {
@@ -112,7 +112,6 @@ def _enum_param(params: dict[str, Any], name: str, values: tuple[str, ...], defa
 def build_job_command(job_id: str, params: dict[str, Any] | None = None) -> list[str]:
     params = params or {}
     py = sys.executable
-
     if job_id == "repo_integrity":
         return [py, "scripts/check_stale_artifacts.py"]
     if job_id == "repo_tests":
@@ -156,7 +155,6 @@ def build_job_command(job_id: str, params: dict[str, Any] | None = None) -> list
         ]
     if job_id == "refresh_dashboard":
         return [py, "scripts/export_dashboard_data.py"]
-
     raise ValueError(f"unknown research job: {job_id}")
 
 
@@ -175,7 +173,6 @@ def _execute_run(run_id: str) -> None:
         record["started_at"] = time.time()
         _write_status(run_id)
         command = list(record["command"])
-
     run_dir = RUNS_ROOT / run_id
     log_path = run_dir / "run.log"
     env = os.environ.copy()
@@ -198,7 +195,7 @@ def _execute_run(run_id: str) -> None:
             record["status"] = "succeeded" if return_code == 0 else "failed"
             record["finished_at"] = time.time()
             _write_status(run_id)
-    except Exception as exc:  # pragma: no cover - defensive runtime boundary
+    except Exception as exc:  # pragma: no cover
         with log_path.open("a", encoding="utf-8", errors="replace") as log:
             log.write(f"\nRAC platform runtime error: {exc}\n")
         with _RUNS_LOCK:
@@ -227,8 +224,7 @@ def launch_job(job_id: str, params: dict[str, Any] | None = None) -> dict[str, A
             "command": command,
         }
         _write_status(run_id)
-    thread = threading.Thread(target=_execute_run, args=(run_id,), daemon=True)
-    thread.start()
+    threading.Thread(target=_execute_run, args=(run_id,), daemon=True).start()
     return {k: v for k, v in _RUNS[run_id].items() if k != "command"}
 
 
@@ -239,11 +235,11 @@ def get_run(run_id: str) -> dict[str, Any] | None:
             return None
         payload = {k: v for k, v in record.items() if k != "command"}
     log_path = RUNS_ROOT / run_id / "run.log"
-    if log_path.exists():
-        lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
-        payload["log_tail"] = lines[-200:]
-    else:
-        payload["log_tail"] = []
+    payload["log_tail"] = (
+        log_path.read_text(encoding="utf-8", errors="replace").splitlines()[-200:]
+        if log_path.exists()
+        else []
+    )
     return payload
 
 
@@ -251,24 +247,45 @@ def list_workspace(prefix: str = "") -> list[dict[str, Any]]:
     base = _workspace_path(prefix) if prefix else WORKSPACE_ROOT
     if not base.exists():
         return []
-    if base.is_file():
-        candidates = [base]
-    else:
-        candidates = sorted((p for p in base.rglob("*") if p.is_file()), key=lambda p: str(p))[:1000]
-    files = []
-    for path in candidates:
-        files.append(
-            {
-                "path": str(path.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
-                "bytes": path.stat().st_size,
-                "modified": path.stat().st_mtime,
-            }
-        )
-    return files
+    candidates = [base] if base.is_file() else sorted(
+        (p for p in base.rglob("*") if p.is_file()), key=lambda p: str(p)
+    )[:1000]
+    return [
+        {
+            "path": str(path.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
+            "bytes": path.stat().st_size,
+            "modified": path.stat().st_mtime,
+        }
+        for path in candidates
+    ]
+
+
+def p1_schedule_progress(trial_store: str = "research/p1/trials.jsonl") -> dict[str, Any]:
+    from ruthless_pipeline.certification import p1_pairing_schedule as ps
+
+    schedule = ps.derive_schedule()
+    completed: set[str] = set()
+    store_path = _workspace_path(trial_store)
+    if store_path.exists():
+        from scripts.ingest_capture_inference import load_trial_store
+
+        completed = {str(record["trial"]["trial_id"]) for record in load_trial_store(store_path)}
+    next_trial = next((entry for entry in schedule if entry["trial_id"] not in completed), None)
+    return {
+        "contract_id": ps.CONTRACT_ID,
+        "schedule_sha256": ps.schedule_sha256(schedule),
+        "planned_trials": ps.EXPECTED_TRIALS,
+        "completed_trials": len(completed),
+        "remaining_trials": ps.EXPECTED_TRIALS - len(completed),
+        "completed_trial_ids": sorted(completed),
+        "next_trial": next_trial,
+        "schedule": schedule,
+        "trial_store": trial_store,
+    }
 
 
 class RuntimeHandler(SimpleHTTPRequestHandler):
-    server_version = "RACResearchRuntime/1.1"
+    server_version = "RACResearchRuntime/1.2"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, directory=str(REPO_ROOT), **kwargs)
@@ -312,9 +329,8 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             self._json({"error": "workspace path is not a file"}, HTTPStatus.BAD_REQUEST)
             return
         body = path.read_bytes()
-        content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
         self.send_response(HTTPStatus.OK)
-        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Type", mimetypes.guess_type(path.name)[0] or "application/octet-stream")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
@@ -330,7 +346,7 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             self._json(
                 {
                     "connected": True,
-                    "runtime_version": "1.1",
+                    "runtime_version": "1.2",
                     "python": sys.version.split()[0],
                     "workspace": str(WORKSPACE_ROOT),
                     "repo_root": str(REPO_ROOT),
@@ -340,6 +356,13 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             return
         if parsed.path == "/api/runtime/catalog":
             self._json({"jobs": JOB_CATALOG})
+            return
+        if parsed.path == "/api/runtime/p1/schedule":
+            trial_store = parse_qs(parsed.query).get("trial_store", ["research/p1/trials.jsonl"])[0]
+            try:
+                self._json(p1_schedule_progress(trial_store))
+            except (ValueError, json.JSONDecodeError) as exc:
+                self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             return
         if parsed.path == "/api/runtime/workspace":
             prefix = parse_qs(parsed.query).get("prefix", [""])[0]
@@ -354,17 +377,14 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             return
         if parsed.path == "/api/runtime/runs":
             with _RUNS_LOCK:
-                runs = [{k: v for k, v in r.items() if k != "command"} for r in _RUNS.values()]
-            runs.sort(key=lambda r: r["created_at"], reverse=True)
+                runs = [{k: v for k, v in record.items() if k != "command"} for record in _RUNS.values()]
+            runs.sort(key=lambda record: record["created_at"], reverse=True)
             self._json({"runs": runs})
             return
         if parsed.path.startswith("/api/runtime/runs/"):
             run_id = parsed.path.rsplit("/", 1)[-1]
             payload = get_run(run_id)
-            if payload is None:
-                self._json({"error": "run not found"}, HTTPStatus.NOT_FOUND)
-            else:
-                self._json(payload)
+            self._json(payload if payload else {"error": "run not found"}, HTTPStatus.OK if payload else HTTPStatus.NOT_FOUND)
             return
         super().do_GET()
 
@@ -372,8 +392,7 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
         if not self._origin_allowed():
             self._json({"error": "origin refused"}, HTTPStatus.FORBIDDEN)
             return
-        parsed = urlparse(self.path)
-        if parsed.path != "/api/runtime/run":
+        if urlparse(self.path).path != "/api/runtime/run":
             self._json({"error": "unknown API route"}, HTTPStatus.NOT_FOUND)
             return
         try:
@@ -382,8 +401,7 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             params = payload.get("params") or {}
             if not isinstance(params, dict):
                 raise ValueError("params must be an object")
-            run = launch_job(job_id, params)
-            self._json(run, HTTPStatus.ACCEPTED)
+            self._json(launch_job(job_id, params), HTTPStatus.ACCEPTED)
         except (ValueError, json.JSONDecodeError) as exc:
             self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
 
@@ -397,8 +415,7 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             self._json({"error": "unknown API route"}, HTTPStatus.NOT_FOUND)
             return
         try:
-            rel = unquote(parsed.path[len(prefix):])
-            destination = _workspace_path(rel)
+            destination = _workspace_path(unquote(parsed.path[len(prefix):]))
             length = int(self.headers.get("Content-Length", "0"))
             if length < 0 or length > MAX_UPLOAD_BYTES:
                 raise ValueError("upload exceeds runtime limit")
