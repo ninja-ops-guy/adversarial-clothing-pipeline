@@ -1,5 +1,7 @@
 # P1 Production Launch — RAC-PRINT-ALPHA-001
 
+<!-- doclint:allow check="broken-path" reason="this operator runbook intentionally references gitignored runtime outputs under production_alpha/vendor_intake/ plus local external recovery paths; those files are created by the production release gate and are expected to be absent from a clean checkout" -->
+
 This is the shortest production path from the frozen Alpha-001 digital specimen to a valid physical P1 matched-pair trial.
 
 ## Current scientific identity
@@ -22,6 +24,8 @@ Do not redesign these surfaces merely to begin manufacturing. Real vendor/specim
 
 ## Production command path
 
+For real manufacturing, use the stricter `tools/p1_production_release.py` entry point. `tools/prepare_print_alpha_production.py` is its lower-level implementation helper and should not be the normal operator surface.
+
 ### 1. Obtain a Printful API token
 
 Create the token in Printful and keep it only in the local environment:
@@ -37,27 +41,30 @@ Never commit or paste the token into JSON, logs, issues, receipts, or manifests.
 Pick one size available on both product 388 and the fallback tee. Example only:
 
 ```bash
-python tools/prepare_print_alpha_production.py intake \
+python tools/p1_production_release.py intake \
   --fetch \
   --size M \
   --output-dir production_alpha/vendor_intake
 ```
 
-The tool downloads the live product, printfile, and template responses for products 388 and 257. It:
+The release gate downloads the live product, printfile, and template responses for products 388 and 257. It:
 
+- verifies exact Printful product identity and title;
 - selects the exact White variant for the chosen size;
 - requires every preregistered placement to exist;
+- refuses unreviewed unexpected non-mockup placements;
 - joins `variant_printfiles` to the exact Printful `printfile_id` dimensions;
 - converts px/DPI to millimeters;
 - stores untouched response bytes under `production_alpha/vendor_intake/raw/`;
 - creates deterministic `printful-source-388.zip` and `printful-source-257.zip` archives;
-- writes `vendor-intake.json` with hashes and geometry;
+- writes a self-hashed `vendor-intake.json` with hashes and geometry;
+- verifies raw bytes against the archives;
 - does **not** authorize spend or place an order.
 
 If responses were downloaded separately, use the offline mode instead:
 
 ```bash
-python tools/prepare_print_alpha_production.py intake \
+python tools/p1_production_release.py intake \
   --raw-dir template_archive \
   --size M \
   --output-dir production_alpha/vendor_intake
@@ -88,7 +95,7 @@ If only the exact frozen `pattern_tile_4096.png` is available, it may be supplie
 Preferred sealed-kit path:
 
 ```bash
-python tools/prepare_print_alpha_production.py build \
+python tools/p1_production_release.py build \
   --intake production_alpha/vendor_intake/vendor-intake.json \
   --print-test-kit /secure/path/print-test-kit.zip \
   --recorded-by '<operator>'
@@ -97,13 +104,13 @@ python tools/prepare_print_alpha_production.py build \
 Pattern-only recovery path:
 
 ```bash
-python tools/prepare_print_alpha_production.py build \
+python tools/p1_production_release.py build \
   --intake production_alpha/vendor_intake/vendor-intake.json \
   --candidate-pattern /secure/path/pattern_tile_4096.png \
   --recorded-by '<operator>'
 ```
 
-This stage:
+Before rendering, the strict release gate re-derives the intake self-hash and re-verifies every raw response and deterministic vendor archive byte-for-byte. It then:
 
 - refuses any candidate source whose hash differs from Alpha-001;
 - tiles the frozen candidate without regeneration or retuning;
@@ -114,6 +121,7 @@ This stage:
 - writes `production_alpha/vendor_intake/ua-values.generated.json`;
 - validates that generated values satisfy the real P1 UA binder contract;
 - writes `production-prep-receipt.json`;
+- re-verifies the vendor intake after rendering to detect concurrent mutation;
 - still does **not** authorize spend or place an order.
 
 ### 5. Review and bind
