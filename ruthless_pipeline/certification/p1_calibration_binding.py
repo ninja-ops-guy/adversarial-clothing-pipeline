@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime
 from typing import Any
 
 from .calibration_ingest import (
@@ -37,6 +38,19 @@ def _tuple3(value: Any, label: str) -> tuple[float, float, float]:
     if not isinstance(value, (list, tuple)) or len(value) != 3:
         raise ValueError(f"{label} must contain three values")
     return (float(value[0]), float(value[1]), float(value[2]))
+
+
+def _parse_utc(value: str, label: str) -> datetime:
+    text = str(value or "")
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError as exc:
+        raise ValueError(f"{label} created_utc is not valid ISO-8601") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"{label} created_utc must be timezone-aware")
+    return parsed
 
 
 def profile_from_payload(payload: dict[str, Any]) -> PrintCameraProfile:
@@ -93,6 +107,7 @@ def profile_from_payload(payload: dict[str, Any]) -> PrintCameraProfile:
         registrations=registrations,
     )
     profile.validate()
+    _parse_utc(profile.created_utc, profile.profile_id or "calibration profile")
     return profile
 
 
@@ -171,10 +186,18 @@ def _evaluate_session_phase(session: dict[str, Any], phase: str) -> dict[str, An
 
 
 def validate_session_calibration_binding(session: dict[str, Any]) -> dict[str, dict[str, Any]] | None:
-    """Recompute and require accepted pre/post calibration for physical P1."""
+    """Recompute and require accepted, distinct chronological P1 brackets."""
     if session.get("evidence_class") != P1_EVIDENCE_CLASS:
         return None
     receipts = {phase: _evaluate_session_phase(session, phase) for phase in PHASES}
+    if receipts["pre"]["profile_id"] == receipts["post"]["profile_id"]:
+        raise ValueError("P1 calibration binding: pre/post calibration profiles must be distinct")
+    if receipts["pre"]["profile_sha256"] == receipts["post"]["profile_sha256"]:
+        raise ValueError("P1 calibration binding: pre/post calibration sources must be distinct")
+    if _parse_utc(receipts["post"]["created_utc"], "post calibration") <= _parse_utc(
+        receipts["pre"]["created_utc"], "pre calibration"
+    ):
+        raise ValueError("P1 calibration binding: post-capture calibration must be later than pre-capture calibration")
     if session.get("calibration_pass") is not True:
         raise ValueError("P1 calibration binding: calibration_pass must reflect accepted bracketing profiles")
     if session.get("calibration_profile_id") != receipts["pre"]["profile_id"]:
