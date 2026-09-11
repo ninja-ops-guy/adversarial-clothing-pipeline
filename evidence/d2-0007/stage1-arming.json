@@ -4,6 +4,18 @@
   "armed_stage": "STAGE_1_MOTIF_SCREENING",
   "armed": true,
   "authorization_scope": "Exactly the frozen 64-composition, eight-generator PERSON-SUR-v3 motif screen defined by configs/d2007_stage1_screening_v1.json. This arming does not authorize any later D2-0007 stage.",
+  "user_ratification": {
+    "status": "RATIFIED",
+    "decision_date": "2026-09-11",
+    "decision": "Proceed",
+    "scope": "Continue the already-preregistered D2-0007 Stage-1 motif-screening path and repair its infrastructure-only aggregation blocker. No downstream stage is authorized by this ratification.",
+    "scientific_inputs_changed": false,
+    "heldout_access_authorized": false,
+    "body_garment_anchor_support_authorized": false,
+    "optimization_authorized": false,
+    "candidate_freeze_authorized": false,
+    "alpha_002_promotion_authorized": false
+  },
   "parent_preregistration": {
     "path": "docs/PREREGISTRATION_D2-0007.md",
     "sha256": "38b955d5b60e3428cce84a8c6b849fbcb61b153a4b3fb3a3040aa730d6e1564f"
@@ -51,9 +63,25 @@
     },
     {
       "attempt": 2,
+      "workflow_run_id": 34561945925,
+      "head_commit": "09dc60d7df796fcd8c8d6d9ba8ed9596e1b1312d",
       "trigger_revision": 2,
       "workflow_fix_commit": "c2f22822c18ee99a537bb660dc642a12853eb521",
-      "status": "TRIGGERED_FROM_IDENTICAL_FROZEN_SCIENTIFIC_INPUTS"
+      "status": "SCREENING_COMPLETE_AGGREGATION_ABORTED_INFRASTRUCTURE",
+      "observations_produced": 64,
+      "generator_jobs_complete": 8,
+      "failure": "Aggregate job imported the screening package without scipy installed; aggregation aborted before combining or interpreting the 64 observations.",
+      "scientific_inputs_changed": false,
+      "heldout_access": false
+    },
+    {
+      "attempt": 3,
+      "trigger_revision": 3,
+      "workflow_fix_commit": "940209e5b59b5967ce1227265e9787c86c6d3ada",
+      "status": "AUTHORIZED_RETRY_FROM_IDENTICAL_FROZEN_SCIENTIFIC_INPUTS",
+      "reason": "Infrastructure-only aggregate dependency repair plus explicit user ratification.",
+      "scientific_inputs_changed": false,
+      "heldout_access_allowed": false
     }
   ],
   "heldout_access_allowed": false,
