@@ -36,6 +36,10 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+          closure = Path('evidence/d2-0007/stage1-screening-closure.json')
+          assert not closure.exists(), (
+              'D2-0007 Stage 1 is already closed; refusing duplicate screening execution'
+          )
           arm = json.loads(Path('evidence/d2-0007/stage1-arming.json').read_text())
           gen = json.loads(Path('generations/RAC-PER-D2-0007.json').read_text())
           assert arm['generation_id'] == 'RAC-PER-D2-0007'
