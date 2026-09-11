@@ -1,0 +1,137 @@
+{
+  "schema_version": "rac-d2007-stage1-closure/1.0",
+  "generation_id": "RAC-PER-D2-0007",
+  "stage": "STAGE_1_MOTIF_SCREENING",
+  "decision": "SCREENED_OUT_H0",
+  "generation_status": "CLOSED_SCREENED_OUT_H0",
+  "evidence_class": "internally_measured",
+  "evidence_scope": "surrogate-only hypothesis screening; not transfer, held-out, physical-efficacy, or product evidence",
+  "parent_preregistration": {
+    "path": "docs/PREREGISTRATION_D2-0007.md",
+    "sha256": "38b955d5b60e3428cce84a8c6b849fbcb61b153a4b3fb3a3040aa730d6e1564f"
+  },
+  "stage1_execution_spec": {
+    "path": "configs/d2007_stage1_screening_v1.json",
+    "sha256": "94526c4d0a90485d95b193e20bea139595a0d0892431b83dcfae60cef2611237"
+  },
+  "source_commit": "43de0636ad06b70733eeefb6b31dafab87e3da65",
+  "workflow_run_id": 34587752211,
+  "workflow_artifact": {
+    "artifact_id": 10196062211,
+    "name": "d2-0007-stage1-screening-34587752211",
+    "digest": "sha256:9021554aec02992f444a21f2704fa8cf29be6578733476c97cbe8998b3925500",
+    "expires_at": "2026-12-10T10:08:44Z"
+  },
+  "scientific_result": {
+    "result_sha256": "adad524550660098217b6f82fbf766a5597c9aecc059d726b90f40e6ba273c4e",
+    "model_set_id": "PERSON-SUR-v3",
+    "observed_composition_count": 64,
+    "screening_budget_exhausted": true,
+    "survivor_count": 0,
+    "admitted_count": 0,
+    "preregistered_h0_screened_out": true,
+    "decision_rule": {
+      "minimum_mean_detection_rate_reduction": 0.15,
+      "minimum_improved_surrogates": 4,
+      "surrogate_count": 6,
+      "maximum_invalid_condition_fraction": 0.1
+    },
+    "family_best_summary": [
+      {
+        "generator_index": 0,
+        "generator": "hyperface_like",
+        "screening_candidate_id": "RAC-D2-0007-S1-G00-C04-7b78713e1ecc",
+        "pattern_sha256": "7b78713e1ecc0559d92265188c19f5a78554acc0b711132d918285e94de33ceb",
+        "mean_detection_rate_reduction": 0.21296296296296294,
+        "improved_surrogate_count": 3,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 1,
+        "generator": "dazzle_surgical_lines",
+        "screening_candidate_id": "RAC-D2-0007-S1-G01-C04-0ee63bf668c2",
+        "pattern_sha256": "0ee63bf668c250397a8daff5cf6dc0089a7e8a53342f363791845b9c980fef9b",
+        "mean_detection_rate_reduction": 0.1851851851851852,
+        "improved_surrogate_count": 3,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 2,
+        "generator": "key_feature_blackout",
+        "screening_candidate_id": "RAC-D2-0007-S1-G02-C03-66ddfa19cf28",
+        "pattern_sha256": "66ddfa19cf28b7e3616d43d090d4583264fb2500b78a04b3222f93f14c5451d9",
+        "mean_detection_rate_reduction": 0.14814814814814817,
+        "improved_surrogate_count": 2,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 3,
+        "generator": "saliency_eye_attack",
+        "screening_candidate_id": "RAC-D2-0007-S1-G03-C01-41a17468c049",
+        "pattern_sha256": "41a17468c0494b7f95686245b5060205c78141492e35a81c92f3ff74c9357408",
+        "mean_detection_rate_reduction": 0.20370370370370372,
+        "improved_surrogate_count": 2,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 4,
+        "generator": "adversarial_patch",
+        "screening_candidate_id": "RAC-D2-0007-S1-G04-C03-fef0739d7308",
+        "pattern_sha256": "fef0739d7308cc36d554c0f6c49ddcc7cb4d9e1be591a5cf6bc28b85bbd29277",
+        "mean_detection_rate_reduction": 0.22222222222222224,
+        "improved_surrogate_count": 3,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 5,
+        "generator": "swapped_landmarks",
+        "screening_candidate_id": "RAC-D2-0007-S1-G05-C04-7defa5d123e3",
+        "mean_detection_rate_reduction": 0.16666666666666666,
+        "improved_surrogate_count": 3,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 6,
+        "generator": "landmark_noise",
+        "screening_candidate_id": "RAC-D2-0007-S1-G06-C02-289cf57f6ca9",
+        "mean_detection_rate_reduction": 0.19444444444444442,
+        "improved_surrogate_count": 2,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      },
+      {
+        "generator_index": 7,
+        "generator": "feature_collage",
+        "screening_candidate_id": "RAC-D2-0007-S1-G07-C03-dc053a4c3195",
+        "mean_detection_rate_reduction": 0.22222222222222224,
+        "improved_surrogate_count": 2,
+        "invalid_condition_fraction": 0.0,
+        "survives": false
+      }
+    ]
+  },
+  "boundary_verification": {
+    "heldout_access": false,
+    "body_garment_anchor_support_built": false,
+    "optimization_opened": false,
+    "candidate_freeze_created": false,
+    "alpha_002_promoted": false,
+    "d2_0005_touched": false,
+    "alpha_001_rebound": false,
+    "tracked_frozen_surface_diff_guard": "PASS"
+  },
+  "closure_consequence": {
+    "stage2_anchor_engineering_authorized": false,
+    "stage3_optimization_authorized": false,
+    "stage5_candidate_freeze_authorized": false,
+    "stage6_heldout_evaluation_authorized": false,
+    "alpha_002_promotion_authorized": false,
+    "reason": "No motif family met the preregistered Stage-1 survivor rule. Per D2-0007, no anchor adapter is built, optimization does not open, no candidate is frozen, held-out data is never accessed, and the generation closes as a screened-out null datapoint."
+  }
+}
