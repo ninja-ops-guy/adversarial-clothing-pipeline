@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const STEPS=['Experiment','Calibration','Control','Candidate','Motion','Review','Seal'];
-let stream=null,recorder=null,chunks=[],arm='control',frozen=null,sealed=false;
+let stream=null,recorder=null,chunks=[],arm='control',frozen=null,sealed=false,runtimeConnected=false;
 const captures={control:{stills:[],videos:[]},candidate:{stills:[],videos:[]}};
 function now(){return new Date().toISOString()}
 function stable(v){if(Array.isArray(v))return v.map(stable);if(v&&typeof v==='object'){const out={};Object.keys(v).sort().forEach(k=>out[k]=stable(v[k]));return out;}return v}
@@ -41,17 +41,37 @@ function analyze(){
  let mm;try{mm=JSON.parse($('modelManifest').value)}catch(e){return alert('Model manifest JSON is invalid.')}
  if(!Array.isArray(mm.models)||typeof mm.thresholds!=='object')return alert('Frozen model manifest requires models[] and thresholds{}.');
  $('modelManifest').disabled=true;$('analyzeBtn').disabled=true;
- const payload={schema_version:'1.0',status:'analysis_pending_local_runner',session_freeze_sha256:frozen.freeze_sha256,models:mm.models,thresholds:mm.thresholds,preprocessing:mm.preprocessing||{},motion_sampling:mm.motion_sampling||null,identity_mode:mm.identity_mode||'disabled',note:'Use scripts/analyze_capture_session.py or an authorized local runner. Browser does not fabricate inference.'};
- $('analysisStatus').textContent='ANALYSIS CONTRACT FROZEN · '+mm.models.length+' models · export bundle for local runner.';frozen.analysis_contract=payload
+ const payload={schema_version:'1.0',status:'analysis_pending_local_runner',session_freeze_sha256:frozen.freeze_sha256,models:mm.models,thresholds:mm.thresholds,preprocessing:mm.preprocessing||{},motion_sampling:mm.motion_sampling||null,identity_mode:mm.identity_mode||'disabled',note:'Execute through the connected RAC Research Workbench or scripts/analyze_capture_session.py. Browser does not fabricate inference.'};
+ $('analysisStatus').textContent='ANALYSIS CONTRACT FROZEN · '+mm.models.length+' models · ready for Research Workbench.';frozen.analysis_contract=payload
 }
-async function exportBundle(){
+function buildSession(){
  const files=[];const session={...frozen,calibration_pass:$('calibrationPass').checked,sealed,captures:{control:{stills:[],videos:[]},candidate:{stills:[],videos:[]}}};
  for(const a of ['control','candidate'])for(const t of ['stills','videos'])for(const r of captures[a][t]){const ext=r.type==='still'?'jpg':'webm',name=a+'/'+r.id+'.'+ext;files.push({name,blob:r.blob});session.captures[a][t].push({...r,blob:undefined,path:name})}
- const data=new Blob([JSON.stringify(session,null,2)],{type:'application/json'});download(data,(frozen.session_id||'rac-capture')+'-session.json');
+ return {session,files}
+}
+async function exportBundle(){
+ const {session,files}=buildSession();const data=new Blob([JSON.stringify(session,null,2)],{type:'application/json'});download(data,(frozen.session_id||'rac-capture')+'-session.json');
  for(const f of files)download(f.blob,(frozen.session_id||'rac-capture')+'-'+f.name.replaceAll('/','-'))
 }
 function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-async function seal(){if(!$('calibrationPass').checked)return alert('Calibration must pass before sealing a physical evidence session.');if(!captures.control.stills.length||!captures.candidate.stills.length)return alert('Matched capture pair incomplete.');sealed=true;$('sealBtn').disabled=true;$('stillBtn').disabled=true;$('recordBtn').disabled=true;$('reviewBtn').disabled=true;$('sealStatus').textContent='SEALED · IMMUTABLE CAPTURE SESSION';renderSteps(6);await exportBundle()}
+function runtimePath(path){return String(path).split('/').map(encodeURIComponent).join('/')}
+async function runtimeUpload(rel,blob){const res=await fetch('/api/runtime/workspace/'+runtimePath(rel),{method:'PUT',body:blob});const payload=await res.json();if(!res.ok)throw new Error(payload.error||('HTTP '+res.status));return payload}
+async function checkRuntime(){try{const res=await fetch('/api/runtime/status',{cache:'no-store'});if(!res.ok)throw new Error('not connected');const p=await res.json();runtimeConnected=p.connected===true}catch(_){runtimeConnected=false}const s=$('runtimeStatus');if(s)s.textContent=runtimeConnected?'RESEARCH RUNTIME · CONNECTED':'RESEARCH RUNTIME · STATIC / READ-ONLY';if($('runtimeStageBtn'))$('runtimeStageBtn').disabled=!(runtimeConnected&&sealed)}
+async function stageSessionToRuntime(){
+ if(!runtimeConnected)throw new Error('Research Workbench runtime is not connected.');if(!sealed)throw new Error('Seal the session before staging.');
+ const {session,files}=buildSession(),base='sessions/'+frozen.session_id;
+ $('sealStatus').textContent='STAGING SEALED SESSION · 0/'+(files.length+1);
+ let n=0;for(const f of files){await runtimeUpload(base+'/'+f.name,f.blob);n++;$('sealStatus').textContent='STAGING SEALED SESSION · '+n+'/'+(files.length+1)}
+ const sessionRel=base+'/'+frozen.session_id+'-session.json';await runtimeUpload(sessionRel,new Blob([JSON.stringify(session,null,2)],{type:'application/json'}));
+ const state={session:sessionRel,inference:base+'/inference.json',output_dir:base+'/p1-output',trial_store:'research/p1/trials.jsonl'};
+ try{localStorage.setItem('racLastStagedSession',JSON.stringify(state))}catch(_){}
+ $('sealStatus').textContent='SEALED + STAGED · '+sessionRel;$('runtimeStageBtn').disabled=false;return state
+}
+async function seal(){
+ if(!$('calibrationPass').checked)return alert('Calibration must pass before sealing a physical evidence session.');if(!captures.control.stills.length||!captures.candidate.stills.length)return alert('Matched capture pair incomplete.');if(!frozen.analysis_contract)return alert('Freeze the ensemble analysis contract before sealing the session.');
+ sealed=true;$('sealBtn').disabled=true;$('stillBtn').disabled=true;$('recordBtn').disabled=true;$('reviewBtn').disabled=true;$('sealStatus').textContent='SEALED · IMMUTABLE CAPTURE SESSION';renderSteps(6);
+ if(runtimeConnected){try{await stageSessionToRuntime()}catch(e){$('sealStatus').textContent='SEALED · RUNTIME STAGING FAILED · '+e.message;await exportBundle()}}else await exportBundle();
+}
 function preset(name){
  const sets={
   surrogate:{models:['yolov8n','fasterrcnn_mobilenet_v3_320','detr_resnet50','ssdlite320_mobilenet_v3','retinanet_resnet50_fpn_v2','fcos_resnet50_fpn']},
@@ -61,6 +81,6 @@ function preset(name){
  const models=sets[name].models,thresholds=Object.fromEntries(models.map(m=>[m,0.5]));
  $('modelManifest').value=JSON.stringify({models,thresholds,preprocessing:{source:'frozen model manifests'},motion_sampling:{fps:2.0,max_frames:120,aggregation:'sequence_fraction',sequence_detection_threshold:0.5},identity_mode:'disabled'},null,2)
 }
-function init(){renderSteps(0);count();$('ensemblePreset').onchange=()=>preset($('ensemblePreset').value);$('freezeBtn').onclick=freeze;$('cameraBtn').onclick=camera;$('stillBtn').onclick=still;$('recordBtn').onclick=startRecord;$('stopBtn').onclick=stopRecord;$('reviewBtn').onclick=review;$('analyzeBtn').onclick=analyze;$('exportBtn').onclick=exportBundle;$('sealBtn').onclick=seal;document.querySelectorAll('.arm').forEach(b=>b.onclick=()=>switchArm(b.dataset.arm));$('calibrationPass').onchange=()=>{$('calibrationGate').querySelector('span').textContent=$('calibrationPass').checked?'PASS':'Pending'}}
-window.RACCaptureLab={manifest,freeze,review,analyze,seal,getState:()=>({frozen,sealed,captures})};window.addEventListener('DOMContentLoaded',init)
+function init(){renderSteps(0);count();$('ensemblePreset').onchange=()=>preset($('ensemblePreset').value);$('freezeBtn').onclick=freeze;$('cameraBtn').onclick=camera;$('stillBtn').onclick=still;$('recordBtn').onclick=startRecord;$('stopBtn').onclick=stopRecord;$('reviewBtn').onclick=review;$('analyzeBtn').onclick=analyze;$('exportBtn').onclick=exportBundle;$('sealBtn').onclick=seal;$('runtimeStageBtn').onclick=async()=>{try{await stageSessionToRuntime()}catch(e){$('sealStatus').textContent='RUNTIME STAGING FAILED · '+e.message}};document.querySelectorAll('.arm').forEach(b=>b.onclick=()=>switchArm(b.dataset.arm));$('calibrationPass').onchange=()=>{$('calibrationGate').querySelector('span').textContent=$('calibrationPass').checked?'PASS':'Pending'};checkRuntime();setInterval(checkRuntime,15000)}
+window.RACCaptureLab={manifest,freeze,review,analyze,seal,stageSessionToRuntime,getState:()=>({frozen,sealed,captures,runtimeConnected})};window.addEventListener('DOMContentLoaded',init)
 })();
