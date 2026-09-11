@@ -1,7 +1,7 @@
 # Production Completion Checklist
 
 **Document ID:** PCC-2026-09-07-001  
-**Version:** 1.1.0  
+**Version:** 1.1.1  
 **Last updated:** 2026-09-11  
 **Classification:** Internal — Strategic  
 **Current authority:** `docs/CURRENT_PROGRAM_STATE.md` and frozen P1 execution surfaces outrank this checklist.
@@ -84,6 +84,10 @@ Choose size + local Printful token
 
 See `docs/P1_PRODUCTION_RELEASE_GATE.md`, `docs/USER_ACTION_NEXT_STEPS.md`, and `physical/p1/P1_OPERATOR_RUNBOOK.md`.
 
+## Next single action
+
+Choose the actual size for the first Printful product-388 hoodie pair, use a local Printful token, and run the strict live vendor intake through `tools/p1_production_release.py intake`; do not authorize spend yet.
+
 ## Stop conditions
 
 Stop before procurement or outcome collection if:
@@ -106,3 +110,4 @@ RAC is **production-ready as a research system**, not product-validated. Orderin
 | --- | --- | --- |
 | 1.0.0 | 2026-09-07 | Initial 20-step production checklist |
 | 1.1.0 | 2026-09-11 | Reconciled D2-0007 closure, recovered Alpha-001 source, strict Printful release tooling, implemented calibration/statistics infrastructure, and frozen 144-trial P1 authority |
+| 1.1.1 | 2026-09-11 | Restored the machine-readable `Next single action` heading used by the deterministic research-dashboard exporter |
