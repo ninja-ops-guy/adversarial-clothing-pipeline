@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import mimetypes
 import os
 import subprocess
 import sys
@@ -14,7 +15,7 @@ from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_ROOT = REPO_ROOT / ".rac-runtime"
@@ -44,16 +45,12 @@ JOB_CATALOG: dict[str, dict[str, Any]] = {
     "generate_calibration_target": {
         "title": "Generate P1 calibration target",
         "description": "Generate RAC-CALT-P1-0001 into the local runtime workspace.",
-        "params": {
-            "output_dir": {"type": "path", "default": "calibration/RAC-CALT-P1-0001"}
-        },
+        "params": {"output_dir": {"type": "path", "default": "calibration/RAC-CALT-P1-0001"}},
     },
     "validate_capture": {
         "title": "Validate sealed Capture Lab session",
         "description": "Verify the exported session schema, hashes, and local capture files.",
-        "params": {
-            "session": {"type": "path", "required": True},
-        },
+        "params": {"session": {"type": "path", "required": True}},
     },
     "analyze_capture": {
         "title": "Run frozen detector analysis",
@@ -250,8 +247,28 @@ def get_run(run_id: str) -> dict[str, Any] | None:
     return payload
 
 
+def list_workspace(prefix: str = "") -> list[dict[str, Any]]:
+    base = _workspace_path(prefix) if prefix else WORKSPACE_ROOT
+    if not base.exists():
+        return []
+    if base.is_file():
+        candidates = [base]
+    else:
+        candidates = sorted((p for p in base.rglob("*") if p.is_file()), key=lambda p: str(p))[:1000]
+    files = []
+    for path in candidates:
+        files.append(
+            {
+                "path": str(path.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
+                "bytes": path.stat().st_size,
+                "modified": path.stat().st_mtime,
+            }
+        )
+    return files
+
+
 class RuntimeHandler(SimpleHTTPRequestHandler):
-    server_version = "RACResearchRuntime/1.0"
+    server_version = "RACResearchRuntime/1.1"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, directory=str(REPO_ROOT), **kwargs)
@@ -285,16 +302,35 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             raise ValueError("JSON body must be an object")
         return payload
 
+    def _send_workspace_file(self, rel: str) -> None:
+        try:
+            path = _workspace_path(rel, require_exists=True)
+        except ValueError as exc:
+            self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            return
+        if not path.is_file():
+            self._json({"error": "workspace path is not a file"}, HTTPStatus.BAD_REQUEST)
+            return
+        body = path.read_bytes()
+        content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
+        if parsed.path.startswith("/api/runtime/") and not self._origin_allowed():
+            self._json({"error": "origin refused"}, HTTPStatus.FORBIDDEN)
+            return
         if parsed.path == "/api/runtime/status":
-            if not self._origin_allowed():
-                self._json({"error": "origin refused"}, HTTPStatus.FORBIDDEN)
-                return
             self._json(
                 {
                     "connected": True,
-                    "runtime_version": "1.0",
+                    "runtime_version": "1.1",
                     "python": sys.version.split()[0],
                     "workspace": str(WORKSPACE_ROOT),
                     "repo_root": str(REPO_ROOT),
@@ -303,24 +339,26 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
             )
             return
         if parsed.path == "/api/runtime/catalog":
-            if not self._origin_allowed():
-                self._json({"error": "origin refused"}, HTTPStatus.FORBIDDEN)
-                return
             self._json({"jobs": JOB_CATALOG})
             return
+        if parsed.path == "/api/runtime/workspace":
+            prefix = parse_qs(parsed.query).get("prefix", [""])[0]
+            try:
+                self._json({"files": list_workspace(prefix)})
+            except ValueError as exc:
+                self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            return
+        workspace_prefix = "/api/runtime/workspace/"
+        if parsed.path.startswith(workspace_prefix):
+            self._send_workspace_file(unquote(parsed.path[len(workspace_prefix):]))
+            return
         if parsed.path == "/api/runtime/runs":
-            if not self._origin_allowed():
-                self._json({"error": "origin refused"}, HTTPStatus.FORBIDDEN)
-                return
             with _RUNS_LOCK:
                 runs = [{k: v for k, v in r.items() if k != "command"} for r in _RUNS.values()]
             runs.sort(key=lambda r: r["created_at"], reverse=True)
             self._json({"runs": runs})
             return
         if parsed.path.startswith("/api/runtime/runs/"):
-            if not self._origin_allowed():
-                self._json({"error": "origin refused"}, HTTPStatus.FORBIDDEN)
-                return
             run_id = parsed.path.rsplit("/", 1)[-1]
             payload = get_run(run_id)
             if payload is None:
@@ -377,7 +415,7 @@ class RuntimeHandler(SimpleHTTPRequestHandler):
                     remaining -= len(chunk)
             self._json(
                 {
-                    "path": str(destination.relative_to(WORKSPACE_ROOT)),
+                    "path": str(destination.relative_to(WORKSPACE_ROOT)).replace("\\", "/"),
                     "bytes": length,
                     "sha256": digest.hexdigest(),
                 },
