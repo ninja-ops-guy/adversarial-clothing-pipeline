@@ -1,109 +1,103 @@
 # RAC Documentation Index
 
-**Last updated:** 2026-09-10 America/New_York (2026-09-11 UTC)
+**Last updated:** 2026-09-11 America/New_York
 
-This page is the navigation layer for the RAC documentation stack. Use the documents below according to their authority and purpose.
+This page is the navigation layer for the RAC documentation stack. Frozen contracts, preregistrations, closure evidence, and physical execution artifacts outrank explanatory documentation.
 
 ## Start here
 
 For a new technical reviewer, read in this order:
 
-1. **[Current Program State](CURRENT_PROGRAM_STATE.md)** — canonical Barrier 0–3 status, P1/UA state, physical-evidence critical path, and authority order.
-2. **[Root README](../README.md)** — executive thesis, system identity and end-to-end flow.
-3. **[System Diagrams](DIAGRAMS.md)** — topology, architecture, trust boundaries, evidence flow, production flow and research lifecycle.
-4. **[Architecture](ARCHITECTURE.md)** — implementation planes, component responsibilities and evidence boundaries.
-5. **[Certification System](CERTIFICATION_SYSTEM.md)** — fail-closed evidence transitions and promotion/refusal logic.
-6. **[End-to-End Research SOP](END_TO_END_RESEARCH_SOP.md)** — operational design → benchmark → print → physical-validation workflow.
-7. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — detailed current completion state, governance/CI baseline and workstream status.
-8. **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** — detailed Sep. 7–8 milestone and D2 closure history.
-9. **[Manuscript Workspace](papers/README.md)** — pre-results papers explaining RAC research questions and methods.
+1. **[Current Program State](CURRENT_PROGRAM_STATE.md)** — canonical current status, scientific lineages, P1 state, authority order, and immediate critical path.
+2. **[Root README](../README.md)** — executive thesis, current state, system identity, and physical-testing transition.
+3. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — detailed current workstream and closure ledger.
+4. **[System Diagrams](DIAGRAMS.md)** — current topology, D2-0007 closure path, Alpha-001 production path, and P1 evidence flow.
+5. **[Architecture](ARCHITECTURE.md)** — implementation planes and evidence boundaries.
+6. **[Production Release Gate](P1_PRODUCTION_RELEASE_GATE.md)** — strict software entry point for live Printful intake and Alpha-001 production build.
+7. **[User Action — Next Steps](USER_ACTION_NEXT_STEPS.md)** — current human operator path from software readiness to physical P1.
+8. **[P1 Operator Runbook](../physical/p1/P1_OPERATOR_RUNBOOK.md)** — authoritative physical P1 execution procedure after specimens exist.
+9. **[Certification System](CERTIFICATION_SYSTEM.md)** — fail-closed evidence transitions and promotion/refusal logic.
+10. **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** — September 7–8 milestone history; preserved as provenance, not current authority.
 
 ## Authority and conflict rule
 
 When documents disagree, use this order:
 
 1. frozen experiment / physical contracts and hash-pinned artifacts;
-2. barrier-specific completion handoffs and independent audit reports;
+2. immutable generation closure evidence and barrier-specific independent audits/handoffs;
 3. [Current Program State](CURRENT_PROGRAM_STATE.md);
 4. [Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md);
-5. roadmap/planning documents;
-6. older historical ledgers and inventory documents.
+5. architecture / operator / roadmap documentation;
+6. older historical ledgers, preregistration-time status descriptions, and planning documents.
 
-For physical P1 execution specifically, `physical/p1/P1_OPERATOR_RUNBOOK.md`,
-`physical/p1/P1_CAPTURE_SCHEDULE.json`, `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`
-and `physical/p1/P1_READINESS_FREEZE.json` outrank older Print Alpha planning material.
-The current P1 execution schedule is **144 frozen trials**; the older 108-row planning
-sheet is not the execution authority.
+For physical P1 execution specifically, these are authoritative:
 
-## Governance order
+```text
+physical/p1/P1_OPERATOR_RUNBOOK.md
+physical/p1/P1_CAPTURE_SCHEDULE.json        # 144 frozen trials
+physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json
+physical/p1/P1_READINESS_FREEZE.json
+tools/p1_no_spend_readiness_gate.py
+tools/p1_bind_ua_values.py
+```
 
-1. **[Product Thesis](PRODUCT_THESIS.md)** — why RAC exists, public-interest mission, evidence/claim philosophy.
-2. **[Perpetual Improvement Master](PERPETUAL_IMPROVEMENT_MASTER.md)** — research governance, evidence labels, open questions and R&D roadmap.
-3. **[Experimental Governance v1](experimental_governance/RAC_EXPERIMENTAL_GOVERNANCE_V1.md)** — prospective constraint-lineage, cohort-sealing, sampling, sentinel/bridge and adaptive-governance specification. **Status: prospective adopted contract; Passes 1–2 are closed/verified, later passes remain audit-gated unless a pass-specific closure says otherwise; frozen experiments are not retroactively mutated.**
-4. **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — critical-first implementation sequence and authoritative pass-completion checklist; keeps current physical/POD work ahead of lower-priority infrastructure.
-5. **[Seven Implementation Passes](experimental_governance/IMPLEMENTATION_PASSES.md)** — pass-by-pass deliverables, tests and exit gates for Governance v1.
-6. **[Pass 1 Closure](experimental_governance/PASS1_CLOSURE_2026-09-10.md)** — adopted Governance Core closure, verified by CI #821.
-7. **[Pass 2 Closure](experimental_governance/PASS2_CLOSURE_2026-09-10.md)** — adopted Constraint Lineage closure, verified by CI #836.
-8. **[Production Completion Checklist](PRODUCTION_COMPLETION_CHECKLIST.md)** — execution order and Production Alpha/Beta/v1 gates.
-9. **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — detailed current completion status, verified baseline and active gates.
+The older 108-row Print Alpha planning sheet is historical only.
 
 ## Current status
 
-- **[Current Program State](CURRENT_PROGRAM_STATE.md)** — recommended first source for current RAC status; Engineering Barriers 0–3 are closed for their declared scope, P1 no-spend readiness is PASS, and UA binding is ready but real values remain unbound.
-- **[P1 No-Spend Handoff / Friday Playbook](handoffs/P1_NO_SPEND_HANDOFF.md)** — frozen-readiness handoff plus UA binding/vendor transition procedure.
-- **[Current Project Progress Ledger](PROJECT_PROGRESS_CURRENT.md)** — detailed RAC/CTM state and physical critical path.
-- **[Barrier 0–2 / CTM Swarm Handoff](RAC_PARALLEL_SWARM_HANDOFF.md)** — historical Barrier 0–2 implementation record plus CTM hardening appendices.
-- **[Barrier 3 Completion Handoff](BARRIER_3_COMPLETION_HANDOFF.md)** — closed deterministic six-stage integration package.
-- **[Independent Barrier 3 Audit](audits/RAC_G_BARRIER_3_AUDIT.md)** — `PASS_WITH_NONBLOCKING_GAPS`; finite-difference verification remains conditional on a future gradient-backed path.
-- **[Experimental Governance Roadmap](experimental_governance/ROADMAP.md)** — Passes 1–2 closed; later passes audit-gated unless independently closed.
-- **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** — detailed Sep. 7–8 milestone history; preserved rather than rewritten retroactively.
-- **[CTM B–D Integration Audit](CTM_BD_INTEGRATION_AUDIT_2026-09-10.md)** — closed PASS audit for the September 10 integration/hardening cycle.
-- **[Project Status](PROJECT_STATUS.md)** — architecture/readiness narrative; historical sections may lag the current-state files above.
-- **[Production Readiness](../PRODUCTION_READINESS.md)** — fail-closed technical/product readiness gates.
-- **[Research Evidence Register](RESEARCH_EVIDENCE_REGISTER.md)** — evidence/source register.
+- **Engineering Barriers 0–3:** closed for declared scope.
+- **D2-0003:** retained negative / RAC-D0; Alpha-001 remains bound to this lineage.
+- **D2-0004:** retained negative / RAC-D0.
+- **D2-0005:** preregistered / not armed.
+- **D2-0007:** closed at Stage 1 as `SCREENED_OUT_H0`; 64/64 compositions evaluated, 0 survivors, no anchors, optimization, candidate freeze, held-out access, or Alpha-002.
+- **Alpha-001 source:** exact historical sealed source recovered and hash-verified; provenance at `evidence/p1/alpha001-source-recovery.json`.
+- **P1 production software:** strict live Printful intake/build path implemented via `tools/p1_production_release.py`.
+- **P1 physical evidence:** open; no efficacy claim is supported yet.
+
+## Production / physical documentation
+
+- **[P1 Production Release Gate](P1_PRODUCTION_RELEASE_GATE.md)** — canonical strict release wrapper for real vendor intake/build. **Status: current.**
+- **[P1 Production Launch](P1_PRODUCTION_LAUNCH.md)** — detailed production handoff, exact Alpha-001 source pins, binding/readiness sequence. **Status: current.**
+- **[User Action — Next Steps](USER_ACTION_NEXT_STEPS.md)** — current operator checklist. **Status: current.**
+- **[P1 Operator Runbook](../physical/p1/P1_OPERATOR_RUNBOOK.md)** — specimen receipt → calibration → frozen 144-trial capture → ingestion/sealing. **Status: frozen / authoritative for execution.**
+- **[P1 No-Spend Handoff](handoffs/P1_NO_SPEND_HANDOFF.md)** — earlier readiness/binder transition handoff. **Status: valid historical handoff; current operator flow is the documents above.**
+- **[User Action Required — Print Alpha](USER_ACTION_REQUIRED_PRINT_ALPHA.md)** — earlier planning-era operator document containing superseded execution assumptions. **Status: historical provenance; do not use as P1 execution authority.**
+- **[Production Readiness](../PRODUCTION_READINESS.md)** — current readiness gates and evidence boundary. **Status: current.**
+
+## Scientific lineage documentation
+
+- **[D2-0007 Preregistration](PREREGISTRATION_D2-0007.md)** — frozen prospective declaration. Its `NOT_ARMED` wording describes the state at freeze time and must not be rewritten post hoc.
+- **[D2-0007 Amendment A1](PREREGISTRATION_D2-0007_AMENDMENT_A1.md)** — frozen pre-execution clarification.
+- `evidence/d2-0007/stage0-landmark-free-smoke-closure.json` — Stage-0 PASS closure.
+- `evidence/d2-0007/stage1-screening-closure.json` — authoritative Stage-1 screened-out closure and downstream prohibition state.
+- **[D2-0005 Preregistration](PREREGISTRATION_D2-0005.md)** — frozen, not armed.
+- **[D2-0004 Closure Note](D2-0004_CLOSURE_NOTE.md)** — retained negative D2-0004 closure.
+
+A frozen preregistration may contain a historical status such as `NOT_ARMED` even after later execution/closure records exist. That is intentional provenance. Current status belongs in the closure evidence and current-state navigation files, not by rewriting the preregistration.
 
 ## Architecture and research system
 
-- [System Diagrams](DIAGRAMS.md) — visual topology of the four-plane system, candidate-generation path, held-out trust boundary, evidence lifecycle, fail-closed certification, digital-to-physical translation, provenance graph and feedback loop. **Status: current.**
-- [Architecture](ARCHITECTURE.md) — four-plane system architecture and component responsibilities. **Status: current.**
-- [Certification System](CERTIFICATION_SYSTEM.md) — RAC evidence ladder and fail-closed transitions. **Status: current.**
-- [Engineering Constitution](ENGINEERING_CONSTITUTION.md) — evidence-integrity, reproducibility and provenance rules. **Status: current.**
-- [Research Release Format](RESEARCH_RELEASE_FORMAT.md) — content-addressed RAC-EXP release contract. **Status: current.**
-- [Paper Series Plan](PAPER_SERIES.md) — research manuscript plan. **Status: current.**
-- [Manuscript Workspace](papers/README.md) — active pre-results paper drafts, including system-architecture and evidence-certification papers. **Status: draft (pre-results).**
-- [CAPGen Integration](CAPGEN_INTEGRATION.md) — environment-adaptive generation inspired by CAPGen (no vendored AGPL code). **Status: current.**
+- **[System Diagrams](DIAGRAMS.md)** — visual topology and current evidence/production paths. **Status: current.**
+- **[Architecture](ARCHITECTURE.md)** — four-plane architecture, earned-complexity gating, production release, P1 authority. **Status: current.**
+- **[Certification System](CERTIFICATION_SYSTEM.md)** — evidence ladder and fail-closed transitions. **Status: current unless a frozen contract says otherwise.**
+- **[Engineering Constitution](ENGINEERING_CONSTITUTION.md)** — evidence integrity and reproducibility rules.
+- **[Research Release Format](RESEARCH_RELEASE_FORMAT.md)** — content-addressed research-release contract.
+- **[End-to-End Research SOP](END_TO_END_RESEARCH_SOP.md)** — broader research workflow; frozen/current P1 documents win if older production details conflict.
 
-## Preregistrations, amendments and analyses
+## Governance
 
-- [Preregistration D2-0005](PREREGISTRATION_D2-0005.md) — frozen mean-vs-CVaR two-arm ablation preregistration with amendments A1–A4 (§9 log); frozen, NOT armed; its D2-0004 gate is satisfied but arming still requires its own authorized governance decision. **Status: current (preregistered, unarmed).**
-- [Design Analysis D2-0005](DESIGN_ANALYSIS_D2-0005.md) — pre-arming operating-characteristics simulation. **Status: analysis only; no outcome data.**
-- [Preregistration D2-0006 DRAFT](PREREGISTRATION_D2-0006_DRAFT.md) — predeclared interpretation-policy decision tree for the prospective replication generation. **Status: draft — not a preregistration; arms nothing.**
-- [Amendment D2-0004-INFRA-001](AMENDMENT_D2-0004_INFRA-001.md) — infrastructure-only amendment consumed by the D2-0004 closure. **Status: consumed.**
-- [D2-0004 Closure Note](D2-0004_CLOSURE_NOTE.md) — canonical narrative of the retained FAIL / RAC-D0 closure. **Status: current.**
-- [Ingest Notes](INGEST_NOTES.md) — `ingest_closed_generation.py` field-mapping notes for converting a closed D2 generation into a RAC-EXP release. **Status: current.**
+- **[Experimental Governance v1](experimental_governance/RAC_EXPERIMENTAL_GOVERNANCE_V1.md)** — adopted prospective governance contract.
+- **[Governance Roadmap](experimental_governance/ROADMAP.md)** — implementation/audit ordering.
+- **[Pass 1 Closure](experimental_governance/PASS1_CLOSURE_2026-09-10.md)** — closed/verified.
+- **[Pass 2 Closure](experimental_governance/PASS2_CLOSURE_2026-09-10.md)** — closed/verified.
+- Later passes remain pass-specific and audit-gated unless their own closure evidence says otherwise.
 
-## Design / production
+## Historical / generated state notes
 
-- [Product Studio](PRODUCT_STUDIO.md) — design factory / studio feature documentation. **Status: current.**
-- [Reference Fidelity Implementation Spec](REFERENCE_FIDELITY_IMPLEMENTATION_SPEC.md) — Reference Fidelity v1 style profiles and scorer spec. **Status: current (framework implemented; empirical tuning open).**
-- [Production Alpha SKU](PRODUCTION_ALPHA_SKU.md) — first-SKU decision/spec and provider-specific production path. **Status: current.**
-- [User Action Required — Print Alpha](USER_ACTION_REQUIRED_PRINT_ALPHA.md) — current human/vendor sequence; binder-owned fields are resolved through `RAC-P1-UA-BINDER-001`, and P1 capture follows the frozen 144-trial schedule. **Status: current.**
-
-## Operating procedures
-
-- [End-to-End Research SOP](END_TO_END_RESEARCH_SOP.md) — full design → D2 → production → calibration → P1 → durability → manufacturing → paper workflow. **Status: current.**
-- [Printful Production Alpha SOP](PRINTFUL_PRODUCTION_SOP.md) — matched control/candidate ordering and provenance procedure; frozen P1 execution surfaces win if any older capture-planning detail conflicts. **Status: production procedure.**
-- [Experiment Pickup Guide](EXPERIMENT_PICKUP_GUIDE.md) — short resume-from-here checklist for each project state. **Status: current.**
-
-## Physical program
-
-- [P1 No-Spend Handoff / Friday Playbook](handoffs/P1_NO_SPEND_HANDOFF.md) — no-spend readiness PASS, UA binder transition and stop rules. **Status: current.**
-- [P1 Operator Runbook](../physical/p1/P1_OPERATOR_RUNBOOK.md) — frozen specimen-arrival → calibration → 144-trial capture → ingestion → sealed-evidence procedure. **Status: frozen / authoritative for P1 execution.**
-- [Capture Lab](CAPTURE_LAB.md) — sequential camera capture, matched control/candidate workflow, analysis contract and session sealing. **Status: current UI/workflow documentation; frozen P1 runbook controls the scientific execution sequence.**
-- [Physical Test Infrastructure](PHYSICAL_TEST_INFRASTRUCTURE.md) — calibration target + P1 capture rig protocol specification. **Status: draft / partially superseded by frozen P1 assets.**
-- [Calibration Target Spec](CALIBRATION_TARGET_SPEC.md) — calibration target specification. **Status: current.**
-- [P1 Capture Rig Spec](P1_CAPTURE_RIG_SPEC.md) — capture rig hardware/geometry specification. **Status: current.**
+- **[Historical Project Progress Ledger](PROJECT_PROGRESS.md)** is a September 8 snapshot. Its old “single source of truth” language is superseded by this index and `CURRENT_PROGRAM_STATE.md`; the file itself is retained unchanged as historical provenance.
+- `program_state/SUMMARY.md` is generated from its compiler's declared canonical inputs. Generation records are intentionally not rewritten after preregistration, so a lifecycle cell may reflect the frozen record while separate closure evidence carries a later scientific outcome. For D2-0007, the authoritative post-execution result is `evidence/d2-0007/stage1-screening-closure.json` and the current-state docs above.
+- `PROJECT_STATUS.md` is now a concise current narrative and no longer serves as a competing authority.
 
 ## Important evidence boundary
 
-Documentation describing implemented software does not imply a physical product has been validated. Engineering Barriers 0–3 and P1 no-spend readiness can be closed while physical efficacy remains unproven. The authoritative current program map is [CURRENT_PROGRAM_STATE.md](CURRENT_PROGRAM_STATE.md), with details in [PROJECT_PROGRESS_CURRENT.md](PROJECT_PROGRESS_CURRENT.md). RAC-P/RAC-M remain unavailable until real evidence closes those gates; older ledgers are retained as historical provenance.
+Documentation describing implemented software does not imply a physical product has been validated. RAC-P/RAC-M remain unavailable until real physical/manufacturing evidence closes those gates. The next program-defining milestone is admissible matched P1 evidence.
