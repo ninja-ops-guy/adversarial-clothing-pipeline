@@ -1,6 +1,6 @@
 # RAC Evidence Certification System
 
-The certification layer converts a pattern experiment into a reproducible evidence object. It is an internal verification framework, not an independent accredited certification and not a guarantee against arbitrary surveillance systems.
+The certification layer converts this pattern experiment into a reproducible evidence object. It is an internal verification framework, not an independent accredited certification and not a guarantee against arbitrary surveillance systems.
 
 The normative engineering rules are defined in [`ENGINEERING_CONSTITUTION.md`](ENGINEERING_CONSTITUTION.md). If documentation conflicts, the constitution and fail-closed implementation take precedence.
 
