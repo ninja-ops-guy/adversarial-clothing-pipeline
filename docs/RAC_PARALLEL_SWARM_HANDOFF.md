@@ -112,3 +112,39 @@ Base: e169706 (post-CTM-A). Scope: CTM-B only (CTM-A authored by governance swar
 
 ## Assertions
 D2_0004_MODIFIED=false D2_0005_ARMED=false NEW_HELDOUT_ACCESS=false SCIENTIFIC_THRESHOLDS_CHANGED=false PHYSICAL_EFFICACY_CLAIMED=false
+
+---
+
+# APPENDIX 3 — CTM Hardening Wave (Lanes A–E) — 2026-09-11
+
+Source of truth: CTM_Lessons_and_Repo_Spec_Proposals_REVISED.md; execution contract: CTM_SWARM_IMPLEMENTATION_BRIEF.md. All lanes additive, fail-closed, frozen surfaces untouched.
+
+## Lane A — SPEC-1, 2, 5, 12 (interpretability P0)
+- ruthless_pipeline/ctm/{swap_validity,scalar_types,optimizer_constraints}.py; manifests.py v1.1 evaluation_audit extension (v1.0 byte-identical); schemas/ctm_swap_validity_v1.schema.json (rac-ctm-swap-validity/1.0). 57 new tests. Landed @ ff999b70 (2 noise commits in history from placeholder push self-correction; tree hash-verified).
+
+## Lanes B+C — SPEC-10, 11 / SPEC-3, 4, 6, 13, 15, 18
+- B: ruthless_pipeline/ctm/{channel,target_semantics}.py; schemas ctm_channel_v1 (rac-ctm-channel/1.0), ctm_target_semantics_v1 (rac-ctm-target-semantics/1.0). 43 tests.
+- C: ruthless_pipeline/ctm/{corpus,citations,claim_lint,pipeline_stage,positioning}.py; schemas ctm_{corpus_entry,corpus_snapshot,citation,claim_scope,positioning}_v1; ctm_registry/literature/ (10 seed entries + snapshot RAC-CTM-CORPUS-SNAPSHOT-1fa6285372d1c434). 72 tests.
+- Integration landed @ e930fc2a; 221/221 tests/ctm green; ALL_34_HASH_MATCH.
+
+## Lane D — SPEC-16, SPEC-7
+- ruthless_pipeline/ctm/external_cohort.py (EXPLORATORY ceiling; promote_to_controlled_efficacy unconditionally refuses; 6 channel-completeness fields known|unknown|inferred; fabrication_delta routes through compare_genomes; mixed-cohort pool refused without declared cohort term).
+- ruthless_pipeline/ctm/retro_mining.py (preregistered retro-mining; sealed 3-state decision CONTINUE/RESCOPE/REJECT_HYPOTHESIS_FAMILY; rejection mechanically impossible without preregistered power+homogeneity+minimum-effect; verify_decision re-derives hash and refuses forged REJECT).
+- schemas ctm_{external_observation,retro_prereg,retro_decision}_v1. 42 tests. Landed @ da44c1b; 263/263 green.
+- NOTE: main-line subsequently extended FamilyResult with channel_metadata_adequate / provenance_adequate (NR pass) — additive strengthening, no conflict.
+
+## Lane E — SPEC-17, 9, 8, 14
+- ruthless_pipeline/ctm/defense_axis.py: DefenseRecord (content-hashed, config_sha256-bound), canonical cell identity pattern×base_target×defense×channel×condition, defended variants collapse to base for replication counting (independent_replication_count / require_not_independent_architecture), paired brittleness deltas (unpaired refused unless explicitly labeled), heterogeneity_by_defense_class; SPEC-9 DefenseDual {principle, certification_form, status} with require_dual_evaluated_before_archival gate (REJECTED or high-heterogeneity heuristics cannot be archived with unevaluated dual).
+- ruthless_pipeline/ctm/genome_v2_register.py + schemas/ctm_genome_v2_register_v1.schema.json + ctm_registry/genome_v2/candidate_register_v1.json (register RAC-CTM-GV2-REGISTER-6da91ed0492299b0): 8 candidates (4 SPEC-8 invariance-class + 4 SPEC-14 FR-adjacency), each with feature definition, invariance claim (deformation group / coarsening operator), computability cost, SPEC-7 dependence; apply_spec7_gate drops legally-rejected families; promotion to v2_candidate requires a verified SPEC-7 decision and is impossible for rejected families. Genome v1 untouched (guard test pins pattern_genome/ bytes).
+- schemas/ctm_defense_axis_v1.schema.json (rac-ctm-defense-axis/1.0). 63 tests.
+- Landed @ b93f75d2 (includes 3 self-corrected placeholder/noise commits; final tree hash-verified: ALL_8_HASH_MATCH). tests/ctm: 338/338 green on fresh clone. Seam reconciliation: test helper updated for main-line FamilyResult adequacy fields.
+
+## Foreign drift at b93f75d2 (documented, NOT modified by this wave)
+- 8 failures: test_dashboard_export rederive(1), test_p1_no_spend_readiness_gate(4), test_provenance_graph rederive(1), test_stale_artifacts(2); plus tests/test_barrier3_rehearsal.py placeholder collection error.
+- Of the 14 pre-wave failures, 11 were resolved by main-line NR/UI commits (objective_telemetry×5, select_surrogate×4, ctm_a_contracts×1, pattern_genome wrong_shape×1); 5 new failures arrived with main-line P1/dashboard commits. None caused by Lanes A–E.
+
+## Deterministic re-derivation at barrier
+- Genome v2 register re-derives byte-identical (RAC-CTM-GV2-REGISTER-6da91ed0492299b0). Corpus snapshot verify_snapshot OK. ctm exports: 108.
+
+## Assertions (re-affirmed)
+D2_0004_MODIFIED=false D2_0005_ARMED=false NEW_HELDOUT_ACCESS=false SCIENTIFIC_THRESHOLDS_CHANGED=false PHYSICAL_EFFICACY_CLAIMED=false
