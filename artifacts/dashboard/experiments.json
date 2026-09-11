@@ -167,12 +167,12 @@
       "source_commit": null,
       "state": "open_external_blockers",
       "user_actions_required": [
-        "Next single action: Pick one POD provider and one exact garment SKU, obtain its real production template, map one frozen design, and order the control/candidate pair. **Further software work after that should be driven by what comes back in the mail.",
-        "Printful account creation + API key provisioning.",
-        "Template ZIP download for the AOP tee; record URL + download date + SHA-256.",
-        "Live fetch of integer `product_id` / `variant_id` via `GET /products` (PENDING-API-FETCH).",
-        "Vendor questions outstanding:",
-        "Shipping address and budget approval."
+        "Next single action: Choose the actual size for the first Printful product-388 hoodie pair, use a local Printful token, and run the strict live vendor intake through `tools/p1_production_release.py intake`; do not authorize spend yet.",
+        "Choose the actual garment size for the first Printful product-388 matched pair.",
+        "Use a local Printful API token to retrieve and preserve the current product, variant, printfile, placement, and template responses through `tools/p1_production_release.py intake`.",
+        "Review and bind the live Printful variant ID, placement geometry, print-technique details, and generated artwork/archive hashes through the governed binder/readiness path.",
+        "Make a separate human budget/spend decision and place the matched candidate/control order.",
+        "Record fulfillment/manufacturing region, vendor substitutions, and received-specimen QA facts when they become available."
       ]
     }
   ],
