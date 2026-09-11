@@ -147,7 +147,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependency-light screening contract requirements
-        run: python -m pip install numpy Pillow jsonschema
+        run: python -m pip install numpy Pillow jsonschema scipy
 
       - name: Download all eight generator partials
         uses: actions/download-artifact@v5
