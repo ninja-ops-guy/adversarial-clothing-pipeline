@@ -1,0 +1,203 @@
+name: D2-0007 Stage-1 Motif Screening
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'evidence/d2-0007/stage1-arming.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: d2-0007-stage1-screening
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    name: screen-g${{ matrix.generator_index }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        generator_index: [0, 1, 2, 3, 4, 5, 6, 7]
+    env:
+      HF_HOME: ${{ github.workspace }}/.model-cache/huggingface
+      TORCH_HOME: ${{ github.workspace }}/.model-cache/torch
+      ULTRALYTICS_SETTINGS_DIR: ${{ github.workspace }}/.model-cache/ultralytics
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Enforce Stage-1 arming overlay and immutable parent
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          arm = json.loads(Path('evidence/d2-0007/stage1-arming.json').read_text())
+          gen = json.loads(Path('generations/RAC-PER-D2-0007.json').read_text())
+          assert arm['generation_id'] == 'RAC-PER-D2-0007'
+          assert arm['armed_stage'] == 'STAGE_1_MOTIF_SCREENING'
+          assert arm['armed'] is True
+          assert arm['heldout_access_allowed'] is False
+          assert arm['body_garment_anchor_support_allowed'] is False
+          assert arm['optimization_allowed'] is False
+          assert arm['candidate_freeze_allowed'] is False
+          assert arm['alpha_002_promotion_allowed'] is False
+          assert arm['stage0_telemetry_sha256'] == '93bebada88426b10e3891b55a6ff1aa8e461c2295d26b58216cfb92c934324bc'
+          # The preregistered skeleton itself stays frozen/unmodified; arming is additive.
+          assert gen['lock_status'] == 'PREREGISTERED'
+          assert gen['armed'] is False
+          assert gen['lock_inference_performed'] is False
+          assert gen['heldout_feedback_allowed'] is False
+          print('Stage-1-only arming overlay valid; parent freeze intact')
+          PY
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Restore/cache surrogate detector weights
+        uses: actions/cache@v4
+        with:
+          path: |
+            .model-cache
+            yolov8n.pt
+          key: d2007-stage1-surrogates-v1-${{ runner.os }}-g${{ matrix.generator_index }}
+          restore-keys: |
+            d2007-stage0-surrogates-v1-${{ runner.os }}
+            d2007-stage1-surrogates-v1-${{ runner.os }}-
+
+      - name: Install pinned CPU PyTorch from runtime lock
+        run: |
+          python -m pip install --upgrade pip
+          TORCH=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['torch'])")
+          TORCHVISION=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['torchvision'])")
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==${TORCH}" "torchvision==${TORCHVISION}"
+
+      - name: Install pipeline and pinned surrogate adapters
+        run: |
+          python -m pip install -e .
+          python -m pip install -r benchmarks/requirements.txt
+          ULTRALYTICS=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['ultralytics'])")
+          TRANSFORMERS=$(python -c "import json;print(json.load(open('benchmarks/runtime_lock.json'))['transformers'])")
+          python -m pip install "ultralytics==${ULTRALYTICS}" "transformers==${TRANSFORMERS}"
+
+      - name: Verify runtime lock before inference
+        run: python scripts/verify_runtime_lock.py
+
+      - name: Run frozen generator family
+        run: |
+          python scripts/d2007_motif_screen.py \
+            --generator-index "${{ matrix.generator_index }}" \
+            --spec configs/d2007_stage1_screening_v1.json \
+            --manifest benchmarks/model_manifest.json \
+            --model-set model_sets/PERSON-SUR-v3.json \
+            --output-dir benchmarks/runtime/d2-0007/stage1
+
+      - name: Validate partial scientific boundary
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          i = int(os.environ['GENERATOR_INDEX'])
+          p = Path(f'benchmarks/runtime/d2-0007/stage1/generator-{i}.json')
+          r = json.loads(p.read_text())
+          assert r['status'] == 'GENERATOR_COMPLETE'
+          assert r['generator_index'] == i
+          assert r['model_set_id'] == 'PERSON-SUR-v3'
+          assert r['heldout_access'] is False
+          assert r['body_garment_anchor_support_built'] is False
+          assert r['optimization_opened'] is False
+          assert r['candidate_freeze_created'] is False
+          assert r['alpha_002_promoted'] is False
+          assert len(r['observations']) == 8
+          assert len(r['candidates']) == 8
+          print(f'generator {i} partial boundary valid')
+          PY
+        env:
+          GENERATOR_INDEX: ${{ matrix.generator_index }}
+
+      - name: Assert tracked frozen surfaces remain unchanged
+        run: git diff --exit-code
+
+      - name: Upload generator partial and candidate bytes
+        uses: actions/upload-artifact@v4
+        with:
+          name: d2-0007-stage1-g${{ matrix.generator_index }}-${{ github.run_id }}
+          path: |
+            benchmarks/runtime/d2-0007/stage1/generator-${{ matrix.generator_index }}.json
+            benchmarks/runtime/d2-0007/stage1/patterns/g${{ matrix.generator_index }}/*.png
+          retention-days: 90
+
+  aggregate:
+    needs: screen
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependency-light screening contract requirements
+        run: python -m pip install numpy Pillow jsonschema
+
+      - name: Download all eight generator partials
+        uses: actions/download-artifact@v5
+        with:
+          pattern: d2-0007-stage1-g*-${{ github.run_id }}
+          path: stage1-inputs
+          merge-multiple: true
+
+      - name: Aggregate under frozen stopping and survivor rule
+        run: |
+          python scripts/d2007_aggregate_screening.py \
+            --spec configs/d2007_stage1_screening_v1.json \
+            --partials-dir stage1-inputs \
+            --output benchmarks/runtime/d2-0007/stage1/screening-result.json
+
+      - name: Validate aggregate cannot advance later stages
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('benchmarks/runtime/d2-0007/stage1/screening-result.json').read_text())
+          assert r['generation_id'] == 'RAC-PER-D2-0007'
+          assert r['stage'] == 'STAGE_1_MOTIF_SCREENING'
+          assert r['status'] == 'COMPLETE'
+          assert r['model_set_id'] == 'PERSON-SUR-v3'
+          assert r['heldout_access'] is False
+          assert r['observed_composition_count'] == 64
+          assert r['admitted_count'] <= 4
+          assert r['body_garment_anchor_support_built'] is False
+          assert r['optimization_opened'] is False
+          assert r['candidate_freeze_created'] is False
+          assert r['alpha_002_promoted'] is False
+          assert len(r['result_sha256']) == 64
+          print(json.dumps({
+              'survivor_count': r['survivor_count'],
+              'admitted_count': r['admitted_count'],
+              'preregistered_h0_screened_out': r['preregistered_h0_screened_out'],
+              'result_sha256': r['result_sha256'],
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Assert tracked frozen surfaces remain unchanged
+        run: git diff --exit-code
+
+      - name: Upload complete Stage-1 screening evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: d2-0007-stage1-screening-${{ github.run_id }}
+          path: |
+            benchmarks/runtime/d2-0007/stage1/screening-result.json
+            stage1-inputs/generator-*.json
+            stage1-inputs/patterns/**/*.png
+          retention-days: 90
