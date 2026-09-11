@@ -5,7 +5,7 @@
 <title>RAC Capture Lab</title><link rel="stylesheet" href="capture-lab.css">
 </head>
 <body>
-<header class="topbar"><div><div class="eyebrow">RUTHLESS // RESEARCH INSTRUMENT</div><h1>RAC CAPTURE LAB</h1><p>Preregistered physical capture → frozen analysis → evidence ingestion</p></div><nav><a href="product-studio.html">Product Studio</a><a href="production-studio.html">Production Mapper</a><a href="index.html">Pattern Lab</a></nav></header>
+<header class="topbar"><div><div class="eyebrow">RUTHLESS // RESEARCH INSTRUMENT</div><h1>RAC CAPTURE LAB</h1><p>Preregistered physical capture → frozen analysis → evidence ingestion</p></div><nav><a href="product-studio.html">Product Studio</a><a href="production-studio.html">Production Mapper</a><a href="research_console/index.html">Research Console</a><a href="index.html">Pattern Lab</a></nav></header>
 <div class="sop-strip" id="sopStrip"></div>
 <main class="layout">
 <section class="panel setup">
@@ -14,7 +14,7 @@
 <label>Experiment ID<input id="experimentId" value="RAC-EXP-2026-001"></label>
 <label>Hypothesis ID<input id="hypothesisId" value="RQ-P1-CAPTURE-001"></label><label>Protocol version<input id="protocolVersion" value="P1-DRAFT"></label>
 <label>Evidence class<select id="evidenceClass"><option value="printed_flat_prototype">PRINTED-FLAT / PAPER-PROTOTYPE</option><option value="physical_garment_p1">PHYSICAL GARMENT / P1</option><option value="synthetic_pipeline_validation_only">SYNTHETIC DRY RUN</option></select></label>
-<label>Generation ID<input id="generationId" placeholder="RAC-PER-D2-0004"></label><label>Generation SHA-256<input id="generationSha" pattern="[0-9a-fA-F]{64}" placeholder="frozen generation artifact hash"></label><label>Candidate artifact ID<input id="candidateId" placeholder="RAC-PER-D2-..."></label>
+<label>Generation ID<input id="generationId" placeholder="RAC-PER-D2-0003"></label><label>Generation SHA-256<input id="generationSha" pattern="[0-9a-fA-F]{64}" placeholder="frozen generation artifact hash"></label><label>Candidate artifact ID<input id="candidateId" placeholder="RAC-PRINT-ALPHA-001"></label>
 <label>Candidate SHA-256<input id="candidateSha" pattern="[0-9a-fA-F]{64}" placeholder="64 hex characters"></label>
 <label>Control artifact ID<input id="controlId" value="CONTROL-01"></label>
 <label>Actor ID<input id="actorId" value="ACT-01"></label>
@@ -36,11 +36,12 @@
 
 <aside class="panel review">
 <h2>Review / Analyze / Seal</h2><div class="body">
+<div id="runtimeStatus" class="status">RESEARCH RUNTIME · CHECKING</div>
 <div class="gate" id="calibrationGate"><b>CALIBRATION</b><span>Pending</span></div>
 <label class="check"><input id="calibrationPass" type="checkbox"> Calibration acceptance gate passed</label>
 <div class="divider"></div>
 <h3>Frozen ensemble</h3>
-<p class="note">Capture is blinded to outcomes. Analysis happens only after capture. Person/object inference is performed by the authorized local analyzer; browser heuristics are never evidence.</p>
+<p class="note">Capture is blinded to outcomes. Analysis happens only after capture. Person/object inference is performed by the authorized local research runtime; browser heuristics are never evidence.</p>
 <label>Frozen ensemble preset<select id="ensemblePreset"><option value="surrogate">SUR-v3 · 6-model authorized research ensemble</option><option value="heldout">HO-v3 · fresh held-out (do not use for optimization)</option><option value="custom">Custom manifest</option></select></label>
 <textarea id="modelManifest" rows="12" spellcheck="false">{
   "models": ["yolov8n", "fasterrcnn_mobilenet_v3_320", "detr_resnet50", "ssdlite320_mobilenet_v3", "retinanet_resnet50_fpn_v2", "fcos_resnet50_fpn"],
@@ -58,11 +59,13 @@
 }</textarea>
 <button id="reviewBtn">Validate Capture Pair</button>
 <button id="analyzeBtn" disabled>Freeze Ensemble Analysis Contract</button>
-<div class="note">After export, run: <code>python scripts/analyze_capture_session.py &lt;session.json&gt; --include-motion --output inference.json</code></div>
+<div class="note">With the Research Workbench connected, sealing stages the immutable session locally and lets you continue to frozen inference/statistics without using a terminal.</div>
 <div id="analysisStatus" class="analysis">No analysis run.</div>
 <div class="divider"></div>
 <button id="exportBtn" disabled>Export Session Bundle</button>
 <button id="sealBtn" class="danger" disabled>Seal Session</button>
+<button id="runtimeStageBtn" disabled>Stage Sealed Session to Workbench</button>
+<a id="continueWorkbench" class="workbench-link" href="research_console/index.html">Continue in Research Console →</a>
 <div id="sealStatus" class="seal">UNSEALED</div>
 </div></aside>
 </main>
