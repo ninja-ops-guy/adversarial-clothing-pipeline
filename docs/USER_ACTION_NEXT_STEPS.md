@@ -3,290 +3,457 @@
 **Document ID:** RAC-USER-ACTION-NEXT-001  
 **Audience:** Mike / human operator  
 **Status:** CURRENT OPERATOR CHECKLIST  
-**Purpose:** State exactly what the human operator must do next, in dependency order, without rewriting or mutating frozen/hash-pinned historical artifacts.
+**Purpose:** Give one executable, dependency-ordered path from current software readiness to admissible physical P1 evidence.
 
-> **Authority note:** `docs/USER_ACTION_REQUIRED_PRINT_ALPHA.md` is retained as a hash-pinned historical packet and contains an older 108-row P1 instruction. **Do not execute that 108-row plan.** For P1 execution, the frozen `physical/p1/P1_CAPTURE_SCHEDULE.json` and `physical/p1/P1_OPERATOR_RUNBOOK.md` are authoritative and require **144 trials**.
+> **Authority:** this is a navigation/operator guide. Frozen contracts and hash-pinned artifacts outrank it. `docs/USER_ACTION_REQUIRED_PRINT_ALPHA.md` is retained as historical provenance and contains a superseded 108-row plan. **Do not execute that plan.** P1 authority is `physical/p1/P1_OPERATOR_RUNBOOK.md` + `physical/p1/P1_CAPTURE_SCHEDULE.json` + `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`, currently **144 trials**.
 
-> **Scientific boundary:** Completing this checklist does not establish physical efficacy. `physical_efficacy_claimed` remains false until measured physical evidence is collected, sealed, and evaluated under the preregistered rules. D2-0004 stays CLOSED/NEGATIVE and immutable. D2-0005 stays PREREGISTERED/NOT ARMED unless a separate governance action explicitly changes it.
+> **Scientific boundary:** none of these steps establishes physical efficacy by itself. Keep `physical_efficacy_claimed=false`. D2-0004 remains CLOSED/NEGATIVE/immutable. D2-0005 remains PREREGISTERED/NOT ARMED unless a separate governance action explicitly changes it.
 
-## Where you are now
+## 0. Preflight — do this before touching vendor data
 
-Engineering Barriers 0–3 are closed for their declared scope. RAC-G has completed the independent Barrier-3 audit with `PASS_WITH_NONBLOCKING_GAPS`. P1 no-spend readiness is PASS and the UA binder is implemented. The remaining critical path is external/vendor input → physical specimens → receipt QA/calibration → frozen P1 execution.
+From the repository root:
 
-## Phase 1 — Collect real vendor values (no spend required)
+```bash
+python3 tools/p1_no_spend_readiness_gate.py
+```
 
-### 1. Authenticate to Printful locally
+Require `P1_NO_SPEND_READINESS=PASS`. If it fails, stop and repair the software/evidence state before collecting vendor values.
 
-- Log in to Printful and create/verify a private API token.
-- Keep the token **only on your local machine**. Never commit it or paste it into `UA_VALUES_TEMPLATE.json`.
-- Verify the token works before continuing.
+Also confirm these files exist:
 
-**Done when:** live Printful API calls succeed and no credential has entered the repository.
+```text
+physical/p1/UA_VALUES_TEMPLATE.json
+physical/p1/P1_OPERATOR_RUNBOOK.md
+physical/p1/P1_CAPTURE_SCHEDULE.json
+physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json
+physical/p1/P1_READINESS_FREEZE.json
+tools/p1_bind_ua_values.py
+```
 
-### 2. Download and preserve the live production templates
+**Done when:** the baseline gate passes and the authoritative P1 surfaces are present.
 
-The current binder requires real template evidence for both:
+---
 
-- Hoodie: Printful catalog product 388.
-- Tee reserve/fallback: Printful catalog product 257.
+## 1. Create/verify Printful API access
 
-Keep the downloaded template/archive bytes unchanged. Record the source and acquisition date outside the credential itself, and compute SHA-256 for the exact files you will treat as authoritative.
+Use Printful's Developer Portal to create a **Private Token**. A store-scoped token is simplest if you have a Manual order platform/API store. An account-level token is also valid, but endpoints that need store context may require `X-PF-Store-Id`.
 
-**Done when:** you have byte-exact hoodie and tee template files plus their SHA-256 values.
+Keep the token outside the repository.
 
-### 3. Record panel geometry from the live templates
+### macOS/Linux/Git Bash
 
-Populate real `width_mm`, `height_mm`, and `dpi` values for:
+```bash
+export PF_TOKEN='REDACTED'
+curl --fail-with-body -sS \
+  -H "Authorization: Bearer $PF_TOKEN" \
+  https://api.printful.com/oauth/scopes
+```
+
+### PowerShell
+
+```powershell
+$env:PF_TOKEN = 'REDACTED'
+Invoke-RestMethod -Headers @{Authorization="Bearer $env:PF_TOKEN"} `
+  -Uri 'https://api.printful.com/oauth/scopes'
+```
+
+Never paste the token into `UA_VALUES_TEMPLATE.json`, a manifest, shell history you plan to commit, screenshots, or issue text.
+
+**Done when:** the scopes request returns successfully.
+
+---
+
+## 2. Capture a live vendor snapshot — no spend
+
+The current production plan uses:
+
+- primary hoodie: Printful catalog product **388**, All-Over Print Recycled Unisex Hoodie;
+- reserve/fallback tee metadata: Printful catalog product **257**, All-Over Print Men's Crew Neck T-Shirt.
+
+The tee metadata is required by the current binder even if you choose not to purchase a reserve tee. Do not confuse **binder-required metadata** with **required procurement**.
+
+Create a local working directory that is not used for secrets:
+
+```bash
+mkdir -p vendor_snapshot
+```
+
+Capture the exact API responses you rely on. For the AOP hoodie, explicitly request the cut-and-sew technique rather than relying on a default technique:
+
+```bash
+curl --fail-with-body -sS -H "Authorization: Bearer $PF_TOKEN" \
+  'https://api.printful.com/mockup-generator/printfiles/388?technique=CUT-SEW' \
+  -o vendor_snapshot/hoodie-388-printfiles.json
+
+curl --fail-with-body -sS -H "Authorization: Bearer $PF_TOKEN" \
+  'https://api.printful.com/mockup-generator/templates/388?technique=CUT-SEW' \
+  -o vendor_snapshot/hoodie-388-templates.json
+
+curl --fail-with-body -sS -H "Authorization: Bearer $PF_TOKEN" \
+  'https://api.printful.com/mockup-generator/printfiles/257?technique=CUT-SEW' \
+  -o vendor_snapshot/tee-257-printfiles.json
+
+curl --fail-with-body -sS -H "Authorization: Bearer $PF_TOKEN" \
+  'https://api.printful.com/mockup-generator/templates/257?technique=CUT-SEW' \
+  -o vendor_snapshot/tee-257-templates.json
+```
+
+If Printful rejects `CUT-SEW` for a product, **do not substitute another technique silently**. Inspect the live catalog/product response and reconcile the technique before continuing.
+
+If you use an account-level token and Printful reports missing store context, add the documented `X-PF-Store-Id` header. Do not invent a store ID.
+
+### Important distinction: metadata snapshot vs production template archive
+
+The API JSON above is **vendor metadata**, not automatically the downloadable production template archive. If Printful's File Guidelines/Design Maker provides an actual template ZIP/PNG/PSD archive, download and preserve that exact file as the production-template artifact. Do not rename a JSON response to `.zip` or bind a metadata hash as an archive hash merely to satisfy the schema.
+
+If no downloadable archive is available for a required binder field, stop and treat it as a contract/tooling reconciliation item rather than fabricating a value.
+
+**Done when:** you have byte-exact vendor metadata for both products and, where the binder requires an archive, the actual vendor template artifact.
+
+---
+
+## 3. Hash every authoritative vendor file
+
+### macOS/Linux/Git Bash
+
+```bash
+sha256sum vendor_snapshot/*
+```
+
+On macOS without `sha256sum`:
+
+```bash
+shasum -a 256 vendor_snapshot/*
+```
+
+### PowerShell
+
+```powershell
+Get-ChildItem vendor_snapshot | Get-FileHash -Algorithm SHA256
+```
+
+Record the acquisition date, source endpoint/page, product ID, technique, and SHA-256. Preserve the original bytes.
+
+**Done when:** every vendor artifact used downstream has a reproducible SHA-256.
+
+---
+
+## 4. Resolve live variants and manufacturing context
+
+Choose one size supported by the primary hoodie and the binder-required tee metadata. Resolve the **live** variant IDs rather than trusting the embedded reference map blindly.
+
+Record:
+
+- selected size;
+- hoodie variant ID;
+- tee variant ID;
+- printer/vendor = Printful;
+- actual print technique from the live vendor response;
+- selling/fulfillment region used for the order;
+- vendor snapshot date.
+
+The binder contains a v1 variant map. If live Printful data disagrees with it, **stop for review**. Do not use `--allow-variant-map-drift` merely to get a green result; use that override only after documenting why the vendor mapping changed and verifying the selected product/size manually.
+
+Printful has documented 2026 AOP fabric changes. Because material/fulfillment changes can become experimental confounders, record the fulfillment/manufacturing region and any vendor-disclosed fabric substitution or material change on the actual order/receipt. Candidate and control must be fulfilled as a matched pair as far as practical.
+
+**Done when:** live size/variant/technique/region facts are known and no unresolved drift exists.
+
+---
+
+## 5. Derive panel geometry from vendor data
+
+Populate only geometry supported by the vendor's live print-file/template data:
 
 **Hoodie:** `back`, `front`, `hood`, `label_inside`, `label_panel`, `pocket`, `sleeve_left`, `sleeve_right`.
 
 **Tee:** `back`, `front`, `sleeve_left`, `sleeve_right`.
 
-Do not infer or guess missing geometry. Stop if a required placement cannot be resolved from the vendor source.
+For each required placement record:
 
-**Done when:** every geometry field required by `physical/p1/UA_VALUES_TEMPLATE.json` has a real positive value.
+- width/height in the source units;
+- DPI/minimum DPI where supplied;
+- conversion to `width_mm` / `height_mm` if the binder requires millimetres;
+- source printfile/template ID.
 
-### 4. Resolve the garment variants you actually intend to use
+For pixel dimensions at a known DPI:
 
-Choose one size that is supported by the required garments. Record:
+```text
+millimetres = pixels / dpi × 25.4
+```
 
-- `garments.size`
-- `garments.hoodie_variant_id`
-- `garments.tee_variant_id`
-- `garments.printer_vendor`
-- `garments.print_technology`
+Do not infer a missing placement from a visually similar placement. Do not treat mockup canvas dimensions as print-area dimensions. If a required binder placement does not exist for the live variant/technique, stop: that is a schema-vendor mismatch to fix in code before binding.
 
-The binder verifies the expected v1 variant maps unless an explicit drift override is used. If Printful's live variant mapping differs, treat that as a review event rather than silently forcing it through.
+**Done when:** every binder-required geometry field is traceable to a live vendor field.
 
-**Done when:** the selected size and live variant IDs are known and internally consistent.
+---
 
-## Phase 2 — Prepare the exact artwork and mapping evidence
+## 6. Export the exact production artwork
 
-### 5. Export the candidate/control production artwork
+Use the resolved live geometry to produce the exact candidate and matched-control files that will be uploaded to Printful.
 
-Create the exact production files for the candidate and matched control using the live template geometry. Preserve the experimental pairing rule: candidate and control should differ in artwork, not garment identity, size, substrate, fulfillment conditions, or other avoidable variables.
+Pairing rule: candidate/control should differ in **artwork**, not product, size, variant, substrate, technique, fulfillment conditions, or other avoidable variables.
 
-Compute SHA-256 for every required candidate/control placement and for each article-level assembled artwork package.
+Do not regenerate or retune a frozen candidate merely because the vendor template is inconvenient. Template fitting is a production mapping operation; scientific design changes require their own governed path.
 
-The intake currently requires article hashes for:
+Hash every final upload file and the assembled article packages. The current intake requires article hashes for:
 
-- `PA-HOODIE-CAND-001`
-- `PA-HOODIE-CTRL-001`
-- `PA-HOODIE-CAND-R01`
-- `PA-HOODIE-CTRL-R01`
-- `PA-TEE-CAND-R01`
-- `PA-TEE-CTRL-R01`
+```text
+PA-HOODIE-CAND-001
+PA-HOODIE-CTRL-001
+PA-HOODIE-CAND-R01
+PA-HOODIE-CTRL-R01
+PA-TEE-CAND-R01
+PA-TEE-CTRL-R01
+```
 
-**Done when:** all required per-placement hashes, article hashes, and mapping filenames are known and reproducible.
+The reserve hashes are binder-required even if reserve garments are not purchased in the first order.
 
-### 6. Fill a copy of the UA intake template
+**Done when:** the exact bytes you intend to upload are frozen, named, and hashed; candidate/control hashes differ where required.
 
-Copy, do not edit in-place as scratch work:
+---
+
+## 7. Fill a working copy of the UA intake
+
+Do not edit the template as scratch state.
+
+### macOS/Linux/Git Bash
 
 ```bash
 cp physical/p1/UA_VALUES_TEMPLATE.json my_ua_values.json
 ```
 
-Replace **every** `PENDING_USER_ACTION` leaf in your copy with a real value. Required groups are:
+### PowerShell
 
-- identity metadata: `values_id`, `recorded_by`, `recorded_utc`
-- hoodie/tee template SHA-256 values
-- hoodie/tee panel geometry
-- candidate/control placement SHA-256 values
-- six article artwork SHA-256 values
-- candidate/control mapping filenames
-- garment size, hoodie variant, tee variant, vendor, print technology
+```powershell
+Copy-Item physical/p1/UA_VALUES_TEMPLATE.json my_ua_values.json
+```
 
-Never put the Printful API token in this file.
+Replace every `PENDING_USER_ACTION` leaf with a real, source-backed value. Never put the API token in this file.
 
-**Stop condition:** if any field is unknown, keep working upstream. Do not invent, approximate, use `TBD`, or bypass the binder.
+Before binding, manually verify:
 
-## Phase 3 — Validate and bind the production evidence
+- all SHA-256 values are lowercase 64-hex;
+- all geometry values are positive;
+- filenames refer to the exact files you hashed;
+- hoodie/tee variants correspond to the selected size;
+- candidate/control artwork is not accidentally identical;
+- no `TBD`, `FIXME`, placeholder, or guessed value remains.
 
-### 7. Run the binder in check-only mode first
+**Stop if any required value is unknown.**
+
+---
+
+## 8. Validate without writing
 
 ```bash
 python3 tools/p1_bind_ua_values.py --values my_ua_values.json --check-only
 ```
 
-The check must succeed without missing fields, pending markers, placeholder-shaped values, malformed hashes, variant mismatches, or candidate/control-artwork equality problems.
+Require success. If it refuses, fix the **source value or genuine contract mismatch**. Do not weaken the binder, frozen schedule, pairing contract, stopping rule, thresholds, D2 state, or readiness logic merely to make it pass.
 
-**If it refuses:** fix the source value. Do not modify the frozen schedule, pairing contract, stopping rule, scientific thresholds, D2 state, or readiness logic to make the check pass.
+**Done when:** check-only succeeds with zero writes required to protected scientific surfaces.
 
-### 8. Perform the atomic bind
+---
 
-Only after check-only succeeds:
+## 9. Bind atomically, then verify the receipt and readiness
+
+Run:
 
 ```bash
 python3 tools/p1_bind_ua_values.py --values my_ua_values.json
 ```
 
-The binder is expected to update only its allowlisted manifests/readiness evidence and emit:
+The binder should emit:
 
-`artifacts/p1-readiness/ua-binding-receipt.json`
+```text
+artifacts/p1-readiness/ua-binding-receipt.json
+```
 
-Successful binding **does not authorize spend** and **does not arm D2-0005**.
+It is designed to re-pin the allowed readiness surface and invoke the readiness verification as part of the controlled transition. After it succeeds, run the readiness gate explicitly once more for operator confirmation:
 
-### 9. Re-run the no-spend readiness gate
+```bash
+python3 tools/p1_no_spend_readiness_gate.py
+```
 
-Run the repository's P1 no-spend readiness gate and require **PASS** before procurement. Preserve the generated receipt/report and confirm the frozen 144-trial schedule and protected scientific surfaces have not changed.
+Require PASS. Verify the 144-trial schedule and pairing contract hashes did not change unexpectedly.
 
-**Do not order anything if the readiness gate fails.**
+Successful binding does **not** authorize spend and does **not** arm D2-0005.
 
-## Phase 4 — Human spend authorization and procurement
+**Done when:** binder succeeds, receipt exists, readiness is PASS, protected state is intact.
 
-### 10. Make a separate human go/no-go decision on spend
+---
 
-Before placing an order, verify:
+## 10. Human procurement go/no-go
 
-- UA binding completed successfully.
-- P1 no-spend readiness is PASS.
-- Candidate/control product, size, and variant match.
-- Candidate/control artwork hashes are intentionally different.
-- Template/artwork hashes match the files you will actually upload.
-- Shipping/fulfillment conditions are as matched as practical.
-- You are satisfied with cost and reserve/fallback quantities.
+Before paying, verify all of the following:
 
-This decision is intentionally outside the binder.
+- bound hashes match the files you will upload;
+- candidate/control use the same hoodie product, size and variant;
+- print technique matches;
+- fulfillment region/conditions are matched as far as the vendor allows;
+- candidate/control artwork is intentionally different;
+- no vendor substitution is known that would break the pair;
+- readiness is PASS;
+- you accept the cost.
 
-### 11. Place the matched Printful order
+At minimum order:
 
-Order at minimum:
+- 1 × primary candidate hoodie;
+- 1 × matched control hoodie.
 
-- 1× candidate hoodie
-- 1× matched control hoodie
+Reserve hoodie/tee units are optional procurement unless the current production plan explicitly promotes them; their metadata may still be required by the binder.
 
-Use the same product/variant/size and comparable fulfillment conditions. Reserve/fallback garments may be ordered if you choose, but do not substitute them silently for the primary pair later.
+Record order ID, order date, line-item variant IDs, fulfillment region, uploaded artwork hashes, and any vendor warnings/substitutions.
 
-Record order IDs, order date, fulfillment region/conditions, and the exact uploaded-artwork hashes in the existing Production Alpha records.
+**Done when:** a traceable matched pair is in production.
 
-**Done when:** a matched physical pair has been ordered and its identity is traceable to the bound manifests.
+---
 
-## Phase 5 — Prepare calibration while garments are in transit
+## 11. Prepare calibration and rig while the garments ship
 
-### 12. Fabricate the calibration target
+Use the repository's deterministic calibration target. Print/fabricate it exactly as specified by its manifest/runbook; verify the physical scale bar with a ruler. Do not crop, stretch, recolor, or rescale it to fit a page.
 
-Use the repository's deterministic calibration-target generator/reference. Print the target at the required scale and verify the physical scale bar with a ruler. Do not stretch, crop, recolor, or otherwise modify the reference image.
+Stage and read:
 
-Keep the physical target with the capture rig.
+```text
+physical/p1/P1_OPERATOR_RUNBOOK.md
+physical/p1/P1_CAPTURE_SCHEDULE.json
+physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json
+physical/p1/CAMERA_LIGHTING_SETUP.md
+physical/p1/P1_READINESS_FREEZE.json
+```
 
-**Done when:** the calibration target is physically available and dimensionally verified.
+Prepare storage, camera, lighting, actor marks, naming workflow, custody labels, and enough capacity to retain original captures and hashes.
 
-### 13. Prepare the capture rig, but do not collect experimental trials yet
+Do **not** collect experimental trials yet.
 
-Read and stage:
+---
 
-- `physical/p1/P1_OPERATOR_RUNBOOK.md`
-- `physical/p1/P1_CAPTURE_SCHEDULE.json`
-- `physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`
-- `physical/p1/CAMERA_LIGHTING_SETUP.md`
-- `physical/p1/P1_READINESS_FREEZE.json`
+## 12. Receipt QA — before efficacy capture
 
-Confirm storage space, camera/lighting availability, naming workflow, custody materials, and the ability to retain original capture files and hashes.
+When the garments arrive, keep them at the required initial wash state and verify:
 
-**Critical rule:** the execution plan is **144 frozen trials**, not the historical 108-row planning sheet.
+- order/SKU/variant identity;
+- candidate/control pairing;
+- material and disclosed manufacturing/fulfillment origin;
+- print placement/registration;
+- seams and continuity;
+- visible defects or substitutions;
+- chain of custody.
 
-## Phase 6 — Receipt QA before P1
+Photograph/measure using the repository's receipt-QA procedure and calibration target. A mismatched or materially defective pair is **not** something to average away later: stop, document, and reorder/escalate.
 
-### 14. Inspect every delivered specimen before testing
+**Done when:** the pair is explicitly QA-admissible.
 
-Keep the garments at the required initial wash state. Verify identity, size/variant, print placement, registration, seam continuity, defects, and candidate/control pairing. Photograph specimens with the calibration target as required by the existing QA procedure and begin chain of custody.
+---
 
-If the pair is mismatched, materially defective, or otherwise inadmissible, **stop**. Reorder/escalate rather than accepting the defect into P1.
+## 13. Calibration acceptance — before the first P1 trial
 
-**Done when:** the intended pair is explicitly QA-admissible and traceable to the bound production records.
+Set up the locked rig exactly as the P1 runbook requires. Perform the calibration exposure/acceptance procedure first.
 
-## Phase 7 — Execute physical P1
+If calibration fails, correct the rig/environment and repeat calibration. Do not change a scientific acceptance threshold because the session failed it.
 
-### 15. Run calibration acceptance first
+**Done when:** the session is calibration-accepted under the frozen rule.
 
-Set up the locked rig according to the authoritative P1 runbook. Run the required calibration exposure and acceptance checks before garment measurements.
+---
 
-If calibration fails, fix the rig/environment and repeat calibration. Do not change scientific thresholds in response to the failure.
+## 14. Execute the authoritative 144-trial P1 schedule
 
-### 16. Execute the frozen 144-trial schedule exactly
+Execute:
 
-Use:
+```text
+physical/p1/P1_CAPTURE_SCHEDULE.json
+```
 
-`physical/p1/P1_CAPTURE_SCHEDULE.json`
+Follow the frozen order/pairing/randomization and `P1_OPERATOR_RUNBOOK.md`. Preserve original files, exact filenames, session metadata, invalid-condition records, and hashes.
 
-Follow its order/pairing/randomization and the operator runbook. Preserve original files, filenames, session metadata, invalid-condition records, and hashes. Invalid trials are handled by the preregistered rules; they are not silently counted as favorable outcomes.
+Never:
 
-**Do not:**
-
-- use the old 108-row plan;
-- change thresholds after seeing results;
+- use the old 108-row planning sheet;
+- improvise a replacement trial outside the runbook;
+- change thresholds after seeing outcomes;
 - arm D2-0005 as part of P1;
-- access new held-out data outside the approved process;
 - rewrite D2-0004;
-- promote synthetic/rehearsal evidence as measured physical evidence.
+- access new held-out data outside the approved process;
+- count invalid trials as favorable outcomes;
+- label synthetic/rehearsal data as measured physical evidence.
 
-## Phase 8 — Seal evidence and analyze under the preregistration
+**Done when:** all required P1 trial dispositions are accounted for under the frozen stopping/invalid-condition rules.
 
-### 17. Validate ingestion and seal the measured evidence
+---
+
+## 15. Ingest, seal, then analyze
 
 After capture:
 
-- complete session/ingestion records;
-- validate expected files and hashes;
-- preserve invalid-condition records;
-- create/seal the physical evidence package through the existing repository workflow;
-- retain the raw captures.
+1. complete the session and ingestion records;
+2. validate expected files and hashes;
+3. preserve invalid-condition records and raw captures;
+4. seal the physical evidence package using the repository workflow;
+5. only then run the preregistered physical analysis;
+6. report PASS, FAIL, negative, or inconclusive results as produced by the frozen rules.
 
-### 18. Run only the preregistered physical analysis
+No post-hoc threshold changes.
 
-Evaluate the sealed P1 evidence using the frozen/preregistered rules. Report the measured result even if it is negative or inconclusive. Physical efficacy remains unsupported until this process yields admissible evidence satisfying the defined claim rules.
+---
 
-## The short version
+## Short operator card
 
-Your next actions, in exact dependency order:
-
-1. Verify Printful API access locally.
-2. Download live hoodie + tee templates and hash them.
-3. Record real panel geometry.
-4. Select/verify live hoodie + tee variant IDs and size.
-5. Export exact candidate/control production artwork and hash every required file/package.
-6. Fill a copy of `physical/p1/UA_VALUES_TEMPLATE.json` completely.
-7. Run `p1_bind_ua_values.py --check-only`.
-8. Run the actual atomic bind.
-9. Require P1 no-spend readiness to remain PASS.
-10. Make the separate human spend decision.
-11. Order the matched pair (plus reserves only if desired).
-12. Fabricate/verify the calibration target and stage the rig.
-13. Perform receipt QA and custody logging when garments arrive.
-14. Require calibration acceptance.
-15. Execute the authoritative frozen **144-trial** P1 schedule.
-16. Validate, ingest, and seal measured evidence.
-17. Run preregistered analysis and report the result without post-hoc threshold changes.
+```text
+[ ] Baseline P1 no-spend gate PASS
+[ ] Printful private token works; token is not in repo
+[ ] Live product 388 + 257 vendor metadata captured
+[ ] Actual production template artifacts captured where required
+[ ] Vendor files SHA-256 hashed
+[ ] Live size/variant/technique/region verified
+[ ] Required panel geometry source-backed
+[ ] Final candidate/control upload bytes frozen + hashed
+[ ] my_ua_values.json complete; no placeholders/secrets
+[ ] binder --check-only PASS
+[ ] atomic binder PASS + receipt exists
+[ ] explicit readiness recheck PASS
+[ ] protected state unchanged
+[ ] human spend authorization
+[ ] matched candidate/control hoodies ordered
+[ ] calibration target + rig ready
+[ ] receipt QA PASS
+[ ] calibration acceptance PASS
+[ ] authoritative 144-trial P1 executed
+[ ] evidence ingested + sealed
+[ ] preregistered analysis run without threshold changes
+```
 
 ## Non-negotiable stop conditions
 
-Stop and investigate if any of the following occurs:
+Stop and investigate if:
 
-- a required UA value is unknown or guessed;
-- binder check-only refuses;
-- the actual binder refuses;
-- the no-spend readiness gate is not PASS;
-- a bound hash no longer matches the file being used;
-- candidate/control garment identity is mismatched;
+- a UA value would have to be guessed;
+- a vendor API response/product/placement/variant disagrees with the binder contract;
+- an actual production-template artifact cannot be obtained for a field that requires one;
+- binder check-only or binding refuses;
+- readiness is not PASS;
+- a hash no longer matches the file being used;
+- candidate/control identity or fulfillment is materially mismatched;
 - receipt QA fails;
-- calibration acceptance fails;
+- calibration fails;
 - the frozen 144-trial schedule/pairing contract changes unexpectedly;
 - D2-0004 changes;
-- D2-0005 becomes armed without its separate explicit governance authorization;
+- D2-0005 becomes armed without separate explicit governance authorization;
 - a scientific threshold changes after outcome access;
-- new held-out access appears outside the authorized protocol;
-- synthetic or rehearsal evidence is being treated as measured physical evidence.
+- unauthorized held-out access appears;
+- synthetic/rehearsal evidence is being promoted as measured physical evidence.
 
 ## Protected-state checkpoint
 
-Before procurement and again before P1 execution, confirm:
+Before procurement and again immediately before P1 execution confirm:
 
-- `D2-0004 = CLOSED / NEGATIVE / immutable`
-- `D2-0005 = PREREGISTERED / NOT ARMED`
-- `physical_efficacy_claimed = false`
-- authoritative P1 schedule = **144 trials**
-- readiness gate = **PASS**
-- spend authorization is a separate human decision
+```text
+D2-0004 = CLOSED / NEGATIVE / immutable
+D2-0005 = PREREGISTERED / NOT ARMED
+physical_efficacy_claimed = false
+authoritative P1 schedule = 144 trials
+readiness gate = PASS
+spend authorization = separate human decision
+```
 
-This checklist is a navigation/operator document only. Frozen contracts, hash-pinned artifacts, barrier handoffs, audit records, and the P1 operator/run schedule remain authoritative over it.
+If any checkpoint is false or ambiguous, stop before spending or collecting outcome data.
