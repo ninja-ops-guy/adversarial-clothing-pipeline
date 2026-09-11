@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from ruthless_pipeline.certification.experiment import ExperimentArtifact, ExperimentRegistry, StageRef
+from ruthless_pipeline.certification.p1_session_binding import validate_session_schedule_binding
 from ruthless_pipeline.certification.physical import PhysicalTrial
 from ruthless_pipeline.certification.schema_version import require_schema_version
 from ruthless_pipeline.certification.trial_statistics import (
@@ -40,6 +41,7 @@ def enforce_promotion_gate(session: dict[str, Any]) -> None:
             "trial store promotion gate: calibration_pass must be true for "
             "a session to enter the P1 trial store"
         )
+    validate_session_schedule_binding(session, verify_capture_order=True)
 
 
 def trial_store_record(
@@ -64,6 +66,7 @@ def trial_store_record(
             "calibration_profile_id": str(session.get("calibration_profile_id", "CAPTURE-CALIBRATION")),
             "candidate": session.get("candidate", {}),
             "generation": session.get("generation", {}),
+            "p1_schedule": session.get("p1_schedule"),
         },
         "prev_record_sha256": prev_record_sha256,
     }
@@ -95,7 +98,17 @@ def load_trial_store(path: Path) -> list[dict[str, Any]]:
                 "(prev_record_sha256 does not match the previous record)"
             )
         enforce_promotion_gate(
-            {"evidence_class": record.get("evidence_class"), "calibration_pass": record.get("calibration_pass")}
+            {
+                "evidence_class": record.get("evidence_class"),
+                "calibration_pass": record.get("calibration_pass"),
+                "trial_id": record.get("trial", {}).get("trial_id"),
+                "distance_m": record.get("trial", {}).get("distance_m"),
+                "yaw_deg": record.get("trial", {}).get("yaw_deg"),
+                "pitch_deg": record.get("trial", {}).get("pitch_deg"),
+                "pose": record.get("trial", {}).get("pose"),
+                "lighting_variant": (record.get("lineage", {}).get("p1_schedule") or {}).get("lighting_variant"),
+                "p1_schedule": record.get("lineage", {}).get("p1_schedule"),
+            }
         )
         trial = trial_from_store_record(record)
         if any(trial_from_store_record(r).trial_id == trial.trial_id for r in records):
@@ -174,12 +187,13 @@ def build_trial(session: dict[str, Any], inference: dict[str, Any], source: str)
     condition = "|".join([
         f"d={session.get('distance_m', 0)}m",
         f"yaw={session.get('yaw_deg', 0)}",
+        f"pitch={session.get('pitch_deg', 0)}",
         f"pose={session.get('pose', 'unspecified')}",
         f"light={session.get('lighting_id', 'unspecified')}",
         f"source={source}",
     ])
     trial = PhysicalTrial(
-        trial_id=f"{session['session_id']}:{source}",
+        trial_id=str(session.get("trial_id") or f"{session['session_id']}:{source}"),
         condition_id=condition,
         control_detected=control,
         candidate_detected=candidate,
@@ -196,6 +210,7 @@ def build_trial(session: dict[str, Any], inference: dict[str, Any], source: str)
             "inference_sha256": str(inference["result_sha256"]),
             "observation_source": source,
             "evidence_class": str(session["evidence_class"]),
+            "p1_schedule_sha256": str((session.get("p1_schedule") or {}).get("schedule_sha256", "")),
         },
     )
     return trial, detail
@@ -206,6 +221,7 @@ def trial_payload(trial: PhysicalTrial, session: dict[str, Any], inference: dict
         "trial_id": trial.trial_id,
         "session_id": session["session_id"],
         "condition_id": trial.condition_id,
+        "p1_schedule": session.get("p1_schedule"),
         "garments": {
             "control_sku": session["control"]["artifact_id"],
             "candidate_sku": session["candidate"]["artifact_id"],
@@ -251,7 +267,13 @@ def register_experiment(
         StageRef("generation", str(generation["artifact_id"]), str(generation["sha256"])),
     ]
     if calibration_sha256:
-        stages.append(StageRef("calibration_profile", str(session.get("calibration_profile_id", "CAPTURE-CALIBRATION")), calibration_sha256))
+        stages.append(
+            StageRef(
+                "calibration_profile",
+                str(session.get("calibration_profile_id", "CAPTURE-CALIBRATION")),
+                calibration_sha256,
+            )
+        )
     stages.append(StageRef("physical_session", str(session["session_id"]), sha256_file(physical_artifact_path)))
 
     artifact = ExperimentArtifact(
@@ -260,11 +282,15 @@ def register_experiment(
         generation_id=str(generation["artifact_id"]),
         created_utc=datetime.now(timezone.utc).isoformat(),
         stages=stages,
-        evidence_label="internally_measured" if session["evidence_class"] == "physical_garment_p1" else "scenario_assumption",
+        evidence_label="internally_measured"
+        if session["evidence_class"] == "physical_garment_p1"
+        else "scenario_assumption",
         validity_flags={
             "capture_evidence_class": session["evidence_class"],
             "physical_evidence_eligible": session["evidence_class"] == "physical_garment_p1",
             "calibration_pass": bool(session.get("calibration_pass")),
+            "p1_schedule_bound": session.get("evidence_class") != "physical_garment_p1"
+            or isinstance(session.get("p1_schedule"), dict),
         },
     )
     registry = ExperimentRegistry.from_json(registry_path.read_text()) if registry_path.exists() else ExperimentRegistry()
@@ -283,7 +309,11 @@ def main() -> int:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--registry", default=None)
     parser.add_argument("--calibration-profile", default=None)
-    parser.add_argument("--trial-store", default=None, help="Append this session to a cumulative matched-trial store and analyze all stored trials.")
+    parser.add_argument(
+        "--trial-store",
+        default=None,
+        help="Append this session to a cumulative matched-trial store and analyze all stored trials.",
+    )
     args = parser.parse_args()
 
     session_path = Path(args.session_json)
@@ -296,8 +326,13 @@ def main() -> int:
         raise SystemExit("ingestion blocked: session/inference lineage mismatch")
     if inference.get("capture_hash_verification") != "PASS":
         raise SystemExit("ingestion blocked: capture integrity did not pass")
-    if session["evidence_class"] == "physical_garment_p1" and not session.get("calibration_pass"):
-        raise SystemExit("ingestion blocked: P1 calibration gate did not pass")
+    if session["evidence_class"] == P1_EVIDENCE_CLASS:
+        if not session.get("calibration_pass"):
+            raise SystemExit("ingestion blocked: P1 calibration gate did not pass")
+        try:
+            validate_session_schedule_binding(session, verify_capture_order=True)
+        except ValueError as exc:
+            raise SystemExit(f"ingestion blocked: {exc}")
 
     trial, detail = build_trial(session, inference, args.source)
     store_records: list[dict[str, Any]] | None = None
@@ -333,7 +368,9 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     trial_record = {
         "schema_version": "1.0",
-        "evidence_label": "internally_measured" if session["evidence_class"] == "physical_garment_p1" else "scenario_assumption",
+        "evidence_label": "internally_measured"
+        if session["evidence_class"] == P1_EVIDENCE_CLASS
+        else "scenario_assumption",
         "trials": [trial_payload(trial, session, inference, detail)],
         "stopping_rule_ref": args.stopping_rule,
     }
@@ -342,7 +379,7 @@ def main() -> int:
     statistics_payload = {
         "schema_version": "1.0",
         "evidence_class": session["evidence_class"],
-        "physical_evidence_eligible": session["evidence_class"] == "physical_garment_p1",
+        "physical_evidence_eligible": session["evidence_class"] == P1_EVIDENCE_CLASS,
         "statistics": asdict(stats) if stats else None,
         "invalid_conditions": asdict(invalid),
         "stopping_rule": asdict(rule),
@@ -364,6 +401,7 @@ def main() -> int:
         (out / "experiment-artifact.json").write_bytes(experiment.canonical_json() + b"\n")
 
     summary = {
+        "trial_id": trial.trial_id,
         "trial_records": str(trial_path),
         "statistics": str(stats_path),
         "trial_valid": trial.control_detected,
