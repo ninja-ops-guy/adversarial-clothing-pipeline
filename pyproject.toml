@@ -16,6 +16,9 @@ dependencies = [
   "jsonschema>=4.20",
 ]
 
+[project.scripts]
+rac-platform = "ruthless_pipeline.platform_runtime:main"
+
 [project.optional-dependencies]
 generative = ["diffusers>=0.30", "transformers>=4.40", "accelerate>=0.30", "safetensors>=0.4"]
 aesthetic = ["open_clip_torch>=2.24"]
