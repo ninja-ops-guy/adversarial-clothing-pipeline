@@ -5,7 +5,7 @@ test('research console links apps and reflects published experiment state', asyn
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('research_console/index.html');
   await expect(page.getByRole('heading', { name: 'RAC Research Console' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Pattern Lab/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Pattern Lab/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /Product Studio/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /Production Mapper/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /Capture Lab/ })).toBeVisible();

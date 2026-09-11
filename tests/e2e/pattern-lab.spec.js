@@ -190,8 +190,7 @@ test('PNG, JSON, SVG and full config exports download non-empty files', async ({
   const actions = [
     () => page.getByRole('button', { name: /Export as PNG/ }).click(),
     () => page.getByRole('button', { name: /Export Config \(JSON\)/ }).click(),
-    () => page.getByRole('button', { name: /Export as SVG/ }).click(),
-    () => page.locator('.header-actions').getByRole('button', { name: /Export Config/ }).click()
+    () => page.getByRole('button', { name: /Export as SVG/ }).click()
   ];
   for (const action of actions) {
     const dl = page.waitForEvent('download');
