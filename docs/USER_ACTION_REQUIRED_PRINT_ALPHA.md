@@ -12,30 +12,6 @@ cannot be resolved yet stay as the literal string `PENDING_USER_ACTION` and are 
 filled in with guesses. A `PENDING_USER_ACTION` status never becomes `PASS` without the
 named physical input.
 
-## Current execution authority
-
-This packet defines the **human/vendor evidence-collection sequence**. It no longer
-authorizes ad-hoc manual replacement of the 208 pending manifest fields.
-
-For fields covered by `RAC-P1-UA-BINDER-001`:
-
-1. Copy `physical/p1/UA_VALUES_TEMPLATE.json`.
-2. Fill the copy only with real values obtained through UA-1..UA-8; never paste API
-   tokens into it.
-3. Run `python3 tools/p1_bind_ua_values.py --values <copy>.json --check-only`.
-4. Require a clean plan with exactly **208 pending-field bindings**, zero writes and no
-   refusal.
-5. Run the binder without `--check-only` only after the intake is complete and verified.
-   The binder writes only its six allowlisted manifests, the readiness freeze and the
-   hash-bound binding receipt; it does not authorize spend or place an order.
-6. Re-run `tools/p1_no_spend_readiness_gate.py` and continue only on PASS.
-
-For physical P1 execution, the frozen authority is
-`physical/p1/P1_OPERATOR_RUNBOOK.md` + `physical/p1/P1_CAPTURE_SCHEDULE.json` +
-`physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`. Those surfaces define the current
-**144-trial** P1 protocol and supersede the older 108-row Print Alpha planning sheet for
-execution.
-
 **How to use this packet:** execute UA-1 through UA-8 in order. Do not skip ahead:
 each action's output is the next action's input. If any step cannot be completed,
 stop and leave the corresponding repo field as `PENDING_USER_ACTION`.
@@ -82,41 +58,42 @@ Unisex Hoodie, color White, cut-and-sew sublimation)
 - **EXPECTED_OUTPUT:** `printfiles_388.json`, `templates_388.json`, and/or the
   template ZIP, byte-exact as downloaded.
 - **WHERE_TO_STORE_OUTPUT:** `production_alpha/` (as referenced by
-  `production_alpha/TEMPLATE_INGESTION_CHECKLIST.md`); copy the verified hashes and
-  geometry into your working `UA_VALUES_TEMPLATE.json` intake for binder validation.
+  `production_alpha/TEMPLATE_INGESTION_CHECKLIST.md`); the SHA-256 goes into
+  `print-alpha/MANIFESTS/template-manifest.json` at UA-3.
 - **WHAT_GATE_IT_UNBLOCKS:** UA-3 (hash + mapping bind) and all per-placement
   artwork export.
 
 ---
 
-## UA-3 — Record template SHA-256 and prepare the production mapping
+## UA-3 — Record template SHA-256 and bind the production mapping
 
 **Exact steps**
 1. `sha256sum printfiles_388.json templates_388.json` (or the template ZIP).
-2. Record the verified archive hashes and download date in your working
-   `physical/p1/UA_VALUES_TEMPLATE.json` copy. Do not directly replace binder-owned
-   pending manifest fields.
+2. Record the hash(es), download URL, and download date into
+   `print-alpha/MANIFESTS/template-manifest.json` (`template_archive_sha256`) and
+   `production_alpha/SKU_MANIFEST.json` (`template.*` fields), replacing
+   `PENDING_USER_ACTION`.
 3. Extract per-panel geometry for the chosen variant (front, back, sleeve_left,
    sleeve_right, pocket, hood, label_panel, label_inside): take each placement's
    `width`/`height`/`dpi` from `printfiles_388.json` and convert with
-   `mm = px / dpi * 25.4`. Record those real values in the working binder intake.
+   `mm = px / dpi * 25.4`. Fill `panel_geometry` in both manifests.
 4. Tile the frozen pattern (SHA-256
    `b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546` — never
    regenerate or retune it) onto each panel rectangle at template DPI.
-5. `sha256sum` each per-placement upload file and record the hashes and mapping-file
-   names in the binder intake. The binder will populate its allowlisted manifest
-   targets atomically after `--check-only` succeeds.
+5. `sha256sum` each per-placement upload file and record the hashes in
+   `print-alpha/MANIFESTS/artwork-manifest.json` and `mapping-manifest.json`.
 
 - **WHY_REQUIRED:** the manifest — not files in flight — is the source of truth.
   Hash binding makes the template, geometry, and artwork immutable and auditable.
 - **INPUT:** UA-2 files; the sealed print-test kit
   (`print-test-kit.zip`, SHA-256 `b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548`).
-- **EXPECTED_OUTPUT:** real archive/geometry/artwork/mapping values ready in the
-  completed UA binder intake; per-placement upload PNGs; no invented values.
-- **WHERE_TO_STORE_OUTPUT:** binder intake outside the frozen manifest targets until
-  validation; upload files in `print-alpha/CANDIDATE/` and `print-alpha/CONTROL/`.
-- **WHAT_GATE_IT_UNBLOCKS:** binder validation, UA-5 (order) and the Production Alpha
-  gate ("provider-accepted panel pack").
+- **EXPECTED_OUTPUT:** all `PENDING_USER_ACTION` geometry/hash fields in
+  `print-alpha/MANIFESTS/template-manifest.json`, `artwork-manifest.json`, and
+  `mapping-manifest.json` replaced by real 64-hex values; per-placement upload PNGs.
+- **WHERE_TO_STORE_OUTPUT:** manifests in `print-alpha/MANIFESTS/`; upload files in
+  `print-alpha/CANDIDATE/` and `print-alpha/CONTROL/`.
+- **WHAT_GATE_IT_UNBLOCKS:** UA-5 (order) and the Production Alpha gate
+  ("provider-accepted panel pack").
 
 ---
 
@@ -127,9 +104,9 @@ Unisex Hoodie, color White, cut-and-sew sublimation)
    — confirm the title is "All-Over Print Recycled Unisex Hoodie".
 2. `curl -s -H "Authorization: Bearer $PF_TOKEN" https://api.printful.com/v2/catalog-products/388/catalog-variants`
    — pick your order size and note its integer `variant_id`.
-3. Record the real size and hoodie/tee variant IDs in the working UA binder intake.
-   The binder validates the embedded v1 variant maps and writes the target manifests
-   atomically. Do not manually pre-bind those target fields.
+3. Record the **same** `variant_id` and size on both garments in
+   `print-alpha/MANIFESTS/sku-manifest.json` (candidate `PA-HOODIE-CAND-001`,
+   control `PA-HOODIE-CTRL-001`) and in `production_alpha/SKU_MANIFEST.json`.
 4. Control design rule: identical product/variant/size/placements/geometry printed
    with the unmodified pre-modification base texture; if no sealed base texture
    exists, use a flat mid-gray sRGB(128,128,128) full-coverage fill and keep the
@@ -139,11 +116,11 @@ Unisex Hoodie, color White, cut-and-sew sublimation)
   (`docs/PRODUCTION_COMPLETION_CHECKLIST.md` step 7). The experiment is only valid
   if control and candidate differ **only** in the printed artwork.
 - **INPUT:** UA-1 token; your size choice.
-- **EXPECTED_OUTPUT:** one matched size/variant decision for candidate and control,
-  plus the control fill decision, represented as real binder-intake values.
-- **WHERE_TO_STORE_OUTPUT:** the working UA binder intake until atomic binding;
-  non-secret operator notes may also be kept in `production_alpha/ORDER_WORKSHEET.md`.
-- **WHAT_GATE_IT_UNBLOCKS:** binder validation and UA-5 (order placement).
+- **EXPECTED_OUTPUT:** one integer `variant_id` + size recorded identically on both
+  SKUs; control fill decision recorded.
+- **WHERE_TO_STORE_OUTPUT:** `print-alpha/MANIFESTS/sku-manifest.json` and
+  `production_alpha/SKU_MANIFEST.json` (`garment_pair[].variant_id`, `size`).
+- **WHAT_GATE_IT_UNBLOCKS:** UA-5 (order placement).
 
 ---
 
@@ -162,16 +139,13 @@ places orders or pays)
 3. Same shipping speed and fulfillment region for all line items.
 4. Record order IDs, date, region, and conditions.
 
-**Human-only boundary:** the UA binder does not authorize spend, place this order or
-turn a software PASS into payment authorization. UA-5 remains a human decision/action.
-
 - **WHY_REQUIRED:** everything between Production Alpha and Production Beta depends
   on real physical objects; code cannot close this.
-- **INPUT:** verified/bound UA-3 hashes, UA-4 variant, shipping address, budget approval.
+- **INPUT:** UA-3 hashes, UA-4 variant, shipping address, budget approval.
 - **EXPECTED_OUTPUT:** Printful order ID(s) for the matched pair (and reserves).
 - **WHERE_TO_STORE_OUTPUT:** `production_alpha/SKU_MANIFEST.json → order.order_ids`,
   `order.order_conditions`, `timestamps.order_placed_utc`; worksheet notes in
-  `production_alpha/ORDER_WORKSHEET.md` according to the applicable post-bind workflow.
+  `production_alpha/ORDER_WORKSHEET.md`.
 - **WHAT_GATE_IT_UNBLOCKS:** UA-7 (receipt QA), UA-8 (capture), and the
   Production Alpha gate ("ordered sample").
 
@@ -238,40 +212,39 @@ all units must stay wash state W0)
 
 ## UA-8 — P1 capture session
 
-**Execution authority:** `physical/p1/P1_OPERATOR_RUNBOOK.md`,
-`physical/p1/P1_CAPTURE_SCHEDULE.json`, and
-`physical/p1/PAIRING_RANDOMIZATION_CONTRACT.json`.
-
 **Exact steps**
 1. Set up the rig per `docs/P1_CAPTURE_RIG_SPEC.md` and lock camera + lighting per
    `physical/p1/CAMERA_LIGHTING_SETUP.md`; tape camera positions and actor marks.
 2. Run the session calibration exposure with RAC-CALT-P1-0001; confirm the session
    acceptance bound (max mean ΔE00 6.0) before any garment capture.
-3. Execute all **144 frozen trials** from `physical/p1/P1_CAPTURE_SCHEDULE.json` in
-   the exact stored execution order. Within each trial, capture the control/candidate
-   arms in the recorded `first_arm` order. Do not substitute the older 108-row
-   `print-alpha/CAPTURE/trial-sheet.csv` as the P1 execution protocol.
-4. Name every capture per `physical/p1/CAPTURE_NAMING_CONVENTION.md` and record its
-   SHA-256 at capture time in the session manifest.
-5. Record the session manifest from `physical/p1/SESSION_MANIFEST_TEMPLATE.json`;
-   record any invalid condition per the frozen/linked invalid-condition rules — an
-   invalid condition is marked invalid, never retried into or counted as candidate success.
-6. Validate and ingest using the P1 operator runbook and the referenced ingestion
-   tooling; keep RAW files and hashes per the naming convention.
+3. Capture all **108 matched rows** from `print-alpha/CAPTURE/trial-sheet.csv`
+   (distances 2/5/8 m × yaw 0/±30° × pose standing/walking × lighting
+   indoor-even/daylight-even × 3 repeats, wash state W0), saving files with the
+   exact names in the sheet (`captures/<trial_id>__control.jpg` /
+   `__candidate.jpg`), following `print-alpha/CAPTURE/capture-protocol.md`.
+4. Record the session manifest from `physical/p1/SESSION_MANIFEST_TEMPLATE.json`;
+   record any invalid condition per
+   `print-alpha/CAPTURE/invalid-condition-rules.json` — invalid conditions are
+   marked invalid, never counted as candidate success.
+5. Ingest with the trial-ingestion template
+   (`physical/p1/PHYSICAL_TRIAL_INGESTION_TEMPLATE.json`); keep RAW files and
+   hashes per `physical/p1/CAPTURE_NAMING_CONVENTION.md`.
 
 - **WHY_REQUIRED:** this is the preregistered physical P1 measurement — the only
   path from a printed garment to measured physical evidence. Camera settings and
   thresholds are locked after calibration and never changed mid-session.
 - **INPUT:** QA-passed matched pair (UA-7), calibration target (UA-6), locked rig,
-  frozen pairing/randomization contract and frozen 144-trial schedule.
-- **EXPECTED_OUTPUT:** the complete scheduled P1 capture set, completed session
-  manifest, invalid-condition record (possibly empty), hashes and validated
-  ingestion records suitable for sealed evidence packaging.
+  the trial sheet.
+- **EXPECTED_OUTPUT:** 108 × 2 capture files with preregistered names, a completed
+  session manifest, an invalid-conditions record (possibly empty), and ingested
+  trial records.
 - **WHERE_TO_STORE_OUTPUT:** captures under the session's `captures/` directory per
-  the naming convention; session manifest and ingestion records under the locations
-  required by the frozen operator runbook.
-- **WHAT_GATE_IT_UNBLOCKS:** physical P1 evaluation and sealed-evidence analysis.
-  A physical PASS/FAIL is decided by the preregistered rule only — no threshold
+  the naming convention; session manifest and ingestion records under
+  `physical/p1/` and `print-alpha/CAPTURE/`.
+- **WHAT_GATE_IT_UNBLOCKS:** physical P1 evaluation
+  (`scripts/evaluate_physical_trial.py`), the physical response surface, and the
+  Production Beta gate ("matched control/candidate P1 experiment"). Note: a
+  physical PASS/FAIL is decided by the preregistered rule only — no threshold
   changes after seeing results.
 
 ---
@@ -286,18 +259,10 @@ old UA-2 ≈ UA-5, old UA-3 ≈ UA-8, old UA-4 ≈ vendor questions
 only. The `user_action_refs` values inside `print-alpha/MANIFESTS/*.json` follow
 the older numbering and are left unchanged for compatibility.
 
-The canonical operational interpretation is therefore: **use this UA-1..UA-8 packet
-for human actions, use `UA_VALUES_TEMPLATE.json` + the binder for binder-owned pending
-fields, and use the frozen P1 runbook/schedule for physical execution.**
-
 ## Standing rules
 
 - No efficacy claim is created by any action in this packet.
 - `PENDING_USER_ACTION` fields are resolved only by the named physical/vendor
   input — never by estimation.
-- Binder-owned pending fields are changed through the fail-closed binder rather than
-  ad-hoc manual edits.
-- Successful binding/readiness does not authorize spend.
 - Any deviation from a step is recorded in writing in the same file the step
   writes to; silent deviation is a protocol violation.
-- If this packet conflicts with a frozen P1 execution surface, the frozen surface wins.
