@@ -1,7 +1,7 @@
 # Production Completion Checklist
 
 **Document ID:** PCC-2026-09-07-001  
-**Version:** 1.1.1  
+**Version:** 1.1.2  
 **Last updated:** 2026-09-11  
 **Classification:** Internal — Strategic  
 **Current authority:** `docs/CURRENT_PROGRAM_STATE.md` and frozen P1 execution surfaces outrank this checklist.
@@ -30,24 +30,24 @@ Status language:
 | # | Step | Status | Current implementation / action |
 | --- | --- | --- | --- |
 | 1 | Preserve closed digital generations and scientific boundaries | **Done** | D2-0003 and D2-0004 retained negative; D2-0005 preregistered/unarmed; D2-0007 closed `SCREENED_OUT_H0` with zero survivors |
-| 2 | Preserve exact Production Alpha source | **Done** | Original Alpha-001 sealed kit recovered from historical Actions run and hash-verified; `evidence/p1/alpha001-source-recovery.json` |
-| 3 | Use one primary physical SKU | **Done (decision)** | Primary = Printful product `388`, All-Over Print Recycled Unisex Hoodie; product `257` retained as fallback/reserve metadata surface |
-| 4 | Capture exact live vendor product/variant/placement data | **Ready (software) / Open (external input)** | `tools/p1_production_release.py intake` validates live data and stores untouched bytes + deterministic archives |
-| 5 | Build exact provider-sized candidate/control artwork | **Ready (software)** | `tools/p1_production_release.py build` uses the exact recovered Alpha-001 source; no regeneration/retuning |
-| 6 | Generate and validate UA values | **Ready (software)** | Production build emits binder-ready values; `tools/p1_bind_ua_values.py --check-only` is required before writing |
-| 7 | Bind real production values and re-run no-spend readiness | **Ready (software) / Open (real inputs)** | Atomic binder + `tools/p1_no_spend_readiness_gate.py`; successful software gate does not authorize spend |
-| 8 | Human procurement go/no-go | **Open (external)** | Verify hashes, matched pair, live variant/technique/fulfillment facts, then explicitly authorize cost |
-| 9 | Order matched control/candidate hoodies | **Open (external)** | Minimum: `PA-HOODIE-CAND-001` + `PA-HOODIE-CTRL-001`; same production variables except artwork |
-| 10 | Generate/fabricate calibration target | **Generator Done / Fabrication Open** | `RAC-CALT-P1-0001` deterministic generator exists; print at 100% / 300 DPI and physically verify 100 mm scale bar |
-| 11 | Stage P1 rig and storage/custody workflow | **Software/spec Done / Physical setup Open** | Current runbook, camera-lighting setup, custody/QA forms, naming and storage rules exist |
-| 12 | Receive and reconcile specimens | **Open (external)** | Receipt QA, pairing, registration, seams, defects, material/fulfillment facts, custody; mismatch blocks testing |
-| 13 | Accept calibration under frozen rule | **Open (external)** | Calibrate before efficacy capture; threshold is not changed to make a failed setup pass |
-| 14 | Execute matched physical P1 | **Open (external)** | Execute authoritative **144-trial** `physical/p1/P1_CAPTURE_SCHEDULE.json`, not historical 108-row planning sheet |
-| 15 | Quantify uncertainty / stopping / invalid conditions | **Done as software; awaits real P1 data** | Paired statistics, uncertainty, stopping and invalid-condition infrastructure already exist |
-| 16 | Ingest and seal P1 evidence | **Ready (software) / awaits data** | Preserve raw captures, dispositions, metadata and hashes; seal before preregistered analysis |
-| 17 | Run preregistered physical analysis | **Open after P1** | Report PASS / FAIL / negative / inconclusive without post-hoc threshold changes |
-| 18 | Run durability sequence | **Open (later evidence)** | W1/W5/W10+ only after a valid W0/P1 baseline |
-| 19 | Establish golden physical sample + lot tolerances | **Open (later evidence)** | Requires real specimens and manufacturing measurements |
+| 2 | Preserve exact Production Alpha source and primary SKU decision | **Done** | Original Alpha-001 sealed kit recovered/hash-verified; primary = Printful product `388` hoodie; product `257` remains fallback/reserve metadata |
+| 3 | Acquire exact live Printful product/variant/placement/template data | **Ready (software) / Open (external input)** | `tools/p1_production_release.py intake` validates the live vendor state and preserves untouched bytes + deterministic archives |
+| 4 | Build exact provider-sized candidate/control artwork | **Ready (software)** | `tools/p1_production_release.py build` uses the exact recovered Alpha-001 source; no regeneration/retuning |
+| 5 | Generate and validate UA values | **Ready (software)** | Production build emits binder-ready values; `tools/p1_bind_ua_values.py --check-only` is required before writing |
+| 6 | Bind real values and re-run no-spend readiness | **Ready (software) / Open (real inputs)** | Atomic binder + `tools/p1_no_spend_readiness_gate.py`; a software PASS still does not authorize spend |
+| 7 | Human go/no-go and matched control/candidate order | **Open (external)** | Verify hashes, live variant/technique/fulfillment facts, explicitly authorize cost, then order `PA-HOODIE-CAND-001` + `PA-HOODIE-CTRL-001` |
+| 8 | Generate/fabricate calibration target | **Generator Done / Fabrication Open** | `RAC-CALT-P1-0001` deterministic generator exists; print at 100% / 300 DPI and physically verify 100 mm scale bar |
+| 9 | Stage P1 rig and storage/custody workflow | **Software/spec Done / Physical setup Open** | Current runbook, camera-lighting setup, custody/QA forms, naming and storage rules exist |
+| 10 | Receive and reconcile specimens | **Open (external)** | Receipt QA, pairing, registration, seams, defects, material/fulfillment facts, custody; mismatch blocks testing |
+| 11 | Accept calibration under frozen rule | **Open (external)** | Calibrate before efficacy capture; threshold is not changed to make a failed setup pass |
+| 12 | Execute matched physical P1 | **Open (external)** | Execute authoritative **144-trial** `physical/p1/P1_CAPTURE_SCHEDULE.json`, not historical 108-row planning sheet |
+| 13 | Quantify uncertainty / stopping / invalid conditions | **Done as software; awaits real P1 data** | Paired statistics, uncertainty, stopping and invalid-condition infrastructure already exist |
+| 14 | Ingest and seal P1 evidence | **Ready (software) / awaits data** | Preserve raw captures, dispositions, metadata and hashes; seal before preregistered analysis |
+| 15 | Run preregistered physical analysis | **Open after P1** | Report PASS / FAIL / negative / inconclusive without post-hoc threshold changes |
+| 16 | Run durability sequence | **Open (later evidence)** | W1/W5/W10+ only after a valid W0/P1 baseline |
+| 17 | Establish golden physical sample | **Open (later evidence)** | Requires real specimens and manufacturing measurements |
+| 18 | Define and test lot-conformity tolerances | **Open (later evidence)** | Color/scale/placement/registration/seam tolerances require measured production variation |
+| 19 | Reach manufacturing conformity evidence | **Open (later evidence)** | Requires repeated physical production lots/samples |
 | 20 | Freeze bounded customer/public claims | **Open (later evidence)** | Claim scope cannot exceed actual digital/physical/manufacturing evidence |
 
 ## Exact Alpha-001 pins
@@ -111,3 +111,4 @@ RAC is **production-ready as a research system**, not product-validated. Orderin
 | 1.0.0 | 2026-09-07 | Initial 20-step production checklist |
 | 1.1.0 | 2026-09-11 | Reconciled D2-0007 closure, recovered Alpha-001 source, strict Printful release tooling, implemented calibration/statistics infrastructure, and frozen 144-trial P1 authority |
 | 1.1.1 | 2026-09-11 | Restored the machine-readable `Next single action` heading used by the deterministic research-dashboard exporter |
+| 1.1.2 | 2026-09-11 | Aligned legacy dashboard blocker cross-references: item 3 = live vendor/template acquisition; item 7 = matched physical pair order |
