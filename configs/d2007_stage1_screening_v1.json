@@ -1,0 +1,117 @@
+{
+  "schema_version": "rac-d2007-stage1-screening-freeze/1.0",
+  "generation_id": "RAC-PER-D2-0007",
+  "stage": "STAGE_1_MOTIF_SCREENING",
+  "status": "PRE_EXECUTION_FROZEN_NOT_RUN",
+  "preregistration": {
+    "path": "docs/PREREGISTRATION_D2-0007.md",
+    "sha256": "38b955d5b60e3428cce84a8c6b849fbcb61b153a4b3fb3a3040aa730d6e1564f"
+  },
+  "generation_record": {
+    "path": "generations/RAC-PER-D2-0007.json",
+    "sha256": "3efd0ddd6ca00c9a9f4ee15ef233eac2d8733cf235ef669927dc8665d072efef"
+  },
+  "stage0_gate": {
+    "path": "evidence/d2-0007/stage0-landmark-free-smoke-closure.json",
+    "required_decision": "PASS",
+    "required_telemetry_sha256": "93bebada88426b10e3891b55a6ff1aa8e461c2295d26b58216cfb92c934324bc"
+  },
+  "scientific_boundary": {
+    "model_set_id": "PERSON-SUR-v3",
+    "heldout_model_set_id": "PERSON-HO-v3",
+    "heldout_access_allowed": false,
+    "evidence_scope": "surrogate-only hypothesis screening; not transfer/efficacy evidence"
+  },
+  "generator_order": [
+    "HyperfaceLikeGenerator",
+    "DazzleSurgicalLinesGenerator",
+    "KeyFeatureBlackoutGenerator",
+    "SaliencyEyeAttackGenerator",
+    "AdversarialPatchGenerator",
+    "SwappedLandmarksGenerator",
+    "LandmarkNoiseGenerator",
+    "FeatureCollageGenerator"
+  ],
+  "budget": {
+    "compositions_per_generator": 8,
+    "total_compositions": 64,
+    "root_seeds": [20270110, 20270111, 20270112],
+    "max_candidates_admitted_to_optimization": 4,
+    "optional_stopping": false,
+    "budget_extension_allowed": false
+  },
+  "seed_derivation": {
+    "algorithm": "sha256-prefix63-v1",
+    "material_template": "RAC-PER-D2-0007|stage1|generator_index={generator_index}|composition_index={composition_index}|root_seed={root_seed}",
+    "digest_rule": "first 8 digest bytes interpreted unsigned big-endian, masked to 63 bits",
+    "note": "Pre-execution serialization of the preregistered root-seed + generator-index composition; fixed before any Stage-1 scoring."
+  },
+  "generator_local_geometry": {
+    "id": "PATTERNS_CANONICAL_128_V1",
+    "purpose": "generator-local motif synthesis only; NOT a body/garment anchor provider and NOT Stage-2 anchor support",
+    "output_size": [128, 128],
+    "landmarks": {
+      "left_eye": {"position": [40, 40]},
+      "right_eye": {"position": [88, 40]},
+      "nose_tip": {"position": [64, 64]},
+      "mouth_center": {"position": [64, 92]},
+      "left_brow": {"position": [40, 28]},
+      "right_brow": {"position": [88, 28]},
+      "left_cheek": {"position": [36, 70]},
+      "right_cheek": {"position": [92, 70]}
+    },
+    "bboxes": {
+      "eyes": [30, 32, 68, 18],
+      "mouth": [48, 84, 32, 16]
+    }
+  },
+  "screening_fixture": {
+    "manifest": "benchmarks/model_manifest.json",
+    "fixture_name": "ultralytics-zidane-two-crop-convenience-fixture",
+    "transform_source": "benchmarks/model_manifest.json#transform_sweep",
+    "transform_sweep": {
+      "brightness": [0.7, 1.0, 1.3],
+      "scale": [1.0],
+      "blur_sigma": [0.0, 0.8],
+      "rotation_deg": [-20.0, 0.0, 20.0]
+    },
+    "matched_control": true,
+    "control_undetected_exclusion": "existing ComparativeBenchmark baseline_qualified semantics"
+  },
+  "decision_rule": {
+    "minimum_mean_absolute_detection_rate_reduction": 0.15,
+    "minimum_improved_surrogates": 4,
+    "improvement_test": "baseline_detection_rate - candidate_detection_rate > 0",
+    "max_invalid_condition_fraction": 0.1,
+    "best_composition_rank": [
+      "mean_detection_rate_reduction:desc",
+      "worst_surrogate_candidate_detection_rate:asc",
+      "composition_index:asc"
+    ],
+    "survivor_rank": [
+      "mean_detection_rate_reduction:desc",
+      "worst_surrogate_candidate_detection_rate:asc",
+      "generator_index:asc",
+      "derived_seed:asc"
+    ]
+  },
+  "downstream_guards": {
+    "body_or_garment_anchor_support_before_survival": "FORBIDDEN",
+    "optimization_before_screening_close": "FORBIDDEN",
+    "candidate_freeze_during_screening": "FORBIDDEN",
+    "heldout_access_before_stage6": "FORBIDDEN",
+    "alpha_002_promotion_during_screening": "FORBIDDEN",
+    "d2_0005_mutation_or_candidate_injection": "CRITICAL_REGRESSION",
+    "alpha_001_rebinding": "CRITICAL_REGRESSION"
+  },
+  "derived_seeds_by_generator": {
+    "HyperfaceLikeGenerator": [2463893899515203965, 6170156324772251700, 5995755387530126933, 3950639788422371873, 7939512587967663778, 5028126238753172041, 3873474653210938241, 194317912118027447],
+    "DazzleSurgicalLinesGenerator": [1083664492517361064, 1113994401468777525, 4221199850896735586, 4046952837153739239, 2269774783641507500, 2545094396088801403, 1252451654326679212, 5580649537082889199],
+    "KeyFeatureBlackoutGenerator": [7740808821873830030, 8514357982261342310, 5914593258772102447, 7663176878463109314, 6295206737385961663, 1761887369444743290, 9182182370977212426, 8533904126070450086],
+    "SaliencyEyeAttackGenerator": [8863184588856903361, 4298958350889757154, 2928138315685416039, 5295965092215314764, 4373457717488092546, 1164777990468736395, 2657271804383990479, 5858998239264300916],
+    "AdversarialPatchGenerator": [8004433526018780602, 5173997531865360129, 4401126000150527338, 547104223593295472, 5076900712125172742, 3536868562730522897, 5999915168843657269, 655478611395221636],
+    "SwappedLandmarksGenerator": [4056268109825292096, 6154981753993196748, 8580744002778662915, 3695728292976325698, 2103271422949518965, 6074241558611783699, 6126947015490017950, 2486310590843685207],
+    "LandmarkNoiseGenerator": [8155659746875205357, 1841968094545346804, 6013366705608157209, 5439712972157073934, 1525766412814489015, 3725473847698423991, 6341970152301321196, 6558699491597653367],
+    "FeatureCollageGenerator": [1993319539246368453, 1354012757544970870, 1050921474346770291, 2159274442237771503, 4509988926257430675, 6994874436928185559, 2939330623180556941, 5557638001117778275]
+  }
+}
