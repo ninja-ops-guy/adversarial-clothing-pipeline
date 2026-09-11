@@ -1,5 +1,7 @@
 # P1 Production Release Gate
 
+<!-- doclint:allow check="broken-path" reason="this operator release guide intentionally references gitignored production_alpha/vendor_intake runtime outputs and local external Alpha-001 recovery paths; those files are created or supplied at execution time and are expected to be absent from a clean checkout" -->
+
 For real `RAC-PRINT-ALPHA-001` manufacturing, use
 `tools/p1_production_release.py` as the operator entry point. It wraps the lower-level
 `tools/prepare_print_alpha_production.py` helper with additional evidence-integrity
