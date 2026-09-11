@@ -1,0 +1,52 @@
+{
+  "schema_version": "rac-p1-alpha001-source-recovery/1.0",
+  "release_id": "RAC-PRINT-ALPHA-001",
+  "candidate_id": "RAC-PER-D2-0003",
+  "recovery_date": "2026-09-11",
+  "recovery_status": "EXACT_SOURCE_RECOVERED_AND_HASH_VERIFIED",
+  "source": {
+    "provider": "GitHub Actions",
+    "workflow_name": "Measured Detector Benchmark",
+    "workflow_run_id": 34078238095,
+    "workflow_head_sha": "65646777151966729ab6c06cdbdfe71671e5266d",
+    "workflow_job": "benchmark",
+    "workflow_job_conclusion": "success",
+    "artifact_id": 10003083548,
+    "artifact_name": "rac-print-test-kit-34078238095",
+    "artifact_digest": "sha256:cfde12ec97ceafcf2d51eef989dee83d774e18be53e3f411c9502ed6a2e0e558",
+    "artifact_created_at": "2026-09-07T03:17:11Z",
+    "artifact_expires_at": "2026-10-07T03:17:10Z"
+  },
+  "sealed_kit": {
+    "member": "print-test-kit.zip",
+    "sha256": "b22b022fd98bc8587251099464010dbc3288f8da70756e183f8e366be06f0548",
+    "bytes": 13945688,
+    "matches_frozen_alpha001_pin": true
+  },
+  "frozen_pattern": {
+    "member": "print-test-kit/design/pattern_tile_4096.png",
+    "sha256": "b07b617fe6dbe178330fff2d9f65c2b720948b641e2bd4865e43ebd62c261546",
+    "dimensions": [4096, 4096],
+    "matches_frozen_alpha001_pin": true
+  },
+  "historical_status": {
+    "d2_decision": "FAIL",
+    "d2_evidence_state": "RAC-D0",
+    "family": "machine_static",
+    "primary_product": "hoodie",
+    "ready_for_print_and_physical_test": true,
+    "physical_validation_performed": false
+  },
+  "boundary": {
+    "source_regenerated": false,
+    "source_retuned": false,
+    "heldout_access_performed_during_recovery": false,
+    "physical_efficacy_claimed": false,
+    "spend_authorized": false,
+    "order_placed": false,
+    "d2_0005_touched": false,
+    "d2_0007_touched": false,
+    "alpha_001_rebound": false
+  },
+  "operator_note": "Use the recovered sealed print-test-kit.zip only after independently verifying its SHA-256 equals the sealed_kit.sha256 above. This receipt records recovery provenance; it does not itself contain or replace the binary source artifact."
+}
