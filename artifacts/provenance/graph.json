@@ -1053,6 +1053,12 @@
       "type": "document"
     },
     {
+      "id": "schema:program_state_v1.schema.json",
+      "path": "schemas/program_state_v1.schema.json",
+      "sha256": "fa75ffbef31f6c4bcf489fb76cf894b01fffd8403cde022dac7c373f2303779d",
+      "type": "document"
+    },
+    {
       "id": "schema:rac_evidence_view_v1.schema.json",
       "path": "schemas/rac_evidence_view_v1.schema.json",
       "sha256": "8d017cbaffe2b077eb2173206afc184f06aaa46207bde41b29be86464bd52f03",
