@@ -86,3 +86,15 @@ test('session setup exposes Research OS lineage fields', async ({ page }) => {
   await expect(page.locator('#generationId')).toBeVisible();
   await expect(page.locator('#generationSha')).toBeVisible();
 });
+
+test('physical P1 exposes frozen schedule and bracketed measured calibration controls', async ({ page }) => {
+  await page.selectOption('#evidenceClass', 'physical_garment_p1');
+  await expect(page.locator('#loadNextTrialBtn')).toBeVisible();
+  await expect(page.locator('#loadNextTrialBtn')).toBeDisabled();
+  await expect(page.locator('#trialId')).toBeVisible();
+  await expect(page.locator('#pitch')).toBeVisible();
+  await expect(page.locator('#preCalibrationFile')).toBeVisible();
+  await expect(page.locator('#postCalibrationFile')).toBeVisible();
+  await expect(page.locator('#prototypeCalibrationLabel')).toBeHidden();
+  await expect(page.locator('#calibrationGate')).toContainText('PRE PENDING');
+});
