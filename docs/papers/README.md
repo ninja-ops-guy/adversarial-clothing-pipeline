@@ -11,8 +11,9 @@
 
 0. [RAC: A Reproducible Architecture for Physical Adversarial Textile Research](00_RAC_SYSTEM_ARCHITECTURE.md) — system topology, four-plane architecture, held-out trust boundary, provenance model and digital-to-physical research flow.
 6. [Fail-Closed Evidence Certification for Physical-AI Experiments](06_FAIL_CLOSED_EVIDENCE_CERTIFICATION.md) — admissibility versus performance, refusal semantics, numerical verification, candidate/control integrity, stale-mapping detection and sealed evidence releases.
+7. [From SAT Solving to Experimental Governance: Integrating Formal Reasoning into Adversarial Textile Research](07_CIC_FORMAL_REASONING_FOR_RAC.md) — CIC-derived satisfiability verification, semantic/compiled separation, scientific projection, governed sampling, structural backend routing, null construction, contradiction explanation and adaptive CTM governance.
 
-These two manuscripts explain **how the RAC research system works** independently from whether a particular adversarial garment succeeds.
+These foundation manuscripts explain **how the RAC research system works** independently from whether a particular adversarial garment succeeds.
 
 ## Experimental papers
 
@@ -30,8 +31,9 @@ For a new technical reader:
 2. `../DIAGRAMS.md`
 3. `../ARCHITECTURE.md`
 4. `06_FAIL_CLOSED_EVIDENCE_CERTIFICATION.md`
-5. `../CERTIFICATION_SYSTEM.md`
-6. the experimental paper associated with the question being studied.
+5. `07_CIC_FORMAL_REASONING_FOR_RAC.md`
+6. `../CERTIFICATION_SYSTEM.md`
+7. the experimental paper associated with the question being studied.
 
 ## Publication discipline
 

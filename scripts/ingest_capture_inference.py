@@ -21,6 +21,7 @@ from ruthless_pipeline.certification.trial_statistics import (
 
 
 P1_EVIDENCE_CLASS = "physical_garment_p1"
+FROZEN_P1_TRIAL_PREFIX = "RAC-P1-T-"
 
 
 def enforce_promotion_gate(session: dict[str, Any]) -> None:
@@ -61,6 +62,7 @@ def trial_store_record(
             "experiment_id": str(session["experiment_id"]),
             "hypothesis_id": str(session.get("hypothesis_id", "UNSPECIFIED")),
             "calibration_profile_id": str(session.get("calibration_profile_id", "CAPTURE-CALIBRATION")),
+            "calibration_profile_sha256": session.get("calibration_profile_sha256"),
             "candidate": session.get("candidate", {}),
             "generation": session.get("generation", {}),
             "p1_schedule": session.get("p1_schedule"),
@@ -78,15 +80,25 @@ def trial_from_store_record(record: dict[str, Any]) -> PhysicalTrial:
 
 
 def _validate_stored_schedule(record: dict[str, Any]) -> None:
+    """Validate schedule lineage for platform-era frozen P1 trial IDs.
+
+    Pre-platform stores used session-derived trial IDs and did not carry the
+    frozen schedule object. Those records remain readable for historical
+    compatibility, but every RAC-P1-T-* record is fail-closed unless its
+    frozen schedule lineage is present and exact.
+    """
     trial = record.get("trial") or {}
     lineage = record.get("lineage") or {}
+    trial_id = str(trial.get("trial_id") or "")
     binding = lineage.get("p1_schedule")
     if not isinstance(binding, dict):
-        raise ValueError("trial store record is missing frozen p1_schedule lineage")
+        if trial_id.startswith(FROZEN_P1_TRIAL_PREFIX):
+            raise ValueError("trial store record is missing frozen p1_schedule lineage")
+        return
     validate_session_schedule_binding(
         {
             "evidence_class": P1_EVIDENCE_CLASS,
-            "trial_id": trial.get("trial_id"),
+            "trial_id": trial_id,
             "distance_m": trial.get("distance_m"),
             "yaw_deg": trial.get("yaw_deg"),
             "pitch_deg": trial.get("pitch_deg"),
@@ -101,7 +113,12 @@ def _validate_stored_schedule(record: dict[str, Any]) -> None:
 def load_trial_store(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
-    records: list[dict[str, Any]] = []
+
+    # Pass 1 verifies framing/schema/hash-chain integrity across the whole
+    # append-only file before semantic validation. This ensures corruption of
+    # a prior line is reported as a hash-chain break rather than as a
+    # downstream schedule/content error in the tampered payload.
+    parsed: list[tuple[int, dict[str, Any]]] = []
     prev_sha: str | None = None
     for line_number, line in enumerate(path.read_text().splitlines(), start=1):
         if not line.strip():
@@ -113,15 +130,23 @@ def load_trial_store(path: Path) -> list[dict[str, Any]]:
                 f"trial store line {line_number}: hash-chain break "
                 "(prev_record_sha256 does not match the previous record)"
             )
+        parsed.append((line_number, record))
+        prev_sha = hashlib.sha256(line.encode()).hexdigest()
+
+    # Pass 2 applies scientific semantics after the append-only structure is
+    # known intact.
+    records: list[dict[str, Any]] = []
+    trial_ids: set[str] = set()
+    for line_number, record in parsed:
         enforce_promotion_gate(
             {"evidence_class": record.get("evidence_class"), "calibration_pass": record.get("calibration_pass")}
         )
         _validate_stored_schedule(record)
         trial = trial_from_store_record(record)
-        if any(trial_from_store_record(r).trial_id == trial.trial_id for r in records):
+        if trial.trial_id in trial_ids:
             raise ValueError(f"trial store line {line_number}: duplicate trial_id {trial.trial_id!r}")
+        trial_ids.add(trial.trial_id)
         records.append(record)
-        prev_sha = hashlib.sha256(line.encode()).hexdigest()
     return records
 
 

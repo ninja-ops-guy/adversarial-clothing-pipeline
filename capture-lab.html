@@ -14,6 +14,13 @@
 <label>Experiment ID<input id="experimentId" value="RAC-EXP-2026-001"></label>
 <label>Hypothesis ID<input id="hypothesisId" value="RQ-P1-CAPTURE-001"></label><label>Protocol version<input id="protocolVersion" value="P1-DRAFT"></label>
 <label>Evidence class<select id="evidenceClass"><option value="printed_flat_prototype">PRINTED-FLAT / PAPER-PROTOTYPE</option><option value="physical_garment_p1">PHYSICAL GARMENT / P1</option><option value="synthetic_pipeline_validation_only">SYNTHETIC DRY RUN</option></select></label>
+<div id="p1SchedulePanel" class="status">
+<b>P1 FROZEN SCHEDULE</b><div id="p1ScheduleStatus">Select PHYSICAL GARMENT / P1 to bind a frozen trial.</div>
+<button id="loadNextTrialBtn" disabled>Load Next Frozen P1 Trial</button>
+<label>Trial ID<input id="trialId" readonly placeholder="RAC-P1-T-####"></label>
+<label>Lighting variant<input id="lightingVariant" readonly placeholder="session-locked"></label>
+<div id="p1ArmOrder" class="note">Arm order not loaded.</div>
+</div>
 <label>Generation ID<input id="generationId" placeholder="RAC-PER-D2-0003"></label><label>Generation SHA-256<input id="generationSha" pattern="[0-9a-fA-F]{64}" placeholder="frozen generation artifact hash"></label><label>Candidate artifact ID<input id="candidateId" placeholder="RAC-PRINT-ALPHA-001"></label>
 <label>Candidate SHA-256<input id="candidateSha" pattern="[0-9a-fA-F]{64}" placeholder="64 hex characters"></label>
 <label>Control artifact ID<input id="controlId" value="CONTROL-01"></label>
@@ -21,7 +28,7 @@
 <label>Camera ID<input id="cameraId" value="CAM-PHONE-MAIN-01"></label>
 <label>Lighting ID<input id="lightingId" value="LUX-INDOOR-OFFICE"></label>
 <div class="row"><label>Distance m<input id="distance" type="number" step=".1" value="2"></label><label>Yaw°<input id="yaw" type="number" value="0"></label></div>
-<label>Pose<select id="pose"><option>standing-front</option><option>standing-back</option><option>standing-left</option><option>standing-right</option><option>walk-cycle</option><option>rotation-360</option></select></label>
+<div class="row"><label>Pitch°<input id="pitch" type="number" value="0"></label><label>Pose<select id="pose"><option>standing-front</option><option>standing-back</option><option>standing-left</option><option>standing-right</option><option>walk-cycle</option><option>rotation-360</option><option>standing</option><option>seated</option></select></label></div>
 <button id="freezeBtn" class="primary">Freeze Session Manifest</button>
 </div></section>
 
@@ -38,7 +45,16 @@
 <h2>Review / Analyze / Seal</h2><div class="body">
 <div id="runtimeStatus" class="status">RESEARCH RUNTIME · CHECKING</div>
 <div class="gate" id="calibrationGate"><b>CALIBRATION</b><span>Pending</span></div>
-<label class="check"><input id="calibrationPass" type="checkbox"> Calibration acceptance gate passed</label>
+<div id="p1CalibrationTools">
+<p class="note">Physical P1 requires measured bracketing calibration. Upload the exact JSON source for the measured PrintCameraProfile before capture and again after the final garment capture. The sealed session retains the exact source text + SHA-256; Python re-evaluates it during validation/ingestion.</p>
+<label>Pre-capture measured profile JSON<input id="preCalibrationFile" type="file" accept="application/json,.json"></label>
+<button id="validatePreCalibrationBtn">Validate Pre-Capture Calibration</button>
+<div id="preCalibrationStatus" class="analysis">PRE · not validated</div>
+<label>Post-capture measured profile JSON<input id="postCalibrationFile" type="file" accept="application/json,.json"></label>
+<button id="validatePostCalibrationBtn" disabled>Validate Post-Capture Calibration</button>
+<div id="postCalibrationStatus" class="analysis">POST · not validated</div>
+</div>
+<label id="prototypeCalibrationLabel" class="check"><input id="calibrationPass" type="checkbox"> Prototype/manual calibration acknowledgment (not P1 evidence)</label>
 <div class="divider"></div>
 <h3>Frozen ensemble</h3>
 <p class="note">Capture is blinded to outcomes. Analysis happens only after capture. Person/object inference is performed by the authorized local research runtime; browser heuristics are never evidence.</p>
