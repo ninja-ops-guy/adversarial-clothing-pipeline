@@ -3,6 +3,18 @@ const { test, expect } = require('@playwright/test');
 test.beforeEach(async ({ page }) => {
   const errors = [];
   page.__errors = errors;
+
+  // GitHub Pages is intentionally static and has no Research Workbench API.
+  // Stub only the runtime-status probe there so the deployed smoke check still
+  // fails on every other console/page error while exercising read-only mode.
+  if ((process.env.BASE_URL || '').includes('github.io')) {
+    await page.route('**/api/runtime/status', route => route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ connected: false })
+    }));
+  }
+
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
   page.on('console', message => {
     if (message.type() === 'error') errors.push(`console: ${message.text()}`);

@@ -1,6 +1,17 @@
 (function(){
 'use strict';
 
+function ensureResearchCatalog(){
+  if(document.querySelector('script[src$="studio-research-catalog.js"]'))return;
+  const script=document.createElement('script');
+  script.src='studio-research-catalog.js';
+  script.async=false;
+  script.dataset.racResearchCatalog='true';
+  document.head.appendChild(script);
+}
+
+ensureResearchCatalog();
+
 const input=document.getElementById('templateFile');
 if(!input)return;
 
