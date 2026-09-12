@@ -1,21 +1,9 @@
-"""RAC Prospective Robustness Characterization (PRC).
+"""Prospective Robustness Characterization (PRC) v1.
 
-Additive, read-only validation infrastructure for prospectively comparing frozen
-digital robustness predictions with later P1 physical observations. PRC never
-mutates P1 authority, Pattern Genome v1, or candidate lineages.
+This package is an additive, read-only scientific observer. It does not mutate
+P1 authority, candidate lineage, or physical evidence.
 """
 
-from .analysis import characterize
-from .authority import AuthorityError, AuthoritySnapshot, validate_repository_authority
-from .p1_adapter import PRCP1Adapter
-from .prediction_freeze import freeze_receipt, validate_prediction_freeze
+from .canonical import RACCanonicalSerializer
 
-__all__ = [
-    "AuthorityError",
-    "AuthoritySnapshot",
-    "PRCP1Adapter",
-    "characterize",
-    "freeze_receipt",
-    "validate_prediction_freeze",
-    "validate_repository_authority",
-]
+__all__ = ["RACCanonicalSerializer"]
