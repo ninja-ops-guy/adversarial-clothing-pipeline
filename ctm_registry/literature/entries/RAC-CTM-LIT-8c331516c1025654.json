@@ -1,0 +1,23 @@
+{
+  "entry_class": "near_miss",
+  "entry_id": "RAC-CTM-LIT-8c331516c1025654",
+  "failure_axes": [
+    "no_commensurable_physical_conditions",
+    "no_physical_evaluation"
+  ],
+  "identifier": {
+    "kind": "url",
+    "value": "https://github.com/hevnsnt/norecognition/tree/09dbc4332fbb965991dfa0f5f8f1eaad1d0c12ec"
+  },
+  "notes": "External research lead for RAC geometric/noise and texture/symbolic generator families. Public repository snapshot 09dbc4332fbb965991dfa0f5f8f1eaad1d0c12ec and current project pages were reviewed; reported outcomes remain author-reported observations requiring independent replication and are not pooled into RAC performance totals. NRSAL v7.0 restricts commercial use; RAC imports no noRecognition code, pattern images, datasets, or generated outputs. Dataset access status remains UNKNOWN_PENDING_PUBLISHER_RESPONSE and permitted use NOT_ESTABLISHED. See docs/research/NORECOGNITION_REVIEW_2026-09-10.md and docs/research/NORECOGNITION_ARCHITECTURE_AND_DATA_ACCESS.md.",
+  "quadrant": "quadrant_2",
+  "recheck_date": "2026-12-01",
+  "schema_version": "rac-ctm-corpus-entry/1.0",
+  "survey_taxonomy": {
+    "node": "detection/garment-attacks",
+    "survey_ref": "acm-csur-2026-physical-world-tasks"
+  },
+  "title": "noRecognition — adversarial garment research program (Bill Swearingen / hevnsnt)",
+  "verification_status": "full_text_verified",
+  "year": 2026
+}
