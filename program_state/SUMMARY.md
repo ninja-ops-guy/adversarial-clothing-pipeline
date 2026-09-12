@@ -3,7 +3,7 @@
 # Canonical Program State (generated)
 
 - Schema: `rac-program-state/1.0` (`https://rac.local/schemas/program_state_v1.schema.json`)
-- State content address (sha256): `b3845f65ea83a8c4c7271916512b3e5ffe96cc0779c9652b1a385e039d057982`
+- State content address (sha256): `f8fbe3d3f28b82a63e363b9dd4adc3f6c4932a6191dded15b57b30edf6cad1a7`
 - Evidence class: `synthetic_pipeline_validation_only`
 
 ## Experiments
@@ -36,7 +36,7 @@
 
 ## CTM registry
 
-- Literature entries: 10
+- Literature entries: 11
 - Genome-v2 register sha256: `e514b9224c016e8f17dc049b22fefcca60938c45edef6424753e4351ac803e4c`
 
 ## Frozen surface
