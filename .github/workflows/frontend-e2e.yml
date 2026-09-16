@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
     paths:
+      - 'landing.html'
+      - 'landing.css'
+      - 'landing.js'
+      - 'pattern-lab.html'
       - 'index.html'
       - 'styles.css'
       - 'core.js'
@@ -34,6 +38,7 @@ on:
       - 'playwright.config.js'
       - 'tests/e2e/**'
       - '.github/workflows/frontend-e2e.yml'
+      - '.github/workflows/pages.yml'
   pull_request:
   workflow_dispatch:
 
@@ -70,10 +75,27 @@ jobs:
           node-version: '24'
       - run: npm install
       - run: npx playwright install --with-deps chromium webkit
-      - name: Verify deployed Pattern Lab
+      - name: Verify deployed Pattern Lab before landing cutover
+        if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
         run: npx playwright test --project=chromium-desktop --grep "all pattern generators|PNG, JSON, SVG"
+      - name: Verify deployed landing page and Pattern Lab
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          SITE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
+        run: |
+          for i in {1..18}; do
+            if curl -fsS "${SITE_URL}" | grep -q 'Evidence before claims' && \
+               curl -fsS "${SITE_URL}pattern-lab.html" | grep -q 'Adversarial Pattern Lab'; then
+              BASE_URL="${SITE_URL}" npx playwright test tests/e2e/landing.spec.js --project=chromium-desktop
+              BASE_URL="${SITE_URL}pattern-lab.html" npx playwright test tests/e2e/pattern-lab.spec.js --project=chromium-desktop --grep "all pattern generators|PNG, JSON, SVG"
+              exit $?
+            fi
+            sleep 10
+          done
+          echo 'Landing page or Pattern Lab was not available from deployed Pages in time.' >&2
+          exit 1
       - name: Verify deployed Product Studio
         env:
           BASE_URL: https://ninja-ops-guy.github.io/adversarial-clothing-pipeline/
