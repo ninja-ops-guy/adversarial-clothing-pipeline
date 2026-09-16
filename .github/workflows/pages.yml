@@ -1,4 +1,4 @@
-name: Deploy Adversarial Pattern Lab to GitHub Pages
+name: Deploy RAC Platform to GitHub Pages
 
 on:
   push:
@@ -28,10 +28,22 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Build static site
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir _site
+          rsync -a --exclude '.git' --exclude '_site' --exclude 'node_modules' ./ _site/
+          cp index.html _site/pattern-lab.html
+          cp landing.html _site/index.html
+          sed -i 's#href="./index.html">Pattern Lab#href="./pattern-lab.html">Pattern Lab#g' _site/pattern-lab.html _site/product-studio.html _site/production-studio.html
+          sed -i 's#href="index.html">Pattern Lab#href="pattern-lab.html">Pattern Lab#g' _site/capture-lab.html
+          sed -i 's#href="../index.html"#href="../pattern-lab.html"#g' _site/research_console/index.html
+
       - name: Upload static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .
+          path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
