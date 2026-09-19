@@ -93,9 +93,9 @@ The v1 advisory decision requires all of the following before it can return
 1. every supplied evidence bundle references the exact ImprovementSpec hash;
 2. every evidence bundle uses the ImprovementSpec's frozen evaluation version;
 3. no retained bundle is FAIL or INCONCLUSIVE;
-4. at least two successful replication identities are present;
-5. at least two independent verifier identities are present;
-6. producer and independent verifier identities differ.
+4. at least two successful replication identities **and** distinct replication-receipt hashes are present;
+5. at least two independent verifier labels, verifier-identity hashes, and verifier-receipt hashes are present;
+6. producer and independent-verifier labels and identity hashes differ.
 
 A FAIL always produces `REJECTED` and remains referenced in the decision.
 Evaluation-version drift is refused rather than coerced.
@@ -111,9 +111,9 @@ Each `RACEvidenceBundle` binds:
 - provenance-firewall attestation SHA-256;
 - result artifact SHA-256 values;
 - PASS / FAIL / INCONCLUSIVE;
-- producer identity;
-- independent verifier identity;
-- replication identity.
+- producer label and host-bound identity SHA-256;
+- independent verifier label, identity SHA-256, and verification-receipt SHA-256;
+- replication label and replication-receipt SHA-256.
 
 This is designed to sit above RAC's current CTM manifest, provenance firewall,
 Pattern Genome, negative-result, and certification machinery. It does not
