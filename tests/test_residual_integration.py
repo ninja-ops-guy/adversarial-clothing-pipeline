@@ -113,7 +113,7 @@ def test_promotable_requires_replication_and_independent_verifiers() -> None:
     assert decision.status == "INCONCLUSIVE"
 
     second = _evidence(
-        spec, 3, replication_id="replication-b", verifier_id="verifier-b"
+        spec, 2, replication_id="replication-b", verifier_id="verifier-b"
     )
     decision = evaluate_improvement(
         spec, [first, second], decision_id="RAC-D-000003"
