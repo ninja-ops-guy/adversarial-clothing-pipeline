@@ -38,7 +38,13 @@ def _evidence(
     outcome: str = "PASS",
     replication_id: str = "replication-a",
     verifier_id: str = "verifier-a",
+    verifier_identity_sha256: str | None = None,
+    verifier_receipt_sha256: str | None = None,
+    replication_receipt_sha256: str | None = None,
 ) -> RACEvidenceBundle:
+    verifier_identity_sha256 = verifier_identity_sha256 or (("c" if index % 2 else "d") * 64)
+    verifier_receipt_sha256 = verifier_receipt_sha256 or (("e" if index % 2 else "f") * 64)
+    replication_receipt_sha256 = replication_receipt_sha256 or (("1" if index % 2 else "2") * 64)
     return RACEvidenceBundle(
         evidence_id=f"RAC-EV-{index:06d}",
         spec_sha256=spec.content_sha256,
@@ -49,8 +55,12 @@ def _evidence(
         artifact_sha256s=(SHA,),
         outcome=outcome,
         producer_id="worker-a",
+        producer_identity_sha256="b" * 64,
         independent_verifier_id=verifier_id,
+        independent_verifier_identity_sha256=verifier_identity_sha256,
+        independent_verifier_receipt_sha256=verifier_receipt_sha256,
         replication_id=replication_id,
+        replication_receipt_sha256=replication_receipt_sha256,
     )
 
 
@@ -145,8 +155,12 @@ def test_evaluation_version_drift_is_refused() -> None:
         artifact_sha256s=(SHA,),
         outcome="PASS",
         producer_id="worker-a",
+        producer_identity_sha256="b" * 64,
         independent_verifier_id="verifier-a",
+        independent_verifier_identity_sha256="c" * 64,
+        independent_verifier_receipt_sha256="d" * 64,
         replication_id="replication-a",
+        replication_receipt_sha256="e" * 64,
     )
     with pytest.raises(RACResidualContractError):
         evaluate_improvement(
@@ -167,8 +181,12 @@ def test_producer_cannot_self_verify() -> None:
             artifact_sha256s=(SHA,),
             outcome="PASS",
             producer_id="worker-a",
+            producer_identity_sha256="b" * 64,
             independent_verifier_id="worker-a",
+            independent_verifier_identity_sha256="b" * 64,
+            independent_verifier_receipt_sha256="d" * 64,
             replication_id="replication-a",
+            replication_receipt_sha256="e" * 64,
         )
 
 
@@ -184,3 +202,43 @@ def test_candidate_rejects_decision_evidence_mismatch() -> None:
     )
     with pytest.raises(RACResidualContractError):
         build_residual_candidate(spec, [evidence], decision)
+
+
+def test_distinct_labels_cannot_fake_verifier_or_replication_independence() -> None:
+    spec = _spec()
+    first = _evidence(
+        spec,
+        1,
+        replication_id="replication-a",
+        verifier_id="verifier-a",
+        verifier_identity_sha256="c" * 64,
+        verifier_receipt_sha256="e" * 64,
+        replication_receipt_sha256="1" * 64,
+    )
+    second = _evidence(
+        spec,
+        2,
+        replication_id="replication-b",
+        verifier_id="verifier-b",
+        verifier_identity_sha256="c" * 64,
+        verifier_receipt_sha256="f" * 64,
+        replication_receipt_sha256="2" * 64,
+    )
+    decision = evaluate_improvement(
+        spec, [first, second], decision_id="RAC-D-000007"
+    )
+    assert decision.status == "INCONCLUSIVE"
+
+    second = _evidence(
+        spec,
+        2,
+        replication_id="replication-b",
+        verifier_id="verifier-b",
+        verifier_identity_sha256="d" * 64,
+        verifier_receipt_sha256="f" * 64,
+        replication_receipt_sha256="1" * 64,
+    )
+    decision = evaluate_improvement(
+        spec, [first, second], decision_id="RAC-D-000008"
+    )
+    assert decision.status == "INCONCLUSIVE"
