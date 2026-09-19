@@ -65,10 +65,9 @@ def _freeze_json(value: Any) -> Any:
             raise RACResidualContractError("non-finite floats are forbidden")
         return value
     if isinstance(value, Mapping):
-        frozen = {str(k): _freeze_json(v) for k, v in value.items()}
-        if len(frozen) != len(value):
-            raise RACResidualContractError("mapping keys must be unique strings")
-        return MappingProxyType(frozen)
+        if any(not isinstance(k, str) for k in value):
+            raise RACResidualContractError("mapping keys must be strings")
+        return MappingProxyType({k: _freeze_json(v) for k, v in value.items()})
     if isinstance(value, (list, tuple)):
         return tuple(_freeze_json(v) for v in value)
     raise RACResidualContractError(
@@ -175,8 +174,12 @@ class RACEvidenceBundle:
     artifact_sha256s: tuple[str, ...]
     outcome: str
     producer_id: str
+    producer_identity_sha256: str
     independent_verifier_id: str
+    independent_verifier_identity_sha256: str
+    independent_verifier_receipt_sha256: str
     replication_id: str
+    replication_receipt_sha256: str
     notes: str = ""
     schema_version: str = EVIDENCE_SCHEMA_VERSION
 
@@ -205,12 +208,28 @@ class RACEvidenceBundle:
                 f"outcome must be one of {sorted(OUTCOMES)}"
             )
         _require_text(self.producer_id, "producer_id")
+        _require_sha256(self.producer_identity_sha256, "producer_identity_sha256")
         _require_text(self.independent_verifier_id, "independent_verifier_id")
-        if self.independent_verifier_id == self.producer_id:
+        _require_sha256(
+            self.independent_verifier_identity_sha256,
+            "independent_verifier_identity_sha256",
+        )
+        _require_sha256(
+            self.independent_verifier_receipt_sha256,
+            "independent_verifier_receipt_sha256",
+        )
+        if (
+            self.independent_verifier_id == self.producer_id
+            or self.independent_verifier_identity_sha256
+            == self.producer_identity_sha256
+        ):
             raise RACResidualContractError(
-                "independent_verifier_id must differ from producer_id"
+                "independent verifier must differ from the producer by id and identity"
             )
         _require_text(self.replication_id, "replication_id")
+        _require_sha256(
+            self.replication_receipt_sha256, "replication_receipt_sha256"
+        )
         if not isinstance(self.notes, str):
             raise RACResidualContractError("notes must be text")
 
@@ -226,8 +245,12 @@ class RACEvidenceBundle:
             "artifact_sha256s": list(self.artifact_sha256s),
             "outcome": self.outcome,
             "producer_id": self.producer_id,
+            "producer_identity_sha256": self.producer_identity_sha256,
             "independent_verifier_id": self.independent_verifier_id,
+            "independent_verifier_identity_sha256": self.independent_verifier_identity_sha256,
+            "independent_verifier_receipt_sha256": self.independent_verifier_receipt_sha256,
             "replication_id": self.replication_id,
+            "replication_receipt_sha256": self.replication_receipt_sha256,
             "notes": self.notes,
         }
 
@@ -315,12 +338,19 @@ def evaluate_improvement(
     elif any(bundle.outcome == "INCONCLUSIVE" for bundle in bundles):
         status = "INCONCLUSIVE"
         reason = "at least one retained evidence bundle is inconclusive"
-    elif len({b.replication_id for b in bundles}) < 2:
+    elif (
+        len({b.replication_id for b in bundles}) < 2
+        or len({b.replication_receipt_sha256 for b in bundles}) < 2
+    ):
         status = "INCONCLUSIVE"
-        reason = "promotion requires at least two successful replication identities"
-    elif len({b.independent_verifier_id for b in bundles}) < 2:
+        reason = "promotion requires two independently receipted replications"
+    elif (
+        len({b.independent_verifier_id for b in bundles}) < 2
+        or len({b.independent_verifier_identity_sha256 for b in bundles}) < 2
+        or len({b.independent_verifier_receipt_sha256 for b in bundles}) < 2
+    ):
         status = "INCONCLUSIVE"
-        reason = "promotion requires at least two independent verifier identities"
+        reason = "promotion requires two hash-distinct independent verifier identities and receipts"
     elif bundles and all(bundle.outcome == "PASS" for bundle in bundles):
         status = "PROMOTABLE"
         reason = (
