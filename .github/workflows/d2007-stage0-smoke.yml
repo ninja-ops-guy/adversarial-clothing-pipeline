@@ -27,7 +27,7 @@ jobs:
       ULTRALYTICS_SETTINGS_DIR: ${{ github.workspace }}/.model-cache/ultralytics
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Assert D2-0007 remains preregistered and unarmed
         run: |
