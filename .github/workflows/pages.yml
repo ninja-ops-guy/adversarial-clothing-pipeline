@@ -41,7 +41,7 @@ jobs:
           sed -i 's#href="../index.html"#href="../pattern-lab.html"#g' _site/research_console/index.html
 
       - name: Upload static site
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
