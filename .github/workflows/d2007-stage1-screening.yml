@@ -29,7 +29,7 @@ jobs:
       ULTRALYTICS_SETTINGS_DIR: ${{ github.workspace }}/.model-cache/ultralytics
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Enforce Stage-1 arming overlay and immutable parent
         run: |
@@ -143,7 +143,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Python
         uses: actions/setup-python@v6

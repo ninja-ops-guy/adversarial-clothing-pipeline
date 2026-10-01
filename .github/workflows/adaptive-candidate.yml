@@ -34,7 +34,7 @@ jobs:
       TORCH_HOME: ${{ github.workspace }}/.model-cache/torch
       ULTRALYTICS_SETTINGS_DIR: ${{ github.workspace }}/.model-cache/ultralytics
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v6
         with:
